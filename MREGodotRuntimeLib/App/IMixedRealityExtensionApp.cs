@@ -173,7 +173,7 @@ namespace MixedRealityExtension.App
 		/// <param name="user">The user to check interactability for.</param>
 		/// <returns>Whether the app is interactable for the given user.</returns>
 		bool IsInteractableForUser(IUser user);
-
+/*FIXME
 		/// <summary>
 		/// Find an actor with the given id or null if none exists.
 		/// </summary>
@@ -198,5 +198,6 @@ namespace MixedRealityExtension.App
 		/// <exception cref="Exception">Thrown when the app is not in the Started state.</exception>
 		/// <exception cref="ArgumentOutOfRangeException">Thrown when the value of the guidSeed argument has already been used this session.</exception>
 		void DeclarePreallocatedActors(Node[] objects, string guidSeed);
+*/
 	}
 }

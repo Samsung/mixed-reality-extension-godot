@@ -29,11 +29,11 @@ namespace MixedRealityExtension.PluginInterfaces
 		Dictionary<string, string> Properties { get; }
 
 		/// <summary>
-		/// Gets the transform of the specified attach point.
+		/// Gets the node of the specified attach point.
 		/// </summary>
 		/// <param name="attachPointName">The name of the attach point to retrieve.</param>
-		/// <returns>The attach point transform, or null if not found.</returns>
-		Transform GetAttachPoint(string attachPointName);
+		/// <returns>The attach point node, or null if not found.</returns>
+		Node GetAttachPoint(string attachPointName);
 
 		/// <summary>
 		/// Called before the user's avatar is destroyed.

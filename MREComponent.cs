@@ -1,7 +1,13 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using Assets.TestBed_Assets.Scripts.Player;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.App;
+using MixedRealityExtension.PluginInterfaces;
+using MixedRealityExtension.API;
+using MixedRealityExtension.Core.Interfaces;
+using MixedRealityExtension.RPC;
 
 class TestLogMessage
 {
@@ -58,9 +64,9 @@ public class MREComponent : Node
 
 	public Transform SceneRoot;
 
-	public Spatial PlaceholderObject;
+	public Node PlaceholderObject;
 
-	public Spatial UserSpatial;
+	public Node UserNode;
 
 	public IMixedRealityExtensionApp MREApp { get; private set; }
 
@@ -78,27 +84,6 @@ public class MREComponent : Node
 
 	private static bool _apiInitialized = false;
 
-	[SerializeField]
-	private TMP_FontAsset DefaultFont;
-
-	[SerializeField]
-	private TMP_FontAsset SerifFont;
-
-	[SerializeField]
-	private TMP_FontAsset SansSerifFont;
-
-	[SerializeField]
-	private TMP_FontAsset MonospaceFont;
-
-	[SerializeField]
-	private TMP_FontAsset CursiveFont;
-
-	[SerializeField]
-	private UnityEngine.Material DefaultPrimMaterial;
-
-	[SerializeField]
-	private DialogFactory DialogFactory;
-
 	private Dictionary<Guid, HostAppUser> hostAppUsers = new Dictionary<Guid, HostAppUser>();
 
 	// Declare member variables here. Examples:
@@ -108,85 +93,85 @@ public class MREComponent : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		if (!_apiInitialized)
-		{
-			var assetCacheGo = new GameObject("MRE Asset Cache");
-			var assetCache = assetCacheGo.AddComponent<AssetCache>();
-			assetCache.CacheRootGO = new GameObject("Assets");
-			assetCache.CacheRootGO.transform.SetParent(assetCacheGo.transform, false);
-			assetCache.CacheRootGO.SetActive(false);
-
-			MREAPI.InitializeAPI(
-				defaultMaterial: DefaultPrimMaterial,
-				layerApplicator: new SimpleLayerApplicator(0, 9, 10, 5),
-				assetCache: assetCache,
-				textFactory: new TmpTextFactory()
-				{
-					DefaultFont = DefaultFont,
-					SerifFont = SerifFont,
-					SansSerifFont = SansSerifFont,
-					MonospaceFont = MonospaceFont,
-					CursiveFont = CursiveFont
-				},
-				permissionManager: new SimplePermissionManager(GrantedPermissions),
-				behaviorFactory: new BehaviorFactory(),
-				dialogFactory: DialogFactory,
-				libraryFactory: new ResourceFactory(),
-				gltfImporterFactory: new VertexShadedGltfImporterFactory(),
-				materialPatcher: new VertexMaterialPatcher(),
-				logger: new MRELogger()
-			);
-			_apiInitialized = true;
-		}
 
 		MREApp = MREAPI.AppsAPI.CreateMixedRealityExtensionApp(this, EphemeralAppID, AppID);
 
-		if (SceneRoot == null)
+	}
+	
+	public override void _Process(float delta) // FIXME LateUpdate
+	{
+		/*
+		if (Input.GetButtonUp("Jump"))
 		{
-			SceneRoot = transform;
+			MREApp?.RPC.SendRPC("button-up", "space", false);
 		}
+		*/
+		MREApp?.Update();
+	}
 
-		MREApp.SceneRoot = SceneRoot.gameObject;
+	private void MREApp_OnAppShutdown()
+	{
+		GD.Print("AppShutdown");
+		OnAppShutdown?.Invoke(this);
+	}
 
-		if (AutoStart)
+	private void MREApp_OnAppStarted()
+	{
+		GD.Print("AppStarted");
+		OnAppStarted?.Invoke(this);
+
+		if (AutoJoin)
 		{
-			EnableApp();
+			UserJoin();
 		}
+	}
 
-		MREApp.RPC.OnReceive("log", new RPCHandler<TestLogMessage>(
-			(logMessage) => Debug.Log($"Log RPC of type {logMessage.GetType()} called with args [ {logMessage.Message}, {logMessage.TestBoolean} ]")
-		));
+	private void MREApp_OnDisconnected()
+	{
+		GD.Print("Disconnected");
+		OnDisconnected?.Invoke(this);
+	}
 
-		// Functional test commands
-		MREApp.RPC.OnReceive("functional-test:test-started", new RPCHandler<string>((testName) =>
+	private void MREApp_OnConnected()
+	{
+		GD.Print("Connected");
+		OnConnected?.Invoke(this);
+	}
+
+	private void MREApp_OnConnecting()
+	{
+		GD.Print("Connecting");
+		OnConnecting?.Invoke(this);
+	}
+
+	private void MREApp_OnConnectFailed(MixedRealityExtension.IPC.ConnectFailedReason reason)
+	{
+		GD.Print($"ConnectFailed. reason: {reason}");
+		if (reason == MixedRealityExtension.IPC.ConnectFailedReason.UnsupportedProtocol)
 		{
-			Debug.Log($"Test started: {testName}.");
-		}));
+			DisableApp();
+		}
+	}
 
-		MREApp.RPC.OnReceive("functional-test:test-complete", new RPCHandler<string, bool>((testName, success) =>
-		{
-			Debug.Log($"Test complete: {testName}. Success: {success}.");
-		}));
+	private void MRE_OnUserJoined(IUser user, bool isLocalUser)
+	{
+		GD.Print($"User joined with host id: {user.HostAppUser.HostUserId} and mre user id: {user.Id}");
+		hostAppUsers[user.Id] = (HostAppUser)user.HostAppUser;
+	}
 
-		MREApp.RPC.OnReceive("functional-test:close-connection", new RPCHandler(() =>
-		{
-			MREApp.Shutdown();
-		}));
-
-		MREApp.RPC.OnReceive("functional-test:trace-message", new RPCHandler<string, string>((testName, message) =>
-		{
-			Debug.Log($"{testName}: {message}");
-		}));
+	private void MRE_OnUserLeft(IUser user, bool isLocalUser)
+	{
+		hostAppUsers.Remove(user.Id);
 	}
 
 	public void EnableApp()
 	{
 		if (PlaceholderObject != null)
 		{
-			PlaceholderObject.gameObject.SetActive(false);
+			PlaceholderObject.PauseMode = PauseModeEnum.Stop;
 		}
 
-		Debug.Log("Connecting to MRE App.");
+		GD.Print("Connecting to MRE App.");
 
 		var args = System.Environment.GetCommandLineArgs();
 		Uri overrideUri = null;
@@ -211,7 +196,7 @@ public class MREComponent : Node
 		}
 		catch (Exception e)
 		{
-			Debug.Log($"Failed to connect to MRE App.  Exception thrown: {e.Message}\nStack trace: {e.StackTrace}");
+			GD.Print($"Failed to connect to MRE App.  Exception thrown: {e.Message}\nStack trace: {e.StackTrace}");
 		}
 	}
 
@@ -229,13 +214,27 @@ public class MREComponent : Node
 
 		if (PlaceholderObject != null)
 		{
-			PlaceholderObject.gameObject.SetActive(true);
+			PlaceholderObject.PauseMode = PauseModeEnum.Process;
 		}
 	}
+	
+	public void UserJoin()
+	{
+		var hostAppUser = new HostAppUser(LocalPlayer.PlayerId, $"TestBed User: {LocalPlayer.PlayerId}")
+		{
+			UserNode = UserNode
+		};
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+		foreach (var kv in UserProperties)
+		{
+			hostAppUser.Properties[kv.Name] = kv.Value;
+		}
+
+		MREApp?.UserJoin(UserNode, hostAppUser, true);
+	}
+
+	public void UserLeave()
+	{
+		MREApp?.UserLeave(UserNode);
+	}
 }

@@ -430,7 +430,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public Action Command;
 	}
-
+*/
 	/// <summary>
 	/// The payload containing the user patch produced during user update from engine to app.
 	/// </summary>
@@ -442,6 +442,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		public UserPatch User;
 	}
 
+/*
 	/// <summary>
 	/// App => Engine
 	/// Prompts the client to display a dialog box to the user.

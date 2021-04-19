@@ -1,6 +1,7 @@
 <Project Sdk="Godot.NET.Sdk/3.2.3">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>mixedrealityextensiongodot</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GLTFSerialization">

@@ -329,7 +329,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public Guid OtherActorId;
 	}
-
+*/
 
 	/// <summary>
 	/// App => Engine, Engine => App
@@ -349,5 +349,5 @@ namespace MixedRealityExtension.Messaging.Payloads
 	public class HeartbeatReply : Payload
 	{
 	}
-*/
+
 }

@@ -8,7 +8,7 @@ public enum LaunchType
 	OnStart
 }
 
-public class LaunchMRE : Node
+public class LaunchMRE : Spatial
 {
 	public LaunchType LaunchType;
 
@@ -21,7 +21,8 @@ public class LaunchMRE : Node
 	// Use this for initialization
 	public override void _Ready()
 	{
-		
+		LaunchType = LaunchType.OnStart;
+		MREComponent = new MREComponent();
 	}
 
 	// Update is called once per frame

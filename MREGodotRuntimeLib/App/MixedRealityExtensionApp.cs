@@ -3,9 +3,9 @@
 
 using MixedRealityExtension.Animation;
 using MixedRealityExtension.API;
-using MixedRealityExtension.Assets;
+//using MixedRealityExtension.Assets;
 using MixedRealityExtension.Core;
-using MixedRealityExtension.Core.Components;
+//using MixedRealityExtension.Core.Components;
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.IPC;
 using MixedRealityExtension.IPC.Connections;
@@ -162,15 +162,7 @@ namespace MixedRealityExtension.App
 
 		internal IConnectionInternal Conn => _conn;
 
-		internal SoundManager SoundManager { get; private set; }
-
-		internal AssetLoader AssetLoader => _assetLoader;
-
 		internal Permissions GrantedPermissions = Permissions.None;
-
-		internal PhysicsBridge PhysicsBridge { get; } = null;
-
-		internal bool UsePhysicsBridge => PhysicsBridge != null;
 
 		#endregion
 
@@ -182,37 +174,18 @@ namespace MixedRealityExtension.App
 		/// <param name="ephemeralAppId">A string uniquely identifying the MRE instance in the shared space across
 		/// all clients. Used for generating user IDs when user tracking is disabled.</param>
 		/// <param name="ownerScript">The owner mono behaviour script for the app.</param>
-		internal MixedRealityExtensionApp(string globalAppId, string ephemeralAppId, MonoBehaviour ownerScript, IMRELogger logger = null)
+		internal MixedRealityExtensionApp(string globalAppId, string ephemeralAppId, Node ownerScript, IMRELogger logger = null)
 		{
 			GlobalAppId = globalAppId;
 			EphemeralAppId = ephemeralAppId;
 			_ownerScript = ownerScript;
 			EventManager = new MWEventManager(this);
-			_assetLoader = new AssetLoader(ownerScript, this);
 			_userManager = new UserManager(this);
-			_actorManager = new ActorManager(this);
-
-			if (Constants.UsePhysicsBridge)
-			{
-				PhysicsBridge = new PhysicsBridge();
-			}
-
-			SoundManager = new SoundManager(this);
-			AnimationManager = new AnimationManager(this);
-			_commandManager = new CommandManager(new Dictionary<Type, ICommandHandlerContext>()
-			{
-				{ typeof(MixedRealityExtensionApp), this },
-				{ typeof(Actor), null },
-				{ typeof(AssetLoader), _assetLoader },
-				{ typeof(ActorManager), _actorManager },
-				{ typeof(AnimationManager), AnimationManager }
-			});
-
+/*
 			var cacheRoot = new Node() { Name = "MRE Cache" };
 			cacheRoot.transform.SetParent(_ownerScript.gameObject.transform);
 			cacheRoot.SetActive(false);
-			_assetManager = new AssetManager(this, cacheRoot);
-
+*/
 			RPC = new RPCInterface(this);
 			RPCChannels = new RPCChannelInterface();
 			// RPC messages without a ChannelName will route to the "global" RPC handlers.
@@ -248,7 +221,8 @@ namespace MixedRealityExtension.App
 			}
 			catch (Exception e)
 			{
-				GD.PushError("$Error downloading MRE manifest \"{manifestUri}\":\n{e.ToString()}");
+				var errMessage = String.Format("Error downloading MRE manifest \"{0}\":\n{1}", manifestUri, e.ToString());
+				GD.PushError(errMessage);
 				manifest = new AppManifest()
 				{
 					Permissions = new Permissions[] { Permissions.UserTracking, Permissions.UserInteraction }
@@ -356,7 +330,6 @@ namespace MixedRealityExtension.App
 		private void Shutdown(bool reactivateOnPermissions)
 		{
 			Disconnect();
-			FreeResources();
 
 			if (!reactivateOnPermissions)
 			{
@@ -374,91 +347,10 @@ namespace MixedRealityExtension.App
 				OnAppShutdown?.Invoke();
 			}
 		}
-
-		private void FreeResources()
-		{
-			foreach (Node go in _ownedNodes)
-			{
-				UnityEngine.Object.Destroy(go);
-			}
-
-			_ownedNodes.Clear();
-			_actorManager.Reset();
-			AnimationManager.Reset();
-			PhysicsBridge.Reset();
-
-			foreach (Guid id in _assetLoader.ActiveContainers)
-			{
-				AssetManager.Unload(id);
-			}
-			_assetLoader.ActiveContainers.Clear();
-		}
-
+		
 		/// <inheritdoc />
 		public void FixedUpdate()
 		{
-			if (_appState == AppState.Stopped)
-			{
-				return;
-			}
-
-			if (UsePhysicsBridge)
-			{
-				if (_shouldSendPhysicsUpdate)
-				{
-					// Sending snapshot which represents the state before physics step is done,
-					// hence we are using time stamp from the start of the fixed update.
-					SendPhysicsUpdate(Time.fixedTime);
-				}
-
-				PhysicsBridge.FixedUpdate(SceneRoot.transform);
-
-				// add delta for next step
-				_timeSinceLastPhysicsUpdate += Time.fixedDeltaTime;
-
-				float updateDeltaTime = Math.Max(Time.fixedDeltaTime,
-					Time.fixedDeltaTime * (float)Math.Floor(_physicsUpdateTimestep / Time.fixedDeltaTime));
-
-				if (updateDeltaTime - _timeSinceLastPhysicsUpdate < 0.001f)
-				{
-					_shouldSendPhysicsUpdate = true;
-				}
-			}
-		}
-
-		private void SendPhysicsUpdate(float timestamp)
-		{
-			if (LocalUser == null)
-			{
-				return;
-			}
-
-			PhysicsBridgePatch physicsPatch = new PhysicsBridgePatch(LocalUser.Id,
-					PhysicsBridge.GenerateSnapshot(timestamp, SceneRoot.transform));
-			// send only updates if there are any, to save band with
-			// in order to produce any updates for settled bodies this should be handled within the physics bridge
-			if (physicsPatch.DoSendThisPatch())
-			{
-				EventManager.QueueEvent(new PhysicsBridgeUpdated(InstanceId, physicsPatch));
-			}
-			
-			//low frequency server upload transform stream
-			{
-				float systemTime = UnityEngine.Time.time;
-				if (PhysicsBridge.shouldSendLowFrequencyTransformUpload(systemTime))
-				{
-					PhysicsTranformServerUploadPatch serverUploadPatch =
-						PhysicsBridge.GenerateServerTransformUploadPatch(InstanceId, systemTime);
-					// upload only if there is a real difference in the transforms
-					if (serverUploadPatch.IsPatched())
-					{
-						EventManager.QueueEvent(new PhysicsTranformServerUploadUpdated(InstanceId, serverUploadPatch));
-					}
-				}
-			}
-
-			_shouldSendPhysicsUpdate = false;
-			_timeSinceLastPhysicsUpdate = 0.0f;
 
 		}
 
@@ -474,26 +366,12 @@ namespace MixedRealityExtension.App
 				// Read and process or queue incoming messages.
 				_conn.Update();
 			}
-			// Process actor queues after connection update.
-			_actorManager.Update();
 
-			if (UsePhysicsBridge)
-			{
-				if (_shouldSendPhysicsUpdate)
-				{
-					// Sending snapshot which represents the state after physics step is done,
-					// hence we need to add time step to the time stamp from the start of the fixed update.
-					SendPhysicsUpdate(Time.fixedTime + Time.fixedDeltaTime);
-				}
-			}
-
-			SoundManager.Update();
 			_commandManager.Update();
-			AnimationManager.Update();
 		}
 
 		/// <inheritdoc />
-		public void UserJoin(Node userGO, IHostAppUser hostAppUser, bool isLocalUser)
+		public void UserJoin(Node userNode, IHostAppUser hostAppUser, bool isLocalUser)
 		{
 			void PerformUserJoin()
 			{
@@ -505,12 +383,24 @@ namespace MixedRealityExtension.App
 					return;
 				}
 
-				var user = userGO.GetComponents<User>()
-					.FirstOrDefault(_user => _user.AppInstanceId == this.InstanceId);
+				User user = null;
+				int userChildCount = userNode.GetChildCount();
+
+				for (int i = 0; i < userChildCount; i++)
+				{
+					var child = userNode.GetChild<User>(i);
+					if (child != null && child.AppInstanceId == this.InstanceId)
+					{
+						user = child;
+						break;
+					}
+
+				}
 
 				if (user == null)
 				{
-					user = userGO.AddComponent<User>();
+					user = new User();
+					userNode.AddChild(user);
 
 					// Generate the obfuscated user ID based on user tracking permission.
 					Guid instancedUserId = GenerateObfuscatedUserId(hostAppUser, EphemeralAppId);
@@ -533,7 +423,7 @@ namespace MixedRealityExtension.App
 
 					LocalUser = user;
 
-					PhysicsBridge.LocalUserId = LocalUser.Id;
+					//PhysicsBridge.LocalUserId = LocalUser.Id;
 
 					// Enable interactions for the user if given the UserInteraction permission.
 					if (GrantedPermissions.HasFlag(Permissions.UserInteraction))
@@ -548,7 +438,7 @@ namespace MixedRealityExtension.App
 				}
 				catch (Exception e)
 				{
-					Debug.LogException(e);
+					GD.PushError(e.ToString());
 				}
 			}
 
@@ -563,10 +453,21 @@ namespace MixedRealityExtension.App
 		}
 
 		/// <inheritdoc />
-		public void UserLeave(Node userGO)
+		public void UserLeave(Node userNode)
 		{
-			var user = userGO.GetComponents<User>()
-				.FirstOrDefault(_user => _user.AppInstanceId == this.InstanceId);
+			User user = null;
+			int userChildCount = userNode.GetChildCount();
+
+			for (int i = 0; i < userChildCount; i++)
+			{
+				var child = userNode.GetChild<User>(i);
+				if (child != null && child.AppInstanceId == this.InstanceId)
+				{
+					user = child;
+					break;
+				}
+
+			}
 
 			if (user != null)
 			{
@@ -582,7 +483,7 @@ namespace MixedRealityExtension.App
 				if (isLocalUser)
 				{
 					LocalUser = null;
-					PhysicsBridge.LocalUserId = null;
+					//PhysicsBridge.LocalUserId = null;
 
 					if (Protocol is Execution)
 					{
@@ -596,36 +497,13 @@ namespace MixedRealityExtension.App
 				}
 				catch (Exception e)
 				{
-					Debug.LogException(e);
+					GD.PushError(e.ToString());
 				}
 			}
 		}
 
 		/// <inheritdoc />
 		public bool IsInteractableForUser(IUser user) => _interactingUserIds.Contains(user.Id);
-
-		/// <inheritdoc />
-		public IActor FindActor(Guid id)
-		{
-			return _actorManager.FindActor(id);
-		}
-
-		public IEnumerable<Actor> FindChildren(Guid id)
-		{
-			return _actorManager.FindChildren(id);
-		}
-
-		/// <inheritdoc />
-		public void OnActorDestroyed(Guid actorId)
-		{
-			if (_actorManager.OnActorDestroy(actorId))
-			{
-				Protocol.Send(new DestroyActors()
-				{
-					ActorIds = new Guid[] { actorId }
-				});
-			}
-		}
 
 		public IUser FindUser(Guid id)
 		{
@@ -634,58 +512,7 @@ namespace MixedRealityExtension.App
 
 		public void UpdateServerTimeOffset(long currentServerTime)
 		{
-			AnimationManager.UpdateServerTimeOffset(currentServerTime);
-		}
-
-		private HashSet<string> usedPreallocSeeds = new HashSet<string>();
-		/// <inheritdoc />
-		public void DeclarePreallocatedActors(Node[] objects, string guidSeed)
-		{
-			if (!(Protocol is Execution))
-			{
-				throw new Exception($"Preallocated actors can only be declared after the app is Started");
-			}
-
-			// guarantee a given seed is only used once per session
-			if (usedPreallocSeeds.Contains(guidSeed))
-			{
-				throw new ArgumentOutOfRangeException(nameof(guidSeed),
-					$"Preallocated actor seed [{guidSeed}] has already been used this session, choose a different one!");
-			}
-			usedPreallocSeeds.Add(guidSeed);
-
-			var goIds = new HashSet<int>(objects.Select(go => go.GetInstanceID()));
-			var rootGos = GetDistinctTreeRoots(objects);
-
-			// add actor components to all gos beneath a tagged go
-			var taggedActors = new List<Actor>(objects.Length);
-			foreach (var root in rootGos)
-			{
-				addActors(root);
-			}
-
-			ProcessCreatedActors(null, taggedActors, null, guidSeed);
-
-			void addActors(Node go)
-			{
-				var oldActor = go.GetComponent<Actor>();
-				if (oldActor != null)
-				{
-					MREAPI.Logger.LogError($"Node {go.name} is already in use by another MRE session, skipping.");
-					return;
-				}
-
-				var actor = go.AddComponent<Actor>();
-				if (goIds.Contains(go.GetInstanceID()))
-				{
-					taggedActors.Add(actor);
-				}
-
-				foreach (Transform child in go.transform)
-				{
-					addActors(child.gameObject);
-				}
-			}
+			//AnimationManager.UpdateServerTimeOffset(currentServerTime);
 		}
 
 		#region Methods - Internal
@@ -720,19 +547,6 @@ namespace MixedRealityExtension.App
 		internal void ExecuteCommandPayload(ICommandHandlerContext handlerContext, ICommandPayload commandPayload, Action onCompleteCallback)
 		{
 			_commandManager.ExecuteCommandPayload(handlerContext, commandPayload, onCompleteCallback);
-		}
-
-		/// <summary>
-		/// Used to set actor parents when the parent is pending
-		/// </summary>
-		internal void ProcessActorCommand(Guid actorId, NetworkCommandPayload payload, Action onCompleteCallback)
-		{
-			_actorManager.ProcessActorCommand(actorId, payload, onCompleteCallback);
-		}
-
-		internal bool OwnsActor(IActor actor)
-		{
-			return FindActor(actor.Id) != null;
 		}
 
 		internal void EnableUserInteraction(IUser user)
@@ -795,8 +609,6 @@ namespace MixedRealityExtension.App
 				Protocol = new Idle(this);
 			}
 
-			FreeResources();
-
 			this.OnDisconnected?.Invoke();
 		}
 
@@ -841,29 +653,6 @@ namespace MixedRealityExtension.App
 			}
 		}
 
-		private Node[] GetDistinctTreeRoots(Node[] gos)
-		{
-			// identify game objects whose ancestors are not also flagged to be actors
-			var goIds = new HashSet<int>(gos.Select(go => go.GetInstanceID()));
-			var rootGos = new List<Node>(gos.Length);
-			foreach (var go in gos)
-			{
-				if (!ancestorInList(go))
-				{
-					rootGos.Add(go);
-				}
-			}
-
-			return rootGos.ToArray();
-
-			bool ancestorInList(Node go)
-			{
-				return go != null && go.transform.parent != null && (
-					goIds.Contains(go.transform.parent.gameObject.GetInstanceID()) ||
-					ancestorInList(go.transform.parent.gameObject));
-			}
-		}
-
 		private Guid GenerateObfuscatedUserId(IHostAppUser hostAppUser, string salt)
 		{
 			using (SHA256 hasher = SHA256.Create())
@@ -888,327 +677,6 @@ namespace MixedRealityExtension.App
 		{
 			RPCChannels.ReceiveRPC(payload);
 			onCompleteCallback?.Invoke();
-		}
-
-		[CommandHandler(typeof(UserUpdate))]
-		private void OnUserUpdate(UserUpdate payload, Action onCompleteCallback)
-		{
-			try
-			{
-				((User)LocalUser).SynchronizeEngine(payload.User);
-				_actorManager.UpdateAllVisibility();
-				onCompleteCallback?.Invoke();
-			}
-			catch (Exception e)
-			{
-				Debug.LogException(e);
-			}
-		}
-
-		[CommandHandler(typeof(CreateFromLibrary))]
-		private async void OnCreateFromLibrary(CreateFromLibrary payload, Action onCompleteCallback)
-		{
-			try
-			{
-				var actors = await _assetLoader.CreateFromLibrary(payload.ResourceId, payload.Actor?.ParentId);
-				ProcessCreatedActors(payload, actors, onCompleteCallback);
-			}
-			catch (Exception e)
-			{
-				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
-				Debug.LogException(e);
-			}
-		}
-
-		[CommandHandler(typeof(CreateEmpty))]
-		private void OnCreateEmpty(CreateEmpty payload, Action onCompleteCallback)
-		{
-			try
-			{
-				var actors = _assetLoader.CreateEmpty(payload.Actor?.ParentId);
-				ProcessCreatedActors(payload, actors, onCompleteCallback);
-			}
-			catch (Exception e)
-			{
-				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
-				Debug.LogException(e);
-			}
-		}
-
-		[CommandHandler(typeof(CreateFromPrefab))]
-		private void OnCreateFromPrefab(CreateFromPrefab payload, Action onCompleteCallback)
-		{
-			try
-			{
-				var curGeneration = generation;
-				AssetManager.OnSet(payload.PrefabId, prefab =>
-				{
-					if (this == null || _conn == null || !_conn.IsActive || generation != curGeneration) return;
-					if (prefab.Asset != null)
-					{
-						var createdActors = _assetLoader.CreateFromPrefab(payload.PrefabId, payload.Actor?.ParentId, payload.CollisionLayer);
-						ProcessCreatedActors(payload, createdActors, onCompleteCallback);
-					}
-					else
-					{
-						var message = $"Prefab {payload.PrefabId} failed to load, canceling actor creation";
-						SendCreateActorResponse(payload, failureMessage: message, onCompleteCallback: onCompleteCallback);
-					}
-				});
-			}
-			catch (Exception e)
-			{
-				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
-				Debug.LogException(e);
-			}
-		}
-
-		private void ProcessCreatedActors(CreateActor originalMessage, IList<Actor> createdActors, Action onCompleteCallback, string guidSeed = null)
-		{
-			Guid guidGenSeed;
-			if (originalMessage != null)
-			{
-				guidGenSeed = originalMessage.Actor.Id;
-			}
-			else
-			{
-				guidGenSeed = UtilMethods.StringToGuid(guidSeed);
-			}
-			var guids = new DeterministicGuids(guidGenSeed);
-
-			// find the actors with no actor parents
-			var rootActors = GetDistinctTreeRoots(
-				createdActors.Select(a => a.gameObject).ToArray()
-			).Select(go => go.GetComponent<Actor>()).ToArray();
-
-			var rootActor = createdActors.FirstOrDefault();
-			var createdAnims = new List<Animation.BaseAnimation>(5);
-
-			if (rootActors.Length == 1 && rootActor.transform.parent == null)
-			{
-				// Delete entire hierarchy as we no longer have a valid parent actor for the root of this hierarchy.  It was likely
-				// destroyed in the process of the async operation before this callback was called.
-				foreach (var actor in createdActors)
-				{
-					actor.Destroy();
-				}
-
-				createdActors.Clear();
-
-				SendCreateActorResponse(
-					originalMessage,
-					failureMessage: "Parent for the actor being created no longer exists.  Cannot create new actor.");
-				return;
-			}
-
-			var secondPassXfrms = new List<Transform>(2);
-			foreach (var root in rootActors)
-			{
-				ProcessActors(root.transform, root.transform.parent != null ? root.transform.parent.GetComponent<Actor>() : null);
-			}
-			// some things require the whole hierarchy to have actors on it. run those here
-			foreach (var pass2 in secondPassXfrms)
-			{
-				ProcessActors2(pass2);
-			}
-
-			if (originalMessage != null && rootActors.Length == 1)
-			{
-				rootActor?.ApplyPatch(originalMessage.Actor);
-			}
-			Actor.ApplyVisibilityUpdate(rootActor);
-
-			_actorManager.UponStable(
-				() => SendCreateActorResponse(originalMessage, actors: createdActors, anims: createdAnims, onCompleteCallback: onCompleteCallback));
-
-			void ProcessActors(Transform xfrm, Actor parent)
-			{
-				// Generate actors for all GameObjects, even if the loader didn't. Only loader-generated
-				// actors are returned to the app though. We do this so library objects get enabled/disabled
-				// correctly, even if they're not tracked by the app.
-				var actor = xfrm.gameObject.GetComponent<Actor>() ?? xfrm.gameObject.AddComponent<Actor>();
-
-				_actorManager.AddActor(guids.Next(), actor);
-				_ownedNodes.Add(actor.gameObject);
-
-				actor.ParentId = parent?.Id ?? actor.ParentId;
-				if (actor.Renderer != null)
-				{
-					// only overwrite material if there's something in the cache, i.e. not a random library material
-					var matId = AssetManager.GetByObject(actor.Renderer.sharedMaterial)?.Id;
-					if (matId.HasValue)
-					{
-						actor.MaterialId = matId.Value;
-					}
-
-					actor.MeshId = AssetManager.GetByObject(actor.UnityMesh)?.Id ?? Guid.Empty;
-				}
-
-				// native animation construction requires the whole actor hierarchy to already exist. defer to second pass
-				var nativeAnim = xfrm.gameObject.GetComponent<UnityEngine.Animation>();
-				if (nativeAnim != null && createdActors.Contains(actor))
-				{
-					secondPassXfrms.Add(xfrm);
-				}
-
-				foreach (Transform child in xfrm)
-				{
-					ProcessActors(child, actor);
-				}
-			}
-
-			void ProcessActors2(Transform xfrm)
-			{
-				var actor = xfrm.gameObject.GetComponent<Actor>();
-				var nativeAnim = xfrm.gameObject.GetComponent<UnityEngine.Animation>();
-				if (nativeAnim != null && createdActors.Contains(actor))
-				{
-					var animTargets = xfrm.gameObject.GetComponent<PrefabAnimationTargets>();
-					int stateIndex = 0;
-					foreach (AnimationState state in nativeAnim)
-					{
-						var anim = new NativeAnimation(AnimationManager, guids.Next(), nativeAnim, state);
-						anim.TargetIds = animTargets != null
-							? animTargets.GetTargets(xfrm, stateIndex++, addRootToTargets: true).Select(a => a.Id).ToList()
-							: new List<Guid>() { actor.Id };
-
-						AnimationManager.RegisterAnimation(anim);
-						createdAnims.Add(anim);
-					}
-				}
-			}
-		}
-
-		private void SendCreateActorResponse(
-			CreateActor originalMessage,
-			IList<Actor> actors = null,
-			IList<Animation.BaseAnimation> anims = null,
-			string failureMessage = null,
-			Action onCompleteCallback = null)
-		{
-			Trace trace = new Trace()
-			{
-				Severity = (actors != null) ? TraceSeverity.Info : TraceSeverity.Error,
-				Message = (actors != null) ?
-					$"Successfully created {actors?.Count ?? 0} objects." :
-					failureMessage
-			};
-			Protocol.Send(
-				new ObjectSpawned()
-				{
-					Result = new OperationResult()
-					{
-						ResultCode = (actors != null) ? OperationResultCode.Success : OperationResultCode.Error,
-						Message = trace.Message
-					},
-					Traces = new List<Trace>() { trace },
-					Actors = actors?.Select((actor) => actor.GeneratePatch()).ToArray() ?? new ActorPatch[] { },
-					Animations = anims?.Select(anim => anim.GeneratePatch()).ToArray() ?? new AnimationPatch[] { }
-				},
-				originalMessage?.MessageId
-			);
-
-			onCompleteCallback?.Invoke();
-		}
-
-		[CommandHandler(typeof(SyncAnimations))]
-		private void OnSyncAnimations(SyncAnimations payload, Action onCompleteCallback)
-		{
-			if (payload.AnimationStates == null)
-			{
-				_actorManager.UponStable(() =>
-				{
-					// Gather and send the animation states of all actors.
-					var animationStates = new List<MWActorAnimationState>();
-					foreach (var actor in _actorManager.Actors)
-					{
-						if (actor != null)
-						{
-							var actorAnimationStates = actor.GetOrCreateActorComponent<AnimationComponent>().GetAnimationStates();
-							if (actorAnimationStates != null)
-							{
-								animationStates.AddRange(actorAnimationStates);
-							}
-						}
-					}
-					Protocol.Send(new SyncAnimations()
-					{
-						AnimationStates = animationStates.ToArray()
-					}, payload.MessageId);
-					onCompleteCallback?.Invoke();
-				});
-			}
-			else
-			{
-				// Apply animation states to the actors.
-				foreach (var animationState in payload.AnimationStates)
-				{
-					SetAnimationState setAnimationState = new SetAnimationState();
-					setAnimationState.ActorId = animationState.ActorId;
-					setAnimationState.AnimationName = animationState.AnimationName;
-					setAnimationState.State = animationState.State;
-					_actorManager.ProcessActorCommand(animationState.ActorId, setAnimationState, null);
-				}
-				onCompleteCallback?.Invoke();
-			}
-		}
-
-		[CommandHandler(typeof(SetAuthoritative))]
-		private void OnSetAuthoritative(SetAuthoritative payload, Action onCompleteCallback)
-		{
-			IsAuthoritativePeer = payload.Authoritative;
-			onCompleteCallback?.Invoke();
-		}
-
-		[CommandHandler(typeof(ShowDialog))]
-		private void OnShowDialog(ShowDialog payload, Action onCompleteCallback)
-		{
-			if (MREAPI.AppsAPI.DialogFactory == null)
-			{
-				Protocol.Send(
-					new DialogResponse() { FailureMessage = "This client has not implemented dialogs" },
-					payload.MessageId
-				);
-				onCompleteCallback?.Invoke();
-			}
-			else if (!GrantedPermissions.HasFlag(Permissions.UserInteraction))
-			{
-				Protocol.Send(
-					new DialogResponse() { FailureMessage = "The user has refused the MRE permission to open dialogs" },
-					payload.MessageId
-				);
-				onCompleteCallback?.Invoke();
-			}
-			else
-			{
-				MREAPI.AppsAPI.DialogFactory.ShowDialog(this, payload.Text, payload.AcceptInput, (submitted, text) =>
-				{
-					Protocol.Send(
-						new DialogResponse() { Submitted = submitted, Text = text },
-						payload.MessageId
-					);
-					onCompleteCallback?.Invoke();
-				});
-			}
-		}
-
-		[CommandHandler(typeof(PhysicsBridgeUpdate))]
-		private void OnTransformsUpdate(PhysicsBridgeUpdate payload, Action onCompleteCallback)
-		{
-			if (UsePhysicsBridge)
-			{
-				PhysicsBridge.addSnapshot(payload.PhysicsBridgePatch.Id, payload.PhysicsBridgePatch.ToSnapshot());
-				onCompleteCallback?.Invoke();
-			}
-		}
-
-		[CommandHandler(typeof(PhysicsTranformServerUpload))]
-		private void OnTransformsServerUpload(PhysicsTranformServerUpload payload, Action onCompleteCallback)
-		{
-			if (UsePhysicsBridge)
-			{
-				onCompleteCallback?.Invoke();
-			}
 		}
 
 		#endregion
