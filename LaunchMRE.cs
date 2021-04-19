@@ -8,7 +8,7 @@ public enum LaunchType
 	OnStart
 }
 
-public class LaunchMRE : Spatial
+public class LaunchMRE : Node
 {
 	public LaunchType LaunchType;
 
