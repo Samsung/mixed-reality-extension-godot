@@ -36,7 +36,7 @@ namespace MixedRealityExtension.App
 	internal sealed class MixedRealityExtensionApp : IMixedRealityExtensionApp, ICommandHandlerContext
 	{
 		private readonly UserManager _userManager;
-		private readonly CommandManager _commandManager;
+		//private readonly CommandManager _commandManager;
 
 		private readonly Node _ownerScript;
 
@@ -367,7 +367,7 @@ namespace MixedRealityExtension.App
 				_conn.Update();
 			}
 
-			_commandManager.Update();
+			//_commandManager.Update();
 		}
 
 		/// <inheritdoc />
@@ -522,7 +522,7 @@ namespace MixedRealityExtension.App
 			if (message.Payload is NetworkCommandPayload ncp)
 			{
 				ncp.MessageId = message.Id;
-				_commandManager.ExecuteCommandPayload(ncp, null);
+				//_commandManager.ExecuteCommandPayload(ncp, null);
 			}
 			else
 			{
@@ -546,7 +546,7 @@ namespace MixedRealityExtension.App
 
 		internal void ExecuteCommandPayload(ICommandHandlerContext handlerContext, ICommandPayload commandPayload, Action onCompleteCallback)
 		{
-			_commandManager.ExecuteCommandPayload(handlerContext, commandPayload, onCompleteCallback);
+			//_commandManager.ExecuteCommandPayload(handlerContext, commandPayload, onCompleteCallback);
 		}
 
 		internal void EnableUserInteraction(IUser user)

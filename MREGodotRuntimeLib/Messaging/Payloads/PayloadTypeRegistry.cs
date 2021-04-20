@@ -54,13 +54,15 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(SyncAnimations), "sync-animations")]
 	[PayloadType(typeof(SyncComplete), "sync-complete")]
 	[PayloadType(typeof(SyncRequest), "sync-request")]
-	[PayloadType(typeof(Traces), "traces")]
+	
 	[PayloadType(typeof(TriggerEventRaised), "trigger-event-raised")]
 	[PayloadType(typeof(UnloadAssets), "unload-assets")]
 	[PayloadType(typeof(UserJoined), "user-joined")]
 	[PayloadType(typeof(UserLeft), "user-left")]
 	[PayloadType(typeof(UserUpdate), "user-update")]
 	*/
+
+	[PayloadType(typeof(Traces), "traces")]
 	internal static class PayloadTypeRegistry
 	{
 		private static Dictionary<string, Type> _stringToPayloadMap;

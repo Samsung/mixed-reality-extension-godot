@@ -60,7 +60,7 @@ public class MREComponent : Node
 	public bool AutoJoin = true;
 
 	//[SerializeField]
-	private Permissions GrantedPermissions;
+	internal Permissions GrantedPermissions;
 
 	public Transform SceneRoot;
 
@@ -93,6 +93,8 @@ public class MREComponent : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		//FIXME temp
+		MREAPI.AppsAPI.PermissionManager = new MixedRealityExtension.Factories.SimplePermissionManager(GrantedPermissions);
 
 		MREApp = MREAPI.AppsAPI.CreateMixedRealityExtensionApp(this, EphemeralAppID, AppID);
 

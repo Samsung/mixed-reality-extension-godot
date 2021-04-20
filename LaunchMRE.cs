@@ -18,11 +18,28 @@ public class LaunchMRE : Spatial
 
 	private bool _running = false;
 
+	public LaunchMRE()
+	{
+		var Child = new MREComponent();
+		ulong objId = Child.GetInstanceId();
+		Child.Name = "MREComponent";
+		Child.SetScript(ResourceLoader.Load("MREComponent.cs"));
+		MREComponent = GD.InstanceFromId(objId) as MREComponent;
+		MREComponent.MREURL = "ws://localhost:3901";
+		MREComponent.SessionID = "testbed";
+		MREComponent.AppID = "helloworld";
+		MREComponent.EphemeralAppID = "helloworld-temp";
+		MREComponent.AutoStart = false;
+		MREComponent.AutoJoin = true;
+		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
+		AddChild(MREComponent);
+
+		LaunchType = LaunchType.OnStart;
+	}
 	// Use this for initialization
 	public override void _Ready()
 	{
-		LaunchType = LaunchType.OnStart;
-		MREComponent = new MREComponent();
+
 	}
 
 	// Update is called once per frame
