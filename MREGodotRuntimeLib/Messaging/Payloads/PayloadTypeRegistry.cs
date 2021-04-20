@@ -11,7 +11,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(ActorCorrection), "actor-correction")]
 	[PayloadType(typeof(ActorUpdate), "actor-update")]
 	[PayloadType(typeof(AnimationUpdate), "animation-update")]
-	[PayloadType(typeof(AppToEngineRPC), "app2engine-rpc")]
+
 	[PayloadType(typeof(AssetsLoaded), "assets-loaded")]
 	[PayloadType(typeof(AssetUpdate), "asset-update")]
 	[PayloadType(typeof(CreateAnimation), "create-animation")]
@@ -24,18 +24,11 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(DestroyActors), "destroy-actors")]
 	[PayloadType(typeof(DestroyAnimations), "destroy-animations")]
 	[PayloadType(typeof(DialogResponse), "dialog-response")]
-	[PayloadType(typeof(EngineToAppRPC), "engine2app-rpc")]
-	[PayloadType(typeof(Handshake), "handshake")]
-	[PayloadType(typeof(HandshakeReply), "handshake-reply")]
-	[PayloadType(typeof(HandshakeComplete), "handshake-complete")]
-	[PayloadType(typeof(Heartbeat), "heartbeat")]
-	[PayloadType(typeof(HeartbeatReply), "heartbeat-reply")]
+
 	[PayloadType(typeof(InterpolateActor), "interpolate-actor")]
 	[PayloadType(typeof(LoadAssets), "load-assets")]
 	[PayloadType(typeof(LocalCommand), "local-command")]
-	[PayloadType(typeof(MultiOperationResult), "multi-operation-result")]
-	[PayloadType(typeof(ObjectSpawned), "object-spawned")]
-	[PayloadType(typeof(OperationResult), "operation-result")]
+
 	[PayloadType(typeof(PhysicsBridgeUpdate), "physicsbridge-transforms-update")]
 	[PayloadType(typeof(PhysicsTranformServerUpload), "physicsbridge-server-transforms-upload")]
 	[PayloadType(typeof(RBAddForce), "rigidbody-add-force")]
@@ -52,17 +45,27 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(ShowDialog), "show-dialog")]
 	[PayloadType(typeof(StateRestore), "state-restore")]
 	[PayloadType(typeof(SyncAnimations), "sync-animations")]
-	[PayloadType(typeof(SyncComplete), "sync-complete")]
-	[PayloadType(typeof(SyncRequest), "sync-request")]
-	
 	[PayloadType(typeof(TriggerEventRaised), "trigger-event-raised")]
 	[PayloadType(typeof(UnloadAssets), "unload-assets")]
+*/
+	
+
+	[PayloadType(typeof(Traces), "traces")]
+	[PayloadType(typeof(EngineToAppRPC), "engine2app-rpc")]
+	[PayloadType(typeof(Handshake), "handshake")]
+	[PayloadType(typeof(HandshakeReply), "handshake-reply")]
+	[PayloadType(typeof(HandshakeComplete), "handshake-complete")]
+	[PayloadType(typeof(Heartbeat), "heartbeat")]
+	[PayloadType(typeof(HeartbeatReply), "heartbeat-reply")]
 	[PayloadType(typeof(UserJoined), "user-joined")]
 	[PayloadType(typeof(UserLeft), "user-left")]
 	[PayloadType(typeof(UserUpdate), "user-update")]
-	*/
-
-	[PayloadType(typeof(Traces), "traces")]
+	[PayloadType(typeof(SyncComplete), "sync-complete")]
+	[PayloadType(typeof(SyncRequest), "sync-request")]
+	[PayloadType(typeof(MultiOperationResult), "multi-operation-result")]
+	[PayloadType(typeof(ObjectSpawned), "object-spawned")]
+	[PayloadType(typeof(OperationResult), "operation-result")]
+	[PayloadType(typeof(AppToEngineRPC), "app2engine-rpc")]
 	internal static class PayloadTypeRegistry
 	{
 		private static Dictionary<string, Type> _stringToPayloadMap;

@@ -32,6 +32,8 @@ public class LaunchMRE : Spatial
 		MREComponent.AutoStart = false;
 		MREComponent.AutoJoin = true;
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
+		MREComponent.UserProperties = new MREComponent.UserProperty[0];
+		MREComponent.UserNode = new Node(); // FIXME: cursor?
 		AddChild(MREComponent);
 
 		LaunchType = LaunchType.OnStart;
@@ -53,6 +55,7 @@ public class LaunchMRE : Spatial
 
 	public override void _Input(InputEvent inputEvent)
 	{
+		/*
 		if ((inputEvent as InputEventMouseButton).IsPressed())
 		{
 			if (LaunchType == LaunchType.MouseButtonDown && MREComponent != null)
@@ -60,6 +63,7 @@ public class LaunchMRE : Spatial
 				StartApp();
 			}
 		}
+		*/
 	}
 
 	private void StartApp()
