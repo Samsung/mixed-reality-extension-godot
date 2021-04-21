@@ -371,6 +371,8 @@ namespace MixedRealityExtension.IPC.Connections
 			// {
 			// 	MREAPI.Logger.LogDebug($"Recv: {json}");
 			// }
+			if (!json.Contains("heartbeat"))
+				Godot.GD.Print($"Recv: {json}");
 
 			try
 			{

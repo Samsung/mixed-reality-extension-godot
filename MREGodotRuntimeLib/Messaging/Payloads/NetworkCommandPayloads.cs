@@ -37,7 +37,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public JArray Args { get; set; } = new JArray();
 	}
-/*FIXME
+
 	/// <summary>
 	/// App => Engine
 	/// Payload for when the app wants to create an asset.
@@ -233,7 +233,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public QuaternionPatch Rotation { get; set; }
 	}
-
+/*
 	/// <summary>
 	/// App => Engine
 	/// Payload for when the app wants to create an animation on a specific actor.
@@ -405,7 +405,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public BehaviorType BehaviorType { get; set; }
 	}
-
+*/
 	/// <summary>
 	/// App => Engine
 	/// Specific to multi-peer adapter: Sets whether this client is "authoritative". When authoritative, the client
@@ -430,7 +430,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public Action Command;
 	}
-*/
+
 	/// <summary>
 	/// The payload containing the user patch produced during user update from engine to app.
 	/// </summary>
@@ -442,7 +442,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		public UserPatch User;
 	}
 
-/*
+
 	/// <summary>
 	/// App => Engine
 	/// Prompts the client to display a dialog box to the user.
@@ -481,7 +481,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public string Text;
 	}
-
+/*
 	/// <summary>
 	/// Bidirectional
 	/// Payload to sync rigid body transforms between peers.

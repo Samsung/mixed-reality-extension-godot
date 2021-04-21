@@ -23,11 +23,11 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(CollisionEventRaised), "collision-event-raised")]
 	[PayloadType(typeof(DestroyActors), "destroy-actors")]
 	[PayloadType(typeof(DestroyAnimations), "destroy-animations")]
-	[PayloadType(typeof(DialogResponse), "dialog-response")]
+
 
 	[PayloadType(typeof(InterpolateActor), "interpolate-actor")]
 	[PayloadType(typeof(LoadAssets), "load-assets")]
-	[PayloadType(typeof(LocalCommand), "local-command")]
+
 
 	[PayloadType(typeof(PhysicsBridgeUpdate), "physicsbridge-transforms-update")]
 	[PayloadType(typeof(PhysicsTranformServerUpload), "physicsbridge-server-transforms-upload")]
@@ -39,17 +39,21 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(RBMoveRotation), "rigidbody-move-rotation")]
 	[PayloadType(typeof(RigidBodyCommands), "rigidbody-commands")]
 	[PayloadType(typeof(SetAnimationState), "set-animation-state")]
-	[PayloadType(typeof(SetAuthoritative), "set-authoritative")]
+
 	[PayloadType(typeof(SetBehavior), "set-behavior")]
 	[PayloadType(typeof(SetMediaState), "set-media-state")]
-	[PayloadType(typeof(ShowDialog), "show-dialog")]
+
 	[PayloadType(typeof(StateRestore), "state-restore")]
 	[PayloadType(typeof(SyncAnimations), "sync-animations")]
 	[PayloadType(typeof(TriggerEventRaised), "trigger-event-raised")]
 	[PayloadType(typeof(UnloadAssets), "unload-assets")]
-*/
-	
 
+	*/
+	[PayloadType(typeof(CreateEmpty), "create-empty")]
+	[PayloadType(typeof(DialogResponse), "dialog-response")]
+	[PayloadType(typeof(ShowDialog), "show-dialog")]
+	[PayloadType(typeof(LocalCommand), "local-command")]
+	[PayloadType(typeof(SetAuthoritative), "set-authoritative")]
 	[PayloadType(typeof(Traces), "traces")]
 	[PayloadType(typeof(EngineToAppRPC), "engine2app-rpc")]
 	[PayloadType(typeof(Handshake), "handshake")]

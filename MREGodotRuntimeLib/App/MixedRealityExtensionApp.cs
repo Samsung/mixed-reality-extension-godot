@@ -36,7 +36,7 @@ namespace MixedRealityExtension.App
 	internal sealed class MixedRealityExtensionApp : IMixedRealityExtensionApp, ICommandHandlerContext
 	{
 		private readonly UserManager _userManager;
-		//private readonly CommandManager _commandManager;
+		private readonly CommandManager _commandManager;
 
 		private readonly Node _ownerScript;
 
@@ -181,6 +181,15 @@ namespace MixedRealityExtension.App
 			_ownerScript = ownerScript;
 			EventManager = new MWEventManager(this);
 			_userManager = new UserManager(this);
+
+			_commandManager = new CommandManager(new Dictionary<Type, ICommandHandlerContext>()
+			{
+				{ typeof(MixedRealityExtensionApp), this },
+				//{ typeof(Actor), null },
+				//{ typeof(AssetLoader), _assetLoader },
+				//{ typeof(ActorManager), _actorManager },
+				//{ typeof(AnimationManager), AnimationManager }
+			});
 /*
 			var cacheRoot = new Node() { Name = "MRE Cache" };
 			cacheRoot.transform.SetParent(_ownerScript.gameObject.transform);
@@ -522,7 +531,7 @@ namespace MixedRealityExtension.App
 			if (message.Payload is NetworkCommandPayload ncp)
 			{
 				ncp.MessageId = message.Id;
-				//_commandManager.ExecuteCommandPayload(ncp, null);
+				_commandManager.ExecuteCommandPayload(ncp, null);
 			}
 			else
 			{
@@ -676,6 +685,13 @@ namespace MixedRealityExtension.App
 		private void OnRPCReceived(AppToEngineRPC payload, Action onCompleteCallback)
 		{
 			RPCChannels.ReceiveRPC(payload);
+			onCompleteCallback?.Invoke();
+		}
+
+		[CommandHandler(typeof(SetAuthoritative))]
+		private void OnSetAuthoritative(SetAuthoritative payload, Action onCompleteCallback)
+		{
+			IsAuthoritativePeer = payload.Authoritative;
 			onCompleteCallback?.Invoke();
 		}
 
