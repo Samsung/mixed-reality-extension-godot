@@ -28,10 +28,9 @@ namespace MixedRealityExtension.Patching.Types
 		[PatchProperty]
 		public CollisionLayer? Layer { get; set; }
 
-/* FIXME
 		[PatchProperty]
 		public ColliderGeometry Geometry { get; set; }
-*/
+
 		[PatchProperty]
 		public ColliderEventType[] EventSubscriptions { get; set; }
 	}

@@ -4,6 +4,7 @@ using System;
 
 using MixedRealityExtension.App;
 using MixedRealityExtension.PluginInterfaces;
+using MixedRealityExtension.PluginInterfaces.Behaviors;
 using Godot;
 
 using AppManager = MixedRealityExtension.Util.ObjectManager<MixedRealityExtension.App.IMixedRealityExtensionApp>;
@@ -37,7 +38,7 @@ namespace MixedRealityExtension.API
 	public class MREAppsAPI
 	{
 		private AppManager _apps = new AppManager();
-
+		internal IBehaviorFactory BehaviorFactory { get; set; }
 		internal IPermissionManager PermissionManager { get; set; }
 
 		/// <summary>

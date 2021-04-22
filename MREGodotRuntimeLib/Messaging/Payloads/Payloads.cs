@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-/*
+
 using MixedRealityExtension.Behaviors;
 using MixedRealityExtension.Behaviors.ActionData;
 using MixedRealityExtension.Behaviors.Actions;
 using MixedRealityExtension.Core.Collision;
-*/
 using MixedRealityExtension.Patching.Types;
 using System;
 using System.Collections.Generic;
@@ -249,7 +248,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		public Guid UserId;
 	}
 
-/* FIXME
+
 	/// <summary>
 	/// Payload for when an action is performed for a behavior on an actor from engine to app.
 	/// </summary>
@@ -329,7 +328,6 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public Guid OtherActorId;
 	}
-*/
 
 	/// <summary>
 	/// App => Engine, Engine => App
@@ -349,5 +347,4 @@ namespace MixedRealityExtension.Messaging.Payloads
 	public class HeartbeatReply : Payload
 	{
 	}
-
 }

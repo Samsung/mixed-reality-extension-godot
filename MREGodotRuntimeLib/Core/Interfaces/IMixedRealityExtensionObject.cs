@@ -27,8 +27,8 @@ namespace MixedRealityExtension.Core.Interfaces
 		Guid AppInstanceId { get; }
 
 		/// <summary>
-		/// The unity game object that the actor is associated with.
+		/// The node that the actor is associated with.
 		/// </summary>
-		Node GameObject { get; }
+		Node node { get; }
 	}
 }

@@ -109,7 +109,7 @@ namespace MixedRealityExtension.App
 		/// <summary>
 		/// The game object that serves as the scene root.
 		/// </summary>
-		Node SceneRoot { get; set; }
+		Spatial SceneRoot { get; set; }
 /*FIXME
 		/// <summary>
 		/// Where assets for this app instance are stored

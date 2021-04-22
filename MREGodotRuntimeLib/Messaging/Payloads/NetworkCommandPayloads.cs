@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 using MixedRealityExtension.Animation;
-//using MixedRealityExtension.Behaviors;
+using MixedRealityExtension.Behaviors;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Patching.Types;
 using System;
@@ -356,7 +356,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		public MediaStateOptions Options { get; set; }
 
 	}
-
+*/
 	/// <summary>
 	/// App => Engine
 	/// Payload for when the app wants to interpolate actor properties (position, rotation, scale. Other fields in the future).
@@ -405,7 +405,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public BehaviorType BehaviorType { get; set; }
 	}
-*/
+
 	/// <summary>
 	/// App => Engine
 	/// Specific to multi-peer adapter: Sets whether this client is "authoritative". When authoritative, the client

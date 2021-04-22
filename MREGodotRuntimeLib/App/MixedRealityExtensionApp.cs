@@ -36,8 +36,8 @@ namespace MixedRealityExtension.App
 	internal sealed class MixedRealityExtensionApp : IMixedRealityExtensionApp, ICommandHandlerContext
 	{
 		private readonly UserManager _userManager;
+		private readonly ActorManager _actorManager;
 		private readonly CommandManager _commandManager;
-
 		private readonly Node _ownerScript;
 
 		private IConnectionInternal _conn;
@@ -100,7 +100,11 @@ namespace MixedRealityExtension.App
 		public event MWEventHandler OnAppShutdown;
 
 		/// <inheritdoc />
-		public event MWEventHandler<IActor> OnActorCreated;
+		public event MWEventHandler<IActor> OnActorCreated
+		{
+			add { _actorManager.OnActorCreated += value; }
+			remove { _actorManager.OnActorCreated -= value; }
+		}
 
 		/// <inheritdoc />
 		public event MWEventHandler<IUser, bool> OnUserJoined;
@@ -132,7 +136,7 @@ namespace MixedRealityExtension.App
 		public Uri ServerAssetUri { get; private set; }
 
 		/// <inheritdoc />
-		public Node SceneRoot { get; set; }
+		public Spatial SceneRoot { get; set; }
 
 		/// <inheritdoc />
 		public IUser LocalUser { get; private set; }
@@ -181,13 +185,14 @@ namespace MixedRealityExtension.App
 			_ownerScript = ownerScript;
 			EventManager = new MWEventManager(this);
 			_userManager = new UserManager(this);
+			_actorManager = new ActorManager(this);
 
 			_commandManager = new CommandManager(new Dictionary<Type, ICommandHandlerContext>()
 			{
 				{ typeof(MixedRealityExtensionApp), this },
 				//{ typeof(Actor), null },
 				//{ typeof(AssetLoader), _assetLoader },
-				//{ typeof(ActorManager), _actorManager },
+				{ typeof(ActorManager), _actorManager },
 				//{ typeof(AnimationManager), AnimationManager }
 			});
 /*
@@ -357,6 +362,27 @@ namespace MixedRealityExtension.App
 			}
 		}
 		
+		private void FreeResources()
+		{
+			foreach (Node node in _ownedNodes)
+			{
+				node.Free();
+			}
+
+			_ownedNodes.Clear();
+			_actorManager.Reset();
+			/*FIXME
+			AnimationManager.Reset();
+			PhysicsBridge.Reset();
+
+			foreach (Guid id in _assetLoader.ActiveContainers)
+			{
+				AssetManager.Unload(id);
+			}
+			_assetLoader.ActiveContainers.Clear();
+			*/
+		}
+
 		/// <inheritdoc />
 		public void FixedUpdate()
 		{
@@ -376,7 +402,10 @@ namespace MixedRealityExtension.App
 				_conn.Update();
 			}
 
-			//_commandManager.Update();
+			// Process actor queues after connection update.
+			_actorManager.Update();
+
+			_commandManager.Update();
 		}
 
 		/// <inheritdoc />
@@ -514,6 +543,29 @@ namespace MixedRealityExtension.App
 		/// <inheritdoc />
 		public bool IsInteractableForUser(IUser user) => _interactingUserIds.Contains(user.Id);
 
+		/// <inheritdoc />
+		public IActor FindActor(Guid id)
+		{
+			return _actorManager.FindActor(id);
+		}
+
+		public IEnumerable<Actor> FindChildren(Guid id)
+		{
+			return _actorManager.FindChildren(id);
+		}
+
+		/// <inheritdoc />
+		public void OnActorDestroyed(Guid actorId)
+		{
+			if (_actorManager.OnActorDestroy(actorId))
+			{
+				Protocol.Send(new DestroyActors()
+				{
+					ActorIds = new Guid[] { actorId }
+				});
+			}
+		}
+
 		public IUser FindUser(Guid id)
 		{
 			return _userManager.FindUser(id);
@@ -555,7 +607,20 @@ namespace MixedRealityExtension.App
 
 		internal void ExecuteCommandPayload(ICommandHandlerContext handlerContext, ICommandPayload commandPayload, Action onCompleteCallback)
 		{
-			//_commandManager.ExecuteCommandPayload(handlerContext, commandPayload, onCompleteCallback);
+			_commandManager.ExecuteCommandPayload(handlerContext, commandPayload, onCompleteCallback);
+		}
+
+		/// <summary>
+		/// Used to set actor parents when the parent is pending
+		/// </summary>
+		internal void ProcessActorCommand(Guid actorId, NetworkCommandPayload payload, Action onCompleteCallback)
+		{
+			_actorManager.ProcessActorCommand(actorId, payload, onCompleteCallback);
+		}
+
+		internal bool OwnsActor(IActor actor)
+		{
+			return FindActor(actor.Id) != null;
 		}
 
 		internal void EnableUserInteraction(IUser user)
@@ -686,6 +751,21 @@ namespace MixedRealityExtension.App
 		{
 			RPCChannels.ReceiveRPC(payload);
 			onCompleteCallback?.Invoke();
+		}
+
+		[CommandHandler(typeof(UserUpdate))]
+		private void OnUserUpdate(UserUpdate payload, Action onCompleteCallback)
+		{
+			try
+			{
+				((User)LocalUser).SynchronizeEngine(payload.User);
+				_actorManager.UpdateAllVisibility();
+				onCompleteCallback?.Invoke();
+			}
+			catch (Exception e)
+			{
+				GD.PushError(e.ToString());
+			}
 		}
 
 		[CommandHandler(typeof(SetAuthoritative))]

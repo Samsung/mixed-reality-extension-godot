@@ -10,7 +10,7 @@ using Godot;
 
 namespace MixedRealityExtension.Core
 {
-	internal abstract class MixedRealityExtensionObject : Node, IMixedRealityExtensionObject
+	internal abstract class MixedRealityExtensionObject : MeshInstance, IMixedRealityExtensionObject
 	{
 		/// <inheritdoc />
 		public Guid Id { get; private set; }
@@ -22,7 +22,7 @@ namespace MixedRealityExtension.Core
 		public virtual new string Name => Name;
 
 		/// <inheritdoc />
-		public Node GameObject => this;
+		public Node node => this;
 
 		internal MixedRealityExtensionApp App { get; private set; }
 
@@ -37,7 +37,7 @@ namespace MixedRealityExtension.Core
 			App = app;
 		}
 
-		protected abstract void InternalUpdate();
+		protected abstract void InternalUpdate(float delta);
 
 		protected virtual void InternalFixedUpdate()
 		{
@@ -71,9 +71,9 @@ namespace MixedRealityExtension.Core
 			OnAwake();
 		}
 
-		private void Update()
+		public override void _Process(float delta)
 		{
-			InternalUpdate();
+			InternalUpdate(delta);
 		}
 
 		private void FixedUpdate()

@@ -2,18 +2,21 @@
 // Licensed under the MIT License.
 
 using MixedRealityExtension.API;
-//using MixedRealityExtension.Core.Collision;
+using MixedRealityExtension.Core.Collision;
 using MixedRealityExtension.Core.Interfaces;
-//using MixedRealityExtension.Core.Types;
-//using MixedRealityExtension.Messaging.Events.Types;
-//using MixedRealityExtension.Patching;
-//using MixedRealityExtension.Patching.Types;
-//using MixedRealityExtension.Util.Unity;
+using MixedRealityExtension.Core.Types;
+using MixedRealityExtension.Messaging.Events.Types;
+using MixedRealityExtension.Patching;
+using MixedRealityExtension.Patching.Types;
+using MixedRealityExtension.Util.GodotHelper;
 using System;
 using System.Linq;
+using Godot;
 
+using MREContactPoint = MixedRealityExtension.Core.Collision.ContactPoint;
 
-//using MREContactPoint = MixedRealityExtension.Core.Collision.ContactPoint;
+using GodotCollisionObject = Godot.CollisionObject;
+//using UnityCollision = UnityEngine.Collision;
 
 namespace MixedRealityExtension.Core
 {
@@ -53,14 +56,14 @@ namespace MixedRealityExtension.Core
 		Mesh
 	}
 /*
-	internal class Collider : MonoBehaviour, ICollider
+	internal class Collider : Node, ICollider
 	{
-		private UnityCollider _collider;
+		private GodotCollisionObject _collider;
 		private Actor _ownerActor;
 		private ColliderEventType _colliderEventSubscriptions = ColliderEventType.None;
 
 		/// <inheritdoc />
-		public bool IsEnabled => _collider.enabled;
+		public bool IsEnabled => _collider.IsShapeOwnerDisabled;
 
 		/// <inheritdoc />
 		public bool IsTrigger => _collider.isTrigger;
@@ -80,7 +83,7 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public ColliderType Shape { get; private set; }
 
-		internal void Initialize(UnityCollider unityCollider, ColliderType? shape = null)
+		internal void Initialize(GodotCollisionObject unityCollider, ColliderType? shape = null)
 		{
 			_ownerActor = unityCollider.gameObject.GetComponent<Actor>()
 				?? throw new Exception("An MRE collider must be associated with a Unity game object that is an MRE actor.");
@@ -202,7 +205,7 @@ namespace MixedRealityExtension.Core
 			};
 		}
 
-		private void OnTriggerEnter(UnityCollider other)
+		private void OnTriggerEnter(GodotCollisionObject other)
 		{
 			if (_colliderEventSubscriptions.HasFlag(ColliderEventType.TriggerEnter))
 			{
@@ -210,7 +213,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		private void OnTriggerExit(UnityCollider other)
+		private void OnTriggerExit(GodotCollisionObject other)
 		{
 			if (_colliderEventSubscriptions.HasFlag(ColliderEventType.TriggerExit))
 			{
@@ -234,7 +237,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		private void SendTriggerEvent(ColliderEventType eventType, UnityCollider otherCollider)
+		private void SendTriggerEvent(ColliderEventType eventType, GodotCollisionObject otherCollider)
 		{
 			if (!_ownerActor.App.IsAuthoritativePeer && !_ownerActor.IsGrabbed)
 			{

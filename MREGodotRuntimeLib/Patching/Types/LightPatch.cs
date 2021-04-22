@@ -29,9 +29,8 @@ namespace MixedRealityExtension.Patching.Types
 
 		public LightPatch()
 		{ }
-
 /*FIXME
-		internal LightPatch(UnityEngine.Light light)
+		internal LightPatch(Godot.Light light)
 		{
 			Enabled = light.enabled;
 			Type = UtilMethods.ConvertEnum<LightType, UnityEngine.LightType>(light.type);

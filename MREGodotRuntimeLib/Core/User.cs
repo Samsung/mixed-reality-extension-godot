@@ -80,7 +80,7 @@ namespace MixedRealityExtension.Core
 			return other != null && Id == other.Id;
 		}
 
-		protected override void InternalUpdate()
+		protected override void InternalUpdate(float delta)
 		{
 			SynchronizeApps();
 		}

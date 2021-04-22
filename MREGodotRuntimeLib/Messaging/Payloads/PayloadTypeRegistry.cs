@@ -6,38 +6,20 @@ using System.Linq;
 
 namespace MixedRealityExtension.Messaging.Payloads
 {
-	/* FIXME
-	[PayloadType(typeof(ActionPerformed), "perform-action")]
-	[PayloadType(typeof(ActorCorrection), "actor-correction")]
-	[PayloadType(typeof(ActorUpdate), "actor-update")]
-	[PayloadType(typeof(AnimationUpdate), "animation-update")]
-
+/*FIXME
 	[PayloadType(typeof(AssetsLoaded), "assets-loaded")]
 	[PayloadType(typeof(AssetUpdate), "asset-update")]
 	[PayloadType(typeof(CreateAnimation), "create-animation")]
 	[PayloadType(typeof(CreateAnimation2), "create-animation-2")]
 	[PayloadType(typeof(CreateAsset), "create-asset")]
-	[PayloadType(typeof(CreateEmpty), "create-empty")]
-	[PayloadType(typeof(CreateFromLibrary), "create-from-library")]
-	[PayloadType(typeof(CreateFromPrefab), "create-from-prefab")]
-	[PayloadType(typeof(CollisionEventRaised), "collision-event-raised")]
-	[PayloadType(typeof(DestroyActors), "destroy-actors")]
-	[PayloadType(typeof(DestroyAnimations), "destroy-animations")]
 
 
-	[PayloadType(typeof(InterpolateActor), "interpolate-actor")]
 	[PayloadType(typeof(LoadAssets), "load-assets")]
 
 
 	[PayloadType(typeof(PhysicsBridgeUpdate), "physicsbridge-transforms-update")]
 	[PayloadType(typeof(PhysicsTranformServerUpload), "physicsbridge-server-transforms-upload")]
-	[PayloadType(typeof(RBAddForce), "rigidbody-add-force")]
-	[PayloadType(typeof(RBAddForceAtPosition), "rigidbody-add-force-at-position")]
-	[PayloadType(typeof(RBAddRelativeTorque), "rigidbody-add-relative-torque")]
-	[PayloadType(typeof(RBAddTorque), "rigidbody-add-torque")]
-	[PayloadType(typeof(RBMovePosition), "rigidbody-move-position")]
-	[PayloadType(typeof(RBMoveRotation), "rigidbody-move-rotation")]
-	[PayloadType(typeof(RigidBodyCommands), "rigidbody-commands")]
+
 	[PayloadType(typeof(SetAnimationState), "set-animation-state")]
 
 	[PayloadType(typeof(SetBehavior), "set-behavior")]
@@ -45,10 +27,35 @@ namespace MixedRealityExtension.Messaging.Payloads
 
 	[PayloadType(typeof(StateRestore), "state-restore")]
 	[PayloadType(typeof(SyncAnimations), "sync-animations")]
-	[PayloadType(typeof(TriggerEventRaised), "trigger-event-raised")]
-	[PayloadType(typeof(UnloadAssets), "unload-assets")]
 
-	*/
+	[PayloadType(typeof(UnloadAssets), "unload-assets")]
+	[PayloadType(typeof(CreateFromPrefab), "create-from-prefab")]
+*/
+
+
+	[PayloadType(typeof(RBAddForce), "rigidbody-add-force")]
+	[PayloadType(typeof(RBAddForceAtPosition), "rigidbody-add-force-at-position")]
+	[PayloadType(typeof(RBAddRelativeTorque), "rigidbody-add-relative-torque")]
+	[PayloadType(typeof(RBAddTorque), "rigidbody-add-torque")]
+	[PayloadType(typeof(RBMovePosition), "rigidbody-move-position")]
+	[PayloadType(typeof(RBMoveRotation), "rigidbody-move-rotation")]
+	[PayloadType(typeof(RigidBodyCommands), "rigidbody-commands")]
+
+	[PayloadType(typeof(TriggerEventRaised), "trigger-event-raised")]
+	[PayloadType(typeof(CreateFromLibrary), "create-from-library")]
+
+	[PayloadType(typeof(CollisionEventRaised), "collision-event-raised")]
+	[PayloadType(typeof(DestroyActors), "destroy-actors")]
+	[PayloadType(typeof(DestroyAnimations), "destroy-animations")]
+
+
+	[PayloadType(typeof(InterpolateActor), "interpolate-actor")]
+	
+	[PayloadType(typeof(ActionPerformed), "perform-action")]
+	[PayloadType(typeof(ActorCorrection), "actor-correction")]
+	[PayloadType(typeof(ActorUpdate), "actor-update")]
+	[PayloadType(typeof(AnimationUpdate), "animation-update")]
+
 	[PayloadType(typeof(CreateEmpty), "create-empty")]
 	[PayloadType(typeof(DialogResponse), "dialog-response")]
 	[PayloadType(typeof(ShowDialog), "show-dialog")]
