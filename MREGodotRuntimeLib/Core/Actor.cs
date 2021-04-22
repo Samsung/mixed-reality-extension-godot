@@ -88,13 +88,6 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public IActor Parent => App.FindActor(ParentId);
 
-		/// <inheritdoc />
-		public new string Name
-		{
-			get => this.Name;
-			set => this.Name = value;
-		}
-
 		private Guid? Owner = null;
 
 		/// <inheritdoc />

@@ -34,7 +34,7 @@ public class MRELogger : IMRELogger
 	}
 }
 
-public class MREComponent : Node
+public class MREComponent : Spatial
 {
 	public delegate void AppEventHandler(MREComponent app);
 
@@ -62,7 +62,7 @@ public class MREComponent : Node
 	//[SerializeField]
 	internal Permissions GrantedPermissions;
 
-	public Transform SceneRoot;
+	public Spatial SceneRoot;
 
 	public Node PlaceholderObject;
 
@@ -98,6 +98,42 @@ public class MREComponent : Node
 
 		MREApp = MREAPI.AppsAPI.CreateMixedRealityExtensionApp(this, EphemeralAppID, AppID);
 
+		if (SceneRoot == null)
+		{
+			SceneRoot = this;
+		}
+
+		MREApp.SceneRoot = SceneRoot;
+
+		if (AutoStart)
+		{
+			EnableApp();
+		}
+
+		MREApp.RPC.OnReceive("log", new RPCHandler<TestLogMessage>(
+			(logMessage) => GD.Print($"Log RPC of type {logMessage.GetType()} called with args [ {logMessage.Message}, {logMessage.TestBoolean} ]")
+		));
+
+		// Functional test commands
+		MREApp.RPC.OnReceive("functional-test:test-started", new RPCHandler<string>((testName) =>
+		{
+			GD.Print($"Test started: {testName}.");
+		}));
+
+		MREApp.RPC.OnReceive("functional-test:test-complete", new RPCHandler<string, bool>((testName, success) =>
+		{
+			GD.Print($"Test complete: {testName}. Success: {success}.");
+		}));
+
+		MREApp.RPC.OnReceive("functional-test:close-connection", new RPCHandler(() =>
+		{
+			MREApp.Shutdown();
+		}));
+
+		MREApp.RPC.OnReceive("functional-test:trace-message", new RPCHandler<string, string>((testName, message) =>
+		{
+			GD.Print($"{testName}: {message}");
+		}));
 	}
 	
 	public override void _Process(float delta) // FIXME LateUpdate

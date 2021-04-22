@@ -3,7 +3,7 @@
 
 using MixedRealityExtension.Animation;
 using MixedRealityExtension.API;
-//using MixedRealityExtension.Assets;
+using MixedRealityExtension.Assets;
 using MixedRealityExtension.Core;
 //using MixedRealityExtension.Core.Components;
 using MixedRealityExtension.Core.Interfaces;
@@ -35,9 +35,13 @@ namespace MixedRealityExtension.App
 {
 	internal sealed class MixedRealityExtensionApp : IMixedRealityExtensionApp, ICommandHandlerContext
 	{
+		private readonly AssetLoader _assetLoader;
 		private readonly UserManager _userManager;
 		private readonly ActorManager _actorManager;
 		private readonly CommandManager _commandManager;
+
+		private readonly AssetManager _assetManager;
+
 		private readonly Node _ownerScript;
 
 		private IConnectionInternal _conn;
@@ -147,8 +151,7 @@ namespace MixedRealityExtension.App
 		/// <inheritdoc />
 		public RPCChannelInterface RPCChannels { get; }
 
-		//FIXME
-		//public AssetManager AssetManager => _assetManager;
+		public AssetManager AssetManager => _assetManager;
 
 		#endregion
 
@@ -184,22 +187,24 @@ namespace MixedRealityExtension.App
 			EphemeralAppId = ephemeralAppId;
 			_ownerScript = ownerScript;
 			EventManager = new MWEventManager(this);
+			_assetLoader = new AssetLoader(ownerScript, this);
 			_userManager = new UserManager(this);
 			_actorManager = new ActorManager(this);
 
 			_commandManager = new CommandManager(new Dictionary<Type, ICommandHandlerContext>()
 			{
 				{ typeof(MixedRealityExtensionApp), this },
-				//{ typeof(Actor), null },
-				//{ typeof(AssetLoader), _assetLoader },
+				{ typeof(Actor), null },
+				{ typeof(AssetLoader), _assetLoader },
 				{ typeof(ActorManager), _actorManager },
 				//{ typeof(AnimationManager), AnimationManager }
 			});
-/*
+
 			var cacheRoot = new Node() { Name = "MRE Cache" };
-			cacheRoot.transform.SetParent(_ownerScript.gameObject.transform);
-			cacheRoot.SetActive(false);
-*/
+			_ownerScript.AddChild(cacheRoot);
+			//cacheRoot.SetActive(false);
+			_assetManager = new AssetManager(this, cacheRoot);
+
 			RPC = new RPCInterface(this);
 			RPCChannels = new RPCChannelInterface();
 			// RPC messages without a ChannelName will route to the "global" RPC handlers.
@@ -727,6 +732,29 @@ namespace MixedRealityExtension.App
 			}
 		}
 
+		private Node[] GetDistinctTreeRoots(Node[] gos)
+		{
+			// identify game objects whose ancestors are not also flagged to be actors
+			var goIds = new HashSet<ulong>(gos.Select(go => go.GetInstanceId()));
+			var rootGos = new List<Node>(gos.Length);
+			foreach (var go in gos)
+			{
+				if (!ancestorInList(go))
+				{
+					rootGos.Add(go);
+				}
+			}
+
+			return rootGos.ToArray();
+
+			bool ancestorInList(Node go)
+			{
+				return go != null && go.GetParent() != null && (
+					goIds.Contains(go.GetParent().GetInstanceId()) ||
+					ancestorInList(go.GetParent()));
+			}
+		}
+
 		private Guid GenerateObfuscatedUserId(IHostAppUser hostAppUser, string salt)
 		{
 			using (SHA256 hasher = SHA256.Create())
@@ -766,6 +794,181 @@ namespace MixedRealityExtension.App
 			{
 				GD.PushError(e.ToString());
 			}
+		}
+
+		[CommandHandler(typeof(CreateEmpty))]
+		private void OnCreateEmpty(CreateEmpty payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var actors = _assetLoader.CreateEmpty(payload.Actor?.ParentId);
+				ProcessCreatedActors(payload, actors, onCompleteCallback);
+			}
+			catch (Exception e)
+			{
+				//SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.PushError(e.ToString());
+			}
+		}
+
+		private void ProcessCreatedActors(CreateActor originalMessage, IList<Actor> createdActors, Action onCompleteCallback, string guidSeed = null)
+		{
+			Guid guidGenSeed;
+			if (originalMessage != null)
+			{
+				guidGenSeed = originalMessage.Actor.Id;
+			}
+			else
+			{
+				guidGenSeed = UtilMethods.StringToGuid(guidSeed);
+			}
+			var guids = new DeterministicGuids(guidGenSeed);
+
+			// find the actors with no actor parents
+			/*FIXME
+			var rootActors = GetDistinctTreeRoots(
+				createdActors.ToArray()
+			).Select(go => go.GetComponent<Actor>()).ToArray();
+			*/
+			var rootActors = createdActors.ToArray();
+			var rootActor = createdActors.FirstOrDefault();
+			//var createdAnims = new List<Animation.BaseAnimation>(5);
+
+			if (rootActors.Length == 1 && rootActor.GetParent() == null)
+			{
+				// Delete entire hierarchy as we no longer have a valid parent actor for the root of this hierarchy.  It was likely
+				// destroyed in the process of the async operation before this callback was called.
+				foreach (var actor in createdActors)
+				{
+					actor.Destroy();
+				}
+
+				createdActors.Clear();
+
+				SendCreateActorResponse(
+					originalMessage,
+					failureMessage: "Parent for the actor being created no longer exists.  Cannot create new actor.");
+				return;
+			}
+
+			var secondPassXfrms = new List<Transform>(2);
+			foreach (var root in rootActors)
+			{
+				ProcessActors(root, root.GetParent() as Actor);
+			}
+			// some things require the whole hierarchy to have actors on it. run those here
+			foreach (var pass2 in secondPassXfrms)
+			{
+				ProcessActors2(pass2);
+			}
+
+			if (originalMessage != null && rootActors.Length == 1)
+			{
+				rootActor?.ApplyPatch(originalMessage.Actor);
+			}
+			Actor.ApplyVisibilityUpdate(rootActor);
+
+			_actorManager.UponStable(
+				() => SendCreateActorResponse(originalMessage, actors: createdActors, /*FIXME anims: createdAnims,*/ onCompleteCallback: onCompleteCallback));
+
+			void ProcessActors(Node xfrm, Actor parent)
+			{
+				// Generate actors for all GameObjects, even if the loader didn't. Only loader-generated
+				// actors are returned to the app though. We do this so library objects get enabled/disabled
+				// correctly, even if they're not tracked by the app.
+				Actor actor = xfrm as Actor;
+				if (actor == null)
+				{
+					actor = new Actor();
+					xfrm.AddChild(actor);
+				}
+
+				_actorManager.AddActor(guids.Next(), actor);
+				_ownedNodes.Add(actor);
+
+				actor.ParentId = parent?.Id ?? actor.ParentId;
+				/* FIXME
+				if (actor.Renderer != null)
+				{
+					// only overwrite material if there's something in the cache, i.e. not a random library material
+					var matId = AssetManager.GetByObject(actor.Renderer.sharedMaterial)?.Id;
+					if (matId.HasValue)
+					{
+						actor.MaterialId = matId.Value;
+					}
+
+					actor.MeshId = AssetManager.GetByObject(actor.UnityMesh)?.Id ?? Guid.Empty;
+				}
+
+				// native animation construction requires the whole actor hierarchy to already exist. defer to second pass
+				var nativeAnim = xfrm.gameObject.GetComponent<UnityEngine.Animation>();
+				if (nativeAnim != null && createdActors.Contains(actor))
+				{
+					secondPassXfrms.Add(xfrm);
+				}
+				
+				foreach (Transform child in xfrm)
+				{
+					ProcessActors(child, actor);
+				}
+				*/
+			}
+
+			void ProcessActors2(Transform xfrm)
+			{
+				/*FIXME
+				var actor = xfrm.gameObject.GetComponent<Actor>();
+				var nativeAnim = xfrm.gameObject.GetComponent<UnityEngine.Animation>();
+				if (nativeAnim != null && createdActors.Contains(actor))
+				{
+					var animTargets = xfrm.gameObject.GetComponent<PrefabAnimationTargets>();
+					int stateIndex = 0;
+					foreach (AnimationState state in nativeAnim)
+					{
+						var anim = new NativeAnimation(AnimationManager, guids.Next(), nativeAnim, state);
+						anim.TargetIds = animTargets != null
+							? animTargets.GetTargets(xfrm, stateIndex++, addRootToTargets: true).Select(a => a.Id).ToList()
+							: new List<Guid>() { actor.Id };
+
+						AnimationManager.RegisterAnimation(anim);
+						createdAnims.Add(anim);
+					}
+				}
+				*/
+			}
+		}
+
+		private void SendCreateActorResponse(
+			CreateActor originalMessage,
+			IList<Actor> actors = null,
+			//FIXME
+			//IList<Animation.BaseAnimation> anims = null,
+			string failureMessage = null,
+			Action onCompleteCallback = null)
+		{
+			Trace trace = new Trace()
+			{
+				Severity = (actors != null) ? TraceSeverity.Info : TraceSeverity.Error,
+				Message = (actors != null) ?
+					$"Successfully created {actors?.Count ?? 0} objects." :
+					failureMessage
+			};
+			Protocol.Send(
+				new ObjectSpawned()
+				{
+					Result = new OperationResult()
+					{
+						ResultCode = (actors != null) ? OperationResultCode.Success : OperationResultCode.Error,
+						Message = trace.Message
+					},
+					Traces = new List<Trace>() { trace },
+					Actors = actors?.Select((actor) => actor.GeneratePatch()).ToArray() ?? new ActorPatch[] { },
+					//Animations = anims?.Select(anim => anim.GeneratePatch()).ToArray() ?? new AnimationPatch[] { }
+				},
+				originalMessage?.MessageId
+			);
+
+			onCompleteCallback?.Invoke();
 		}
 
 		[CommandHandler(typeof(SetAuthoritative))]

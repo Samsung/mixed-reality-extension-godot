@@ -16,8 +16,6 @@ namespace MixedRealityExtension.Core
 	{
 		private IList<MixedRealityExtensionApp> _joinedApps = new List<MixedRealityExtensionApp>();
 
-		public override string Name => HostAppUser.Name;
-
 		public IHostAppUser HostAppUser { get; private set; }
 
 		public UInt32 Groups { get; internal set; } = 1;
@@ -27,6 +25,7 @@ namespace MixedRealityExtension.Core
 		internal void Initialize(IHostAppUser hostAppUser, Guid userId, Guid ephemeralUserId, MixedRealityExtensionApp app)
 		{
 			HostAppUser = hostAppUser;
+			Name = HostAppUser.Name;
 			base.Initialize(userId, app);
 			EphemeralUserId = ephemeralUserId;
 		}

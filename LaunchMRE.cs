@@ -10,10 +10,13 @@ public enum LaunchType
 
 public class LaunchMRE : Spatial
 {
+	[Export]
 	public LaunchType LaunchType;
 
+	[Export]
 	public MREComponent MREComponent;
 
+	[Export]
 	public bool StopAppOnExit = true;
 
 	private bool _running = false;

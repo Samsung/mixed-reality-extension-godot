@@ -19,9 +19,6 @@ namespace MixedRealityExtension.Core
 		public Guid AppInstanceId => App.InstanceId;
 
 		/// <inheritdoc />
-		public virtual new string Name => Name;
-
-		/// <inheritdoc />
 		public Node node => this;
 
 		internal MixedRealityExtensionApp App { get; private set; }

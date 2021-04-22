@@ -16,11 +16,6 @@ namespace MixedRealityExtension.Core.Interfaces
 		IActor Parent { get; }
 
 		/// <summary>
-		/// Gets and sets the name of the actor.
-		/// </summary>
-		new string Name { get; set; }
-
-		/// <summary>
 		/// Gets the app that the actor is owned by.
 		/// </summary>
 		IMixedRealityExtensionApp App { get; }

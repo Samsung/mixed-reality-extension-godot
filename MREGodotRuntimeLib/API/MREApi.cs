@@ -39,6 +39,17 @@ namespace MixedRealityExtension.API
 	{
 		private AppManager _apps = new AppManager();
 		internal IBehaviorFactory BehaviorFactory { get; set; }
+
+		/// <summary>
+		/// The class responsible for assigning layers to colliders.
+		/// </summary>
+		public ILayerApplicator LayerApplicator { get; internal set; }
+		
+		/// <summary>
+		/// The class responsible for long-term asset caching.
+		/// </summary>
+		public IAssetCache AssetCache { get; internal set; }
+		
 		internal IPermissionManager PermissionManager { get; set; }
 
 		/// <summary>
