@@ -3,6 +3,7 @@
 using System;
 
 using MixedRealityExtension.App;
+using MixedRealityExtension.Factories;
 using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.PluginInterfaces.Behaviors;
 using Godot;
@@ -38,7 +39,6 @@ namespace MixedRealityExtension.API
 	public class MREAppsAPI
 	{
 		private AppManager _apps = new AppManager();
-		internal IBehaviorFactory BehaviorFactory { get; set; }
 
 		/// <summary>
 		/// The class responsible for assigning layers to colliders.
@@ -49,6 +49,10 @@ namespace MixedRealityExtension.API
 		/// The class responsible for long-term asset caching.
 		/// </summary>
 		public IAssetCache AssetCache { get; internal set; }
+
+		internal IBehaviorFactory BehaviorFactory { get; set; }
+
+		internal IPrimitiveFactory PrimitiveFactory { get; set; } = new MWPrimitiveFactory();
 		
 		internal IPermissionManager PermissionManager { get; set; }
 

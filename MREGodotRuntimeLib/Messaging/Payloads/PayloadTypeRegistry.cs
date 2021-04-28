@@ -6,33 +6,24 @@ using System.Linq;
 
 namespace MixedRealityExtension.Messaging.Payloads
 {
-/*FIXME
-	[PayloadType(typeof(AssetsLoaded), "assets-loaded")]
-	[PayloadType(typeof(AssetUpdate), "asset-update")]
+/*
 	[PayloadType(typeof(CreateAnimation), "create-animation")]
 	[PayloadType(typeof(CreateAnimation2), "create-animation-2")]
-	[PayloadType(typeof(CreateAsset), "create-asset")]
-
-
-	[PayloadType(typeof(LoadAssets), "load-assets")]
-
 
 	[PayloadType(typeof(PhysicsBridgeUpdate), "physicsbridge-transforms-update")]
 	[PayloadType(typeof(PhysicsTranformServerUpload), "physicsbridge-server-transforms-upload")]
-
 	[PayloadType(typeof(SetAnimationState), "set-animation-state")]
-
-	[PayloadType(typeof(SetBehavior), "set-behavior")]
 	[PayloadType(typeof(SetMediaState), "set-media-state")]
-
-	[PayloadType(typeof(StateRestore), "state-restore")]
 	[PayloadType(typeof(SyncAnimations), "sync-animations")]
-
+*/
+	[PayloadType(typeof(AssetsLoaded), "assets-loaded")]
+	[PayloadType(typeof(AssetUpdate), "asset-update")]
+	[PayloadType(typeof(LoadAssets), "load-assets")]
+	[PayloadType(typeof(SetBehavior), "set-behavior")]
+	[PayloadType(typeof(StateRestore), "state-restore")]
 	[PayloadType(typeof(UnloadAssets), "unload-assets")]
 	[PayloadType(typeof(CreateFromPrefab), "create-from-prefab")]
-*/
-
-
+	[PayloadType(typeof(CreateAsset), "create-asset")]
 	[PayloadType(typeof(RBAddForce), "rigidbody-add-force")]
 	[PayloadType(typeof(RBAddForceAtPosition), "rigidbody-add-force-at-position")]
 	[PayloadType(typeof(RBAddRelativeTorque), "rigidbody-add-relative-torque")]

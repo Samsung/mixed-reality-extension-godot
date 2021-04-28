@@ -1089,12 +1089,31 @@ namespace MixedRealityExtension.Core
 				if (MeshId != Guid.Empty)
 				{
 					/*
+					// guarantee renderer component
+					if (renderer == null)
+					{
+						renderer = gameObject.AddComponent<MeshRenderer>();
+						renderer.sharedMaterial = MREAPI.AppsAPI.DefaultMaterial;
+						forceUpdateRenderer = true;
+					}
+					// guarantee mesh filter (unless it has a skinned mesh renderer)
+					if (renderer is MeshRenderer && meshFilter == null)
+					{
+						meshFilter = gameObject.AddComponent<MeshFilter>();
+					}
+					*/
+
 					// look up and assign mesh
 					var updatedMeshId = MeshId;
 					App.AssetManager.OnSet(MeshId, sharedMesh =>
 					{
-						if (!this || MeshId != updatedMeshId) return;
+						if (MeshId != updatedMeshId) return;
+						var aabb = ((ArrayMesh)sharedMesh.Asset).GetAabb();
+						var array = ((ArrayMesh)sharedMesh.Asset).SurfaceGetArrays(0);
+						var tt = array[(int)Godot.ArrayMesh.ArrayType.Vertex];
 						Mesh = (Mesh)sharedMesh.Asset;
+						//Mesh = new CubeMesh();
+						/*FIXME
 						if (Collider != null && Collider.Shape == ColliderType.Auto)
 						{
 							SetCollider(new ColliderPatch()
@@ -1102,8 +1121,9 @@ namespace MixedRealityExtension.Core
 								Geometry = new AutoColliderGeometry()
 							});
 						}
+						*/
 					});
-*/
+
 					// patch material
 					if (appearance.MaterialId != null)
 					{

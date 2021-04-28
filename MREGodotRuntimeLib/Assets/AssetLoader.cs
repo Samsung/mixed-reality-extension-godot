@@ -373,6 +373,7 @@ namespace MixedRealityExtension.Assets
 
 			return assets;
 		}
+*/
 
 		[CommandHandler(typeof(AssetUpdate))]
 		internal void OnAssetUpdate(AssetUpdate payload, Action onCompleteCallback)
@@ -380,8 +381,7 @@ namespace MixedRealityExtension.Assets
 			var def = payload.Asset;
 			_app.AssetManager.OnSet(def.Id, asset =>
 			{
-				if (!_owner) return;
-
+				/*FIXME
 				if (def.Material != null && asset.Asset != null && asset.Asset is UnityEngine.Material mat)
 				{
 					// make sure material reference is write-safe
@@ -417,14 +417,17 @@ namespace MixedRealityExtension.Assets
 				{
 					// do nothing; sound asset properties are immutable
 				}
-				else if (def.Mesh != null)
+				
+				else*/ if (def.Mesh != null)
 				{
 					// do nothing; mesh properties are immutable
 				}
+				/*FIXME
 				else if (def.AnimationData != null)
 				{
 					// do nothing; animation data are immutable
 				}
+				*/
 				else
 				{
 					_app.Logger.LogError($"Asset {def.Id} is not patchable, or not of the right type!");
@@ -443,7 +446,7 @@ namespace MixedRealityExtension.Assets
 			AssetSource source = null;
 
 			ActiveContainers.Add(payload.ContainerId);
-
+/*FIXME
 			// create materials
 			if (unityAsset == null && def.Material != null)
 			{
@@ -472,9 +475,9 @@ namespace MixedRealityExtension.Assets
 					response.FailureMessage = result.FailureMessage;
 				}
 			}
-
+*/
 			// create meshes
-			else if (unityAsset == null && def.Mesh != null)
+			if (unityAsset == null && def.Mesh != null)
 			{
 				if (def.Mesh.Value.PrimitiveDefinition != null)
 				{
@@ -482,7 +485,8 @@ namespace MixedRealityExtension.Assets
 					try
 					{
 						unityAsset = factory.CreatePrimitive(def.Mesh.Value.PrimitiveDefinition.Value);
-						colliderGeo = ConvertPrimToCollider(def.Mesh.Value.PrimitiveDefinition.Value, def.Id);
+						//FIXME
+						//colliderGeo = ConvertPrimToCollider(def.Mesh.Value.PrimitiveDefinition.Value, def.Id);
 					}
 					catch (Exception e)
 					{
@@ -495,7 +499,7 @@ namespace MixedRealityExtension.Assets
 					response.FailureMessage = $"Cannot create mesh {def.Id} without a primitive definition";
 				}
 			}
-
+/*
 			// create sounds
 			else if (unityAsset == null && def.Sound != null)
 			{
@@ -549,13 +553,13 @@ namespace MixedRealityExtension.Assets
 				animDataCache.Tracks = def.AnimationData.Value.Tracks;
 				unityAsset = animDataCache;
 			}
-
+*/
 			_app.AssetManager.Set(def.Id, payload.ContainerId, unityAsset, colliderGeo, source);
 
 			// verify creation and apply initial patch
 			if (unityAsset != null)
 			{
-				unityAsset.name = def.Name;
+				//unityAsset.Name = def.Name;
 				OnAssetUpdate(new AssetUpdate()
 				{
 					Asset = def
@@ -588,7 +592,7 @@ namespace MixedRealityExtension.Assets
 
 			onCompleteCallback?.Invoke();
 		}
-
+/*
 		[CommandHandler(typeof(UnloadAssets))]
 		internal void UnloadAssets(UnloadAssets payload, Action onCompleteCallback)
 		{
@@ -597,10 +601,11 @@ namespace MixedRealityExtension.Assets
 
 			onCompleteCallback?.Invoke();
 		}
-
-		private Asset GenerateAssetPatch(UnityEngine.Object unityAsset, Guid id)
+*/
+		private Asset GenerateAssetPatch(Godot.Object unityAsset, Guid id)
 		{
-			if (unityAsset is GameObject go)
+			/* FIXME
+			if (unityAsset is Node go)
 			{
 				int actorCount = 0;
 				MWGOTreeWalker.VisitTree(go, _ =>
@@ -642,30 +647,42 @@ namespace MixedRealityExtension.Assets
 					}
 				};
 			}
-			else if (unityAsset is UnityEngine.Mesh mesh)
+			else 
+			*/
+			if (unityAsset is Godot.Mesh mesh)
 			{
+				ArrayMesh arrayMesh = mesh as ArrayMesh;
+				Godot.Collections.Array array = arrayMesh.SurfaceGetArrays(0);
+				var aabb = arrayMesh.GetAabb();
+				var vertexCount = (array[(int)ArrayMesh.ArrayType.Vertex] as Array).Length;
+				
+
 				return new Asset()
 				{
 					Id = id,
 					Mesh = new MWMesh()
 					{
-						VertexCount = mesh.vertexCount,
-						TriangleCount = mesh.triangles.Length / 3,
+						VertexCount = vertexCount,
+						//FIXME
+						//TriangleCount = mesh.triangles.Length / 3,
+
 						BoundingBoxDimensions = new Vector3Patch()
 						{
-							X = mesh.bounds.size.x,
-							Y = mesh.bounds.size.y,
-							Z = mesh.bounds.size.z
+							X = aabb.Size.x,
+							Y = aabb.Size.y,
+							Z = aabb.Size.z
 						},
 						BoundingBoxCenter = new Vector3Patch()
 						{
-							X = mesh.bounds.center.x,
-							Y = mesh.bounds.center.y,
-							Z = mesh.bounds.center.z
+							X = aabb.Position.x,
+							Y = aabb.Position.y,
+							Z = aabb.Position.z
 						}
+
 					}
 				};
 			}
+			/*
 			else if (unityAsset is AudioClip sound)
 			{
 				return new Asset()
@@ -695,12 +712,13 @@ namespace MixedRealityExtension.Assets
 					Id = id
 				};
 			}
+			*/
 			else
 			{
 				throw new Exception($"Asset {id} is not patchable, or not of the right type!");
 			}
 		}
-
+/*
 		internal ColliderGeometry ConvertPrimToCollider(PrimitiveDefinition prim, Guid meshId)
 		{
 			MWVector3 dims = prim.Dimensions;
