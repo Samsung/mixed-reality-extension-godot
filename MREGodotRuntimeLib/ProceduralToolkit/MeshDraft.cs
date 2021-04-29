@@ -43,35 +43,18 @@ namespace MixedRealityExtension.ProceduralToolkit
 		{
 			if (mesh == null) throw new ArgumentNullException("mesh");
 
-			var meshDataTool = new MeshDataTool();
-			meshDataTool.CreateFromSurface(mesh, 0);
-			var meshVertexCount = meshDataTool.GetVertexCount();
-			
-			for (int i = 0; i < meshVertexCount; i++)
-				vertices[i] = meshDataTool.GetVertex(i);
-				
-			for (int i = 0; i < meshVertexCount; i++)
-				normals[i] = meshDataTool.GetVertexNormal(i);
-				
-			for (int i = 0; i < meshVertexCount; i++)
-				tangents[i] = meshDataTool.GetVertexTangent(i);
-
-				
-			for (int i = 0; i < meshVertexCount; i++)
-				uv[i] = meshDataTool.GetVertexUv(i);
-				
-			for (int i = 0; i < meshVertexCount; i++)
-				uv2[i] = meshDataTool.GetVertexUv2(i);
-				
-			for (int i = 0; i < meshVertexCount; i++)
-				colors[i] = meshDataTool.GetVertexColor(i);
+			var array = mesh.SurfaceGetArrays(0);
+			vertices.AddRange(array[(int)ArrayMesh.ArrayType.Vertex] as Vector3[]);
+			triangles.AddRange(array[(int)ArrayMesh.ArrayType.Index] as int[]);
+			normals.AddRange(array[(int)ArrayMesh.ArrayType.Normal] as Vector3[]);
+			tangents.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Plane[]);
+			uv.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Vector2[]);
+			uv2.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Vector2[]);
 
 			//FIXME
 			//name = mesh.name;
-			//mesh.GetTriangles(triangles, 0);
 			//mesh.GetUVs(2, uv3);
 			//mesh.GetUVs(3, uv4);
-			
 		}
 
 		/// <summary>
@@ -934,8 +917,10 @@ namespace MixedRealityExtension.ProceduralToolkit
 				array[(int)ArrayMesh.ArrayType.TexUv2] = uv2.ToArray();
 			if (colors.Count > 0)
 				array[(int)ArrayMesh.ArrayType.Color] = colors.ToArray();
+			if (triangles.Count > 0)
+				array[(int)ArrayMesh.ArrayType.Index] = triangles.ToArray();
 			//FIXME:LineLoop?
-			mesh.AddSurfaceFromArrays(Godot.ArrayMesh.PrimitiveType.LineLoop, array);
+			mesh.AddSurfaceFromArrays(Godot.ArrayMesh.PrimitiveType.Triangles, array);
 			//FIXME
 			//mesh.SetTriangles(triangles, 0, calculateBounds);
 			//mesh.SetUVs(2, uv3);
