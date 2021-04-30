@@ -419,12 +419,10 @@ namespace MixedRealityExtension.Assets
 				{
 					// do nothing; mesh properties are immutable
 				}
-				/*FIXME
 				else if (def.AnimationData != null)
 				{
 					// do nothing; animation data are immutable
 				}
-				*/
 				else
 				{
 					_app.Logger.LogError($"Asset {def.Id} is not patchable, or not of the right type!");
@@ -538,15 +536,15 @@ namespace MixedRealityExtension.Assets
 					response.FailureMessage = "VideoPlayerFactory not implemented";
 				}
 			}
-
+*/
 			// create animation data
 			else if (unityAsset == null && def.AnimationData != null)
 			{
-				var animDataCache = ScriptableObject.CreateInstance<AnimationDataCached>();
+				var animDataCache = new AnimationDataCached();
 				animDataCache.Tracks = def.AnimationData.Value.Tracks;
 				unityAsset = animDataCache;
 			}
-*/
+
 			_app.AssetManager.Set(def.Id, payload.ContainerId, unityAsset, colliderGeo, source);
 
 			// verify creation and apply initial patch
@@ -692,6 +690,7 @@ namespace MixedRealityExtension.Assets
 					}
 				};
 			}
+			*/
 			else if (unityAsset is AnimationDataCached animData)
 			{
 				return new Asset()
@@ -699,7 +698,7 @@ namespace MixedRealityExtension.Assets
 					Id = id
 				};
 			}
-			*/
+
 			else
 			{
 				throw new Exception($"Asset {id} is not patchable, or not of the right type!");

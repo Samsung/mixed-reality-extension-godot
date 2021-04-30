@@ -7,15 +7,14 @@ using System.Linq;
 namespace MixedRealityExtension.Messaging.Payloads
 {
 /*
-	[PayloadType(typeof(CreateAnimation), "create-animation")]
-	[PayloadType(typeof(CreateAnimation2), "create-animation-2")]
-
 	[PayloadType(typeof(PhysicsBridgeUpdate), "physicsbridge-transforms-update")]
 	[PayloadType(typeof(PhysicsTranformServerUpload), "physicsbridge-server-transforms-upload")]
-	[PayloadType(typeof(SetAnimationState), "set-animation-state")]
 	[PayloadType(typeof(SetMediaState), "set-media-state")]
+*/	
+	[PayloadType(typeof(CreateAnimation), "create-animation")]
+	[PayloadType(typeof(CreateAnimation2), "create-animation-2")]
+	[PayloadType(typeof(SetAnimationState), "set-animation-state")]
 	[PayloadType(typeof(SyncAnimations), "sync-animations")]
-*/
 	[PayloadType(typeof(AssetsLoaded), "assets-loaded")]
 	[PayloadType(typeof(AssetUpdate), "asset-update")]
 	[PayloadType(typeof(LoadAssets), "load-assets")]

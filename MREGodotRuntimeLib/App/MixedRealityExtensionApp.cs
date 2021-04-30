@@ -5,7 +5,7 @@ using MixedRealityExtension.Animation;
 using MixedRealityExtension.API;
 using MixedRealityExtension.Assets;
 using MixedRealityExtension.Core;
-//using MixedRealityExtension.Core.Components;
+using MixedRealityExtension.Core.Components;
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.IPC;
 using MixedRealityExtension.IPC.Connections;
@@ -39,9 +39,8 @@ namespace MixedRealityExtension.App
 		private readonly UserManager _userManager;
 		private readonly ActorManager _actorManager;
 		private readonly CommandManager _commandManager;
-
+		internal readonly AnimationManager AnimationManager;
 		private readonly AssetManager _assetManager;
-
 		private readonly Node _ownerScript;
 
 		private IConnectionInternal _conn;
@@ -191,13 +190,14 @@ namespace MixedRealityExtension.App
 			_userManager = new UserManager(this);
 			_actorManager = new ActorManager(this);
 
+			AnimationManager = new AnimationManager(this);
 			_commandManager = new CommandManager(new Dictionary<Type, ICommandHandlerContext>()
 			{
 				{ typeof(MixedRealityExtensionApp), this },
 				{ typeof(Actor), null },
 				{ typeof(AssetLoader), _assetLoader },
 				{ typeof(ActorManager), _actorManager },
-				//{ typeof(AnimationManager), AnimationManager }
+				{ typeof(AnimationManager), AnimationManager }
 			});
 
 			var cacheRoot = new Node() { Name = "MRE Cache" };
@@ -376,8 +376,8 @@ namespace MixedRealityExtension.App
 
 			_ownedNodes.Clear();
 			_actorManager.Reset();
-			/*FIXME
 			AnimationManager.Reset();
+			/*FIXME
 			PhysicsBridge.Reset();
 
 			foreach (Guid id in _assetLoader.ActiveContainers)
@@ -411,6 +411,7 @@ namespace MixedRealityExtension.App
 			_actorManager.Update();
 
 			_commandManager.Update();
+			AnimationManager.Update();
 		}
 
 		/// <inheritdoc />
@@ -578,7 +579,7 @@ namespace MixedRealityExtension.App
 
 		public void UpdateServerTimeOffset(long currentServerTime)
 		{
-			//AnimationManager.UpdateServerTimeOffset(currentServerTime);
+			AnimationManager.UpdateServerTimeOffset(currentServerTime);
 		}
 
 		#region Methods - Internal
@@ -832,7 +833,7 @@ namespace MixedRealityExtension.App
 			*/
 			var rootActors = createdActors.ToArray();
 			var rootActor = createdActors.FirstOrDefault();
-			//var createdAnims = new List<Animation.BaseAnimation>(5);
+			var createdAnims = new List<Animation.BaseAnimation>(5);
 
 			if (rootActors.Length == 1 && rootActor.GetParent() == null)
 			{
@@ -869,7 +870,7 @@ namespace MixedRealityExtension.App
 			Actor.ApplyVisibilityUpdate(rootActor);
 
 			_actorManager.UponStable(
-				() => SendCreateActorResponse(originalMessage, actors: createdActors, /*FIXME anims: createdAnims,*/ onCompleteCallback: onCompleteCallback));
+				() => SendCreateActorResponse(originalMessage, actors: createdActors, anims: createdAnims, onCompleteCallback: onCompleteCallback));
 
 			void ProcessActors(Node xfrm, Actor parent)
 			{
@@ -941,8 +942,7 @@ namespace MixedRealityExtension.App
 		private void SendCreateActorResponse(
 			CreateActor originalMessage,
 			IList<Actor> actors = null,
-			//FIXME
-			//IList<Animation.BaseAnimation> anims = null,
+			IList<Animation.BaseAnimation> anims = null,
 			string failureMessage = null,
 			Action onCompleteCallback = null)
 		{
@@ -963,7 +963,7 @@ namespace MixedRealityExtension.App
 					},
 					Traces = new List<Trace>() { trace },
 					Actors = actors?.Select((actor) => actor.GeneratePatch()).ToArray() ?? new ActorPatch[] { },
-					//Animations = anims?.Select(anim => anim.GeneratePatch()).ToArray() ?? new AnimationPatch[] { }
+					Animations = anims?.Select(anim => anim.GeneratePatch()).ToArray() ?? new AnimationPatch[] { }
 				},
 				originalMessage?.MessageId
 			);

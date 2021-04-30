@@ -58,12 +58,11 @@ namespace MixedRealityExtension.Assets
 		/// If this asset is a video, contains those properties
 		/// </summary>
 		public VideoStream? VideoStream;
-/*FIXME
+
 		/// <summary>
 		/// Only populated when this asset is animation data. An asset will only have one of these types specified.
 		/// </summary>
 		public AnimationData? AnimationData;
-*/
 	}
 
 	/// <summary>

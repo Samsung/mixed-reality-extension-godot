@@ -233,7 +233,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public QuaternionPatch Rotation { get; set; }
 	}
-/*
+
 	/// <summary>
 	/// App => Engine
 	/// Payload for when the app wants to create an animation on a specific actor.
@@ -323,7 +323,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public MWSetAnimationStateOptions State { get; set; }
 	}
-
+/*FIXME
 	/// <summary>
 	/// App => Engine
 	/// Payload for when the app wants to set animation state.
