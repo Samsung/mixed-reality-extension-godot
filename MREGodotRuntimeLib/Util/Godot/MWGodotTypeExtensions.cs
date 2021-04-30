@@ -109,8 +109,8 @@ namespace MixedRealityExtension.Util.GodotHelper
 				_this.Rotation = new MWQuaternion();
 			}
 
-			_this.Position.FromGodotVector3(appRoot.ToLocal(transform.Transform.origin));
-			_this.Rotation.FromGodotQuaternion((appRoot.Transform.basis * transform.Transform.basis).Quat());
+			_this.Position.FromGodotVector3(appRoot.ToLocal(transform.GlobalTransform.origin));
+			_this.Rotation.FromGodotQuaternion((appRoot.GlobalTransform.basis * transform.GlobalTransform.basis).Quat());
 		}
 
 		public static MWVector3 ToLocalMWVector3(this MWVector3 _this, Vector3 point, Spatial objectRoot)

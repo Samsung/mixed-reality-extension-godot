@@ -235,13 +235,13 @@ namespace MixedRealityExtension.Core
 		{
 			ProcessActorCommand(payload.ActorId, payload, onCompleteCallback);
 		}
-
+*/
 		[CommandHandler(typeof(InterpolateActor))]
 		private void OnInterpolateActor(InterpolateActor payload, Action onCompleteCallback)
 		{
 			ProcessActorCommand(payload.ActorId, payload, onCompleteCallback);
 		}
-*/
+
 		[CommandHandler(typeof(SetBehavior))]
 		private void OnSetBehavior(SetBehavior payload, Action onCompleteCallback)
 		{

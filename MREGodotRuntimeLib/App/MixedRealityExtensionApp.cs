@@ -920,7 +920,6 @@ namespace MixedRealityExtension.App
 			var rootActors = GetDistinctTreeRoots(
 				createdActors.ToArray()
 			).Select(go => go as Actor).ToArray();
-			//var rootActors = createdActors.ToArray();
 			var rootActor = createdActors.FirstOrDefault();
 			var createdAnims = new List<Animation.BaseAnimation>(5);
 
@@ -941,7 +940,7 @@ namespace MixedRealityExtension.App
 				return;
 			}
 
-			var secondPassXfrms = new List<Transform>(2);
+			var secondPassXfrms = new List<Spatial>(2);
 			foreach (var root in rootActors)
 			{
 				ProcessActors(root.Node3D, root.GetParent() as Actor);
@@ -988,14 +987,12 @@ namespace MixedRealityExtension.App
 					actor.MeshId = AssetManager.GetByObject(actor.GodotMesh)?.Id ?? Guid.Empty;
 				}
 
-				/* FIXME
 				// native animation construction requires the whole actor hierarchy to already exist. defer to second pass
-				var nativeAnim = xfrm.gameObject.GetComponent<UnityEngine.Animation>();
+				var nativeAnim = node3D.GetChild<Godot.AnimationPlayer>();
 				if (nativeAnim != null && createdActors.Contains(actor))
 				{
-					secondPassXfrms.Add(xfrm);
+					secondPassXfrms.Add(node3D);
 				}
-				*/
 
 				foreach (object node in actor.GetChildren())
 				{
@@ -1004,7 +1001,7 @@ namespace MixedRealityExtension.App
 				}
 			}
 
-			void ProcessActors2(Transform xfrm)
+			void ProcessActors2(Spatial node3D)
 			{
 				/*FIXME
 				var actor = xfrm.gameObject.GetComponent<Actor>();
@@ -1058,6 +1055,48 @@ namespace MixedRealityExtension.App
 			);
 
 			onCompleteCallback?.Invoke();
+		}
+
+		[CommandHandler(typeof(SyncAnimations))]
+		private void OnSyncAnimations(SyncAnimations payload, Action onCompleteCallback)
+		{
+			if (payload.AnimationStates == null)
+			{
+				_actorManager.UponStable(() =>
+				{
+					// Gather and send the animation states of all actors.
+					var animationStates = new List<MWActorAnimationState>();
+					foreach (var actor in _actorManager.Actors)
+					{
+						if (actor != null)
+						{
+							var actorAnimationStates = actor.GetOrCreateActorComponent<AnimationComponent>().GetAnimationStates();
+							if (actorAnimationStates != null)
+							{
+								animationStates.AddRange(actorAnimationStates);
+							}
+						}
+					}
+					Protocol.Send(new SyncAnimations()
+					{
+						AnimationStates = animationStates.ToArray()
+					}, payload.MessageId);
+					onCompleteCallback?.Invoke();
+				});
+			}
+			else
+			{
+				// Apply animation states to the actors.
+				foreach (var animationState in payload.AnimationStates)
+				{
+					SetAnimationState setAnimationState = new SetAnimationState();
+					setAnimationState.ActorId = animationState.ActorId;
+					setAnimationState.AnimationName = animationState.AnimationName;
+					setAnimationState.State = animationState.State;
+					_actorManager.ProcessActorCommand(animationState.ActorId, setAnimationState, null);
+				}
+				onCompleteCallback?.Invoke();
+			}
 		}
 
 		[CommandHandler(typeof(SetAuthoritative))]

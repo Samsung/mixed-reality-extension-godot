@@ -118,6 +118,8 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public IActor Parent => App.FindActor(ParentId);
 
+		public new string Name { get; set; }
+
 		private Guid? Owner = null;
 
 		/// <inheritdoc />
@@ -1094,6 +1096,7 @@ namespace MixedRealityExtension.Core
 			if (nameOrNull != null)
 			{
 				Name = nameOrNull;
+				base.Name = Name;
 			}
 		}
 /*
@@ -1987,7 +1990,7 @@ namespace MixedRealityExtension.Core
 				mediaInstance.Instance = null;
 			}
 		}
-
+*/
 
 		[CommandHandler(typeof(InterpolateActor))]
 		private void OnInterpolateActor(InterpolateActor payload, Action onCompleteCallback)
@@ -2001,7 +2004,7 @@ namespace MixedRealityExtension.Core
 					payload.Enabled);
 			onCompleteCallback?.Invoke();
 		}
-*/
+
 		[CommandHandler(typeof(SetBehavior))]
 		private void OnSetBehavior(SetBehavior payload, Action onCompleteCallback)
 		{

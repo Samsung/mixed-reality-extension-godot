@@ -134,44 +134,25 @@ namespace MixedRealityExtension.Util.GodotHelper
 			else
 				return 2;
 		}
-/*FIXME
-		public static WrapMode ToUnityWrapMode(this MWAnimationWrapMode wrapMode)
+
+		public static bool IsInterpolationLoopWrap(this MWAnimationWrapMode wrapMode)
 		{
-			global::Godot.AnimationPlayer
 			switch (wrapMode)
 			{
 				case MWAnimationWrapMode.Loop:
-					return WrapMode.Loop;
+					return true;
 
 				case MWAnimationWrapMode.PingPong:
-					return WrapMode.PingPong;
+					GD.PushError("WrapMode.PingPong is not supported.");
+					return true;
 
 				case MWAnimationWrapMode.Once:
-					return WrapMode.Once;
+					return false;
 
 				default:
-					return WrapMode.Once;
+					return true;
 			}
 		}
-
-		public static MWAnimationWrapMode FromUnityWrapMode(this WrapMode wrapMode)
-		{
-			switch (wrapMode)
-			{
-				case WrapMode.Loop:
-					return MWAnimationWrapMode.Loop;
-
-				case WrapMode.PingPong:
-					return MWAnimationWrapMode.PingPong;
-
-				case WrapMode.Once:
-					return MWAnimationWrapMode.Once;
-
-				default:
-					return MWAnimationWrapMode.Once;
-			}
-		}
-*/
 
 		public static T GetChild<T>(this Node _this) where T : class
 		{
