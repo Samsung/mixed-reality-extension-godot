@@ -2,11 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Assets.TestBed_Assets.Scripts.Player;
-using MixedRealityExtension.Core;
 using MixedRealityExtension.App;
 using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.API;
+using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Interfaces;
+using MixedRealityExtension.Factories;
 using MixedRealityExtension.RPC;
 
 class TestLogMessage
@@ -84,15 +85,46 @@ public class MREComponent : Spatial
 
 	private static bool _apiInitialized = false;
 
+	private SpatialMaterial DefaultPrimMaterial = new SpatialMaterial();
+
 	private Dictionary<Guid, HostAppUser> hostAppUsers = new Dictionary<Guid, HostAppUser>();
 
-	// Declare member variables here. Examples:
-	// private int a = 2;
-	// private string b = "text";
-
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		if (!_apiInitialized)
+		{
+			/*FIXME
+			var assetCacheGo = new GameObject("MRE Asset Cache");
+			var assetCache = assetCacheGo.AddComponent<AssetCache>();
+			assetCache.CacheRootGO = new GameObject("Assets");
+			assetCache.CacheRootGO.transform.SetParent(assetCacheGo.transform, false);
+			assetCache.CacheRootGO.SetActive(false);
+			*/
+			MREAPI.InitializeAPI(
+				defaultMaterial: DefaultPrimMaterial,
+				//layerApplicator: new SimpleLayerApplicator(0, 9, 10, 5),
+				//assetCache: assetCache,
+				/*
+				textFactory: new TmpTextFactory()
+				{
+					DefaultFont = DefaultFont,
+					SerifFont = SerifFont,
+					SansSerifFont = SansSerifFont,
+					MonospaceFont = MonospaceFont,
+					CursiveFont = CursiveFont
+				},
+				*/
+				permissionManager: new SimplePermissionManager(GrantedPermissions),
+				//behaviorFactory: new BehaviorFactory(),
+				//dialogFactory: DialogFactory,
+				//libraryFactory: new ResourceFactory(),
+				//gltfImporterFactory: new VertexShadedGltfImporterFactory(),
+				//materialPatcher: new VertexMaterialPatcher(),
+				logger: new MRELogger()
+			);
+			_apiInitialized = true;
+		}
+
 		//FIXME temp
 		MREAPI.AppsAPI.PermissionManager = new MixedRealityExtension.Factories.SimplePermissionManager(GrantedPermissions);
 

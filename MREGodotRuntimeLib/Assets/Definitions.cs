@@ -136,12 +136,12 @@ namespace MixedRealityExtension.Assets
 		/// <summary>
 		/// Offset the texture by this amount as a fraction of the resolution
 		/// </summary>
-		public Vector2Patch MainTextureOffset;
+		public Vector3Patch MainTextureOffset;
 
 		/// <summary>
 		/// Scale the texture by this amount in each axis
 		/// </summary>
-		public Vector2Patch MainTextureScale;
+		public Vector3Patch MainTextureScale;
 
 		/// <summary>
 		/// The lighting-independent color
@@ -188,17 +188,11 @@ namespace MixedRealityExtension.Assets
 		/// The resolution of the texture
 		/// </summary>
 		public Vector2Patch Resolution;
-/*FIXME
-		/// <summary>
-		/// How out-of-range U coordinates should be handled
-		/// </summary>
-		public UnityEngine.TextureWrapMode? WrapModeU;
 
 		/// <summary>
-		/// How out-of-range V coordinates should be handled
+		/// The flags are used to set various properties of the Texture.
 		/// </summary>
-		public UnityEngine.TextureWrapMode? WrapModeV;
-*/
+		public uint? Flags;
 	}
 
 	/// <summary>

@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-//using MixedRealityExtension.Assets;
+using MixedRealityExtension.Assets;
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.IPC;
 using MixedRealityExtension.RPC;
@@ -110,12 +110,12 @@ namespace MixedRealityExtension.App
 		/// The game object that serves as the scene root.
 		/// </summary>
 		Spatial SceneRoot { get; set; }
-/*FIXME
+
 		/// <summary>
 		/// Where assets for this app instance are stored
 		/// </summary>
 		AssetManager AssetManager { get; }
-*/
+
 		/// <summary>
 		/// The RPC interface for registering handlers and invoking remote procedure calls.
 		/// </summary>

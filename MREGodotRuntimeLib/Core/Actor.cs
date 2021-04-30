@@ -162,8 +162,6 @@ namespace MixedRealityExtension.Core
 			set
 			{
 				_materialId = value;
-/*FIXME
-				if (!Renderer) return;
 
 				// look up and assign material, or default if none assigned
 				if (_materialId != Guid.Empty)
@@ -171,9 +169,9 @@ namespace MixedRealityExtension.Core
 					var updatedMaterialId = _materialId;
 					App.AssetManager.OnSet(_materialId, sharedMat =>
 					{
-						if (!this || !Renderer || _materialId != updatedMaterialId) return;
+						if (_materialId != updatedMaterialId) return;
 
-						Renderer.sharedMaterial = (Material)sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial;
+						MaterialOverride = (Material)sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial;
 
 						// keep this material up to date
 						if (!ListeningForMaterialChanges)
@@ -185,14 +183,13 @@ namespace MixedRealityExtension.Core
 				}
 				else
 				{
-					Renderer.sharedMaterial = MREAPI.AppsAPI.DefaultMaterial;
+					MaterialOverride = MREAPI.AppsAPI.DefaultMaterial;
 					if (ListeningForMaterialChanges)
 					{
 						App.AssetManager.AssetReferenceChanged -= CheckMaterialReferenceChanged;
 						ListeningForMaterialChanges = false;
 					}
 				}
-*/
 			}
 		}
 
@@ -1173,19 +1170,19 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-/*FIXME
+
 		/// <summary>
 		/// Precondition: Asset identified by `id` exists, and is a material.
 		/// </summary>
 		/// <param name="id"></param>
 		private void CheckMaterialReferenceChanged(Guid id)
 		{
-			if (this != null && MaterialId == id && Renderer != null)
+			if (this != null && MaterialId == id)
 			{
-				Renderer.sharedMaterial = (Material)App.AssetManager.GetById(id).Value.Asset;
+				MaterialOverride = (Material)App.AssetManager.GetById(id).Value.Asset;
 			}
 		}
-*/
+
 		private void PatchTransform(ActorTransformPatch transformPatch)
 		{
 			if (transformPatch != null)
