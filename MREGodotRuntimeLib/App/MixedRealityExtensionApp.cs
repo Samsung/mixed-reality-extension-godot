@@ -20,6 +20,7 @@ using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.RPC;
 using MixedRealityExtension.Util;
 using MixedRealityExtension.Util.Logging;
+using MixedRealityExtension.Util.GodotHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -427,19 +428,8 @@ namespace MixedRealityExtension.App
 					return;
 				}
 
-				User user = null;
-				int userChildCount = userNode.GetChildCount();
-
-				for (int i = 0; i < userChildCount; i++)
-				{
-					var child = userNode.GetChild<User>(i);
-					if (child != null && child.AppInstanceId == this.InstanceId)
-					{
-						user = child;
-						break;
-					}
-
-				}
+				var user = userNode.GetChildren<User>()
+					.FirstOrDefault(_user => _user.AppInstanceId == this.InstanceId);
 
 				if (user == null)
 				{
@@ -499,19 +489,8 @@ namespace MixedRealityExtension.App
 		/// <inheritdoc />
 		public void UserLeave(Node userNode)
 		{
-			User user = null;
-			int userChildCount = userNode.GetChildCount();
-
-			for (int i = 0; i < userChildCount; i++)
-			{
-				var child = userNode.GetChild<User>(i);
-				if (child != null && child.AppInstanceId == this.InstanceId)
-				{
-					user = child;
-					break;
-				}
-
-			}
+			var user = userNode.GetChildren<User>()
+				.FirstOrDefault(_user => _user.AppInstanceId == this.InstanceId);
 
 			if (user != null)
 			{

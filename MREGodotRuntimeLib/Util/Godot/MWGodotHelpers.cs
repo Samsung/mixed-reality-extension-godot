@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 using System;
+using System.Collections.Generic;
 using MixedRealityExtension.Core.Types;
 using MixedRealityExtension.Animation;
 using Godot;
@@ -171,5 +172,28 @@ namespace MixedRealityExtension.Util.GodotHelper
 			}
 		}
 */
+
+		public static T GetChild<T>(this Node _this) where T : class
+		{
+			var userChildCount = _this.GetChildCount();
+			for (int i = 0; i < userChildCount; i++)
+			{
+				var child = _this.GetChild<T>(i);
+				if (child != null)
+					return child;
+			}
+			return null;
+		}
+
+		public static IEnumerable<T> GetChildren<T>(this Node _this) where T : class
+		{
+			var userChildCount = _this.GetChildCount();
+			for (int i = 0; i < userChildCount; i++)
+			{
+				var child = _this.GetChild<T>(i);
+				if (child != null)
+					yield return child;
+			}
+		}
 	}
 }

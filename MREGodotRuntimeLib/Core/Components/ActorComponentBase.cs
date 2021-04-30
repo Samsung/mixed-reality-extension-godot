@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 using System;
 using Godot;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Core.Components
 {
@@ -21,22 +22,8 @@ namespace MixedRealityExtension.Core.Components
 
 		private void Start()
 		{
-			if (AttachedActor == null)
-			{
-				int childCount = GetChildCount();
-
-				for (int i = 0; i < childCount; i++)
-				{
-					var child = GetChild<Actor>(i);
-					if (child != null)
-					{
-						AttachedActor = child;
-						break;
-					}
-				}
-			}
-			if (AttachedActor == null)
-				throw new NullReferenceException("Node must have an actor child on it if it is going to have an actor component on it.");
+			AttachedActor = this.GetChild<Actor>() ??
+				throw new NullReferenceException("Node must have an actor node on it if it is going to have an actor component on it.");
 		}
 	}
 }
