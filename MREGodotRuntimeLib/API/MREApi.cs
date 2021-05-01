@@ -44,7 +44,7 @@ namespace MixedRealityExtension.API
 			//ITextFactory textFactory,
 			IPermissionManager permissionManager,
 			// missing features if omitted
-			//IBehaviorFactory behaviorFactory = null,
+			IBehaviorFactory behaviorFactory = null,
 			//IDialogFactory dialogFactory = null,
 			//ILibraryResourceFactory libraryFactory = null,
 			//IVideoPlayerFactory videoPlayerFactory = null,
@@ -62,7 +62,7 @@ namespace MixedRealityExtension.API
 			AppsAPI.PermissionManager = permissionManager;
 
 			// missing features if omitted
-			//AppsAPI.BehaviorFactory = behaviorFactory;
+			AppsAPI.BehaviorFactory = behaviorFactory;
 			//AppsAPI.DialogFactory = dialogFactory;
 			//AppsAPI.LibraryResourceFactory = libraryFactory;
 			//AppsAPI.VideoPlayerFactory = videoPlayerFactory;

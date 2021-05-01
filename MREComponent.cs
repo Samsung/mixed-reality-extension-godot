@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Behaviors;
 using Assets.TestBed_Assets.Scripts.Player;
 using MixedRealityExtension.App;
 using MixedRealityExtension.PluginInterfaces;
@@ -115,7 +116,7 @@ public class MREComponent : Spatial
 				},
 				*/
 				permissionManager: new SimplePermissionManager(GrantedPermissions),
-				//behaviorFactory: new BehaviorFactory(),
+				behaviorFactory: new BehaviorFactory(),
 				//dialogFactory: DialogFactory,
 				//libraryFactory: new ResourceFactory(),
 				//gltfImporterFactory: new VertexShadedGltfImporterFactory(),

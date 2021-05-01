@@ -178,7 +178,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 			var userChildCount = _this.GetChildCount();
 			for (int i = 0; i < userChildCount; i++)
 			{
-				var child = _this.GetChild<T>(i);
+				var child = _this.GetChild(i) as T;
 				if (child != null)
 					return child;
 			}
@@ -190,10 +190,16 @@ namespace MixedRealityExtension.Util.GodotHelper
 			var userChildCount = _this.GetChildCount();
 			for (int i = 0; i < userChildCount; i++)
 			{
-				var child = _this.GetChild<T>(i);
+				var child = _this.GetChild(i) as T;
 				if (child != null)
 					yield return child;
 			}
+		}
+
+		public static T AddNode<T>(this Node _this, T node) where T : Node
+		{
+			_this.AddChild(node);
+			return node;
 		}
 	}
 }
