@@ -106,7 +106,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 	}
-/*FIXME
+/*FIXME ConvexPolygonShape?
 	/// <summary>
 	/// Class that represents the mesh geometry of a mesh collider.
 	/// </summary>

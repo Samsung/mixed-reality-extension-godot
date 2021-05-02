@@ -22,8 +22,7 @@ namespace MixedRealityExtension
 
 			SerializerSettings.Converters.Add(new DashFormattedEnumConverter());
 			SerializerSettings.Converters.Add(new PayloadConverter());
-			//FIXME
-			//SerializerSettings.Converters.Add(new CollisionGeometryConverter());
+			SerializerSettings.Converters.Add(new CollisionGeometryConverter());
 		}
 
 		/*

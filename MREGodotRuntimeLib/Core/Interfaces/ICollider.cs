@@ -19,12 +19,12 @@ namespace MixedRealityExtension.Core.Interfaces
 		/// Whether the collider is enabled.
 		/// </summary>
 		bool IsEnabled { get; }
-
+/*FIXME
 		/// <summary>
 		/// Whether the collider is a trigger.
 		/// </summary>
 		bool IsTrigger { get; }
-
+*/
 		//CollisionLayer CollisionLayer { get; }
 
 		/// <summary>

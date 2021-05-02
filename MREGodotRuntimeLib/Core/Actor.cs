@@ -22,7 +22,7 @@ using System.Linq;
 using Godot;
 
 //using UnityLight = UnityEngine.Light;
-//using UnityCollider = UnityEngine.Collider;
+using GodotCollisionShape = Godot.CollisionShape;
 using MixedRealityExtension.PluginInterfaces.Behaviors;
 using MixedRealityExtension.Util;
 //using IVideoPlayer = MixedRealityExtension.PluginInterfaces.IVideoPlayer;
@@ -38,7 +38,7 @@ namespace MixedRealityExtension.Core
 	{
 		private RigidBody _rigidbody;
 		//private UnityLight _light;
-		//private UnityCollider _collider;
+		private GodotCollisionShape _collider;
 		private ColliderPatch _pendingColliderPatch;
 		private LookAtComponent _lookAt;
 		class MediaInstance
@@ -145,7 +145,7 @@ namespace MixedRealityExtension.Core
 
 		internal IText Text { get; private set; }
 
-		//internal Collider Collider { get; private set; }
+		internal Collider Collider { get; private set; }
 
 		internal Attachment Attachment { get; } = new Attachment();
 		private Attachment _cachedAttachment = new Attachment();
@@ -330,10 +330,11 @@ namespace MixedRealityExtension.Core
 			PatchParent(actorPatch.ParentId);
 			PatchAppearance(actorPatch.Appearance);
 			PatchTransform(actorPatch.Transform);
+			PatchCollider(actorPatch.Collider);
 /*
 			PatchLight(actorPatch.Light);
 			PatchRigidBody(actorPatch.RigidBody);
-			PatchCollider(actorPatch.Collider);
+			
 			PatchText(actorPatch.Text);
 			PatchAttachment(actorPatch.Attachment);
 			PatchLookAt(actorPatch.LookAt);
@@ -469,26 +470,27 @@ namespace MixedRealityExtension.Core
 
 			if (generateAll)
 			{
-				/*
+				/*FIXME
 				var rigidBody = PatchingUtilMethods.GeneratePatch(RigidBody, (Rigidbody)null,
 					App.SceneRoot.transform, !App.UsePhysicsBridge);
+				*/
 
 				ColliderPatch collider = null;
-				_collider = gameObject.GetComponent<UnityCollider>();
-				if (_collider != null)
+				Collider = this.GetChild<Collider>();
+				if (Collider != null)
 				{
-					if (Collider == null)
+					_collider = Collider.GetChild<GodotCollisionShape>();
+					if (_collider != null)
 					{
-						Collider = gameObject.AddComponent<Collider>();
+						Collider.Initialize(_collider);
+						collider = Collider.GenerateInitialPatch();
 					}
-					Collider.Initialize(_collider);
-					collider = Collider.GenerateInitialPatch();
 				}
-*/
+
 				output.ParentId = ParentId;
 				output.Name = Name;
 //				output.RigidBody = rigidBody;
-//				output.Collider = collider;
+				output.Collider = collider;
 				output.Appearance = new AppearancePatch()
 				{
 					Enabled = appearanceEnabled,
@@ -883,7 +885,7 @@ namespace MixedRealityExtension.Core
 			}
 			return RigidBody;
 		}
-
+*/
 		/// <summary>
 		/// Precondition: The mesh referred to by MeshId is loaded and available for use.
 		/// </summary>
@@ -915,43 +917,45 @@ namespace MixedRealityExtension.Core
 				}
 				else
 				{
-					Destroy(_collider);
+					_collider.Free();
 					_collider = null;
 				}
 			}
 
-			UnityCollider unityCollider = null;
+			GodotCollisionShape godotCollisionShape = null;
 
 			switch (colliderType)
 			{
 				case ColliderType.Box:
-					var boxCollider = gameObject.AddComponent<BoxCollider>();
+					var boxCollider = new CollisionShape() { Shape = new BoxShape() };
 					colliderGeometry.Patch(App, boxCollider);
-					unityCollider = boxCollider;
+					godotCollisionShape = boxCollider;
 					break;
 				case ColliderType.Sphere:
-					var sphereCollider = gameObject.AddComponent<SphereCollider>();
+					var sphereCollider =  new CollisionShape() { Shape = new SphereShape() };
 					colliderGeometry.Patch(App, sphereCollider);
-					unityCollider = sphereCollider;
+					godotCollisionShape = sphereCollider;
 					break;
 				case ColliderType.Capsule:
-					var capsuleCollider = gameObject.AddComponent<CapsuleCollider>();
+					var capsuleCollider =  new CollisionShape() { Shape = new CapsuleShape() };
 					colliderGeometry.Patch(App, capsuleCollider);
-					unityCollider = capsuleCollider;
+					godotCollisionShape = capsuleCollider;
 					break;
+					/*FIXME
 				case ColliderType.Mesh:
-					var meshCollider = gameObject.AddComponent<MeshCollider>();
+					var meshCollider =  gameObject.AddComponent<MeshCollider>();
 					colliderGeometry.Patch(App, meshCollider);
-					unityCollider = meshCollider;
+					godotCollisionShape = meshCollider;
 					break;
+					*/
 				default:
 					App.Logger.LogWarning("Cannot add the given collider type to the actor " +
 						$"during runtime.  Collider Type: {colliderPatch.Geometry.Shape}");
 					break;
 			}
 
-			_collider = unityCollider;
-
+			_collider = godotCollisionShape;
+/*FIXME
 			// update bounciness and frictions 
 			if (colliderPatch.Bounciness.HasValue)
 				_collider.material.bounciness = colliderPatch.Bounciness.Value;
@@ -959,15 +963,17 @@ namespace MixedRealityExtension.Core
 				_collider.material.staticFriction = colliderPatch.StaticFriction.Value;
 			if (colliderPatch.DynamicFriction.HasValue)
 				_collider.material.dynamicFriction = colliderPatch.DynamicFriction.Value;
-
+*/
 			if (Collider == null)
 			{
-				Collider = gameObject.AddComponent<Collider>();
+				Collider = new Collider();
+				AddChild(Collider);
 			}
+			Collider.AddChild(_collider);
 			Collider.Initialize(_collider, colliderPatch.Geometry.Shape);
 			return;
 		}
-*/
+
 		private void PatchParent(Guid? parentId)
 		{
 			if (!parentId.HasValue)
@@ -1109,8 +1115,6 @@ namespace MixedRealityExtension.Core
 						var array = ((ArrayMesh)sharedMesh.Asset).SurfaceGetArrays(0);
 						var tt = array[(int)Godot.ArrayMesh.ArrayType.Vertex];
 						Mesh = (Mesh)sharedMesh.Asset;
-						//Mesh = new CubeMesh();
-						/*FIXME
 						if (Collider != null && Collider.Shape == ColliderType.Auto)
 						{
 							SetCollider(new ColliderPatch()
@@ -1118,7 +1122,6 @@ namespace MixedRealityExtension.Core
 								Geometry = new AutoColliderGeometry()
 							});
 						}
-						*/
 					});
 
 					// patch material
@@ -1130,15 +1133,13 @@ namespace MixedRealityExtension.Core
 				// clean up unused components
 				else
 				{
-					/*FIXME
 					if (Collider != null && Collider.Shape == ColliderType.Auto)
 					{
-						Destroy(_collider);
-						Destroy(Collider);
+						_collider.Free();
+						Collider.Free();
 						_collider = null;
 						Collider = null;
 					}
-					*/
 				}
 			}
 
@@ -1420,7 +1421,7 @@ namespace MixedRealityExtension.Core
 				Text.SynchronizeEngine(textPatch);
 			}
 		}
-
+*/
 		private int colliderGeneration = 0;
 		private void PatchCollider(ColliderPatch colliderPatch)
 		{
@@ -1460,7 +1461,7 @@ namespace MixedRealityExtension.Core
 						_pendingColliderPatch.Enabled = colliderPatch.Enabled.Value;
 					if (colliderPatch.IsTrigger.HasValue)
 						_pendingColliderPatch.IsTrigger = colliderPatch.IsTrigger.Value;
-
+/*FIXME
 					// update bounciness and frictions 
 					if (colliderPatch.Bounciness.HasValue)
 						_collider.material.bounciness = colliderPatch.Bounciness.Value;
@@ -1468,6 +1469,7 @@ namespace MixedRealityExtension.Core
 						_collider.material.staticFriction = colliderPatch.StaticFriction.Value;
 					if (colliderPatch.DynamicFriction.HasValue)
 						_collider.material.dynamicFriction = colliderPatch.DynamicFriction.Value;
+*/
 				}
 				else if (_pendingColliderPatch == null)
 				{
@@ -1475,7 +1477,7 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-
+/*FIXME
 		private void PatchAttachment(AttachmentPatch attachmentPatch)
 		{
 			if (attachmentPatch != null && attachmentPatch.IsPatched() && !attachmentPatch.Equals(Attachment))

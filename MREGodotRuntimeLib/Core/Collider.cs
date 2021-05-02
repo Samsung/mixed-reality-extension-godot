@@ -55,16 +55,16 @@ namespace MixedRealityExtension.Core
 		/// </summary>
 		Mesh
 	}
-/*
-	internal class Collider : Node, ICollider
+
+	internal class Collider : Area, ICollider
 	{
-		private GodotCollisionObject _collider;
+		private CollisionShape _collider;
 		private Actor _ownerActor;
 		private ColliderEventType _colliderEventSubscriptions = ColliderEventType.None;
 
 		/// <inheritdoc />
-		public bool IsEnabled => _collider.IsShapeOwnerDisabled;
-
+		public bool IsEnabled => !_collider.Disabled;
+/*FIXME
 		/// <inheritdoc />
 		public bool IsTrigger => _collider.isTrigger;
 
@@ -76,50 +76,54 @@ namespace MixedRealityExtension.Core
 
 		/// <inheritdoc />
 		public float DynamicFriction => _collider.material.dynamicFriction;
-
+*/
 		// /// <inheritdoc />
 		//public CollisionLayer CollisionLayer { get; set; }
 
 		/// <inheritdoc />
 		public ColliderType Shape { get; private set; }
 
-		internal void Initialize(GodotCollisionObject unityCollider, ColliderType? shape = null)
+		internal void Initialize(CollisionShape collisionShape, ColliderType? shape = null)
 		{
-			_ownerActor = unityCollider.gameObject.GetComponent<Actor>()
+			_ownerActor = collisionShape.GetParent().GetParent<Actor>()
 				?? throw new Exception("An MRE collider must be associated with a Unity game object that is an MRE actor.");
-			_collider = unityCollider;
+			_collider = collisionShape;
 
 			if (shape.HasValue)
 			{
 				Shape = shape.Value;
 			}
-			else if (unityCollider is SphereCollider)
+			else if (collisionShape.Shape is SphereShape)
 			{
 				Shape = ColliderType.Sphere;
 			}
-			else if (unityCollider is BoxCollider)
+			else if (collisionShape.Shape is BoxShape)
 			{
 				Shape = ColliderType.Box;
 			}
-			else if (unityCollider is CapsuleCollider)
+			else if (collisionShape.Shape is CapsuleShape)
 			{
 				Shape = ColliderType.Capsule;
 			}
-			else if (unityCollider is MeshCollider)
+			/*FIXME
+			else if (collisionShape.Shape is MeshCollider)
 			{
 				Shape = ColliderType.Mesh;
 			}
+			*/
 		}
 
 		internal void ApplyPatch(ColliderPatch patch)
 		{
-			_collider.enabled = _collider.enabled.GetPatchApplied(IsEnabled.ApplyPatch(patch.Enabled));
+			_collider.Disabled = _collider.Disabled.GetPatchApplied(!IsEnabled.ApplyPatch(patch.Enabled));
+			/*FIXME
 			_collider.isTrigger = _collider.isTrigger.GetPatchApplied(IsTrigger.ApplyPatch(patch.IsTrigger));
 			_collider.material.bounciness = _collider.material.bounciness.GetPatchApplied(Bounciness.ApplyPatch(patch.Bounciness));
 			_collider.material.staticFriction = _collider.material.staticFriction.GetPatchApplied(StaticFriction.ApplyPatch(patch.StaticFriction));
 			_collider.material.dynamicFriction = _collider.material.dynamicFriction.GetPatchApplied(DynamicFriction.ApplyPatch(patch.DynamicFriction));
 
 			MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(patch.Layer, _collider);
+			*/
 
 			if (patch.EventSubscriptions != null)
 			{
@@ -147,42 +151,44 @@ namespace MixedRealityExtension.Core
 			{
 				colliderGeo = new AutoColliderGeometry();
 			}
-			else if (_collider is SphereCollider sphereCollider)
+			else if (_collider.Shape is SphereShape sphereCollider)
 			{
 				colliderGeo = new SphereColliderGeometry()
 				{
-					Radius = sphereCollider.radius,
-					Center = sphereCollider.center.CreateMWVector3()
+					Radius = sphereCollider.Radius,
+					Center = _collider.Transform.origin.CreateMWVector3()
 				};
 			}
-			else if (_collider is BoxCollider boxCollider)
+			else if (_collider.Shape is BoxShape boxCollider)
 			{
 				colliderGeo = new BoxColliderGeometry()
 				{
-					Size = boxCollider.size.CreateMWVector3(),
-					Center = boxCollider.center.CreateMWVector3()
+					Size = boxCollider.Extents.CreateMWVector3(),
+					Center = _collider.Transform.origin.CreateMWVector3()
 				};
 			}
-			else if (_collider is CapsuleCollider capsuleCollider)
+			else if (_collider.Shape is CapsuleShape capsuleCollider)
 			{
 				// The size vector describes the dimensions of the bounding box containing the collider
 				MWVector3 size;
+				/*FXIME there is no direction in godot CapsuleShape.
 				if (capsuleCollider.direction == 0)
 				{
-					size = new MWVector3(capsuleCollider.height, 2 * capsuleCollider.radius, 2 * capsuleCollider.radius);
+					size = new MWVector3(capsuleCollider.Height, 2 * capsuleCollider.Radius, 2 * capsuleCollider.Radius);
 				}
 				else if (capsuleCollider.direction == 1)
 				{
-					size = new MWVector3(2 * capsuleCollider.radius, capsuleCollider.height, 2 * capsuleCollider.radius);
+					size = new MWVector3(2 * capsuleCollider.Radius, capsuleCollider.Height, 2 * capsuleCollider.Radius);
 				}
 				else
+				*/
 				{
-					size = new MWVector3(2 * capsuleCollider.radius, 2 * capsuleCollider.radius, capsuleCollider.height);
+					size = new MWVector3(2 * capsuleCollider.Radius, 2 * capsuleCollider.Radius, capsuleCollider.Height);
 				}
 
 				colliderGeo = new CapsuleColliderGeometry()
 				{
-					Center = capsuleCollider.center.CreateMWVector3(),
+					Center = _collider.Transform.origin.CreateMWVector3(),
 					Size = size
 				};
 			}
@@ -194,17 +200,19 @@ namespace MixedRealityExtension.Core
 
 			return colliderGeo == null ? null : new ColliderPatch()
 			{
-				Enabled = _collider.enabled,
+				Enabled = !_collider.Disabled,
+				/*FIXME
 				IsTrigger = _collider.isTrigger,
 				Bounciness = _collider.material.bounciness,
 				StaticFriction = _collider.material.staticFriction,
 				DynamicFriction = _collider.material.dynamicFriction,
 
 				Layer = MREAPI.AppsAPI.LayerApplicator.DetermineLayerOfCollider(_collider),
+				*/
 				Geometry = colliderGeo
 			};
 		}
-
+/*FIXME
 		private void OnTriggerEnter(GodotCollisionObject other)
 		{
 			if (_colliderEventSubscriptions.HasFlag(ColliderEventType.TriggerEnter))
@@ -286,6 +294,6 @@ namespace MixedRealityExtension.Core
 					new CollisionEvent(_ownerActor.Id, eventType, collisionData));
 			}
 		}
+		*/
 	}
-	*/
 }
