@@ -24,17 +24,16 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			var targetData = new TargetData()
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromUnityVector3(targetPoint, Behavior.Actor.GameObject.transform, app.SceneRoot.transform)
+					PointData.CreateFromGodotVector3(targetPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
 				}
 			};
 
 			TargetAction.StartAction(user, targetData);
-*/
 		}
 
 		public void EndTargeting(IUser user, Vector3 targetPoint)
@@ -44,17 +43,16 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			var targetData = new TargetData()
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromUnityVector3(targetPoint, Behavior.Actor.GameObject.transform, app.SceneRoot.transform)
+					PointData.CreateFromGodotVector3(targetPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
 				}
 			};
 
 			TargetAction.StopAction(user, targetData);
-*/
 		}
 
 		public void UpdateTargetPoint(IUser user, Vector3 targetPoint)
@@ -87,20 +85,19 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			if (_currentTargetPoints.Any())
 			{
 				TargetAction.PerformActionUpdate(new TargetData()
 				{
 					targetedPoints = _currentTargetPoints.Select((point) =>
 					{
-						return PointData.CreateFromUnityVector3(point, Behavior.Actor.GameObject.transform, App.SceneRoot.transform);
+						return PointData.CreateFromGodotVector3(point, Behavior.Actor.node as Spatial, app.SceneRoot);
 					}).ToArray()
 				});
 
 				_currentTargetPoints.Clear();
 			}
-*/
 		}
 
 		protected virtual void OnTargetPointUpdated(Vector3 point)

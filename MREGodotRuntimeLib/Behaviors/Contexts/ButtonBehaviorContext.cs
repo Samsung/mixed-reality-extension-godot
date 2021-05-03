@@ -26,15 +26,14 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			_hoverAction.StartAction(user, new ButtonData()
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromUnityVector3(hoverPoint, Behavior.Actor.GameObject.transform, App.SceneRoot.transform)
+					PointData.CreateFromGodotVector3(hoverPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
 				}
 			});
-*/
 		}
 
 		public void EndHover(IUser user, Vector3 hoverPoint)
@@ -44,15 +43,14 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			_hoverAction.StopAction(user, new ButtonData()
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromUnityVector3(hoverPoint, Behavior.Actor.GameObject.transform, App.SceneRoot.transform)
+					PointData.CreateFromGodotVector3(hoverPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
 				}
 			});
-*/
 		}
 
 		public void StartButton(IUser user, Vector3 buttonStartPoint)
@@ -62,15 +60,14 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			_buttonAction.StartAction(user, new ButtonData()
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromUnityVector3(buttonStartPoint, Behavior.Actor.GameObject.transform, App.SceneRoot.transform)
+					PointData.CreateFromGodotVector3(buttonStartPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
 				}
 			});
-*/
 			IsPressed = true;
 		}
 
@@ -81,15 +78,14 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			_buttonAction.StopAction(user, new ButtonData()
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromUnityVector3(buttonEndPoint, Behavior.Actor.GameObject.transform, App.SceneRoot.transform)
+					PointData.CreateFromGodotVector3(buttonEndPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
 				}
 			});
-*/
 			IsPressed = false;
 		}
 
@@ -100,15 +96,14 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			_clickAction.StartAction(user, new ButtonData()
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromUnityVector3(clickPoint, Behavior.Actor.GameObject.transform, App.SceneRoot.transform)
+					PointData.CreateFromGodotVector3(clickPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
 				}
 			});
-*/
 		}
 
 		internal ButtonBehaviorContext()
@@ -125,14 +120,14 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				return;
 			}
-/*FIXME
+
 			if (_hoverPoints.Any())
 			{
 				_hoverAction.PerformActionUpdate(new ButtonData()
 				{
 					targetedPoints = _hoverPoints.Select((point) =>
 					{
-						return PointData.CreateFromUnityVector3(point, Behavior.Actor.GameObject.transform, App.SceneRoot.transform);
+						return PointData.CreateFromGodotVector3(point, Behavior.Actor.node as Spatial, app.SceneRoot);
 					}).ToArray()
 				});
 
@@ -145,13 +140,12 @@ namespace MixedRealityExtension.Behaviors.Contexts
 				{
 					targetedPoints = _buttonPressedPoints.Select((point) =>
 					{
-						return PointData.CreateFromUnityVector3(point, Behavior.Actor.GameObject.transform, App.SceneRoot.transform);
+						return PointData.CreateFromGodotVector3(point, Behavior.Actor.node as Spatial, app.SceneRoot);
 					}).ToArray()
 				});
 
 				_buttonPressedPoints.Clear();
 			}
-*/
 		}
 
 		protected override void OnTargetPointUpdated(Vector3 targetPoint)

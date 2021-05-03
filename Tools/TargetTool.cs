@@ -100,6 +100,12 @@ namespace Assets.Scripts.Tools
 			{
 				newBehavior = newTarget.GetBehavior<TargetBehavior>();
 
+				// FIXME: This is workaround. Sometimes newBehavior is null even if new Target is an Actor!
+				if (newBehavior == null && newTarget is MixedRealityExtension.Core.Actor)
+				{
+					return;
+				}
+
 				if (newBehavior.GetDesiredToolType() != inputSource.CurrentTool.GetType())
 				{
 					inputSource.HoldTool(newBehavior.GetDesiredToolType());
@@ -169,29 +175,15 @@ namespace Assets.Scripts.Tools
 
 		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
-			hitPoint = null;
-			/*FIXME
-			RaycastHit hitInfo;
-			var gameObject = inputSource.gameObject;
-			hitPoint = null;
-
-			// Only target layers 0 (Default), 5 (UI), and 10 (Hologram).
-			// You still want to hit all layers, but only interact with these.
-			int layerMask = (1 << 0) | (1 << 5) | (1 << 10);
-
-			if (Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hitInfo, Mathf.Inf))
+			if (inputSource.rayCast.IsColliding())
 			{
-				for (var transform = hitInfo.transform; transform; transform = transform.parent)
-				{
-					if (transform.GetComponents<TargetBehavior>().FirstOrDefault() != null
-						&& ((1 << transform.gameObject.layer) | layerMask) != 0)
-					{
-						hitPoint = hitInfo.point;
-						return transform.gameObject;
-					}
-				}
+				hitPoint = inputSource.rayCast.GetCollisionPoint();
+				return (inputSource.rayCast.GetCollider() as Node).GetParent() as Spatial;
 			}
-			*/
+			else
+			{
+				hitPoint = null;
+			}
 
 			return null;
 		}

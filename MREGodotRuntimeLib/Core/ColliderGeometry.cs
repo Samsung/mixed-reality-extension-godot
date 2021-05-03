@@ -53,7 +53,7 @@ namespace MixedRealityExtension.Core
 					newCenter.x = Center.X;
 					newCenter.y = Center.Y;
 					newCenter.z = Center.Z;
-					collider.Transform = new Transform() { origin = newCenter };
+					collider.Transform = new Transform(Basis.Identity, newCenter);
 				}
 
 				if (Radius != null)
@@ -92,7 +92,7 @@ namespace MixedRealityExtension.Core
 					newCenter.x = Center.X;
 					newCenter.y = Center.Y;
 					newCenter.z = Center.Z;
-					collider.Transform = new Transform() { origin = newCenter };
+					collider.Transform = new Transform(Basis.Identity, newCenter);
 				}
 
 				if (Size != null)
@@ -185,7 +185,7 @@ namespace MixedRealityExtension.Core
 					newCenter.x = Center.X;
 					newCenter.y = Center.Y;
 					newCenter.z = Center.Z;
-					collider.Transform = new Transform() { origin = newCenter };
+					collider.Transform = new Transform(Basis.Identity, newCenter);
 				}
 
 				if (Size != null)

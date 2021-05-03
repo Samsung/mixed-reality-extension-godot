@@ -9,6 +9,8 @@ namespace Assets.Scripts.User
 	public class InputSource : Spatial
 	{
 		private Tool _currentTool;
+
+		internal RayCast rayCast;
 		public Node UserNode;
 
 		public Tool CurrentTool => _currentTool;
@@ -17,6 +19,8 @@ namespace Assets.Scripts.User
 
 		public override void _Ready()
 		{
+			rayCast = GetNode<RayCast>("../RayCast");
+			rayCast.CastTo = new Vector3(0, 0, -100);
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
 		}
@@ -53,7 +57,7 @@ namespace Assets.Scripts.User
 			}
 		}
 
-		public override void _Process(float delta)
+		public override void _PhysicsProcess(float delta)
 		{
 			_currentTool.Update(this);
 		}

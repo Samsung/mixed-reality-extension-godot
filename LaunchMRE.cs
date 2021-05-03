@@ -23,6 +23,11 @@ public class LaunchMRE : Spatial
 
 	public LaunchMRE()
 	{
+
+	}
+	// Use this for initialization
+	public override void _Ready()
+	{
 		var Child = new MREComponent();
 		ulong objId = Child.GetInstanceId();
 		Child.Name = "MREComponent";
@@ -36,14 +41,10 @@ public class LaunchMRE : Spatial
 		MREComponent.AutoJoin = true;
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
-		MREComponent.UserNode = new Node(); // FIXME: cursor?
+		MREComponent.UserNode = this.GetNode("Player");//   new Node(); // FIXME: cursor?
 		AddChild(MREComponent);
 
 		LaunchType = LaunchType.OnStart;
-	}
-	// Use this for initialization
-	public override void _Ready()
-	{
 
 	}
 

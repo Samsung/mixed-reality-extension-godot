@@ -111,13 +111,13 @@ namespace MixedRealityExtension.Util.GodotHelper
 			//FIXME
 			//_this.Rotation.FromGodotQuaternion(Quaternion.Inverse(appRoot.rotation) * transform.rotation);
 		}
-/*FIXME
-		public static MWVector3 ToLocalMWVector3(this MWVector3 _this, Vector3 point, Transform objectRoot)
+
+		public static MWVector3 ToLocalMWVector3(this MWVector3 _this, Vector3 point, Spatial objectRoot)
 		{
-			_this.FromGodotVector3(objectRoot.InverseTransformPoint(point));
+			_this.FromGodotVector3(objectRoot.ToGlobal(point));
 			return _this;
 		}
-*/
+
 		public static Vector2 ToVector2(this MWVector2 _this)
 		{
 			return new Vector2()
