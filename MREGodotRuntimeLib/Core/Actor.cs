@@ -1159,12 +1159,8 @@ namespace MixedRealityExtension.Core
 			// Note: MonoBehaviours don't support conditional access (actor.Renderer?.enabled)
 			if (actor != null)
 			{
-				/*FIXME
-				if (actor.Renderer != null && ((actor.Renderer.enabled != actor.activeAndEnabled) || force))
-				{
-					actor.Renderer.enabled = actor.activeAndEnabled;
-				}
-*/
+				actor.Visible = actor.activeAndEnabled;
+
 				foreach (var child in actor.App.FindChildren(actor.Id))
 				{
 					ApplyVisibilityUpdate(child, force);

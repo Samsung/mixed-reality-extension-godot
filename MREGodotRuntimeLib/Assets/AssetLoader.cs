@@ -476,8 +476,7 @@ namespace MixedRealityExtension.Assets
 					try
 					{
 						unityAsset = factory.CreatePrimitive(def.Mesh.Value.PrimitiveDefinition.Value);
-						//FIXME
-						//colliderGeo = ConvertPrimToCollider(def.Mesh.Value.PrimitiveDefinition.Value, def.Id);
+						colliderGeo = ConvertPrimToCollider(def.Mesh.Value.PrimitiveDefinition.Value, def.Id);
 					}
 					catch (Exception e)
 					{
@@ -704,7 +703,7 @@ namespace MixedRealityExtension.Assets
 				throw new Exception($"Asset {id} is not patchable, or not of the right type!");
 			}
 		}
-/*
+
 		internal ColliderGeometry ConvertPrimToCollider(PrimitiveDefinition prim, Guid meshId)
 		{
 			MWVector3 dims = prim.Dimensions;
@@ -727,14 +726,14 @@ namespace MixedRealityExtension.Assets
 					{
 						Size = dims
 					};
-
+/*FIXME
 				case PrimitiveShape.Cylinder:
 					dims = dims ?? new MWVector3(0.2f, 1, 0.2f);
 					return new MeshColliderGeometry()
 					{
 						MeshId = meshId
 					};
-
+*/
 				case PrimitiveShape.Plane:
 					dims = dims ?? new MWVector3(1, 0, 1);
 					return new BoxColliderGeometry()
@@ -746,6 +745,5 @@ namespace MixedRealityExtension.Assets
 					return null;
 			}
 		}
-		*/
 	}
 }
