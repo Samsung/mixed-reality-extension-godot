@@ -24,6 +24,8 @@ using MWTexture = MixedRealityExtension.Assets.Texture;
 using MWMesh = MixedRealityExtension.Assets.Mesh;
 using MWSound = MixedRealityExtension.Assets.Sound;
 using MWVideoStream = MixedRealityExtension.Assets.VideoStream;
+using UnityGLTF.Loader;
+using UnityGLTF;
 
 namespace MixedRealityExtension.Assets
 {
@@ -77,14 +79,15 @@ namespace MixedRealityExtension.Assets
 			newGO.AddChild(actor);
 			return new List<Actor>() { actor };
 		}
-/*
+
 		internal IList<Actor> CreateFromPrefab(Guid prefabId, Guid? parentId, CollisionLayer? collisionLayer)
 		{
-			GameObject prefab = _app.AssetManager.GetById(prefabId)?.Asset as GameObject;
+			var asset = _app.AssetManager.GetById(prefabId)?.Asset;
+			Node prefab = asset as Node;
 
-			GameObject instance = UnityEngine.Object.Instantiate(
-				prefab, GetGameObjectFromParentId(parentId).transform, false);
-
+			Node parent = GetGameObjectFromParentId(parentId);
+			parent.AddChild(prefab.Duplicate());
+/*
 			// copy animation target mapping
 			var sourceMap = prefab.GetComponent<PrefabAnimationTargets>();
 			var destMap = instance.GetComponent<PrefabAnimationTargets>();
@@ -92,11 +95,12 @@ namespace MixedRealityExtension.Assets
 			{
 				destMap.AnimationTargets = sourceMap.AnimationTargets;
 			}
-
+*/
 			// note: actor properties are set in App#ProcessCreatedActors
 			var actorList = new List<Actor>();
-			MWGOTreeWalker.VisitTree(instance, go =>
+			MWGOTreeWalker.VisitTree(prefab, go =>
 			{
+				/*
 				var collider = go.GetComponent<UnityEngine.Collider>();
 				if (collider != null)
 				{
@@ -106,8 +110,8 @@ namespace MixedRealityExtension.Assets
 				{
 					go.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
 				}
-
-				actorList.Add(go.AddComponent<Actor>());
+				*/
+				actorList.Add(go.AddNode(new Actor()));
 			});
 
 			return actorList;
@@ -142,7 +146,7 @@ namespace MixedRealityExtension.Assets
 				failureMessage = UtilMethods.FormatException(
 					$"An unexpected error occurred while loading the asset [{payload.Source.Uri}].", e);
 			}
-
+GD.Print("assets?.Count : "+ assets?.Count);
 			_app.Protocol.Send(new Message()
 			{
 				ReplyToId = payload.MessageId,
@@ -211,7 +215,7 @@ namespace MixedRealityExtension.Assets
 			IList<Asset> assetDefs = new List<Asset>(30);
 			DeterministicGuids guidGenerator = new DeterministicGuids(UtilMethods.StringToGuid(
 				$"{containerId}:{source.ParsedUri.AbsoluteUri}"));
-			IList<UnityEngine.Object> assets;
+			IList<Godot.Object> assets;
 
 			// fetch assets from glTF stream or cache
 			if (source.Version != cachedVersion)
@@ -235,17 +239,21 @@ namespace MixedRealityExtension.Assets
 			foreach (var asset in assets)
 			{
 				var assetDef = GenerateAssetPatch(asset, guidGenerator.Next());
-				assetDef.Name = asset.name;
+				//assetDef.Name = asset.name;
 
 				string internalId = null;
+				/*
 				if (asset is UnityEngine.Texture)
 				{
 					internalId = $"texture:{textureIndex++}";
 				}
-				else if (asset is UnityEngine.Mesh)
+				else 
+				*/
+				if (asset is Godot.Mesh)
 				{
 					internalId = $"mesh:{meshIndex++}";
 				}
+				/*
 				else if (asset is UnityEngine.Material)
 				{
 					internalId = $"material:{materialIndex++}";
@@ -254,10 +262,12 @@ namespace MixedRealityExtension.Assets
 				{
 					internalId = $"scene:{prefabIndex++}";
 				}
+				*/
 				assetDef.Source = new AssetSource(source.ContainerType, source.ParsedUri.AbsoluteUri, internalId, source.Version);
 
 				ColliderGeometry colliderGeo = null;
-				if (asset is UnityEngine.Mesh mesh)
+				/* FIXME
+				if (asset is Godot.Mesh mesh)
 				{
 					colliderGeo = colliderType == ColliderType.Mesh ?
 						(ColliderGeometry)new MeshColliderGeometry() { MeshId = assetDef.Id } :
@@ -267,6 +277,7 @@ namespace MixedRealityExtension.Assets
 							Center = mesh.bounds.center.CreateMWVector3()
 						};
 				}
+				*/
 
 				_app.AssetManager.Set(assetDef.Id, containerId, asset, colliderGeo, assetDef.Source);
 				assetDefs.Add(assetDef);
@@ -275,9 +286,9 @@ namespace MixedRealityExtension.Assets
 			return assetDefs;
 		}
 
-		private async Task<IList<UnityEngine.Object>> LoadGltfFromStream(WebRequestLoader loader, Stream stream, ColliderType colliderType)
+		private async Task<IList<Godot.Object>> LoadGltfFromStream(WebRequestLoader loader, Stream stream, ColliderType colliderType)
 		{
-			var assets = new List<UnityEngine.Object>(30);
+			var assets = new List<Godot.Object>(30);
 
 			// pre-parse glTF document so we can get a scene count
 			// run this on a threadpool thread so that the Unity main thread is not blocked
@@ -291,7 +302,7 @@ namespace MixedRealityExtension.Assets
 			}
 			catch (Exception e)
 			{
-				Debug.LogError(e);
+				GD.PrintErr(e);
 			}
 			if (gltfRoot == null)
 			{
@@ -300,11 +311,12 @@ namespace MixedRealityExtension.Assets
 			stream.Position = 0;
 
 			using (GLTFSceneImporter importer =
-				MREAPI.AppsAPI.GLTFImporterFactory.CreateImporter(gltfRoot, loader, _asyncHelper, stream))
+				MREAPI.AppsAPI.GLTFImporterFactory.CreateImporter(gltfRoot, loader, null /* FIXME _asyncHelper*/, stream))
 			{
-				importer.SceneParent = MREAPI.AppsAPI.AssetCache.CacheRootGO.transform;
+				importer.SceneParent = MREAPI.AppsAPI.AssetCache.CacheRootGO;
 				importer.Collider = colliderType.ToGLTFColliderType();
 
+				/*FIXME not supported in godot?
 				// load textures
 				if (gltfRoot.Textures != null)
 				{
@@ -316,6 +328,7 @@ namespace MixedRealityExtension.Assets
 						assets.Add(texture);
 					}
 				}
+				*/
 
 				// load meshes
 				if (gltfRoot.Meshes != null)
@@ -324,11 +337,11 @@ namespace MixedRealityExtension.Assets
 					for (var i = 0; i < gltfRoot.Meshes.Count; i++)
 					{
 						var mesh = await importer.LoadMeshAsync(i, cancellationSource.Token);
-						mesh.name = gltfRoot.Meshes[i].Name ?? $"mesh:{i}";
+						mesh.ResourceName = gltfRoot.Meshes[i].Name ?? $"mesh:{i}";
 						assets.Add(mesh);
 					}
 				}
-
+				/*FIXME
 				// load materials
 				if (gltfRoot.Materials != null)
 				{
@@ -340,6 +353,7 @@ namespace MixedRealityExtension.Assets
 						assets.Add(material);
 					}
 				}
+				*/
 
 				// load prefabs
 				if (gltfRoot.Scenes != null)
@@ -348,9 +362,9 @@ namespace MixedRealityExtension.Assets
 					{
 						await importer.LoadSceneAsync(i).ConfigureAwait(true);
 
-						GameObject rootObject = importer.LastLoadedScene;
-						rootObject.name = gltfRoot.Scenes[i].Name ?? $"scene:{i}";
-
+						Node rootObject = importer.LastLoadedScene;
+						rootObject.Name = gltfRoot.Scenes[i].Name ?? $"scene:{i}";
+						/* FIXME
 						var animation = rootObject.GetComponent<UnityEngine.Animation>();
 						if (animation != null)
 						{
@@ -365,7 +379,7 @@ namespace MixedRealityExtension.Assets
 						{
 							go.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
 						});
-
+						*/
 						assets.Add(rootObject);
 					}
 				}
@@ -373,7 +387,6 @@ namespace MixedRealityExtension.Assets
 
 			return assets;
 		}
-*/
 
 		[CommandHandler(typeof(AssetUpdate))]
 		internal void OnAssetUpdate(AssetUpdate payload, Action onCompleteCallback)
@@ -594,7 +607,6 @@ namespace MixedRealityExtension.Assets
 */
 		private Asset GenerateAssetPatch(Godot.Object unityAsset, Guid id)
 		{
-			/* FIXME
 			if (unityAsset is Node go)
 			{
 				int actorCount = 0;
@@ -612,8 +624,7 @@ namespace MixedRealityExtension.Assets
 					}
 				};
 			}
-			else */
-			if (unityAsset is Godot.SpatialMaterial mat)
+			else if (unityAsset is Godot.SpatialMaterial mat)
 			{
 				return new Asset()
 				{

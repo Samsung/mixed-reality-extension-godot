@@ -791,6 +791,34 @@ namespace MixedRealityExtension.App
 			}
 		}
 
+		[CommandHandler(typeof(CreateFromPrefab))]
+		private void OnCreateFromPrefab(CreateFromPrefab payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var curGeneration = generation;
+				AssetManager.OnSet(payload.PrefabId, prefab =>
+				{
+					if (this == null || _conn == null || !_conn.IsActive || generation != curGeneration) return;
+					if (prefab.Asset != null)
+					{
+						var createdActors = _assetLoader.CreateFromPrefab(payload.PrefabId, payload.Actor?.ParentId, payload.CollisionLayer);
+						ProcessCreatedActors(payload, createdActors, onCompleteCallback);
+					}
+					else
+					{
+						var message = $"Prefab {payload.PrefabId} failed to load, canceling actor creation";
+						SendCreateActorResponse(payload, failureMessage: message, onCompleteCallback: onCompleteCallback);
+					}
+				});
+			}
+			catch (Exception e)
+			{
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.Print(e);
+			}
+		}
+
 		private void ProcessCreatedActors(CreateActor originalMessage, IList<Actor> createdActors, Action onCompleteCallback, string guidSeed = null)
 		{
 			Guid guidGenSeed;

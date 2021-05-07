@@ -4,6 +4,7 @@ using MixedRealityExtension.API;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Types;
 using Godot;
+using UnityGLTF;
 //using UnityGLTF;
 
 namespace MixedRealityExtension.Util.GodotHelper
@@ -158,7 +159,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 				a = _this.A
 			};
 		}
-/*FIXME
+
 		public static GLTFSceneImporter.ColliderType ToGLTFColliderType(this ColliderType _this)
 		{
 			switch (_this)
@@ -174,6 +175,5 @@ namespace MixedRealityExtension.Util.GodotHelper
 					return GLTFSceneImporter.ColliderType.None;
 			}
 		}
-*/
 	}
 }

@@ -40,7 +40,7 @@ namespace MixedRealityExtension.API
 			// required properties
 			SpatialMaterial defaultMaterial,
 			//ILayerApplicator layerApplicator,
-			//IAssetCache assetCache,
+			IAssetCache assetCache,
 			//ITextFactory textFactory,
 			IPermissionManager permissionManager,
 			// missing features if omitted
@@ -50,14 +50,14 @@ namespace MixedRealityExtension.API
 			//IVideoPlayerFactory videoPlayerFactory = null,
 			// reasonable defaults provided
 			IPrimitiveFactory primitiveFactory = null,
-			//IGLTFImporterFactory gltfImporterFactory = null,
+			IGLTFImporterFactory gltfImporterFactory = null,
 			IMaterialPatcher materialPatcher = null,
 			IMRELogger logger = null)
 		{
 			// required properties
 			AppsAPI.DefaultMaterial = defaultMaterial;
 			//AppsAPI.LayerApplicator = layerApplicator;
-			//AppsAPI.AssetCache = assetCache;
+			AppsAPI.AssetCache = assetCache;
 			//AppsAPI.TextFactory = textFactory;
 			AppsAPI.PermissionManager = permissionManager;
 
@@ -69,7 +69,7 @@ namespace MixedRealityExtension.API
 
 			// reasonable defaults provided
 			AppsAPI.PrimitiveFactory = primitiveFactory ?? new MWPrimitiveFactory();
-			//AppsAPI.GLTFImporterFactory = gltfImporterFactory ?? new GLTFImporterFactory();
+			AppsAPI.GLTFImporterFactory = gltfImporterFactory ?? new GLTFImporterFactory();
 			AppsAPI.MaterialPatcher = materialPatcher ?? new DefaultMaterialPatcher();
 
 #if ANDROID_DEBUG
@@ -118,6 +118,8 @@ namespace MixedRealityExtension.API
 		internal IBehaviorFactory BehaviorFactory { get; set; }
 
 		internal IPrimitiveFactory PrimitiveFactory { get; set; }
+
+		internal IGLTFImporterFactory GLTFImporterFactory { get; set; }
 
 		internal IMaterialPatcher MaterialPatcher { get; set; }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Behaviors;
 using Assets.TestBed_Assets.Scripts.Player;
 using MixedRealityExtension.App;
+using MixedRealityExtension.Assets;
 using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.API;
 using MixedRealityExtension.Core;
@@ -94,17 +95,19 @@ public class MREComponent : Spatial
 	{
 		if (!_apiInitialized)
 		{
-			/*FIXME
-			var assetCacheGo = new GameObject("MRE Asset Cache");
-			var assetCache = assetCacheGo.AddComponent<AssetCache>();
-			assetCache.CacheRootGO = new GameObject("Assets");
-			assetCache.CacheRootGO.transform.SetParent(assetCacheGo.transform, false);
-			assetCache.CacheRootGO.SetActive(false);
-			*/
+			var assetCacheGo = new Node { Name = "MRE Asset Cache" };
+			var assetCache = new AssetCache();
+			assetCacheGo.AddChild(assetCache);
+
+			assetCache.CacheRootGO = new Node { Name = "Assets" };
+
+			//assetCache.CacheRootGO.transform.SetParent(assetCacheGo.transform, false);
+			assetCache.CacheRootGO.SetProcess(false);
+
 			MREAPI.InitializeAPI(
 				defaultMaterial: DefaultPrimMaterial,
 				//layerApplicator: new SimpleLayerApplicator(0, 9, 10, 5),
-				//assetCache: assetCache,
+				assetCache: assetCache,
 				/*
 				textFactory: new TmpTextFactory()
 				{

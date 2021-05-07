@@ -197,9 +197,9 @@ namespace MixedRealityExtension.IPC.Connections
 				var wasOpen = false;
 				var stream = new MemoryStream();
 				var receiveBuffer = new ArraySegment<byte>(new byte[ReceiveBufferSize], 0, ReceiveBufferSize);
-				WebSocketReceiveResult result = default;
-				CancellationTokenSource sendWorkerCancellationSource = default;
-				Task sendWorker = default;
+				WebSocketReceiveResult result = default(WebSocketReceiveResult);
+				CancellationTokenSource sendWorkerCancellationSource = default(CancellationTokenSource);
+				Task sendWorker = default(Task);
 
 				while (true)
 				{
