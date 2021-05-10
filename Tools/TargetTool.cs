@@ -4,6 +4,7 @@ using Assets.Scripts.Behaviors;
 using Assets.Scripts.User;
 using System.Linq;
 using Godot;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace Assets.Scripts.Tools
 {
@@ -101,7 +102,7 @@ namespace Assets.Scripts.Tools
 				newBehavior = newTarget.GetBehavior<TargetBehavior>();
 
 				// FIXME: This is workaround. Sometimes newBehavior is null even if new Target is an Actor!
-				if (newBehavior == null && newTarget is MixedRealityExtension.Core.Actor)
+				if (newBehavior == null /*&& newTarget is MixedRealityExtension.Core.Actor*/)
 				{
 					return;
 				}
@@ -178,7 +179,14 @@ namespace Assets.Scripts.Tools
 			if (inputSource.rayCast.IsColliding())
 			{
 				hitPoint = inputSource.rayCast.GetCollisionPoint();
-				return (inputSource.rayCast.GetCollider() as Node).GetParent() as Spatial;
+				for (var node = (inputSource.rayCast.GetCollider() as Node); node != null; node = node.GetParent())
+				{
+					if (node is MixedRealityExtension.Core.Actor a)
+					{
+						if (node.GetChild<TargetBehavior>() != null)
+							return node as Spatial;
+					}
+				}
 			}
 			else
 			{

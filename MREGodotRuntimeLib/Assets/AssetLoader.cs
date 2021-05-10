@@ -87,7 +87,9 @@ namespace MixedRealityExtension.Assets
 
 			Node parent = GetGameObjectFromParentId(parentId);
 			var newActor = new Actor();
-			newActor.AddChild(prefab.Duplicate());
+			prefab.GetParent().RemoveChild(prefab);
+			GD.Print("prefab id!!: " + prefabId);
+			newActor.AddChild(prefab);
 			parent.AddChild(newActor);
 /*
 			// copy animation target mapping
@@ -100,8 +102,8 @@ namespace MixedRealityExtension.Assets
 */
 			// note: actor properties are set in App#ProcessCreatedActors
 			var actorList = new List<Actor>();
-
 			actorList.Add(newActor);
+
 			/*
 			MWGOTreeWalker.VisitTree(prefab, go =>
 			{
@@ -158,7 +160,7 @@ namespace MixedRealityExtension.Assets
 				failureMessage = UtilMethods.FormatException(
 					$"An unexpected error occurred while loading the asset [{payload.Source.Uri}].", e);
 			}
-GD.Print("assets?.Count : "+ assets?.Count);
+
 			_app.Protocol.Send(new Message()
 			{
 				ReplyToId = payload.MessageId,
@@ -290,6 +292,18 @@ GD.Print("assets?.Count : "+ assets?.Count);
 						};
 				}
 				*/
+				if (asset is Godot.Mesh mesh)
+				{
+					if (colliderType != ColliderType.Mesh)
+					{
+						var aabb = mesh.GetAabb();
+						colliderGeo = (ColliderGeometry)new BoxColliderGeometry()
+						{
+							Size = (aabb.Size * 0.8f).CreateMWVector3(),
+							Center = aabb.Position.CreateMWVector3()
+						};
+					}
+				}
 
 				_app.AssetManager.Set(assetDef.Id, containerId, asset, colliderGeo, assetDef.Source);
 				assetDefs.Add(assetDef);
@@ -603,7 +617,7 @@ GD.Print("assets?.Count : "+ assets?.Count);
 
 			onCompleteCallback?.Invoke();
 		}
-/*
+
 		[CommandHandler(typeof(UnloadAssets))]
 		internal void UnloadAssets(UnloadAssets payload, Action onCompleteCallback)
 		{
@@ -612,7 +626,7 @@ GD.Print("assets?.Count : "+ assets?.Count);
 
 			onCompleteCallback?.Invoke();
 		}
-*/
+
 		private Asset GenerateAssetPatch(Godot.Object unityAsset, Guid id)
 		{
 			if (unityAsset is Node go)

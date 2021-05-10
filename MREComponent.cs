@@ -95,12 +95,13 @@ public class MREComponent : Spatial
 	{
 		if (!_apiInitialized)
 		{
-			var assetCacheGo = new Node { Name = "MRE Asset Cache" };
+			var assetCacheGo = new Spatial { Name = "MRE Asset Cache" };
 			var assetCache = new AssetCache();
 			assetCacheGo.AddChild(assetCache);
 
-			assetCache.CacheRootGO = new Node { Name = "Assets" };
+			assetCache.CacheRootGO = new Spatial { Name = "Assets" };
 
+			//FIXME
 			//assetCache.CacheRootGO.transform.SetParent(assetCacheGo.transform, false);
 			assetCache.CacheRootGO.SetProcess(false);
 
