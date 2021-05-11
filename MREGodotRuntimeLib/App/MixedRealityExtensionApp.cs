@@ -786,7 +786,7 @@ namespace MixedRealityExtension.App
 			}
 			catch (Exception e)
 			{
-				//SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
 				GD.PushError(e.ToString());
 			}
 		}

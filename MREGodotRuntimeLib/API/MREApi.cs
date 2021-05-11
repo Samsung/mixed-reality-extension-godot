@@ -41,7 +41,7 @@ namespace MixedRealityExtension.API
 			SpatialMaterial defaultMaterial,
 			//ILayerApplicator layerApplicator,
 			IAssetCache assetCache,
-			//ITextFactory textFactory,
+			ITextFactory textFactory,
 			IPermissionManager permissionManager,
 			// missing features if omitted
 			IBehaviorFactory behaviorFactory = null,
@@ -58,7 +58,7 @@ namespace MixedRealityExtension.API
 			AppsAPI.DefaultMaterial = defaultMaterial;
 			//AppsAPI.LayerApplicator = layerApplicator;
 			AppsAPI.AssetCache = assetCache;
-			//AppsAPI.TextFactory = textFactory;
+			AppsAPI.TextFactory = textFactory;
 			AppsAPI.PermissionManager = permissionManager;
 
 			// missing features if omitted
@@ -116,6 +116,8 @@ namespace MixedRealityExtension.API
 		public IAssetCache AssetCache { get; internal set; }
 
 		internal IBehaviorFactory BehaviorFactory { get; set; }
+
+		internal ITextFactory TextFactory { get; set; }
 
 		internal IPrimitiveFactory PrimitiveFactory { get; set; }
 

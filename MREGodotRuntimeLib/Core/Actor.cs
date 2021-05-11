@@ -395,11 +395,12 @@ namespace MixedRealityExtension.Core
 			PatchAppearance(actorPatch.Appearance);
 			PatchTransform(actorPatch.Transform);
 			PatchCollider(actorPatch.Collider);
+			PatchText(actorPatch.Text);
 /*
 			PatchLight(actorPatch.Light);
 			PatchRigidBody(actorPatch.RigidBody);
 			
-			PatchText(actorPatch.Text);
+			
 			PatchAttachment(actorPatch.Attachment);
 			PatchLookAt(actorPatch.LookAt);
 			PatchGrabbable(actorPatch.Grabbable);
@@ -875,13 +876,13 @@ namespace MixedRealityExtension.Core
 				hostAppUser.AfterAvatarCreated += Reattach;
 			}
 		}
-/*
+
 		private IText AddText()
 		{
 			Text = MREAPI.AppsAPI.TextFactory.CreateText(this);
 			return Text;
 		}
-
+/*
 		private Light AddLight()
 		{
 			if (_light == null)
@@ -1468,7 +1469,7 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-
+*/
 		private void PatchText(TextPatch textPatch)
 		{
 			if (textPatch != null)
@@ -1480,7 +1481,7 @@ namespace MixedRealityExtension.Core
 				Text.SynchronizeEngine(textPatch);
 			}
 		}
-*/
+
 		private int colliderGeneration = 0;
 		private void PatchCollider(ColliderPatch colliderPatch)
 		{

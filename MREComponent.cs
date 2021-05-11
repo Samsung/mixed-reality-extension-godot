@@ -109,16 +109,7 @@ public class MREComponent : Spatial
 				defaultMaterial: DefaultPrimMaterial,
 				//layerApplicator: new SimpleLayerApplicator(0, 9, 10, 5),
 				assetCache: assetCache,
-				/*
-				textFactory: new TmpTextFactory()
-				{
-					DefaultFont = DefaultFont,
-					SerifFont = SerifFont,
-					SansSerifFont = SansSerifFont,
-					MonospaceFont = MonospaceFont,
-					CursiveFont = CursiveFont
-				},
-				*/
+				textFactory: new SimpleTextFactory(),
 				permissionManager: new SimplePermissionManager(GrantedPermissions),
 				behaviorFactory: new BehaviorFactory(),
 				//dialogFactory: DialogFactory,
