@@ -6,7 +6,7 @@ using Godot;
 
 namespace Assets.Scripts.User
 {
-	public class InputSource : Spatial
+	public class InputSource : Camera
 	{
 		private Tool _currentTool;
 
@@ -19,7 +19,7 @@ namespace Assets.Scripts.User
 
 		public override void _Ready()
 		{
-			rayCast = GetNode<RayCast>("../RayCast");
+			rayCast = GetNode<RayCast>("RayCast");
 			rayCast.CastTo = new Vector3(0, 0, -100);
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);

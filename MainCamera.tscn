@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://MainCamera.cs" type="Script" id=1]
 [ext_resource path="res://Player/InputSource.cs" type="Script" id=2]
@@ -15,10 +15,17 @@
 
 [sub_resource type="GradientTexture" id=6]
 
-[sub_resource type="CubeMesh" id=7]
-
 [node name="Player" type="KinematicBody"]
 script = ExtResource( 1 )
+
+[node name="MainCamera" type="Camera" parent="."]
+current = true
+script = ExtResource( 2 )
+
+[node name="RayCast" type="RayCast" parent="MainCamera"]
+enabled = true
+cast_to = Vector3( 0, 0, -1 )
+collide_with_areas = true
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
@@ -29,10 +36,6 @@ disabled = true
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
-
-[node name="MainCamera" type="Camera" parent="."]
-current = true
-script = ExtResource( 2 )
 
 [node name="HUD" type="Control" parent="."]
 anchor_right = 1.0
@@ -110,13 +113,3 @@ margin_bottom = 12.5
 rect_rotation = 90.0
 texture = SubResource( 6 )
 expand = true
-
-[node name="MeshInstance2" type="MeshInstance" parent="."]
-transform = Transform( 0.01, 0, 0, 0, 0.01, 0, 0, 0, 10, 0, 0, -11.2323 )
-mesh = SubResource( 7 )
-material/0 = null
-
-[node name="RayCast" type="RayCast" parent="."]
-enabled = true
-cast_to = Vector3( 0, 0, -1 )
-collide_with_areas = true
