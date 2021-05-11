@@ -51,10 +51,10 @@ namespace MixedRealityExtension.Assets
 			*/
 		}
 
-		internal Node GetGameObjectFromParentId(Guid? parentId)
+		internal Spatial GetGameObjectFromParentId(Guid? parentId)
 		{
 			var parent = _app.FindActor(parentId ?? Guid.Empty) as Actor;
-			return parent ?? _app.SceneRoot;
+			return parent?.Node3D ?? _app.SceneRoot;
 		}
 /*FIXME
 		internal async Task<IList<Actor>> CreateFromLibrary(string resourceId, Guid? parentId)
@@ -69,28 +69,23 @@ namespace MixedRealityExtension.Assets
 */
 		internal IList<Actor> CreateEmpty(Guid? parentId)
 		{
-			Node newGO = _app.AssetManager.EmptyTemplate().Duplicate();
+			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
 			GetGameObjectFromParentId(parentId).AddChild(newGO);
 
 			//FIXME
 			//newGO.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
 
-			Actor actor = new Actor();
-			newGO.AddChild(actor);
+			Actor actor = Actor.Instantiate(newGO);
 			return new List<Actor>() { actor };
 		}
 
 		internal IList<Actor> CreateFromPrefab(Guid prefabId, Guid? parentId, CollisionLayer? collisionLayer)
 		{
-			var asset = _app.AssetManager.GetById(prefabId)?.Asset;
-			Node prefab = asset as Node;
+			var asset = _app.AssetManager.GetById(prefabId)?.Asset as Node;
+			Spatial prefab = asset.Duplicate() as Spatial;
 
-			Node parent = GetGameObjectFromParentId(parentId);
-			var newActor = new Actor();
-			prefab.GetParent().RemoveChild(prefab);
-			GD.Print("prefab id!!: " + prefabId);
-			newActor.AddChild(prefab);
-			parent.AddChild(newActor);
+			Spatial parent = GetGameObjectFromParentId(parentId);
+			parent.AddChild(prefab);
 /*
 			// copy animation target mapping
 			var sourceMap = prefab.GetComponent<PrefabAnimationTargets>();
@@ -102,9 +97,6 @@ namespace MixedRealityExtension.Assets
 */
 			// note: actor properties are set in App#ProcessCreatedActors
 			var actorList = new List<Actor>();
-			actorList.Add(newActor);
-
-			/*
 			MWGOTreeWalker.VisitTree(prefab, go =>
 			{
 				/*
@@ -117,17 +109,14 @@ namespace MixedRealityExtension.Assets
 				{
 					go.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
 				}
-				
-				//actorList.Add(go.AddNode(new Actor()));
-				if (go is Spatial)
+				*/
+				if (go.GetType() == typeof(Spatial))
 				{
-					var newActor = new Actor();
-					newActor.AddChild(go);
+					var newActor = Actor.Instantiate((Spatial)go);
 					actorList.Add(newActor);
 				}
-				GD.Print(go);
 			});
-			*/
+
 			return actorList;
 		}
 

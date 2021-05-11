@@ -712,11 +712,11 @@ namespace MixedRealityExtension.App
 			}
 		}
 
-		private Node[] GetDistinctTreeRoots(Node[] gos)
+		private Spatial[] GetDistinctTreeRoots(Spatial[] gos)
 		{
 			// identify game objects whose ancestors are not also flagged to be actors
 			var goIds = new HashSet<ulong>(gos.Select(go => go.GetInstanceId()));
-			var rootGos = new List<Node>(gos.Length);
+			var rootGos = new List<Spatial>(gos.Length);
 			foreach (var go in gos)
 			{
 				if (!ancestorInList(go))
@@ -727,11 +727,11 @@ namespace MixedRealityExtension.App
 
 			return rootGos.ToArray();
 
-			bool ancestorInList(Node go)
+			bool ancestorInList(Spatial go)
 			{
 				return go != null && go.GetParent() != null && (
 					goIds.Contains(go.GetParent().GetInstanceId()) ||
-					ancestorInList(go.GetParent()));
+					ancestorInList(go.GetParent() as Spatial));
 			}
 		}
 
@@ -833,12 +833,10 @@ namespace MixedRealityExtension.App
 			var guids = new DeterministicGuids(guidGenSeed);
 
 			// find the actors with no actor parents
-			/*FIXME
 			var rootActors = GetDistinctTreeRoots(
 				createdActors.ToArray()
-			).Select(go => go.GetComponent<Actor>()).ToArray();
-			*/
-			var rootActors = createdActors.ToArray();
+			).Select(go => go as Actor).ToArray();
+			//var rootActors = createdActors.ToArray();
 			var rootActor = createdActors.FirstOrDefault();
 			var createdAnims = new List<Animation.BaseAnimation>(5);
 
@@ -862,7 +860,7 @@ namespace MixedRealityExtension.App
 			var secondPassXfrms = new List<Transform>(2);
 			foreach (var root in rootActors)
 			{
-				ProcessActors(root, root.GetParent() as Actor);
+				ProcessActors(root.Node3D, root.GetParent() as Actor);
 			}
 			// some things require the whole hierarchy to have actors on it. run those here
 			foreach (var pass2 in secondPassXfrms)
@@ -879,47 +877,47 @@ namespace MixedRealityExtension.App
 			_actorManager.UponStable(
 				() => SendCreateActorResponse(originalMessage, actors: createdActors, anims: createdAnims, onCompleteCallback: onCompleteCallback));
 
-			void ProcessActors(Node xfrm, Actor parent)
+			void ProcessActors(Spatial node3D, Actor parent)
 			{
-				// Generate actors for all GameObjects, even if the loader didn't. Only loader-generated
+				// Generate actors for all node3D, even if the loader didn't. Only loader-generated
 				// actors are returned to the app though. We do this so library objects get enabled/disabled
 				// correctly, even if they're not tracked by the app.
-				Actor actor = xfrm as Actor;
-				if (actor == null)
-				{
-					actor = new Actor();
-					xfrm.AddChild(actor);
-				}
+				Actor actor = (node3D as Actor) ?? Actor.Instantiate(node3D);
 
 				_actorManager.AddActor(guids.Next(), actor);
 				_ownedNodes.Add(actor);
 
 				actor.ParentId = parent?.Id ?? actor.ParentId;
-				/* FIXME
-				if (actor.Renderer != null)
+
+				if (actor.MeshInstance != null)
 				{
 					// only overwrite material if there's something in the cache, i.e. not a random library material
-					var matId = AssetManager.GetByObject(actor.Renderer.sharedMaterial)?.Id;
-					if (matId.HasValue)
+					if (actor.MeshInstance.MaterialOverride != null)
 					{
-						actor.MaterialId = matId.Value;
+						var matId = AssetManager.GetByObject(actor.MeshInstance.MaterialOverride)?.Id;
+						if (matId.HasValue)
+						{
+							actor.MaterialId = matId.Value;
+						}
 					}
 
-					actor.MeshId = AssetManager.GetByObject(actor.UnityMesh)?.Id ?? Guid.Empty;
+					actor.MeshId = AssetManager.GetByObject(actor.GodotMesh)?.Id ?? Guid.Empty;
 				}
 
+				/* FIXME
 				// native animation construction requires the whole actor hierarchy to already exist. defer to second pass
 				var nativeAnim = xfrm.gameObject.GetComponent<UnityEngine.Animation>();
 				if (nativeAnim != null && createdActors.Contains(actor))
 				{
 					secondPassXfrms.Add(xfrm);
 				}
-				
-				foreach (Transform child in xfrm)
-				{
-					ProcessActors(child, actor);
-				}
 				*/
+
+				foreach (object node in actor.GetChildren())
+				{
+					if (node.GetType() == typeof(Spatial) || node.GetType() == typeof(Actor))
+						ProcessActors((Spatial)node, actor);
+				}
 			}
 
 			void ProcessActors2(Transform xfrm)

@@ -31,7 +31,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromGodotVector3(hoverPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
+					PointData.CreateFromGodotVector3(hoverPoint, Behavior.Actor.Node3D as Spatial, app.SceneRoot)
 				}
 			});
 		}
@@ -48,7 +48,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromGodotVector3(hoverPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
+					PointData.CreateFromGodotVector3(hoverPoint, Behavior.Actor.Node3D as Spatial, app.SceneRoot)
 				}
 			});
 		}
@@ -65,7 +65,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromGodotVector3(buttonStartPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
+					PointData.CreateFromGodotVector3(buttonStartPoint, Behavior.Actor.Node3D as Spatial, app.SceneRoot)
 				}
 			});
 			IsPressed = true;
@@ -83,7 +83,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromGodotVector3(buttonEndPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
+					PointData.CreateFromGodotVector3(buttonEndPoint, Behavior.Actor.Node3D as Spatial, app.SceneRoot)
 				}
 			});
 			IsPressed = false;
@@ -101,7 +101,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromGodotVector3(clickPoint, Behavior.Actor.node as Spatial, app.SceneRoot)
+					PointData.CreateFromGodotVector3(clickPoint, Behavior.Actor.Node3D as Spatial, app.SceneRoot)
 				}
 			});
 		}
@@ -127,7 +127,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 				{
 					targetedPoints = _hoverPoints.Select((point) =>
 					{
-						return PointData.CreateFromGodotVector3(point, Behavior.Actor.node as Spatial, app.SceneRoot);
+						return PointData.CreateFromGodotVector3(point, Behavior.Actor.Node3D as Spatial, app.SceneRoot);
 					}).ToArray()
 				});
 
@@ -140,7 +140,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 				{
 					targetedPoints = _buttonPressedPoints.Select((point) =>
 					{
-						return PointData.CreateFromGodotVector3(point, Behavior.Actor.node as Spatial, app.SceneRoot);
+						return PointData.CreateFromGodotVector3(point, Behavior.Actor.Node3D as Spatial, app.SceneRoot);
 					}).ToArray()
 				});
 

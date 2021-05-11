@@ -20,9 +20,9 @@ namespace MixedRealityExtension.Core.Components
 
 		}
 
-		private void Start()
+		public override void _Ready()
 		{
-			AttachedActor = this.GetChild<Actor>() ??
+			AttachedActor = GetParent() as Actor ??
 				throw new NullReferenceException("Node must have an actor node on it if it is going to have an actor component on it.");
 		}
 	}

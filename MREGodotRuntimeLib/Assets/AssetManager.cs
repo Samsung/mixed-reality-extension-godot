@@ -54,7 +54,7 @@ namespace MixedRealityExtension.Assets
 		private readonly Dictionary<Guid, List<AssetCallback>> Callbacks
 			= new Dictionary<Guid, List<AssetCallback>>(50);
 		private readonly Node cacheRoot;
-		private readonly Node emptyTemplate;
+		private readonly Spatial emptyTemplate;
 
 		public AssetManager(App.IMixedRealityExtensionApp app, Node root = null)
 		{
@@ -63,7 +63,7 @@ namespace MixedRealityExtension.Assets
 			//FIXME
 			//cacheRoot.SetActive(false);
 
-			emptyTemplate = new Node { Name = "Empty" };
+			emptyTemplate = new Spatial { Name = "Empty" };
 			cacheRoot.AddChild(emptyTemplate);
 		}
 
@@ -81,7 +81,7 @@ namespace MixedRealityExtension.Assets
 		/// The game object that should be duplicated for new actors.
 		/// </summary>
 		/// <returns></returns>
-		public Node EmptyTemplate()
+		public Spatial EmptyTemplate()
 		{
 			return emptyTemplate;
 		}
@@ -102,7 +102,6 @@ namespace MixedRealityExtension.Assets
 				// copy sourced assets if requesting write-safe
 				if (writeSafe)
 				{
-					//FIXME
 					//MakeWriteSafe(metadata);
 				}
 				return Assets[id.Value];

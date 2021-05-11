@@ -19,11 +19,14 @@ transform = Transform( 1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0
 transform = Transform( 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.5, 4.942 )
 
 [node name="Area" type="Area" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.454101, 0, 11.111 )
+transform = Transform( 0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -3.73684, 0, 0 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Area"]
 shape = SubResource( 1 )
 disabled = true
+__meta__ = {
+"_editor_description_": ""
+}
 
 [node name="MeshInstance" type="MeshInstance" parent="Area"]
 mesh = SubResource( 2 )

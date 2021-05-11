@@ -36,6 +36,21 @@ namespace MixedRealityExtension.Core
 	/// </summary>
 	internal sealed class Actor : MixedRealityExtensionObject, ICommandHandlerContext, IActor
 	{
+		//FIXME: need to change path
+		private static Resource Resource = ResourceLoader.Load("MREGodotRuntimeLib/Core/Actor.cs");
+
+		public static Actor Instantiate(Spatial node3D)
+		{
+			var parent = node3D.GetParent();
+			ulong objId = node3D.GetInstanceId();
+			parent.RemoveChild(node3D);
+
+			node3D.SetScript(Resource);
+			var newNode = GD.InstanceFromId(objId) as Actor;
+			parent.AddChild(newNode);
+			return newNode;
+		}
+
 		private RigidBody _rigidbody;
 		//private UnityLight _light;
 		private GodotCollisionShape _collider;
@@ -69,6 +84,20 @@ namespace MixedRealityExtension.Core
 
 		private ActorTransformPatch _rbTransformPatch;
 
+		private MeshInstance meshInstance = null;
+
+		internal MeshInstance MeshInstance
+		{
+			get
+			{
+				if (meshInstance == null)
+				{
+					meshInstance = Node3D.GetChild<MeshInstance>();
+				}
+				return meshInstance;
+			}
+		}
+
 		/// <summary>
 		/// Checks if rigid body is simulated locally.
 		/// </summary>
@@ -101,7 +130,7 @@ namespace MixedRealityExtension.Core
 				if (_localTransform == null)
 				{
 					_localTransform = new MWScaledTransform();
-					_localTransform.ToLocalTransform(this);
+					_localTransform.ToLocalTransform(Node3D);
 				}
 
 				return _localTransform;
@@ -121,7 +150,7 @@ namespace MixedRealityExtension.Core
 				if (_appTransform == null)
 				{
 					_appTransform = new MWTransform();
-					_appTransform.ToAppTransform(this, App.SceneRoot);
+					_appTransform.ToAppTransform(Node3D, App.SceneRoot);
 				}
 
 				return _appTransform;
@@ -169,9 +198,9 @@ namespace MixedRealityExtension.Core
 					var updatedMaterialId = _materialId;
 					App.AssetManager.OnSet(_materialId, sharedMat =>
 					{
-						if (_materialId != updatedMaterialId) return;
+						if (this == null || MeshInstance == null || _materialId != updatedMaterialId) return;
 
-						MaterialOverride = (Material)sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial;
+						MeshInstance.MaterialOverride = (Material)sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial;
 
 						// keep this material up to date
 						if (!ListeningForMaterialChanges)
@@ -183,7 +212,7 @@ namespace MixedRealityExtension.Core
 				}
 				else
 				{
-					MaterialOverride = MREAPI.AppsAPI.DefaultMaterial;
+					MeshInstance.MaterialOverride = MREAPI.AppsAPI.DefaultMaterial;
 					if (ListeningForMaterialChanges)
 					{
 						App.AssetManager.AssetReferenceChanged -= CheckMaterialReferenceChanged;
@@ -194,6 +223,42 @@ namespace MixedRealityExtension.Core
 		}
 
 		internal Guid MeshId { get; set; } = Guid.Empty;
+
+		internal Mesh GodotMesh
+		{
+			get
+			{
+				/*FIXME
+				if (Renderer is SkinnedMeshRenderer skinned)
+				{
+					return skinned.sharedMesh;
+				}
+				else if (MeshFilter != null)
+				{
+					return MeshFilter.sharedMesh;
+				}
+				else
+				{
+					return null;
+				}
+				*/
+				return MeshInstance.Mesh;
+			}
+			set
+			{
+				/*FIXME
+				if (Renderer is SkinnedMeshRenderer skinned)
+				{
+					skinned.sharedMesh = value;
+				}
+				else
+				{
+					MeshFilter.sharedMesh = value;
+				}
+				*/
+				MeshInstance.Mesh = value;
+			}
+		}
 
 		internal bool Grabbable { get; private set; }
 
@@ -241,7 +306,6 @@ namespace MixedRealityExtension.Core
 			var component = GetActorComponent<ComponentT>();
 			if (component == null)
 			{
-				//component = gameObject.AddComponent<ComponentT>();
 				component = new ComponentT();
 				this.AddChild(component);
 				component.AttachedActor = this;
@@ -303,7 +367,7 @@ namespace MixedRealityExtension.Core
 				if (IsGrabbed || _grabbedLastSync)
 				{
 					var appTransform = new MWTransform();
-					appTransform.ToAppTransform(this, App.SceneRoot);
+					appTransform.ToAppTransform(Node3D, App.SceneRoot);
 
 					var actorCorrection = new ActorCorrection()
 					{
@@ -397,10 +461,10 @@ namespace MixedRealityExtension.Core
 			{
 				if (generateAll || path.PathParts[1] == "local")
 				{
-					LocalTransform.ToLocalTransform(this);
+					LocalTransform.ToLocalTransform(Node3D);
 					if (generateAll || path.PathParts[2] == "position")
 					{
-						var localPos = this.Transform.origin;
+						var localPos = Node3D.Transform.origin;
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
 						{
 							output.Transform.Local.Position.X = localPos.x;
@@ -416,7 +480,7 @@ namespace MixedRealityExtension.Core
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
 					{
-						var localRot = new Quat(this.Rotation);
+						var localRot = new Quat(Node3D.Rotation);
 						output.Transform.Local.Rotation.X = localRot.x;
 						output.Transform.Local.Rotation.Y = localRot.y;
 						output.Transform.Local.Rotation.Z = localRot.z;
@@ -424,7 +488,7 @@ namespace MixedRealityExtension.Core
 					}
 					if (generateAll || path.PathParts[2] == "scale")
 					{
-						var localScale = this.Scale;
+						var localScale = Node3D.Scale;
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
 						{
 							output.Transform.Local.Scale.X = localScale.x;
@@ -441,7 +505,7 @@ namespace MixedRealityExtension.Core
 				}
 				if (generateAll || path.PathParts[1] == "app")
 				{
-					AppTransform.ToAppTransform(this, App.SceneRoot);
+					AppTransform.ToAppTransform(Node3D, App.SceneRoot);
 					if (generateAll || path.PathParts[2] == "position")
 					{
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
@@ -459,7 +523,7 @@ namespace MixedRealityExtension.Core
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
 					{
-						var localRot = new Quat(this.Rotation);
+						var localRot = new Quat(Node3D.Rotation);
 						output.Transform.App.Rotation.X = AppTransform.Rotation.X;
 						output.Transform.App.Rotation.Y = AppTransform.Rotation.Y;
 						output.Transform.App.Rotation.Z = AppTransform.Rotation.Z;
@@ -476,15 +540,16 @@ namespace MixedRealityExtension.Core
 				*/
 
 				ColliderPatch collider = null;
-				Collider = this.GetChild<Collider>();
-				if (Collider != null)
+				var area = Node3D.GetChild<Area>();
+				_collider = area?.GetChild<GodotCollisionShape>();
+				if (_collider != null)
 				{
-					_collider = Collider.GetChild<GodotCollisionShape>();
-					if (_collider != null)
+					if (Collider == null)
 					{
-						Collider.Initialize(_collider);
-						collider = Collider.GenerateInitialPatch();
+						Collider = Collider.Instantiate(area);
 					}
+					Collider.Initialize(_collider);
+					collider = Collider.GenerateInitialPatch();
 				}
 
 				output.ParentId = ParentId;
@@ -578,8 +643,8 @@ namespace MixedRealityExtension.Core
 
 			if (flags.HasFlag(ActorComponentType.Transform))
 			{
-				__methodVar_localTransform.ToLocalTransform(this);
-				__methodVar_appTransform.ToAppTransform(this, App.SceneRoot);
+				__methodVar_localTransform.ToLocalTransform(Node3D);
+				__methodVar_appTransform.ToAppTransform(Node3D, App.SceneRoot);
 
 				actorPatch.Transform = new ActorTransformPatch()
 				{
@@ -967,7 +1032,7 @@ namespace MixedRealityExtension.Core
 			if (Collider == null)
 			{
 				Collider = new Collider();
-				AddChild(Collider);
+				Node3D.AddChild(Collider);
 			}
 			Collider.AddChild(_collider);
 			Collider.Initialize(_collider, colliderPatch.Geometry.Shape);
@@ -986,13 +1051,13 @@ namespace MixedRealityExtension.Core
 			{
 				// clear parent
 				ParentId = Guid.Empty;
-				App.SceneRoot.AddChild(this);
+				App.SceneRoot.AddChild(Node3D);
 			}
 			else if (parentId.Value != ParentId && newParent != null)
 			{
 				// reassign parent
 				ParentId = parentId.Value;
-				((Actor)newParent).AddChild(this);
+				((Actor)newParent).Node3D.AddChild(Node3D);
 			}
 			else if (parentId.Value != ParentId)
 			{
@@ -1005,7 +1070,7 @@ namespace MixedRealityExtension.Core
 						var freshParent = App.FindActor(ParentId) as Actor;
 						if (this != null && freshParent != null && Parent != freshParent)
 						{
-							freshParent.AddChild(this);
+							freshParent.Node3D.AddChild(Node3D);
 						}
 					}
 				}, null);
@@ -1091,14 +1156,15 @@ namespace MixedRealityExtension.Core
 				// apply mesh/material to game object
 				if (MeshId != Guid.Empty)
 				{
-					/*
-					// guarantee renderer component
-					if (renderer == null)
+					// guarantee meshInstance
+					if (meshInstance == null)
 					{
-						renderer = gameObject.AddComponent<MeshRenderer>();
-						renderer.sharedMaterial = MREAPI.AppsAPI.DefaultMaterial;
+						meshInstance = new MeshInstance();
+						Node3D.AddChild(meshInstance);
+						meshInstance.MaterialOverride = MREAPI.AppsAPI.DefaultMaterial;
 						forceUpdateRenderer = true;
 					}
+					/*FIXME
 					// guarantee mesh filter (unless it has a skinned mesh renderer)
 					if (renderer is MeshRenderer && meshFilter == null)
 					{
@@ -1111,10 +1177,7 @@ namespace MixedRealityExtension.Core
 					App.AssetManager.OnSet(MeshId, sharedMesh =>
 					{
 						if (MeshId != updatedMeshId) return;
-						var aabb = ((ArrayMesh)sharedMesh.Asset).GetAabb();
-						var array = ((ArrayMesh)sharedMesh.Asset).SurfaceGetArrays(0);
-						var tt = array[(int)Godot.ArrayMesh.ArrayType.Vertex];
-						Mesh = (Mesh)sharedMesh.Asset;
+						GodotMesh = (Mesh)sharedMesh.Asset;
 						if (Collider != null && Collider.Shape == ColliderType.Auto)
 						{
 							SetCollider(new ColliderPatch()
@@ -1159,7 +1222,7 @@ namespace MixedRealityExtension.Core
 			// Note: MonoBehaviours don't support conditional access (actor.Renderer?.enabled)
 			if (actor != null)
 			{
-				actor.Visible = actor.activeAndEnabled;
+				actor.Node3D.Visible = actor.activeAndEnabled;
 
 				foreach (var child in actor.App.FindChildren(actor.Id))
 				{
@@ -1174,9 +1237,9 @@ namespace MixedRealityExtension.Core
 		/// <param name="id"></param>
 		private void CheckMaterialReferenceChanged(Guid id)
 		{
-			if (this != null && MaterialId == id)
+			if (this != null && MaterialId == id && MeshInstance != null)
 			{
-				MaterialOverride = (Material)App.AssetManager.GetById(id).Value.Asset;
+				MeshInstance.MaterialOverride = (Material)App.AssetManager.GetById(id).Value.Asset;
 			}
 		}
 
@@ -1189,14 +1252,14 @@ namespace MixedRealityExtension.Core
 					// Apply local first.
 					if (transformPatch.Local != null)
 					{
-						this.ApplyLocalPatch(LocalTransform, transformPatch.Local);
+						Node3D.ApplyLocalPatch(LocalTransform, transformPatch.Local);
 					}
 
 					// Apply app patch second to ensure it overrides any duplicate values from the local patch.
 					// App transform patching always wins over local, except for scale.
 					if (transformPatch.App != null)
 					{
-						this.ApplyAppPatch(App.SceneRoot, AppTransform, transformPatch.App);
+						Node3D.ApplyAppPatch(App.SceneRoot, AppTransform, transformPatch.App);
 					}
 				}
 				else

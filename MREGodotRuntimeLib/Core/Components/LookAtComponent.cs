@@ -24,7 +24,7 @@ namespace MixedRealityExtension.Core.Components
 				IActor targetActor = AttachedActor.App.FindActor(patch.ActorId.Value);
 				if (targetActor != null)
 				{
-					_targetObject = targetActor.node as Spatial;
+					_targetObject = targetActor.Node3D as Spatial;
 				}
 				else
 				{

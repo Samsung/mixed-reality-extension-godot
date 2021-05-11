@@ -10,14 +10,13 @@ namespace MixedRealityExtension.Util.GodotHelper
 
 		public static void VisitTree(Node treeRoot, VisitorFn fn)
 		{
+			var children = treeRoot.GetChildren();
 			fn(treeRoot);
 
-			var childCount = treeRoot.GetChildCount(); 
 			// Walk children to add to the actors flat list.
-			for (int i = 0; i < childCount; ++i)
+			foreach (Node child in children)
 			{
-				var childGO = treeRoot.GetChild(i);
-				VisitTree(childGO, fn);
+				VisitTree(child, fn);
 			}
 		}
 	}
