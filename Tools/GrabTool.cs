@@ -124,7 +124,7 @@ namespace Assets.Scripts.Tools
 			_previousParent.AddChild(CurrentGrabbedTarget);
 			CurrentGrabbedTarget = null;
 
-			_manipulator.Free();
+			_manipulator.QueueFree();
 			_manipulator = null;
 		}
 
@@ -147,7 +147,7 @@ namespace Assets.Scripts.Tools
 		{
 			if (_manipulator != null)
 			{
-				_manipulator.Free();
+				_manipulator.QueueFree();
 			}
 		}
 	}

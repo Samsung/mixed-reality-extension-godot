@@ -350,6 +350,7 @@ namespace MixedRealityExtension.App
 		private void Shutdown(bool reactivateOnPermissions)
 		{
 			Disconnect();
+			FreeResources();
 
 			if (!reactivateOnPermissions)
 			{
@@ -372,7 +373,7 @@ namespace MixedRealityExtension.App
 		{
 			foreach (Node node in _ownedNodes)
 			{
-				node.Free();
+				node.QueueFree();
 			}
 
 			_ownedNodes.Clear();
@@ -380,13 +381,12 @@ namespace MixedRealityExtension.App
 			AnimationManager.Reset();
 			/*FIXME
 			PhysicsBridge.Reset();
-
+			*/
 			foreach (Guid id in _assetLoader.ActiveContainers)
 			{
 				AssetManager.Unload(id);
 			}
 			_assetLoader.ActiveContainers.Clear();
-			*/
 		}
 
 		/// <inheritdoc />
@@ -667,6 +667,8 @@ namespace MixedRealityExtension.App
 				Protocol.Stop();
 				Protocol = new Idle(this);
 			}
+
+			FreeResources();
 
 			this.OnDisconnected?.Invoke();
 		}

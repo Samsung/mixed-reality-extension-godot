@@ -199,7 +199,14 @@ namespace MixedRealityExtension.Assets
 				// asset is a one-off, just destroy it
 				if (asset.Source == null)
 				{
-					asset.Asset.Free();
+					if (asset.Asset is Node node)
+					{
+						node.QueueFree();
+					}
+					else
+					{
+						asset.Asset.Free();
+					}
 				}
 				// asset is shared with other MRE instances, just return asset to cache
 				else

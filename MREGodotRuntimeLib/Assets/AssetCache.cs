@@ -209,7 +209,14 @@ namespace MixedRealityExtension.Assets
 					foreach (var o in item.Assets)
 					{
 						CacheInspector.Remove(o);
-						o.Free();
+						if (o is Node node)
+						{
+							node.QueueFree();
+						}
+						else
+						{
+							o.Free();
+						}
 					}
 					return true;
 				}

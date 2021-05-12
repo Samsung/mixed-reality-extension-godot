@@ -1200,7 +1200,7 @@ namespace MixedRealityExtension.Core
 					if (Collider != null && Collider.Shape == ColliderType.Auto)
 					{
 						_collider.Free();
-						Collider.Free();
+						Collider.QueueFree();
 						_collider = null;
 						Collider = null;
 					}
