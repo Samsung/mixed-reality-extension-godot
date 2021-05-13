@@ -372,8 +372,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 				for (int i = fan.Count - 1; i > 1; i--)
 				{
 					triangles.Add(0 + count);
-					triangles.Add(i + count);
 					triangles.Add(i - 1 + count);
+					triangles.Add(i + count);
 				}
 			}
 			else
@@ -381,8 +381,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 				for (int i = 1; i < fan.Count - 1; i++)
 				{
 					triangles.Add(0 + count);
-					triangles.Add(i + count);
 					triangles.Add(i + 1 + count);
+					triangles.Add(i + count);
 				}
 			}
 			vertices.AddRange(fan);
@@ -441,8 +441,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 				i++, j += i%2*2, k += (i + 1)%2*2)
 			{
 				triangles.Add(i + vertices.Count);
-				triangles.Add(j + vertices.Count);
 				triangles.Add(k + vertices.Count);
+				triangles.Add(j + vertices.Count);
 			}
 			vertices.AddRange(strip);
 			this.normals.AddRange(normals);

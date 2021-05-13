@@ -10,7 +10,6 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// </summary>
 	public partial class MeshDraft
 	{
-		/*
 		#region Platonic solids
 
 		/// <summary>
@@ -45,7 +44,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			}
 			return draft;
 		}
-*/
+
 		/// <summary>
 		/// Constructs a cube draft
 		/// </summary>
@@ -103,7 +102,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			}
 			return draft;
 		}
-/*FIXME
+
 		/// <summary>
 		/// Constructs a octahedron draft
 		/// </summary>
@@ -141,11 +140,11 @@ namespace MixedRealityExtension.ProceduralToolkit
 			}
 
 			var draft = new MeshDraft {name = "Dodecahedron"}
-				.AddTriangleFan(upperCap, Vector3.up)
+				.AddTriangleFan(upperCap, Vector3.Up)
 				.AddFlatTriangleBand(upperRing, upperCap, false)
 				.AddFlatTriangleBand(lowerRing, upperRing, false)
 				.AddFlatTriangleBand(lowerCap, lowerRing, false)
-				.AddTriangleFan(lowerCap, Vector3.down, true);
+				.AddTriangleFan(lowerCap, Vector3.Down, true);
 			return draft;
 		}
 
@@ -234,7 +233,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				for (int x = 0; x <= xSegments; x++)
 				{
 					draft.vertices.Add(new Vector3(x*xStep, 0f, z*zStep));
-					draft.normals.Add(Vector3.up);
+					draft.normals.Add(Vector3.Up);
 					if (generateUV)
 					{
 						draft.uv.Add(new Vector2((float) x/xSegments, (float) z/zSegments));
@@ -248,11 +247,12 @@ namespace MixedRealityExtension.ProceduralToolkit
 				for (int x = 0; x < xSegments; x++)
 				{
 					draft.triangles.Add(i);
-					draft.triangles.Add(i + xSegments + 1);
-					draft.triangles.Add(i + 1);
 					draft.triangles.Add(i + 1);
 					draft.triangles.Add(i + xSegments + 1);
+					draft.triangles.Add(i + 1);
 					draft.triangles.Add(i + xSegments + 2);
+					draft.triangles.Add(i + xSegments + 1);
+
 					i++;
 				}
 				i++;
@@ -275,7 +275,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				currentAngle += segmentAngle;
 			}
 
-			var draft = new MeshDraft().AddBaselessPyramid(Vector3.up*height, ring, generateUV);
+			var draft = new MeshDraft().AddBaselessPyramid(Vector3.Up*height, ring, generateUV);
 			if (generateUV)
 			{
 				var fanUV = new Vector2[segments];
@@ -287,11 +287,11 @@ namespace MixedRealityExtension.ProceduralToolkit
 					fanUV[i] = uv;
 					currentAngle += segmentAngle;
 				}
-				draft.AddTriangleFan(ring, Vector3.down, fanUV, true);
+				draft.AddTriangleFan(ring, Vector3.Down, fanUV, true);
 			}
 			else
 			{
-				draft.AddTriangleFan(ring, Vector3.down, true);
+				draft.AddTriangleFan(ring, Vector3.Down, true);
 			}
 			draft.name = "Pyramid";
 			return draft;
@@ -313,8 +313,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 			}
 
 			var draft = new MeshDraft {name = "Bipyramid"}
-				.AddBaselessPyramid(Vector3.up*height/2, ring, generateUV)
-				.AddBaselessPyramid(Vector3.down*height/2, ring, generateUV, true);
+				.AddBaselessPyramid(Vector3.Up*height/2, ring, generateUV)
+				.AddBaselessPyramid(Vector3.Down*height/2, ring, generateUV, true);
 			return draft;
 		}
 
@@ -325,7 +325,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		{
 			float segmentAngle = 360f/segments;
 			float currentAngle = 0;
-			Vector3 halfHeightUp = Vector3.up*height/2;
+			Vector3 halfHeightUp = Vector3.Up*height/2;
 
 			var lowerRing = new List<Vector3>(segments);
 			var lowerDiskUV = new List<Vector2>();
@@ -352,13 +352,13 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 			if (generateUV)
 			{
-				draft.AddTriangleFan(upperRing, Vector3.up, upperDiskUV)
-					.AddTriangleFan(lowerRing, Vector3.down, lowerDiskUV, true);
+				draft.AddTriangleFan(upperRing, Vector3.Up, upperDiskUV)
+					.AddTriangleFan(lowerRing, Vector3.Down, lowerDiskUV, true);
 			}
 			else
 			{
-				draft.AddTriangleFan(upperRing, Vector3.up)
-					.AddTriangleFan(lowerRing, Vector3.down, true);
+				draft.AddTriangleFan(upperRing, Vector3.Up)
+					.AddTriangleFan(lowerRing, Vector3.Down, true);
 			}
 			return draft;
 		}
@@ -370,7 +370,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		{
 			float segmentAngle = 360f/segments;
 			float currentAngle = 0;
-			Vector3 halfHeightUp = Vector3.up*height/2;
+			Vector3 halfHeightUp = Vector3.Up*height/2;
 
 			var draft = new MeshDraft {name = "Cylinder"};
 			var lowerRing = new List<Vector3>(segments);
@@ -406,14 +406,14 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 			if (generateUV)
 			{
-				draft.AddTriangleFan(lowerRing, Vector3.down, lowerDiskUV, true);
-				draft.AddTriangleFan(upperRing, Vector3.up, upperDiskUV);
+				draft.AddTriangleFan(lowerRing, Vector3.Down, lowerDiskUV, true);
+				draft.AddTriangleFan(upperRing, Vector3.Up, upperDiskUV);
 				draft.AddTriangleStrip(strip, stripNormals, stripUV);
 			}
 			else
 			{
-				draft.AddTriangleFan(lowerRing, Vector3.down, true);
-				draft.AddTriangleFan(upperRing, Vector3.up);
+				draft.AddTriangleFan(lowerRing, Vector3.Down, true);
+				draft.AddTriangleFan(upperRing, Vector3.Up);
 				draft.AddTriangleStrip(strip, stripNormals);
 			}
 			return draft;
@@ -587,7 +587,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				{
 					Vector3 point = surfaceFunction(radius, height, currentHorizontalAngle, currentVerticalAngle);
 					draft.vertices.Add(point);
-					draft.normals.Add(point.normalized);
+					draft.normals.Add(point.Normalized());
 					if (generateUV)
 					{
 						draft.uv.Add(new Vector2((float) x/horizontalSegments, (float) y/verticalSegments));
@@ -609,12 +609,12 @@ namespace MixedRealityExtension.ProceduralToolkit
 					int i3 = (ring + 1)*horizontalCount + i + 1;
 
 					draft.triangles.Add(i0);
-					draft.triangles.Add(i1);
 					draft.triangles.Add(i2);
+					draft.triangles.Add(i1);
 
 					draft.triangles.Add(i2);
-					draft.triangles.Add(i1);
 					draft.triangles.Add(i3);
+					draft.triangles.Add(i1);
 				}
 			}
 			return draft;
@@ -682,10 +682,10 @@ namespace MixedRealityExtension.ProceduralToolkit
 			var faces = new int[3 * numFaces];
 			int vi = 0, fi = 0, topCap = 0, botCap = 1;
 
-			verts[vi].Set(0, (float)(height / 2 + radius), 0);
-			norms[vi++].Set(0, 1, 0);
-			verts[vi].Set(0, (float)(-height / 2 - radius), 0);
-			norms[vi++].Set(0, -1, 0);
+			verts[vi] = new Vector3(0, (float)(height / 2 + radius), 0);
+			norms[vi++] = new Vector3(0, 1, 0);
+			verts[vi] = new Vector3(0, (float)(-height / 2 - radius), 0);
+			norms[vi++] = new Vector3(0, -1, 0);
 
 			for (var s = 0; s < segments; s++)
 			{
@@ -694,21 +694,21 @@ namespace MixedRealityExtension.ProceduralToolkit
 					var radial = radius * Math.Sin(r * phi);
 
 					// create verts (top cap)
-					verts[vi].Set(
+					verts[vi] = new Vector3(
 						(float)(radial * Math.Cos(s * theta)),
 						(float)(height / 2 + radius * Math.Cos(r * phi)),
 						(float)(radial * Math.Sin(s * theta))
 					);
-					norms[vi].Set(
+					norms[vi] = new Vector3(
 						(float)Math.Cos(s * theta),
 						(float)Math.Cos(r * phi),
 						(float)Math.Sin(s * theta)
 					);
-					norms[vi++].Normalize();
+					norms[vi++].Normalized();
 
 					// mirror top-cap verts for bottom cap
-					verts[vi].Set(verts[vi - 1].x, -verts[vi - 1].y, verts[vi - 1].z);
-					norms[vi].Set(norms[vi - 1].x, -norms[vi - 1].y, norms[vi - 1].z);
+					verts[vi] = new Vector3(verts[vi - 1].x, -verts[vi - 1].y, verts[vi - 1].z);
+					norms[vi] = new Vector3(norms[vi - 1].x, -norms[vi - 1].y, norms[vi - 1].z);
 					vi++;
 
 					int top_s1r1 = vi - 2, top_s1r0 = vi - 4;
@@ -727,35 +727,35 @@ namespace MixedRealityExtension.ProceduralToolkit
 					if (r == 1)
 					{
 						faces[3 * fi + 0] = topCap;
-						faces[3 * fi + 1] = top_s1r1;
-						faces[3 * fi + 2] = top_s0r1;
+						faces[3 * fi + 1] = top_s0r1;
+						faces[3 * fi + 2] = top_s1r1;
 						fi++;
 
 						faces[3 * fi + 0] = botCap;
-						faces[3 * fi + 1] = bot_s0r1;
-						faces[3 * fi + 2] = bot_s1r1;
+						faces[3 * fi + 1] = bot_s1r1;
+						faces[3 * fi + 2] = bot_s0r1;
 						fi++;
 					}
 					else
 					{
 						faces[3 * fi + 0] = top_s1r0;
-						faces[3 * fi + 1] = top_s1r1;
-						faces[3 * fi + 2] = top_s0r0;
+						faces[3 * fi + 1] = top_s0r0;
+						faces[3 * fi + 2] = top_s1r1;
 						fi++;
 
 						faces[3 * fi + 0] = top_s0r0;
-						faces[3 * fi + 1] = top_s1r1;
-						faces[3 * fi + 2] = top_s0r1;
+						faces[3 * fi + 1] = top_s0r1;
+						faces[3 * fi + 2] = top_s1r1;
 						fi++;
 
 						faces[3 * fi + 0] = bot_s0r1;
-						faces[3 * fi + 1] = bot_s1r1;
-						faces[3 * fi + 2] = bot_s0r0;
+						faces[3 * fi + 1] = bot_s0r0;
+						faces[3 * fi + 2] = bot_s1r1;
 						fi++;
 
 						faces[3 * fi + 0] = bot_s0r0;
-						faces[3 * fi + 1] = bot_s1r1;
-						faces[3 * fi + 2] = bot_s1r0;
+						faces[3 * fi + 1] = bot_s1r0;
+						faces[3 * fi + 2] = bot_s1r1;
 						fi++;
 					}
 				}
@@ -770,13 +770,13 @@ namespace MixedRealityExtension.ProceduralToolkit
 				}
 
 				faces[3 * fi + 0] = top_s0;
-				faces[3 * fi + 1] = top_s1;
-				faces[3 * fi + 2] = bot_s1;
+				faces[3 * fi + 1] = bot_s1;
+				faces[3 * fi + 2] = top_s1;
 				fi++;
 
 				faces[3 * fi + 0] = bot_s0;
-				faces[3 * fi + 1] = top_s0;
-				faces[3 * fi + 2] = bot_s1;
+				faces[3 * fi + 1] = bot_s1;
+				faces[3 * fi + 2] = top_s0;
 				fi++;
 			}
 
@@ -788,6 +788,5 @@ namespace MixedRealityExtension.ProceduralToolkit
 				normals = new List<Vector3>(norms)
 			};
 		}
-		*/
 	}
 }
