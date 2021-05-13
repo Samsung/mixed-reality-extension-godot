@@ -12,8 +12,7 @@ public class SimpleText : IText
 	private readonly Label label;
 	private readonly DynamicFont dynamicFont;
 	private readonly Viewport textViewport;
-
-	private static readonly float ViewportHegiht = 444;
+	private TextAnchorLocation anchor;
 
 	/// <inheritdoc />
 	public bool Enabled
@@ -48,25 +47,28 @@ public class SimpleText : IText
 	/// <inheritdoc />
 	public float PixelsPerLine { get; private set; }
 
-	private static readonly Dictionary<TextAnchorLocation, Vector2> Pivot = new Dictionary<TextAnchorLocation, Vector2>
+	private static readonly Dictionary<TextAnchorLocation, Vector3> Pivot = new Dictionary<TextAnchorLocation, Vector3>
 	{
-		{ TextAnchorLocation.TopLeft, new Vector2(0, 1)},
-		{ TextAnchorLocation.TopCenter, new Vector2(0.5f, 1) },
-		{ TextAnchorLocation.TopRight, new Vector2(1, 1) },
-		{ TextAnchorLocation.MiddleLeft, new Vector2(0, 0.5f) },
-		{ TextAnchorLocation.MiddleCenter, new Vector2(0.5f, 0.5f) },
-		{ TextAnchorLocation.MiddleRight, new Vector2(1, 0.5f) },
-		{ TextAnchorLocation.BottomLeft, new Vector2(0, 0) },
-		{ TextAnchorLocation.BottomCenter, new Vector2(0.5f, 0) },
-		{ TextAnchorLocation.BottomRight, new Vector2(1, 0) }
+		{ TextAnchorLocation.TopLeft, new Vector3(1, -1, 0)},
+		{ TextAnchorLocation.TopCenter, new Vector3(0, -1, 0) },
+		{ TextAnchorLocation.TopRight, new Vector3(-1, -1, 0) },
+		{ TextAnchorLocation.MiddleLeft, new Vector3(1, 0, 0) },
+		{ TextAnchorLocation.MiddleCenter, new Vector3(0, 0, 0) },
+		{ TextAnchorLocation.MiddleRight, new Vector3(-1, 0, 0) },
+		{ TextAnchorLocation.BottomLeft, new Vector3(1, 1, 0) },
+		{ TextAnchorLocation.BottomCenter, new Vector3(0, 1, 0) },
+		{ TextAnchorLocation.BottomRight, new Vector3(-1, 1, 0) }
 	};
 
-	//FIXME
 	/// <inheritdoc />
 	public TextAnchorLocation Anchor
 	{
-		get;
-		private set;
+		get => anchor;
+		private set
+		{
+			anchor = value;
+			resizeContainer();
+		}
 	}
 
 	//FIXME
@@ -147,7 +149,6 @@ public class SimpleText : IText
 		PixelsPerLine = 50;
 		Height = 1;
 
-		Anchor = TextAnchorLocation.TopLeft;
 		Justify = TextJustify.Left;
 		Font = FontFamily.SansSerif;
 	}
@@ -171,10 +172,11 @@ public class SimpleText : IText
 
 	private void resizeContainer()
 	{
-		label.RectSize = new Vector2(dynamicFont.GetStringSize(label.Text).x, ViewportHegiht / 2);
-		textViewport.Size = new Vector2(label.RectSize.x * 3f, ViewportHegiht);
-		textMesh.Scale = new Vector3(label.RectSize.x * 0.005f,
-									textMesh.Scale.y,
+		label.RectSize = dynamicFont.GetStringSize(label.Text);
+		textViewport.Size = new Vector2(label.RectSize.x * 3f, label.RectSize.y * 2f);
+		textMesh.Scale = new Vector3(label.RectSize.x * 0.003f,
+									label.RectSize.y * 0.003f,
 									textMesh.Scale.z);
+		textMesh.Translation = Pivot[Anchor] * textMesh.Scale;
 	}
 }
