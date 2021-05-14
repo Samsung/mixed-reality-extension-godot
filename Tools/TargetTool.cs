@@ -78,7 +78,7 @@ namespace Assets.Scripts.Tools
 
 			Vector3? hitPoint;
 			var newTarget = FindTarget(inputSource, out hitPoint);
-			if (Target == null && newTarget == null)
+			if ((Target == null || !Godot.Object.IsInstanceValid(Target)) && (newTarget == null || !Godot.Object.IsInstanceValid(newTarget)))
 			{
 				return;
 			}

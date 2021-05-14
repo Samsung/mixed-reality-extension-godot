@@ -57,7 +57,7 @@ namespace Assets.Scripts.User
 			}
 		}
 
-		public override void _PhysicsProcess(float delta)
+		public override void _Process(float delta)
 		{
 			_currentTool.Update(this);
 		}
