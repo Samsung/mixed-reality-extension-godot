@@ -60,8 +60,9 @@ namespace MixedRealityExtension.Assets
 		{
 			App = app;
 			cacheRoot = root ?? new Node { Name = "MRE Cache Root" };
-			//FIXME
-			//cacheRoot.SetActive(false);
+			cacheRoot.SetProcess(false);
+			if (cacheRoot != root)
+				app.SceneRoot.AddChild(cacheRoot);
 
 			emptyTemplate = new Spatial { Name = "Empty" };
 			cacheRoot.AddChild(emptyTemplate);

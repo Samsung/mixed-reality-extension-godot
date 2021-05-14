@@ -203,7 +203,7 @@ namespace MixedRealityExtension.App
 
 			var cacheRoot = new Node() { Name = "MRE Cache" };
 			_ownerScript.AddChild(cacheRoot);
-			//cacheRoot.SetActive(false);
+			cacheRoot.SetProcess(false);
 			_assetManager = new AssetManager(this, cacheRoot);
 
 			RPC = new RPCInterface(this);
