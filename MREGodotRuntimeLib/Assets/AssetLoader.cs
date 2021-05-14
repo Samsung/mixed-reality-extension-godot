@@ -24,8 +24,8 @@ using MWTexture = MixedRealityExtension.Assets.Texture;
 using MWMesh = MixedRealityExtension.Assets.Mesh;
 using MWSound = MixedRealityExtension.Assets.Sound;
 using MWVideoStream = MixedRealityExtension.Assets.VideoStream;
-using UnityGLTF.Loader;
-using UnityGLTF;
+using GodotGLTF.Loader;
+using GodotGLTF;
 
 namespace MixedRealityExtension.Assets
 {

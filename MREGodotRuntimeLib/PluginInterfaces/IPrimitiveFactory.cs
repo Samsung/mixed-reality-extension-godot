@@ -13,7 +13,7 @@ namespace MixedRealityExtension.PluginInterfaces
 	public interface IPrimitiveFactory
 	{
 		/// <summary>
-		/// Create a new Unity mesh with a known shape
+		/// Create a new Godot mesh with a known shape
 		/// </summary>
 		/// <param name="definition">The shape and size of the primitive to create</param>
 		/// <returns>The mesh of the newly created primitive</returns>

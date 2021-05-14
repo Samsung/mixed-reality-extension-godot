@@ -135,7 +135,7 @@ namespace MixedRealityExtension.Util
 			var error = lines[0];
 			var trace = string.Join("\n", lines.Where(l =>
 				l.Contains("MixedRealityExtension") ||
-				l.Contains("UnityGLTF") ||
+				l.Contains("GodotGLTF") ||
 				l.Contains("Rethrow")));
 			return $"{message} The trace is below:\n{error}\n{trace}";
 		}

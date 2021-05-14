@@ -3,8 +3,8 @@
 using System.IO;
 using GLTF.Schema;
 using MixedRealityExtension.Assets;
-using UnityGLTF;
-using UnityGLTF.Loader;
+using GodotGLTF;
+using GodotGLTF.Loader;
 
 namespace MixedRealityExtension.PluginInterfaces
 {

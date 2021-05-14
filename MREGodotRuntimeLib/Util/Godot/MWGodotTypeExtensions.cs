@@ -4,8 +4,8 @@ using MixedRealityExtension.API;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Types;
 using Godot;
-using UnityGLTF;
-//using UnityGLTF;
+using GodotGLTF;
+//using GodotGLTF;
 
 namespace MixedRealityExtension.Util.GodotHelper
 {

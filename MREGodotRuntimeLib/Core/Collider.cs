@@ -101,7 +101,7 @@ namespace MixedRealityExtension.Core
 		internal void Initialize(CollisionShape collisionShape, ColliderType? shape = null)
 		{
 			_ownerActor = collisionShape.GetParent().GetParent<Actor>()
-				?? throw new Exception("An MRE collider must be associated with a Unity game object that is an MRE actor.");
+				?? throw new Exception("An MRE collider must be associated with an MRE actor.");
 			_collider = collisionShape;
 
 			if (shape.HasValue)
@@ -209,7 +209,7 @@ namespace MixedRealityExtension.Core
 			}
 			else
 			{
-				_ownerActor.App.Logger.LogWarning($"MRE SDK does not support the following Unity collider and will not " +
+				_ownerActor.App.Logger.LogWarning($"MRE SDK does not support the following Godot collision shape and will not " +
 					$"be available in the MRE app.  Collider Type: {_collider.GetType()}");
 			}
 
