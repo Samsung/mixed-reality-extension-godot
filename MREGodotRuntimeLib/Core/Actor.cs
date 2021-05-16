@@ -396,12 +396,12 @@ namespace MixedRealityExtension.Core
 			PatchTransform(actorPatch.Transform);
 			PatchCollider(actorPatch.Collider);
 			PatchText(actorPatch.Text);
+			PatchAttachment(actorPatch.Attachment);
 /*
 			PatchLight(actorPatch.Light);
 			PatchRigidBody(actorPatch.RigidBody);
 			
 			
-			PatchAttachment(actorPatch.Attachment);
 			PatchLookAt(actorPatch.LookAt);
 			PatchGrabbable(actorPatch.Grabbable);
 			PatchSubscriptions(actorPatch.Subscriptions);
@@ -435,9 +435,7 @@ namespace MixedRealityExtension.Core
 		internal void Destroy()
 		{
 			CleanUp();
-
-			//FIXME
-			//Destroy(gameObject);
+			this.QueueFree();
 		}
 
 		internal ActorPatch GeneratePatch(ActorPatch output = null, TargetPath path = null)
@@ -779,14 +777,13 @@ namespace MixedRealityExtension.Core
 			};
 			return FindAttachmentRecursive(this);
 		}
-/*
+
 		private void DetachFromAttachPointParent()
 		{
 			try
 			{
-				if (transform != null)
 				{
-					var attachmentComponent = transform.parent.GetComponents<MREAttachmentComponent>()
+					var attachmentComponent = GetParent().GetChildren<MREAttachmentComponent>()
 						.FirstOrDefault(component =>
 							component.Actor != null &&
 							component.Actor.Id == Id &&
@@ -796,10 +793,10 @@ namespace MixedRealityExtension.Core
 					if (attachmentComponent != null)
 					{
 						attachmentComponent.Actor = null;
-						Destroy(attachmentComponent);
+						attachmentComponent.QueueFree();
 
-						var parent = Parent != null ? (Parent as Actor).transform : App.SceneRoot.transform;
-						transform.SetParent(parent, false);
+						var parent = Parent != null ? (Parent as Actor) : App.SceneRoot;
+						parent.AddChild(this);
 					}
 				}
 			}
@@ -822,13 +819,14 @@ namespace MixedRealityExtension.Core
 				{
 					hostAppUser.BeforeAvatarDestroyed -= UserInfo_BeforeAvatarDestroyed;
 
-					Transform attachPoint = hostAppUser.GetAttachPoint(Attachment.AttachPoint);
+					Node attachPoint = hostAppUser.GetAttachPoint(Attachment.AttachPoint);
 					if (attachPoint != null)
 					{
-						var attachmentComponent = attachPoint.gameObject.AddComponent<MREAttachmentComponent>();
+						var attachmentComponent = attachPoint.AddNode(new MREAttachmentComponent());
 						attachmentComponent.Actor = this;
 						attachmentComponent.UserId = Attachment.UserId;
-						transform.SetParent(attachPoint, false);
+						this.GetParent().RemoveChild(this);
+						attachPoint.AddChild(this);
 						hostAppUser.BeforeAvatarDestroyed += UserInfo_BeforeAvatarDestroyed;
 						return true;
 					}
@@ -841,7 +839,6 @@ namespace MixedRealityExtension.Core
 
 			return false;
 		}
-*/
 		private void UserInfo_BeforeAvatarDestroyed()
 		{
 			// Remember the original local transform.
@@ -1537,7 +1534,7 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-/*FIXME
+
 		private void PatchAttachment(AttachmentPatch attachmentPatch)
 		{
 			if (attachmentPatch != null && attachmentPatch.IsPatched() && !attachmentPatch.Equals(Attachment))
@@ -1549,7 +1546,7 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-
+/*FIXME
 		private void PatchLookAt(LookAtPatch lookAtPatch)
 		{
 			if (lookAtPatch != null)
