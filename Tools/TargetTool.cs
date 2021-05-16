@@ -176,6 +176,7 @@ namespace Assets.Scripts.Tools
 
 		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
+			hitPoint = null;
 			if (inputSource.rayCast.IsColliding())
 			{
 				hitPoint = inputSource.rayCast.GetCollisionPoint();
@@ -187,10 +188,6 @@ namespace Assets.Scripts.Tools
 							return node as Spatial;
 					}
 				}
-			}
-			else
-			{
-				hitPoint = null;
 			}
 
 			return null;

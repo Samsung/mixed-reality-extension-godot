@@ -2,12 +2,12 @@
 // Licensed under the MIT License.
 
 using CollisionLayer = MixedRealityExtension.Core.CollisionLayer;
-//using Collider = UnityEngine.Collider;
+using Godot;
 
 namespace MixedRealityExtension.PluginInterfaces
 {
 	/// <summary>
-	/// Apply an MRE collider layers to Unity colliders.
+	/// Apply an MRE collision layers to Unity collision.
 	/// </summary>
 	public interface ILayerApplicator
 	{
@@ -15,20 +15,19 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// The Unity layer new actors should be created on.
 		/// </summary>
 		byte DefaultLayer { get; }
-/*FIXME
-		/// <summary>
-		/// Apply a layer to a collider.
-		/// </summary>
-		/// <param name="layer">An MRE collision layer</param>
-		/// <param name="collider">A Unity collider</param>
-		void ApplyLayerToCollider(CollisionLayer? layer, Collider collider);
 
 		/// <summary>
-		/// Get a collider's layer.
+		/// Apply a layer to a collision.
 		/// </summary>
-		/// <param name="collider">The collider.</param>
-		/// <returns>The layer the given collider is on.</returns>
-		CollisionLayer DetermineLayerOfCollider(Collider collider);
-*/
+		/// <param name="layer">An MRE collision layer</param>
+		/// <param name="area">A Godot Area</param>
+		void ApplyLayerToCollider(CollisionLayer? layer, Area area);
+
+		/// <summary>
+		/// Get a collision's layer.
+		/// </summary>
+		/// <param name="area">The area.</param>
+		/// <returns>The layer the given collision is on.</returns>
+		CollisionLayer DetermineLayerOfCollider(Area area);
 	}
 }

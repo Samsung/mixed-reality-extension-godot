@@ -72,9 +72,6 @@ namespace MixedRealityExtension.Assets
 			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
 			GetGameObjectFromParentId(parentId).AddChild(newGO);
 
-			//FIXME
-			//newGO.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
-
 			Actor actor = Actor.Instantiate(newGO);
 			return new List<Actor>() { actor };
 		}
@@ -99,17 +96,12 @@ namespace MixedRealityExtension.Assets
 			var actorList = new List<Actor>();
 			MWGOTreeWalker.VisitTree(prefab, go =>
 			{
-				/*
-				var collider = go.GetComponent<UnityEngine.Collider>();
+				var collider = go.GetChild<Area>();
 				if (collider != null)
 				{
 					MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(collisionLayer, collider);
 				}
-				else
-				{
-					go.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
-				}
-				*/
+
 				if (go.GetType() == typeof(Spatial))
 				{
 					var newActor = Actor.Instantiate((Spatial)go);
@@ -385,12 +377,8 @@ namespace MixedRealityExtension.Assets
 							var mapping = rootObject.AddComponent<PrefabAnimationTargets>();
 							mapping.Initialize(gltfRoot, i);
 						}
-
-						MWGOTreeWalker.VisitTree(rootObject, (go) =>
-						{
-							go.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
-						});
 						*/
+
 						assets.Add(rootObject);
 					}
 				}

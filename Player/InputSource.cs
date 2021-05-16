@@ -19,8 +19,14 @@ namespace Assets.Scripts.User
 
 		public override void _Ready()
 		{
+			// Only target layers 0 (Default), 5 (UI), and 10 (Hologram).
+			// You still want to hit all layers, but only interact with these.
+			uint layerMask = (1 << 0) | (1 << 5) | (1 << 10);
+
 			rayCast = GetNode<RayCast>("RayCast");
 			rayCast.CastTo = new Vector3(0, 0, -100);
+			rayCast.CollisionMask = layerMask;
+
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
 		}

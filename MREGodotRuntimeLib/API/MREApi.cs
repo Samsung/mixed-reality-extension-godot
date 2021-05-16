@@ -39,7 +39,7 @@ namespace MixedRealityExtension.API
 		public static void InitializeAPI(
 			// required properties
 			SpatialMaterial defaultMaterial,
-			//ILayerApplicator layerApplicator,
+			ILayerApplicator layerApplicator,
 			IAssetCache assetCache,
 			ITextFactory textFactory,
 			IPermissionManager permissionManager,
@@ -56,7 +56,7 @@ namespace MixedRealityExtension.API
 		{
 			// required properties
 			AppsAPI.DefaultMaterial = defaultMaterial;
-			//AppsAPI.LayerApplicator = layerApplicator;
+			AppsAPI.LayerApplicator = layerApplicator;
 			AppsAPI.AssetCache = assetCache;
 			AppsAPI.TextFactory = textFactory;
 			AppsAPI.PermissionManager = permissionManager;

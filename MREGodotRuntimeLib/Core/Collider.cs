@@ -136,9 +136,9 @@ namespace MixedRealityExtension.Core
 			_collider.material.bounciness = _collider.material.bounciness.GetPatchApplied(Bounciness.ApplyPatch(patch.Bounciness));
 			_collider.material.staticFriction = _collider.material.staticFriction.GetPatchApplied(StaticFriction.ApplyPatch(patch.StaticFriction));
 			_collider.material.dynamicFriction = _collider.material.dynamicFriction.GetPatchApplied(DynamicFriction.ApplyPatch(patch.DynamicFriction));
-
-			MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(patch.Layer, _collider);
 			*/
+
+			MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(patch.Layer, this);
 
 			if (patch.EventSubscriptions != null)
 			{
@@ -221,9 +221,9 @@ namespace MixedRealityExtension.Core
 				Bounciness = _collider.material.bounciness,
 				StaticFriction = _collider.material.staticFriction,
 				DynamicFriction = _collider.material.dynamicFriction,
-
-				Layer = MREAPI.AppsAPI.LayerApplicator.DetermineLayerOfCollider(_collider),
 				*/
+				Layer = MREAPI.AppsAPI.LayerApplicator.DetermineLayerOfCollider(this),
+
 				Geometry = colliderGeo
 			};
 		}

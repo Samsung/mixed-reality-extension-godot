@@ -105,7 +105,7 @@ public class MREComponent : Spatial
 
 			MREAPI.InitializeAPI(
 				defaultMaterial: DefaultPrimMaterial,
-				//layerApplicator: new SimpleLayerApplicator(0, 9, 10, 5),
+				layerApplicator: new SimpleLayerApplicator(0, 9, 10, 5),
 				assetCache: assetCache,
 				textFactory: new SimpleTextFactory(),
 				permissionManager: new SimplePermissionManager(GrantedPermissions),
