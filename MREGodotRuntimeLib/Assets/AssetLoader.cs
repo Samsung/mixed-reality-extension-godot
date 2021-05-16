@@ -728,7 +728,7 @@ namespace MixedRealityExtension.Assets
 				case PrimitiveShape.Box:
 					return new BoxColliderGeometry()
 					{
-						Size = dims ?? new MWVector3(1, 1, 1)
+						Size = new MWVector3(dims.X / 2, dims.Y / 2, dims.Z / 2) ?? new MWVector3(0.5f, 0.5f, 0.5f)
 					};
 
 				case PrimitiveShape.Capsule:
