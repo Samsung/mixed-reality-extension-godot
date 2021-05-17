@@ -16,6 +16,7 @@ namespace MixedRealityExtension.Core.Components
 		private Spatial _targetObject;
 		private LookAtMode _lookAtMode;
 		private bool _backward;
+		private Actor parent;
 
 		internal void ApplyPatch(LookAtPatch patch)
 		{
@@ -39,31 +40,32 @@ namespace MixedRealityExtension.Core.Components
 			{
 				_backward = patch.Backward.Value;
 			}
+			parent = GetParent() as Actor;
 		}
 
-		void Update()
+		public override void _Process(float delta)
 		{
-/*FIXME
 			if (_lookAtMode != LookAtMode.None && _targetObject != null)
 			{
-				var rotation = CalcRotation();
-				if (rotation.HasValue)
-				{
-					rotation = rotation.Value;
-				}
+				LookAt();
 			}
-*/
 		}
-/*FIXME
-		private Quat? CalcRotation()
+
+		private void LookAt()
 		{
 			Vector3 pos = _targetObject.Transform.origin;
-			Vector3 delta = pos - Transform.origin;
+			Vector3 delta = pos - parent.Transform.origin;
+
+			if (parent == null)
+			{
+				// parent should be Actor.
+				return;
+			}
 
 			if (delta == Vector3.Zero)
 			{
 				// In case of zero-length, don't change our rotation.
-				return null;
+				return;
 			}
 
 			if (_backward)
@@ -71,15 +73,11 @@ namespace MixedRealityExtension.Core.Components
 				delta *= -1;
 			}
 
-			//Quat look = _targetObject.Transform.LookingAt(delta, Vector3.Up).origin;
-
+			parent.LookAt(delta, Vector3.Up);
 			if (_lookAtMode == LookAtMode.TargetY)
 			{
-				look = Quat.Euler(0, look.eulerAngles.y, look.eulerAngles.z);
+				parent.Rotation = new Vector3(0, parent.Rotation.y, parent.Rotation.z);
 			}
-
-			return look;
 		}
-*/
 	}
 }

@@ -397,12 +397,12 @@ namespace MixedRealityExtension.Core
 			PatchCollider(actorPatch.Collider);
 			PatchText(actorPatch.Text);
 			PatchAttachment(actorPatch.Attachment);
+			PatchLookAt(actorPatch.LookAt);
 /*
 			PatchLight(actorPatch.Light);
 			PatchRigidBody(actorPatch.RigidBody);
 			
 			
-			PatchLookAt(actorPatch.LookAt);
 			PatchGrabbable(actorPatch.Grabbable);
 			PatchSubscriptions(actorPatch.Subscriptions);
 */
@@ -990,7 +990,11 @@ namespace MixedRealityExtension.Core
 			switch (colliderType)
 			{
 				case ColliderType.Box:
-					var boxCollider = new CollisionShape() { Shape = new BoxShape() };
+					var boxCollider = new CollisionShape() {
+						Shape = new BoxShape() {
+							Extents = new Vector3(0.5f, 0.5f, 0.5f)
+						}
+					};
 					colliderGeometry.Patch(App, boxCollider);
 					godotCollisionShape = boxCollider;
 					break;
@@ -1546,7 +1550,7 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-/*FIXME
+
 		private void PatchLookAt(LookAtPatch lookAtPatch)
 		{
 			if (lookAtPatch != null)
@@ -1558,7 +1562,7 @@ namespace MixedRealityExtension.Core
 				_lookAt.ApplyPatch(lookAtPatch);
 			}
 		}
-
+/*FIXME
 		private void PatchGrabbable(bool? grabbable)
 		{
 			if (grabbable != null && grabbable.Value != Grabbable)
