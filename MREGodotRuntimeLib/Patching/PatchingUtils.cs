@@ -410,7 +410,7 @@ namespace MixedRealityExtension.Patching
 			if (patch.Rotation != null)
 			{
 				var Rotation = new Quat();
-				Rotation = Rotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
+				Rotation = Rotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation)).Normalized();
 				_this.Rotation = Rotation.GetEuler();
 			}
 
@@ -430,11 +430,9 @@ namespace MixedRealityExtension.Patching
 
 			if (patch.Rotation != null)
 			{
-				/*FIXME
-				var currAppRotation = Quaternion.Inverse(appRoot.rotation) * _this.rotation;
-				var newAppRotation = currAppRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
-				_this.rotation = appRoot.rotation * newAppRotation;
-				*/
+				var currAppRotation = appRoot.Transform.Inverse() * _this.Transform;
+				var newAppRotation = currAppRotation.basis.Quat().GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
+				_this.Transform = new Transform(newAppRotation, _this.Transform.origin);
 			}
 		}
 	}
