@@ -50,11 +50,6 @@ namespace MixedRealityExtension.ProceduralToolkit
 			tangents.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Plane[]);
 			uv.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Vector2[]);
 			uv2.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Vector2[]);
-
-			//FIXME
-			//name = mesh.name;
-			//mesh.GetUVs(2, uv3);
-			//mesh.GetUVs(3, uv4);
 		}
 
 		/// <summary>
@@ -689,13 +684,11 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public MeshDraft Rotate(Quat rotation)
 		{
-			/*FIXME
 			for (int i = 0; i < vertices.Count; i++)
 			{
-				vertices[i] = rotation*vertices[i];
-				normals[i] = rotation*normals[i];
+				vertices[i] = (rotation*vertices[i]).GetEuler();
+				normals[i] = (rotation*normals[i]).GetEuler();
 			}
-			*/
 			return this;
 		}
 
@@ -718,10 +711,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 		{
 			for (int i = 0; i < vertices.Count; i++)
 			{
-				/*FIXME
-				vertices[i] = Vector3.Scale(vertices[i], scale);
-				normals[i] = Vector3.Scale(normals[i], scale).normalized;
-				*/
+				vertices[i] = vertices[i] * scale;
+				normals[i] = (normals[i] * scale).Normalized();
 			}
 			return this;
 		}
@@ -872,8 +863,11 @@ namespace MixedRealityExtension.ProceduralToolkit
 			{
 				throw new ArgumentNullException("mesh");
 			}
-			//FIXME
-			//mesh.Clear(false);
+
+			var surfaceCount = mesh.GetSurfaceCount();
+			for (int i = 0; i < surfaceCount; i++)
+				mesh.SurfaceRemove(0);
+			mesh.ClearBlendShapes();
 			FillMesh(ref mesh, calculateBounds, autoIndexFormat);
 		}
 
@@ -919,15 +913,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 				array[(int)ArrayMesh.ArrayType.Color] = colors.ToArray();
 			if (triangles.Count > 0)
 				array[(int)ArrayMesh.ArrayType.Index] = triangles.ToArray();
-			//FIXME:LineLoop?
+
 			mesh.AddSurfaceFromArrays(Godot.ArrayMesh.PrimitiveType.Triangles, array);
-			//FIXME
-			//mesh.SetTriangles(triangles, 0, calculateBounds);
-			//mesh.SetUVs(2, uv3);
-			//mesh.SetUVs(3, uv4);
-
-			//FIXME
-
 		}
 
 		public override string ToString()
