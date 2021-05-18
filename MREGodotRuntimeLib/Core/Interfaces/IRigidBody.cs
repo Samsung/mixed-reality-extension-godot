@@ -131,7 +131,7 @@ namespace MixedRealityExtension.Core.Interfaces
 		/// Gets the constraint flags applied to the rigid body.
 		/// </summary>
 		MRERigidBodyConstraints ConstraintFlags { get; }
-
+/*FIXME
 		/// <summary>
 		/// Move the position of the rigid body to the new position.
 		/// </summary>
@@ -168,5 +168,6 @@ namespace MixedRealityExtension.Core.Interfaces
 		/// </summary>
 		/// <param name="relativeTorque">The relative torque to apply to the rigid body.</param>
 		void RigidBodyAddRelativeTorque(MWVector3 relativeTorque);
+		*/
 	}
 }

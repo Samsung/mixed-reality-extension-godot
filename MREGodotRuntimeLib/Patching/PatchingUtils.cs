@@ -196,9 +196,9 @@ namespace MixedRealityExtension.Patching
 				return null;
 			}
 		}
-		/*FIXME
-		public static RigidBodyPatch GeneratePatch(RigidBody _old, Rigidbody _new,
-			Transform sceneRoot, bool addVelocities)
+
+		public static RigidBodyPatch GeneratePatch(MixedRealityExtension.Core.RigidBody _old, Godot.RigidBody _new,
+			Spatial sceneRoot, bool addVelocities)
 		{
 			if (_old == null && _new != null)
 			{
@@ -215,19 +215,21 @@ namespace MixedRealityExtension.Patching
 				
 				// we add velocities only if there is an explicit subscription for it, since it might cause significant bandwidth 
 				Velocity = ((addVelocities) ?
-				  GeneratePatch(_old.Velocity, sceneRoot.InverseTransformDirection(_new.velocity)) : null),
+				  GeneratePatch(_old.Velocity, sceneRoot.ToLocal(_new.LinearVelocity)) : null),
 				AngularVelocity = ((addVelocities) ?
-				  GeneratePatch(_old.AngularVelocity, sceneRoot.InverseTransformDirection(_new.angularVelocity)) : null),
+				  GeneratePatch(_old.AngularVelocity, sceneRoot.ToLocal(_new.AngularVelocity)) : null),
 
 				CollisionDetectionMode = GeneratePatch(
 					_old.CollisionDetectionMode,
-					UtilMethods.ConvertEnum<MRECollisionDetectionMode, UnityCollisionDetectionMode>(_new.collisionDetectionMode)),
-				ConstraintFlags = GeneratePatch(
-					_old.ConstraintFlags,
-					UtilMethods.ConvertEnum<MRERigidBodyConstraints, UnityRigidBodyConstraints>(_new.constraints)),
-				DetectCollisions = GeneratePatch(_old.DetectCollisions, _new.detectCollisions),
-				Mass = GeneratePatch(_old.Mass, _new.mass),
-				UseGravity = GeneratePatch(_old.UseGravity, _new.useGravity),
+					_new.ContinuousCd switch
+					{
+						true => MRECollisionDetectionMode.Continuous,
+						false => MRECollisionDetectionMode.Discrete
+					}),
+				ConstraintFlags = GeneratePatch(_old.ConstraintFlags, _new.GetMRERigidBodyConstraints()),
+				DetectCollisions = GeneratePatch(_old.DetectCollisions, !_new.GetChild<CollisionShape>().Disabled),
+				Mass = GeneratePatch(_old.Mass, _new.Mass),
+				UseGravity = GeneratePatch(_old.UseGravity, !Mathf.IsZeroApprox(_new.GravityScale)),
 			};
 
 			if (patch.IsPatched())
@@ -239,7 +241,7 @@ namespace MixedRealityExtension.Patching
 				return null;
 			}
 		}
-
+		/*FIXME
 		public static LightPatch GeneratePatch(MRELight _old, UnityLight _new)
 		{
 			if (_old == null && _new != null)

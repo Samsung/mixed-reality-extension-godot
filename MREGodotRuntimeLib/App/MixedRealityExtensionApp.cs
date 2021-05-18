@@ -59,6 +59,8 @@ namespace MixedRealityExtension.App
 		private float _timeSinceLastPhysicsUpdate = 0.0f;
 		private bool _shouldSendPhysicsUpdate = false;
 
+		private float _fixedDeltaTime = 1000f / Engine.IterationsPerSecond;
+
 		private enum AppState
 		{
 			Stopped,
@@ -171,6 +173,10 @@ namespace MixedRealityExtension.App
 
 		internal Permissions GrantedPermissions = Permissions.None;
 
+		internal PhysicsBridge PhysicsBridge { get; } = null;
+
+		internal bool UsePhysicsBridge => PhysicsBridge != null;
+
 		#endregion
 
 		/// <summary>
@@ -190,6 +196,11 @@ namespace MixedRealityExtension.App
 			_assetLoader = new AssetLoader(ownerScript, this);
 			_userManager = new UserManager(this);
 			_actorManager = new ActorManager(this);
+
+			if (Constants.UsePhysicsBridge)
+			{
+				PhysicsBridge = new PhysicsBridge();
+			}
 
 			AnimationManager = new AnimationManager(this);
 			_commandManager = new CommandManager(new Dictionary<Type, ICommandHandlerContext>()
@@ -379,9 +390,8 @@ namespace MixedRealityExtension.App
 			_ownedNodes.Clear();
 			_actorManager.Reset();
 			AnimationManager.Reset();
-			/*FIXME
 			PhysicsBridge.Reset();
-			*/
+
 			foreach (Guid id in _assetLoader.ActiveContainers)
 			{
 				AssetManager.Unload(id);
@@ -392,11 +402,73 @@ namespace MixedRealityExtension.App
 		/// <inheritdoc />
 		public void FixedUpdate()
 		{
+			if (_appState == AppState.Stopped)
+			{
+				return;
+			}
+
+			if (UsePhysicsBridge)
+			{
+				if (_shouldSendPhysicsUpdate)
+				{
+					// Sending snapshot which represents the state before physics step is done,
+					// hence we are using time stamp from the start of the fixed update.
+					SendPhysicsUpdate(_fixedDeltaTime);
+				}
+
+				PhysicsBridge.FixedUpdate(SceneRoot);
+
+				// add delta for next step
+				_timeSinceLastPhysicsUpdate += _fixedDeltaTime;
+
+				float updateDeltaTime = Math.Max(_fixedDeltaTime,
+					_fixedDeltaTime * (float)Math.Floor(_physicsUpdateTimestep / _fixedDeltaTime));
+
+				if (updateDeltaTime - _timeSinceLastPhysicsUpdate < 0.001f)
+				{
+					_shouldSendPhysicsUpdate = true;
+				}
+			}
+		}
+
+		private void SendPhysicsUpdate(float timestamp)
+		{
+			if (LocalUser == null)
+			{
+				return;
+			}
+
+			PhysicsBridgePatch physicsPatch = new PhysicsBridgePatch(LocalUser.Id,
+					PhysicsBridge.GenerateSnapshot(timestamp, SceneRoot));
+			// send only updates if there are any, to save band with
+			// in order to produce any updates for settled bodies this should be handled within the physics bridge
+			if (physicsPatch.DoSendThisPatch())
+			{
+				EventManager.QueueEvent(new PhysicsBridgeUpdated(InstanceId, physicsPatch));
+			}
+
+			//low frequency server upload transform stream
+			{
+				float systemTime = OS.GetTicksMsec() / 1000f;
+				if (PhysicsBridge.shouldSendLowFrequencyTransformUpload(systemTime))
+				{
+					PhysicsTranformServerUploadPatch serverUploadPatch =
+						PhysicsBridge.GenerateServerTransformUploadPatch(InstanceId, systemTime);
+					// upload only if there is a real difference in the transforms
+					if (serverUploadPatch.IsPatched())
+					{
+						EventManager.QueueEvent(new PhysicsTranformServerUploadUpdated(InstanceId, serverUploadPatch));
+					}
+				}
+			}
+
+			_shouldSendPhysicsUpdate = false;
+			_timeSinceLastPhysicsUpdate = 0.0f;
 
 		}
 
 		/// <inheritdoc />
-		public void Update()
+		public void Update(float delta)
 		{
 			// Process events then we will update the connection.
 			EventManager.ProcessEvents();
@@ -410,6 +482,16 @@ namespace MixedRealityExtension.App
 
 			// Process actor queues after connection update.
 			_actorManager.Update();
+
+			if (UsePhysicsBridge)
+			{
+				if (_shouldSendPhysicsUpdate)
+				{
+					// Sending snapshot which represents the state after physics step is done,
+					// hence we need to add time step to the time stamp from the start of the fixed update.
+					SendPhysicsUpdate(delta + _fixedDeltaTime);
+				}
+			}
 
 			_commandManager.Update();
 			AnimationManager.Update();
@@ -457,7 +539,7 @@ namespace MixedRealityExtension.App
 
 					LocalUser = user;
 
-					//PhysicsBridge.LocalUserId = LocalUser.Id;
+					PhysicsBridge.LocalUserId = LocalUser.Id;
 
 					// Enable interactions for the user if given the UserInteraction permission.
 					if (GrantedPermissions.HasFlag(Permissions.UserInteraction))
@@ -506,7 +588,7 @@ namespace MixedRealityExtension.App
 				if (isLocalUser)
 				{
 					LocalUser = null;
-					//PhysicsBridge.LocalUserId = null;
+					PhysicsBridge.LocalUserId = null;
 
 					if (Protocol is Execution)
 					{
@@ -983,6 +1065,25 @@ namespace MixedRealityExtension.App
 		{
 			IsAuthoritativePeer = payload.Authoritative;
 			onCompleteCallback?.Invoke();
+		}
+
+		[CommandHandler(typeof(PhysicsBridgeUpdate))]
+		private void OnTransformsUpdate(PhysicsBridgeUpdate payload, Action onCompleteCallback)
+		{
+			if (UsePhysicsBridge)
+			{
+				PhysicsBridge.addSnapshot(payload.PhysicsBridgePatch.Id, payload.PhysicsBridgePatch.ToSnapshot());
+				onCompleteCallback?.Invoke();
+			}
+		}
+
+		[CommandHandler(typeof(PhysicsTranformServerUpload))]
+		private void OnTransformsServerUpload(PhysicsTranformServerUpload payload, Action onCompleteCallback)
+		{
+			if (UsePhysicsBridge)
+			{
+				onCompleteCallback?.Invoke();
+			}
 		}
 
 		#endregion

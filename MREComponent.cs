@@ -162,15 +162,15 @@ public class MREComponent : Spatial
 		}));
 	}
 	
-	public override void _Process(float delta) // FIXME LateUpdate
+	public override void _PhysicsProcess(float delta)
 	{
-		/*
+		/* FIXME
 		if (Input.GetButtonUp("Jump"))
 		{
 			MREApp?.RPC.SendRPC("button-up", "space", false);
 		}
 		*/
-		MREApp?.Update();
+		MREApp?.Update(delta);
 	}
 
 	private void MREApp_OnAppShutdown()

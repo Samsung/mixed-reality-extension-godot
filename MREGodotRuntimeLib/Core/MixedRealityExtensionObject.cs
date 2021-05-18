@@ -56,14 +56,14 @@ namespace MixedRealityExtension.Core
 
 		}
 
-		#region MonoBehaviour Methods
+		#region Node Methods
 
-		private void Start()
+		public override void _Ready()
 		{
 			OnStart();
 		}
 
-		private void Awake()
+		public override void _EnterTree()
 		{
 			OnAwake();
 		}
@@ -73,12 +73,12 @@ namespace MixedRealityExtension.Core
 			InternalUpdate(delta);
 		}
 
-		private void FixedUpdate()
+		public override void _PhysicsProcess(float delta)
 		{
 			InternalFixedUpdate();
 		}
 
-		private void OnDestroy()
+		public override void _ExitTree()
 		{
 			OnDestroyed();
 		}

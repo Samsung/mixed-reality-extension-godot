@@ -5,7 +5,8 @@ using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Types;
 using Godot;
 using GodotGLTF;
-//using GodotGLTF;
+
+using MRERigidBodyConstraints = MixedRealityExtension.Core.Interfaces.RigidBodyConstraints;
 
 namespace MixedRealityExtension.Util.GodotHelper
 {
@@ -109,8 +110,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 			}
 
 			_this.Position.FromGodotVector3(appRoot.ToLocal(transform.Transform.origin));
-			//FIXME
-			//_this.Rotation.FromGodotQuaternion(Quaternion.Inverse(appRoot.rotation) * transform.rotation);
+			_this.Rotation.FromGodotQuaternion((appRoot.Transform.basis * transform.Transform.basis).Quat());
 		}
 
 		public static MWVector3 ToLocalMWVector3(this MWVector3 _this, Vector3 point, Spatial objectRoot)
@@ -174,6 +174,24 @@ namespace MixedRealityExtension.Util.GodotHelper
 				default:
 					return GLTFSceneImporter.ColliderType.None;
 			}
+		}
+
+		public static MRERigidBodyConstraints GetMRERigidBodyConstraints(this Godot.RigidBody rigidBody)
+		{
+			MRERigidBodyConstraints constraints = 0;
+			if (rigidBody.AxisLockLinearX)
+				constraints |= MRERigidBodyConstraints.FreezePositionX;
+			if (rigidBody.AxisLockLinearY)
+				constraints |= MRERigidBodyConstraints.FreezePositionY;
+			if (rigidBody.AxisLockLinearZ)
+				constraints |= MRERigidBodyConstraints.FreezePositionZ;
+			if (rigidBody.AxisLockAngularX)
+				constraints |= MRERigidBodyConstraints.FreezeRotationX;
+			if (rigidBody.AxisLockAngularY)
+				constraints |= MRERigidBodyConstraints.FreezeRotationY;
+			if (rigidBody.AxisLockAngularZ)
+				constraints |= MRERigidBodyConstraints.FreezeRotationZ;
+			return constraints;
 		}
 	}
 }

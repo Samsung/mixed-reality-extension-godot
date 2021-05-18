@@ -481,7 +481,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public string Text;
 	}
-/*
+
 	/// <summary>
 	/// Bidirectional
 	/// Payload to sync rigid body transforms between peers.
@@ -505,5 +505,4 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public PhysicsTranformServerUploadPatch PhysicsTranformServer { get; set; }
 	}
-*/
 }
