@@ -1070,6 +1070,7 @@ namespace MixedRealityExtension.Core
 			{
 				// reassign parent
 				ParentId = parentId.Value;
+				Node3D.GetParent().RemoveChild(Node3D);
 				((Actor)newParent).Node3D.AddChild(Node3D);
 			}
 			else if (parentId.Value != ParentId)
