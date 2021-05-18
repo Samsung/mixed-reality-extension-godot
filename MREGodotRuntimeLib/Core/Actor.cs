@@ -399,10 +399,10 @@ namespace MixedRealityExtension.Core
 			PatchAttachment(actorPatch.Attachment);
 			PatchLookAt(actorPatch.LookAt);
 			PatchLight(actorPatch.Light);
+			PatchSubscriptions(actorPatch.Subscriptions);
 /*
 			PatchRigidBody(actorPatch.RigidBody);
 			PatchGrabbable(actorPatch.Grabbable);
-			PatchSubscriptions(actorPatch.Subscriptions);
 */
 		}
 /*
@@ -1627,6 +1627,7 @@ namespace MixedRealityExtension.Core
 				Grabbable = grabbable.Value;
 			}
 		}
+*/
 
 		private void PatchSubscriptions(IEnumerable<ActorComponentType> subscriptions)
 		{
@@ -1639,7 +1640,7 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-
+/*FIXME
 		private void GenerateTransformPatch(ActorPatch actorPatch)
 		{
 			var transformPatch = new ActorTransformPatch()
