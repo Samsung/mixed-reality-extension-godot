@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-//using UnityLight = UnityEngine.Light;
+using GodotLight = Godot.Light;
 using GodotCollisionShape = Godot.CollisionShape;
 using MixedRealityExtension.PluginInterfaces.Behaviors;
 using MixedRealityExtension.Util;
@@ -52,7 +52,7 @@ namespace MixedRealityExtension.Core
 		}
 
 		private RigidBody _rigidbody;
-		//private UnityLight _light;
+		private GodotLight _light;
 		private GodotCollisionShape _collider;
 		private ColliderPatch _pendingColliderPatch;
 		private LookAtComponent _lookAt;
@@ -398,11 +398,9 @@ namespace MixedRealityExtension.Core
 			PatchText(actorPatch.Text);
 			PatchAttachment(actorPatch.Attachment);
 			PatchLookAt(actorPatch.LookAt);
-/*
 			PatchLight(actorPatch.Light);
+/*
 			PatchRigidBody(actorPatch.RigidBody);
-			
-			
 			PatchGrabbable(actorPatch.Grabbable);
 			PatchSubscriptions(actorPatch.Subscriptions);
 */
@@ -669,9 +667,9 @@ namespace MixedRealityExtension.Core
 
 		protected override void OnStart()
 		{
+			_light = this.GetChild<GodotLight>();
 			/*FIXME
 			//_rigidbody = gameObject.GetComponent<Rigidbody>();
-			//_light = gameObject.GetComponent<UnityLight>();
 		}
 
 		protected override void OnDestroyed()
@@ -879,17 +877,30 @@ namespace MixedRealityExtension.Core
 			Text = MREAPI.AppsAPI.TextFactory.CreateText(this);
 			return Text;
 		}
-/*
-		private Light AddLight()
+
+		private Light AddLight(LightType? lightType)
 		{
 			if (_light == null)
 			{
-				_light = gameObject.AddComponent<UnityLight>();
+				switch (lightType)
+				{
+					case LightType.Spot:
+						_light = new SpotLight();
+						_light.RotateX(-90);
+						break;
+					case LightType.Point:
+						_light = new OmniLight();
+						break;
+					case LightType.Directional:
+						_light = new DirectionalLight();
+						break;
+				}
+				AddChild(_light);
 				Light = new Light(_light);
 			}
 			return Light;
 		}
-
+/*
 		void OnRigidBodyGrabbed(object sender, ActionStateChangedArgs args)
 		{
 			if (App.UsePhysicsBridge)
@@ -1424,19 +1435,19 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-
+*/
 		private void PatchLight(LightPatch lightPatch)
 		{
 			if (lightPatch != null)
 			{
 				if (Light == null)
 				{
-					AddLight();
+					AddLight(lightPatch.Type);
 				}
 				Light.SynchronizeEngine(lightPatch);
 			}
 		}
-
+/*FIXME
 		private void PatchRigidBody(RigidBodyPatch rigidBodyPatch)
 		{
 			if (rigidBodyPatch != null)
