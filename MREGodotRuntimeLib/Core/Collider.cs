@@ -120,12 +120,10 @@ namespace MixedRealityExtension.Core
 			{
 				Shape = ColliderType.Capsule;
 			}
-			/*FIXME
-			else if (collisionShape.Shape is MeshCollider)
+			else if (collisionShape.Shape is ConcavePolygonShape)
 			{
 				Shape = ColliderType.Mesh;
 			}
-			*/
 		}
 
 		internal void ApplyPatch(ColliderPatch patch)

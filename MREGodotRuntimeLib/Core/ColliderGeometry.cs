@@ -106,7 +106,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 	}
-/*FIXME ConvexPolygonShape?
+
 	/// <summary>
 	/// Class that represents the mesh geometry of a mesh collider.
 	/// </summary>
@@ -122,24 +122,23 @@ namespace MixedRealityExtension.Core
 
 		internal override void Patch(MixedRealityExtensionApp app, GodotCollisionShape collider)
 		{
-			if (collider.Shape is Mesh meshCollider)
+			if (collider.Shape is ConcavePolygonShape concavePolygonShape)
 			{
-				Patch(app, meshCollider);
+				Patch(app, concavePolygonShape);
 			}
 		}
 
-		private void Patch(MixedRealityExtensionApp app, MeshCollider collider)
+		private void Patch(MixedRealityExtensionApp app, ConcavePolygonShape concavePolygonShape)
 		{
 			var tempId = MeshId;
 			app.AssetManager.OnSet(MeshId, asset =>
 			{
 				if (MeshId != tempId) return;
-				collider.sharedMesh = asset.Asset as Mesh;
-				collider.convex = true;
+				concavePolygonShape.Data = (Vector3[])(asset.Asset as Mesh).SurfaceGetArrays(0)[0];
 			});
 		}
 	}
-*/
+
 	/// <summary>
 	/// Class that describes a capsule-shaped collision volume
 	/// </summary>

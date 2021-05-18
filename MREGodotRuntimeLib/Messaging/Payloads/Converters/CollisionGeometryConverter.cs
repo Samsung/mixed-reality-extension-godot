@@ -40,11 +40,9 @@ namespace MixedRealityExtension.Messaging.Payloads.Converters
 					case "capsule":
 						colliderGeometry = new CapsuleColliderGeometry();
 						break;
-						/*FIXME
 					case "mesh":
 						colliderGeometry = new MeshColliderGeometry();
 						break;
-						*/
 					case "auto":
 						colliderGeometry = new AutoColliderGeometry();
 						break;

@@ -261,29 +261,16 @@ namespace MixedRealityExtension.Assets
 				assetDef.Source = new AssetSource(source.ContainerType, source.ParsedUri.AbsoluteUri, internalId, source.Version);
 
 				ColliderGeometry colliderGeo = null;
-				/* FIXME
+
 				if (asset is Godot.Mesh mesh)
 				{
 					colliderGeo = colliderType == ColliderType.Mesh ?
 						(ColliderGeometry)new MeshColliderGeometry() { MeshId = assetDef.Id } :
 						(ColliderGeometry)new BoxColliderGeometry()
 						{
-							Size = (mesh.bounds.size * 0.8f).CreateMWVector3(),
-							Center = mesh.bounds.center.CreateMWVector3()
+							Size = (mesh.GetAabb().Size * 0.8f).CreateMWVector3(),
+							Center = mesh.GetAabb().Position.CreateMWVector3()
 						};
-				}
-				*/
-				if (asset is Godot.Mesh mesh)
-				{
-					if (colliderType != ColliderType.Mesh)
-					{
-						var aabb = mesh.GetAabb();
-						colliderGeo = (ColliderGeometry)new BoxColliderGeometry()
-						{
-							Size = (aabb.Size * 0.8f).CreateMWVector3(),
-							Center = aabb.Position.CreateMWVector3()
-						};
-					}
 				}
 
 				_app.AssetManager.Set(assetDef.Id, containerId, asset, colliderGeo, assetDef.Source);
@@ -736,14 +723,12 @@ namespace MixedRealityExtension.Assets
 					{
 						Size = dims
 					};
-/*FIXME
 				case PrimitiveShape.Cylinder:
 					dims = dims ?? new MWVector3(0.2f, 1, 0.2f);
 					return new MeshColliderGeometry()
 					{
 						MeshId = meshId
 					};
-*/
 				case PrimitiveShape.Plane:
 					dims = dims ?? new MWVector3(1, 0, 1);
 					return new BoxColliderGeometry()
