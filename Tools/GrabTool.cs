@@ -100,14 +100,15 @@ namespace Assets.Scripts.Tools
 			_currentInputSource = inputSource;
 
 			var targetTransform = CurrentGrabbedTarget.GlobalTransform;
-			var inputTransform = _currentInputSource.GlobalTransform;
 
 			_manipulator = new Spatial() { Name = "manipulator" };
-			//_manipulator.parent = null;
+			inputSource.GetTree().Root.AddChild(_manipulator);
 			_manipulator.GlobalTransform = targetTransform;
 
 			_previousParent = CurrentGrabbedTarget.GetParent();
+			_previousParent.RemoveChild(CurrentGrabbedTarget);
 			_manipulator.AddChild(CurrentGrabbedTarget);
+			CurrentGrabbedTarget.GlobalTransform = targetTransform;
 
 			_manipulatorPosInToolSpace = _currentInputSource.ToLocal(_manipulator.GlobalTransform.origin);
 			_manipulatorupInToolSpace = _currentInputSource.ToLocal(_manipulator.GlobalTransform.basis.y);
@@ -120,8 +121,10 @@ namespace Assets.Scripts.Tools
 			{
 				return;
 			}
-
+			var currentTargetGolbalTransform = CurrentGrabbedTarget.GlobalTransform;
+			_manipulator.RemoveChild(CurrentGrabbedTarget);
 			_previousParent.AddChild(CurrentGrabbedTarget);
+			CurrentGrabbedTarget.GlobalTransform = currentTargetGolbalTransform;
 			CurrentGrabbedTarget = null;
 
 			_manipulator.QueueFree();
@@ -131,14 +134,14 @@ namespace Assets.Scripts.Tools
 		private void UpdatePosition()
 		{
 			Vector3 targetPosition = _currentInputSource.ToGlobal(_manipulatorPosInToolSpace);
-			_manipulator.GlobalTransform = new Transform(Basis.Identity, targetPosition);
+			_manipulator.GlobalTransform = new Transform(_manipulator.GlobalTransform.basis, targetPosition);
 		}
 
 		private void UpdateRotation()
 		{
 			Vector3 targetLookAtPos = _currentInputSource.ToGlobal(_manipulatorLookAtPosInToolSpace);
+			Vector3 targetUp = _currentInputSource.ToGlobal(_manipulatorupInToolSpace);
 			/*FIXME
-			Vector3 targetUp = _currentInputSource.transform.TransformDirection(_manipulatorupInToolSpace);
 			_manipulator.transform.rotation = Quaternion.LookRotation(targetLookAtPos - _manipulator.transform.position, targetUp);
 			*/
 		}

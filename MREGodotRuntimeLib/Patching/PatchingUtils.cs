@@ -117,15 +117,15 @@ namespace MixedRealityExtension.Patching
 				return null;
 			}
 		}
-/*FIXME
-		public static TransformPatch GenerateAppTransformPatch(MWTransform _old, Transform _new, Transform appRoot)
+
+		public static TransformPatch GenerateAppTransformPatch(MWTransform _old, Spatial _new, Spatial appRoot)
 		{
 			if (_old == null && _new != null)
 			{
 				return new TransformPatch()
 				{
-					Position = GeneratePatch(null, appRoot.InverseTransformPoint(_new.position)),
-					Rotation = GeneratePatch(null, Quaternion.Inverse(appRoot.rotation) * _new.rotation),
+					Position = GeneratePatch(null, appRoot.ToLocal(_new.GlobalTransform.origin)),
+					Rotation = GeneratePatch(null, new Quat(appRoot.GlobalTransform.basis).Inverse() * _new.Rotation),
 				};
 			}
 			else if (_new == null)
@@ -135,22 +135,22 @@ namespace MixedRealityExtension.Patching
 
 			TransformPatch transform = new TransformPatch()
 			{
-				Position = GeneratePatch(_old.Position, appRoot.InverseTransformPoint(_new.position)),
-				Rotation = GeneratePatch(_old.Rotation, Quaternion.Inverse(appRoot.rotation) * _new.rotation),
+				Position = GeneratePatch(_old.Position, appRoot.ToLocal(_new.GlobalTransform.origin)),
+				Rotation = GeneratePatch(_old.Rotation, new Quat(appRoot.GlobalTransform.basis).Inverse() * _new.Rotation),
 			};
 
 			return transform.IsPatched() ? transform : null;
 		}
 
-		public static ScaledTransformPatch GenerateLocalTransformPatch(MWScaledTransform _old, Transform _new)
+		public static ScaledTransformPatch GenerateLocalTransformPatch(MWScaledTransform _old, Spatial _new)
 		{
 			if (_old == null && _new != null)
 			{
 				return new ScaledTransformPatch()
 				{
-					Position = GeneratePatch(null, _new.localPosition),
-					Rotation = GeneratePatch(null, _new.localRotation),
-					Scale = GeneratePatch(null, _new.localScale)
+					Position = GeneratePatch(null, _new.Transform.origin),
+					Rotation = GeneratePatch(null, new Quat(_new.Transform.basis)),
+					Scale = GeneratePatch(null, _new.Scale)
 				};
 			}
 			else if (_new == null)
@@ -160,14 +160,14 @@ namespace MixedRealityExtension.Patching
 
 			ScaledTransformPatch transform = new ScaledTransformPatch()
 			{
-				Position = GeneratePatch(_old.Position, _new.localPosition),
-				Rotation = GeneratePatch(_old.Rotation, _new.localRotation),
-				Scale = GeneratePatch(_old.Scale, _new.localScale)
+				Position = GeneratePatch(_old.Position, _new.Transform.origin),
+				Rotation = GeneratePatch(_old.Rotation, new Quat(_new.Transform.basis)),
+				Scale = GeneratePatch(_old.Scale, _new.Scale)
 			};
 
 			return transform.IsPatched() ? transform : null;
 		}
-*/
+
 		public static ColorPatch GeneratePatch(MWColor _old, Color _new)
 		{
 			if (_old == null && _new != null)
