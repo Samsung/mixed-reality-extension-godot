@@ -28,11 +28,8 @@ public class LaunchMRE : Spatial
 	// Use this for initialization
 	public override void _Ready()
 	{
-		var Child = new MREComponent();
-		ulong objId = Child.GetInstanceId();
-		Child.Name = "MREComponent";
-		Child.SetScript(ResourceLoader.Load("MREComponent.cs"));
-		MREComponent = GD.InstanceFromId(objId) as MREComponent;
+		MREComponent = new MREComponent();
+		MREComponent.Name = "MREComponent";
 		MREComponent.MREURL = "ws://localhost:3901";
 		MREComponent.SessionID = "testbed";
 		MREComponent.AppID = "helloworld";

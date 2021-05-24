@@ -65,11 +65,10 @@ namespace MixedRealityExtension.Core
 		{
 			var parent = area.GetParent();
 			ulong objId = area.GetInstanceId();
-			parent.RemoveChild(area);
 
 			area.SetScript(Resource);
 			var newArea = GD.InstanceFromId(objId) as Collider;
-			parent.AddChild(newArea);
+			newArea.SetProcess(true);
 			return newArea;
 		}
 

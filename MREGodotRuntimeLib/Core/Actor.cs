@@ -43,11 +43,11 @@ namespace MixedRealityExtension.Core
 		{
 			var parent = node3D.GetParent();
 			ulong objId = node3D.GetInstanceId();
-			parent.RemoveChild(node3D);
 
 			node3D.SetScript(Resource);
 			var newNode = GD.InstanceFromId(objId) as Actor;
-			parent.AddChild(newNode);
+			newNode.SetProcess(true);
+
 			return newNode;
 		}
 
@@ -713,10 +713,10 @@ namespace MixedRealityExtension.Core
 			try
 			{
 				// TODO: Add ability to flag an actor for "high-frequency" updates
-				if (DateTime.Now.Millisecond >= _nextUpdateTime)
+				if (OS.GetTicksMsec() >= _nextUpdateTime)
 				{
 					
-					_nextUpdateTime = DateTime.Now.Millisecond + 200f + (float)GD.RandRange(-100, 100);
+					_nextUpdateTime = OS.GetTicksMsec() + 200f + (float)GD.RandRange(-100, 100);
 					SynchronizeApp();
 
 					// Give components the opportunity to synchronize the app.
