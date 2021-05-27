@@ -1,17 +1,17 @@
 [gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://MainCamera.cs" type="Script" id=1]
+[ext_resource path="res://Player.cs" type="Script" id=1]
 [ext_resource path="res://Player/InputSource.cs" type="Script" id=2]
 
 [sub_resource type="CapsuleShape" id=1]
+
+[sub_resource type="GradientTexture" id=2]
 
 [sub_resource type="GradientTexture" id=3]
 
 [sub_resource type="GradientTexture" id=4]
 
 [sub_resource type="GradientTexture" id=5]
-
-[sub_resource type="GradientTexture" id=6]
 
 [node name="Player" type="KinematicBody"]
 script = ExtResource( 1 )
@@ -63,7 +63,7 @@ margin_left = -2.5
 margin_top = 4.5
 margin_right = 2.5
 margin_bottom = 20.5
-texture = SubResource( 3 )
+texture = SubResource( 2 )
 expand = true
 __meta__ = {
 "_edit_use_anchors_": false
@@ -78,7 +78,7 @@ margin_left = -2.5
 margin_top = -20.5
 margin_right = 2.5
 margin_bottom = -4.5
-texture = SubResource( 4 )
+texture = SubResource( 3 )
 expand = true
 __meta__ = {
 "_edit_use_anchors_": false
@@ -94,7 +94,7 @@ margin_top = -2.5
 margin_right = 0.5
 margin_bottom = 12.5
 rect_rotation = 90.0
-texture = SubResource( 5 )
+texture = SubResource( 4 )
 expand = true
 
 [node name="Right" type="TextureRect" parent="HUD/Crosshair"]
@@ -107,5 +107,5 @@ margin_top = -2.5
 margin_right = 24.5
 margin_bottom = 12.5
 rect_rotation = 90.0
-texture = SubResource( 6 )
+texture = SubResource( 5 )
 expand = true

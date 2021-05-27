@@ -1,62 +1,63 @@
 using Godot;
 using System;
 
-public class Player : Area2D
+public class Player : KinematicBody
 {
-	// Declare member variables here. Examples:
-	// private int a = 2;
-	// private string b = "text";
-	[Export]
-	public int Speed = 400; // How fast the player will move (pixels/sec).
+    // Declare member variables here. Examples:
+    // private int a = 2;
+    // private string b = "text";
+    private float speed = 5f;
+    private float cameraSpeed = 0.5f;
+    private float spin = 0.05f;
+    private Camera camera;
+    private Vector2 mouseDelta = new Vector2();
 
-	private Vector2 _screenSize; // Size of the game window.
-	
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-		CubeMesh c = new CubeMesh();
-		_screenSize = GetViewport().Size;
-	}
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
+    {
+        camera = GetNode<Camera>("MainCamera");
+    }
 
-	public override void _Process(float delta)
-	{
-		var velocity = new Vector2(); // The player's movement vector.
+    public override void _PhysicsProcess(float delta)
+    {
+        camera.RotationDegrees = new Vector3(camera.RotationDegrees.x - mouseDelta.y * cameraSpeed,
+                                             camera.RotationDegrees.y - mouseDelta.x * cameraSpeed,
+                                             camera.RotationDegrees.z);
 
-		if (Input.IsActionPressed("ui_right"))
-		{
-			velocity.x += 1;
-		}
+        mouseDelta = new Vector2();
+        var velocity = Vector3.Zero;
 
-		if (Input.IsActionPressed("ui_left"))
-		{
-			velocity.x -= 1;
-		}
+        //Transform = camera.Transform;
+        if (Input.IsActionPressed("move_right"))
+        {
+            velocity += camera.GlobalTransform.basis.x;
+        }
+        if (Input.IsActionPressed("move_left"))
+        {
+            velocity -= camera.GlobalTransform.basis.x;
+        }
+        if (Input.IsActionPressed("move_back"))
+        {
+            velocity += camera.GlobalTransform.basis.z;
+        }
+        if (Input.IsActionPressed("move_forward"))
+        {
+            velocity -= camera.GlobalTransform.basis.z;
+        }
+        velocity = MoveAndSlide(velocity);
 
-		if (Input.IsActionPressed("ui_down"))
-		{
-			velocity.y += 1;
-		}
+    }
 
-		if (Input.IsActionPressed("ui_up"))
-		{
-			velocity.y -= 1;
-		}
+    public override void _Input(InputEvent inputEvent)
+    {
+        if (inputEvent is InputEventMouseMotion e)
+        {
+            mouseDelta = e.Relative;
+        }
+    }
 
-		var animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
-
-		if (velocity.Length() > 0)
-		{
-			velocity = velocity.Normalized() * Speed;
-			animatedSprite.Play();
-		}
-		else
-		{
-			animatedSprite.Stop();
-		}
-		Position += velocity * delta;
-		Position = new Vector2(
-			x: Mathf.Clamp(Position.x, 0, _screenSize.x),
-			y: Mathf.Clamp(Position.y, 0, _screenSize.y)
-		);
-	}
+    private float Lerp(float firstFloat, float secondFloat, float by)
+    {
+        return firstFloat * (1 - by) + secondFloat * by;
+    }
 }

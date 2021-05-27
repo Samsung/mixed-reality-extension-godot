@@ -11,9 +11,8 @@ public enum LaunchType
 public class LaunchMRE : Spatial
 {
 	[Export]
-	public LaunchType LaunchType;
+	public LaunchType LaunchType = LaunchType.OnStart;
 
-	[Export]
 	public MREComponent MREComponent;
 
 	[Export]
@@ -21,28 +20,48 @@ public class LaunchMRE : Spatial
 
 	private bool _running = false;
 
-	public LaunchMRE()
-	{
+	//MREComponent Properties
+	[Export]
+	public string MREURL;
 
-	}
+	[Export]
+	public string SessionID;
+
+	[Export]
+	public string AppID;
+
+	[Export]
+	public string EphemeralAppID;
+
+	[Export]
+	public bool AutoStart = false;
+
+	[Export]
+	public bool AutoJoin = true;
+
+	[Export]
+	public PackedScene UserNode;
+
+	[Export]
+	public Vector3 UserNodeTranslation;
+
 	// Use this for initialization
 	public override void _Ready()
 	{
 		MREComponent = new MREComponent();
 		MREComponent.Name = "MREComponent";
-		MREComponent.MREURL = "ws://localhost:3901";
-		MREComponent.SessionID = "testbed";
-		MREComponent.AppID = "helloworld";
-		MREComponent.EphemeralAppID = "helloworld-temp";
-		MREComponent.AutoStart = false;
-		MREComponent.AutoJoin = true;
+		MREComponent.MREURL = MREURL;
+		MREComponent.SessionID = SessionID;
+		MREComponent.AppID = AppID;
+		MREComponent.EphemeralAppID = EphemeralAppID;
+		MREComponent.AutoStart = AutoStart;
+		MREComponent.AutoJoin = AutoJoin;
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
-		MREComponent.UserNode = this.GetNode("Player");//   new Node(); // FIXME: cursor?
+		MREComponent.UserNode = UserNode.Instance();
+		(MREComponent.UserNode as Spatial).Translation = UserNodeTranslation;
+		AddChild(MREComponent.UserNode);
 		AddChild(MREComponent);
-
-		LaunchType = LaunchType.OnStart;
-
 	}
 
 	// Update is called once per frame

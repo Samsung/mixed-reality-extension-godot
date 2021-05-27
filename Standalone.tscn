@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://LaunchMRE.cs" type="Script" id=1]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=2]
+
+[node name="MicroAppRoot" type="Spatial"]
+script = ExtResource( 1 )
+MREURL = "ws://localhost:3901"
+SessionID = "testbed"
+AppID = "helloworld"
+EphemeralAppID = "helloworld-temp"
+UserNode = ExtResource( 2 )
+UserNodeTranslation = Vector3( 0, 0, 3 )

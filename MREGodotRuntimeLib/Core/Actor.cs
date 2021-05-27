@@ -406,22 +406,22 @@ namespace MixedRealityExtension.Core
 			PatchRigidBody(actorPatch.RigidBody);
 			PatchGrabbable(actorPatch.Grabbable);
 		}
-/*
+
 		internal void ApplyCorrection(ActorCorrection actorCorrection)
 		{
 			CorrectAppTransform(actorCorrection.AppTransform);
 		}
-*/
+
 		internal void SynchronizeEngine(ActorPatch actorPatch)
 		{
 			ApplyPatch(actorPatch);
 		}
-/*
+
 		internal void EngineCorrection(ActorCorrection actorCorrection)
 		{
 			ApplyCorrection(actorCorrection);
 		}
-*/
+
 		internal void ExecuteRigidBodyCommands(RigidBodyCommands commandPayload, Action onCompleteCallback)
 		{
 			foreach (var command in commandPayload.CommandPayloads.OfType<ICommandPayload>())
@@ -1800,8 +1800,7 @@ namespace MixedRealityExtension.Core
 		[CommandHandler(typeof(ActorCorrection))]
 		private void OnActorCorrection(ActorCorrection payload, Action onCompleteCallback)
 		{
-			//FIXME
-			//EngineCorrection(payload);
+			EngineCorrection(payload);
 			onCompleteCallback?.Invoke();
 		}
 
