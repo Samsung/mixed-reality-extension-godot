@@ -122,7 +122,7 @@ public class SimpleText : IText
 		label = new Label();
 		dynamicFont = new DynamicFont()
 		{
-			FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NanumSquareRound/NanumSquareRoundR.ttf"),
+			FontData = ResourceLoader.Load<DynamicFontData>("MREGodotRuntime/Scripts/Fonts/NanumSquareRound/NanumSquareRoundR.ttf"),
 			Size = 60
 		};
 		label.AddFontOverride("font", dynamicFont);
