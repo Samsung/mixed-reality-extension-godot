@@ -77,7 +77,7 @@ namespace MixedRealityExtension.Core
 		private MWScaledTransform _localTransform;
 		private MWTransform _appTransform;
 
-		//private TransformLerper _transformLerper;
+		private TransformLerper _transformLerper;
 
 		private Dictionary<Type, ActorComponentBase> _components = new Dictionary<Type, ActorComponentBase>();
 
@@ -728,7 +728,7 @@ namespace MixedRealityExtension.Core
 				App?.Logger.LogError($"Failed to synchronize app.  Exception: {e.Message}\nStackTrace: {e.StackTrace}");
 			}
 
-			//_transformLerper?.Update();
+			_transformLerper?.Update();
 		}
 
 		protected override void InternalFixedUpdate()
@@ -1356,13 +1356,11 @@ namespace MixedRealityExtension.Core
 
 			if (RigidBody == null)
 			{
-				/*FIXME
 				// We need to lerp at the transform level with the transform lerper.
 				if (_transformLerper == null)
 				{
-					_transformLerper = new TransformLerper(gameObject.transform);
+					_transformLerper = new TransformLerper(this);
 				}
-				*/
 
 				// Convert the app relative transform for the correction to world position relative to our app root.
 				Vector3? newPos = null;
@@ -1389,8 +1387,7 @@ namespace MixedRealityExtension.Core
 
 				// We do not pass in a value for the update period at this point.  We will be adding in lag
 				// prediction for the network here in the future once that is more fully fleshed out.
-				//FIXME
-				//_transformLerper.SetTarget(newPos, newRot);
+				_transformLerper.SetTarget(newPos, newRot);
 			}
 			else
 			{
