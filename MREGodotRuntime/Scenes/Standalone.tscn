@@ -9,5 +9,8 @@ MREURL = "ws://localhost:3901"
 SessionID = "testbed"
 AppID = "helloworld"
 EphemeralAppID = "helloworld-temp"
-UserNode = ExtResource( 2 )
+UserNode = NodePath("../Player")
 UserNodeTranslation = Vector3( 0, 0, 3 )
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3 )

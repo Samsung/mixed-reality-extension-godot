@@ -40,10 +40,7 @@ public class LaunchMRE : Spatial
 	public bool AutoJoin = true;
 
 	[Export]
-	public PackedScene UserNode;
-
-	[Export]
-	public Vector3 UserNodeTranslation;
+	public NodePath UserNode;
 
 	// Use this for initialization
 	public override void _Ready()
@@ -58,8 +55,7 @@ public class LaunchMRE : Spatial
 		MREComponent.AutoJoin = AutoJoin;
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
-		MREComponent.UserNode = UserNode.Instance();
-		(MREComponent.UserNode as Spatial).Translation = UserNodeTranslation;
+		MREComponent.UserNode = GetNode(UserNode);
 		AddChild(MREComponent.UserNode);
 		AddChild(MREComponent);
 	}

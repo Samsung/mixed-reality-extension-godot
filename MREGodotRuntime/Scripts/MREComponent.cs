@@ -161,8 +161,12 @@ public class MREComponent : Spatial
 			GD.Print($"{testName}: {message}");
 		}));
 	}
-	
 	public override void _PhysicsProcess(float delta)
+	{
+		MREApp?.FixedUpdate();
+	}
+
+	public override void _Process(float delta)
 	{
 		/* FIXME
 		if (Input.GetButtonUp("Jump"))
