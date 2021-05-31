@@ -3,7 +3,7 @@
 [ext_resource path="res://MREGodotRuntime/Scripts/LaunchMRE.cs" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scenes/Player.tscn" type="PackedScene" id=2]
 
-[node name="MicroAppRoot" type="Spatial"]
+[node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
 MREURL = "ws://mres.altvr.com/helloworld"
 SessionID = "testbed"
