@@ -204,10 +204,6 @@ namespace MixedRealityExtension.Assets
 					{
 						node.QueueFree();
 					}
-					else
-					{
-						asset.Asset.Free();
-					}
 				}
 				// asset is shared with other MRE instances, just return asset to cache
 				else
