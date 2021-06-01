@@ -9,6 +9,7 @@ using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.Util.GodotHelper;
 using System;
 using System.Collections.Generic;
+using MWAssets = MixedRealityExtension.Assets;
 using Material = Godot.SpatialMaterial;
 using MWMaterial = MixedRealityExtension.Assets.Material;
 using Texture = Godot.Texture;
@@ -21,7 +22,7 @@ namespace MixedRealityExtension.Factories
 	public class DefaultMaterialPatcher : IMaterialPatcher
 	{
 		protected Dictionary<ulong, Guid> mainTextureAssignments = new Dictionary<ulong, Guid>(20);
-
+		protected Dictionary<ulong, Guid> emissiveTextureAssignments = new Dictionary<ulong, Guid>(20);
 		private MWColor _materialColor = new MWColor();
 		private MWVector3 _textureOffset = new MWVector3();
 		private MWVector3 _textureScale = new MWVector3();
@@ -67,6 +68,77 @@ namespace MixedRealityExtension.Factories
 					});
 				}
 			}
+
+			if (patch.EmissiveColor != null)
+			{
+				material.EmissionEnabled = true;
+				var color = material.Emission;
+				color.r = patch.EmissiveColor.R ?? color.r;
+				color.g = patch.EmissiveColor.G ?? color.g;
+				color.b = patch.EmissiveColor.B ?? color.b;
+				color.a = patch.EmissiveColor.A ?? color.a;
+				material.Emission = color;
+			}
+
+			if (patch.EmissiveTextureOffset != null)
+			{
+				material.EmissionEnabled = true;
+				var offset = material.Uv2Offset;
+				offset.x = patch.EmissiveTextureOffset.X ?? offset.x;
+				offset.y = patch.EmissiveTextureOffset.Y ?? offset.y;
+				material.Uv2Offset = offset;
+			}
+
+			if (patch.EmissiveTextureScale != null)
+			{
+				material.EmissionEnabled = true;
+				var scale = material.Uv2Scale;
+				scale.x = patch.EmissiveTextureScale.X ?? scale.x;
+				scale.y = patch.EmissiveTextureScale.Y ?? scale.y;
+				material.Uv2Scale = scale;
+			}
+
+			if (patch.EmissiveTextureId != null)
+			{
+				material.EmissionEnabled = true;
+				var textureId = patch.EmissiveTextureId.Value;
+				emissiveTextureAssignments[material.GetInstanceId()] = textureId;
+				if (textureId == Guid.Empty)
+				{
+					material.EmissionTexture = null;
+				}
+				else
+				{
+					app.AssetManager.OnSet(textureId, tex =>
+					{
+						if (material == null || emissiveTextureAssignments[material.GetInstanceId()] != textureId) return;
+						material.EmissionTexture = (Texture)tex.Asset;
+					});
+				}
+			}
+
+			if (patch.AlphaCutoff != null)
+			{
+				material.ParamsUseAlphaScissor = true;
+				material.ParamsAlphaScissorThreshold = patch.AlphaCutoff.Value;
+			}
+
+			switch (patch.AlphaMode)
+			{
+				case MWAssets.AlphaMode.Opaque:
+					material.FlagsTransparent = false;
+					break;
+				case MWAssets.AlphaMode.Mask:
+					material.ParamsUseAlphaScissor = true;
+					material.ParamsAlphaScissorThreshold = 1.0f;
+					break;
+				case MWAssets.AlphaMode.Blend:
+					material.FlagsTransparent = true;
+					material.ParamsUseAlphaScissor = false;
+					break;
+				// ignore default case, i.e. null
+			}
+
 		}
 
 		/// <inheritdoc />
