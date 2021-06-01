@@ -12,7 +12,7 @@ namespace Assets.Scripts.Tools
 		{
 			base.UpdateTool(inputSource);
 
-			if (Target == null)
+			if (Target == null || !Godot.Object.IsInstanceValid(Target))
 			{
 				return;
 			}
@@ -60,7 +60,7 @@ namespace Assets.Scripts.Tools
 				newBehavior,
 				inputSource);
 
-			if (oldTarget != null)
+			if (oldTarget != null && Godot.Object.IsInstanceValid(oldTarget))
 			{
 				var oldBehavior = oldTarget.GetBehavior<ButtonBehavior>();
 				if (oldBehavior != null)
@@ -73,7 +73,7 @@ namespace Assets.Scripts.Tools
 				}
 			}
 
-			if (newTarget != null)
+			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget))
 			{
 				var newButtonBehavior = newBehavior as ButtonBehavior;
 				if (newButtonBehavior != null)

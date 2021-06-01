@@ -13,7 +13,7 @@ namespace Assets.Scripts.Tools
 		{
 			base.UpdateTool(inputSource);
 
-			if (Target == null || !TargetGrabbed)
+			if (Target == null || !TargetGrabbed || !Godot.Object.IsInstanceValid(Target))
 			{
 				return;
 			}

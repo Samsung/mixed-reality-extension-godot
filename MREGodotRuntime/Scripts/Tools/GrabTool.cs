@@ -36,7 +36,7 @@ namespace Assets.Scripts.Tools
 		private Vector3 _manipulatorLookAtPosInToolSpace;
 		private InputSource _currentInputSource;
 
-		public bool GrabActive => CurrentGrabbedTarget != null;
+		public bool GrabActive => CurrentGrabbedTarget != null && Godot.Object.IsInstanceValid(CurrentGrabbedTarget);
 
 		public Spatial CurrentGrabbedTarget { get; private set; }
 
@@ -44,7 +44,7 @@ namespace Assets.Scripts.Tools
 
 		public void Update(InputSource inputSource, Spatial target)
 		{
-			if (target == null)
+			if (target == null || !Godot.Object.IsInstanceValid(target))
 			{
 				return;
 			}
@@ -91,7 +91,7 @@ namespace Assets.Scripts.Tools
 
 		private void StartGrab(InputSource inputSource, Spatial target)
 		{
-			if (GrabActive ||target == null)
+			if (GrabActive ||target == null || !Godot.Object.IsInstanceValid(target))
 			{
 				return;
 			}

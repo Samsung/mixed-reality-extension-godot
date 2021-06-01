@@ -35,7 +35,7 @@ namespace Assets.Scripts.Tools
 
 			Vector3? hitPoint;
 			var newTarget = FindTarget(inputSource, out hitPoint);
-			if (newTarget == null)
+			if (newTarget == null || !Godot.Object.IsInstanceValid(newTarget))
 			{
 				return;
 			}
@@ -97,7 +97,7 @@ namespace Assets.Scripts.Tools
 			}
 
 			TargetBehavior newBehavior = null;
-			if (newTarget != null)
+			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget))
 			{
 				newBehavior = newTarget.GetBehavior<TargetBehavior>();
 
@@ -144,12 +144,12 @@ namespace Assets.Scripts.Tools
 			TargetBehavior newBehavior,
 			InputSource inputSource)
 		{
-			if (oldTarget != null)
+			if (oldTarget != null && Godot.Object.IsInstanceValid(oldTarget))
 			{
 				_currentTargetBehavior.Context.EndTargeting(_currentTargetBehavior.GetMWUnityUser(inputSource.UserNode), oldTargetPoint);
 			}
 
-			if (newTarget != null)
+			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget))
 			{
 				newBehavior.Context.StartTargeting(newBehavior.GetMWUnityUser(inputSource.UserNode), newTargetPoint);
 			}
