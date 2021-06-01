@@ -371,8 +371,10 @@ namespace MixedRealityExtension.IPC.Connections
 			// {
 			// 	MREAPI.Logger.LogDebug($"Recv: {json}");
 			// }
-			if (!json.Contains("heartbeat"))
-				Godot.GD.Print($"Recv: {json}");
+
+			// This causes performance issue. Use this code only when debugging.
+			//if (!json.Contains("heartbeat"))
+			//	Godot.GD.Print($"Recv: {json}");
 
 			try
 			{
