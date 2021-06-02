@@ -32,6 +32,7 @@ public class LaunchMRE : Spatial
 	{
 		if (!IsInsideTree())
 			return;
+
 		switch (LaunchType)
 		{
 			case LaunchType.MouseButtonDown:
@@ -40,14 +41,14 @@ public class LaunchMRE : Spatial
 				{
 					CollisionArea = this.GetChild<Area>() ?? new Area();
 					AddChild(CollisionArea);
-					CollisionArea.Connect("input_event", this, nameof(_InputEvent));
+					CollisionArea.Connect("input_event", this, nameof(OnInputEvent));
+					CollisionArea.Connect("body_entered", this, nameof(OnBodyEntered));
+					CollisionArea.Connect("body_exited", this, nameof(OnBodyExited));
 					CollisionArea.Owner = GetTree().EditedSceneRoot;
 
 					var CollisionShape = CollisionArea.GetChild<CollisionShape>() ?? new CollisionShape();
 					CollisionArea.AddChild(CollisionShape);
 					CollisionShape.Owner = GetTree().EditedSceneRoot;
-
-
 				}
 				break;
 			case LaunchType.OnStart:
@@ -116,7 +117,7 @@ public class LaunchMRE : Spatial
 		}
 	}
 
-	public void _InputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 clickPosition, Vector3 clickNormal, int shapeIdx)
+	public void OnInputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 clickPosition, Vector3 clickNormal, int shapeIdx)
 	{
 		if ((inputEvent is InputEventMouseButton e) && e.IsPressed())
 		{
@@ -145,23 +146,22 @@ public class LaunchMRE : Spatial
 		MREComponent?.DisableApp();
 		_running = false;
 	}
-	/*
-	private void OnTriggerEnter(Collider other)
+
+	private void OnBodyEntered(Node other)
 	{
-		if (LaunchType == LaunchType.TriggerVolume && other.gameObject.tag == "Player")
+		if (LaunchType == LaunchType.TriggerVolume && other.Name == "Player")
 		{
 			StartApp();
 		}
 	}
-	private void OnTriggerExit(Collider other)
+	private void OnBodyExited(Node other)
 	{
 		if (StopAppOnExit)
 		{
-			if (LaunchType == LaunchType.TriggerVolume && other.gameObject.tag == "Player")
+			if (LaunchType == LaunchType.TriggerVolume && other.Name == "Player")
 			{
 				StopApp();
 			}
 		}
 	}
-	*/
 }

@@ -39,7 +39,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 		public void EndTargeting(IUser user, Vector3 targetPoint)
 		{
 			var app = App;
-			if (app == null)
+			if (app == null || Behavior == null)
 			{
 				return;
 			}
