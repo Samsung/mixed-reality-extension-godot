@@ -23,6 +23,7 @@ You should now see a slowly spinning Hello World label.
 The MRETestbed project contains 2 Godot scenes set up for different testing purposes
 * `HelloWorld.tscn`: Connects to a single MRE in the cloud on startup, no interaction needed.
 * `Standalone.tscn`: Connects to a localhost.
+* `SynchronizationTest-localhost.tscn`: Connects twice to twice to a localhost MREs with the same session ID. When you click on the two spheres you will see 2 different connections to the same server, so you can perform basic multiuser testing without multiple machines or multiple unity instances.
 
 The Localhost samples requires a local node server running, see the [Sample repository](
 https://github.com/Microsoft/mixed-reality-extension-sdk-samples#How-to-Build-and-Run-the-Hello-World-sample) for localhost deployment.

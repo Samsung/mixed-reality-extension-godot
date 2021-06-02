@@ -36,6 +36,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
 [node name="HUD" type="Control" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -50,6 +51,7 @@ margin_left = -21.0
 margin_top = -21.0
 margin_right = 21.0
 margin_bottom = 21.0
+mouse_filter = 2
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -63,6 +65,7 @@ margin_left = -2.5
 margin_top = 4.5
 margin_right = 2.5
 margin_bottom = 20.5
+mouse_filter = 2
 texture = SubResource( 2 )
 expand = true
 __meta__ = {
@@ -78,6 +81,7 @@ margin_left = -2.5
 margin_top = -20.5
 margin_right = 2.5
 margin_bottom = -4.5
+mouse_filter = 2
 texture = SubResource( 3 )
 expand = true
 __meta__ = {
@@ -94,6 +98,7 @@ margin_top = -2.5
 margin_right = 0.5
 margin_bottom = 12.5
 rect_rotation = 90.0
+mouse_filter = 2
 texture = SubResource( 4 )
 expand = true
 
@@ -107,5 +112,6 @@ margin_top = -2.5
 margin_right = 24.5
 margin_bottom = 12.5
 rect_rotation = 90.0
+mouse_filter = 2
 texture = SubResource( 5 )
 expand = true

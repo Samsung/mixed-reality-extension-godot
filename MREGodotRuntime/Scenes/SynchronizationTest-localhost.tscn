@@ -1,0 +1,69 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://MREGodotRuntime/Scripts/LaunchMRE.cs" type="Script" id=1]
+[ext_resource path="res://MREGodotRuntime/Scenes/Player.tscn" type="PackedScene" id=2]
+
+[sub_resource type="SphereShape" id=1]
+
+[sub_resource type="SphereMesh" id=2]
+
+[sub_resource type="SpatialMaterial" id=3]
+albedo_color = Color( 0.980392, 0.588235, 0.196078, 1 )
+
+[sub_resource type="SpatialMaterial" id=4]
+albedo_color = Color( 0.980392, 0.588235, 0.196078, 1 )
+
+[node name="Root" type="Spatial"]
+
+[node name="MRENode-PrimaryInstance" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0 )
+script = ExtResource( 1 )
+MREURL = "ws://localhost:3901"
+SessionID = "testbed"
+LaunchType = 0
+UserNode = NodePath("../Player")
+AppID = "helloworld"
+EphemeralAppID = "helloworld-temp"
+
+[node name="Area" type="Area" parent="MRENode-PrimaryInstance"]
+
+[node name="CollisionShape" type="CollisionShape" parent="MRENode-PrimaryInstance/Area"]
+shape = SubResource( 1 )
+
+[node name="MeshInstance" type="MeshInstance" parent="MRENode-PrimaryInstance/Area"]
+mesh = SubResource( 2 )
+material/0 = SubResource( 3 )
+
+[node name="MRENode-SecondInstance" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0 )
+script = ExtResource( 1 )
+MREURL = "ws://localhost:3901"
+SessionID = "testbed"
+LaunchType = 0
+UserNode = NodePath("../Player")
+AppID = "helloworld"
+EphemeralAppID = "helloworld-temp"
+
+[node name="Area" type="Area" parent="MRENode-SecondInstance"]
+
+[node name="CollisionShape" type="CollisionShape" parent="MRENode-SecondInstance/Area"]
+shape = SubResource( 1 )
+
+[node name="MeshInstance" type="MeshInstance" parent="MRENode-SecondInstance/Area"]
+mesh = SubResource( 2 )
+material/0 = SubResource( 4 )
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5 )
+
+[node name="Label" type="Label" parent="."]
+margin_left = 538.858
+margin_top = 122.714
+margin_right = 644.858
+margin_bottom = 136.714
+rect_scale = Vector2( 2, 2 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Click the Planets"
+__meta__ = {
+"_edit_use_anchors_": false
+}

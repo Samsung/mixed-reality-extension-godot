@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using MixedRealityExtension.Util.GodotHelper;
 
 public enum LaunchType
 {
@@ -8,10 +9,56 @@ public enum LaunchType
 	OnStart
 }
 
+[Tool]
 public class LaunchMRE : Spatial
 {
+	private Area CollisionArea;
+
+	private LaunchType launchType = LaunchType.OnStart;
 	[Export]
-	public LaunchType LaunchType = LaunchType.OnStart;
+	public LaunchType LaunchType
+	{
+		get => launchType;
+		set
+		{
+			if (launchType == value)
+				return;
+			launchType = value;
+			UpdateEditorSceneWithLaunchType();
+		}
+	}
+
+	void UpdateEditorSceneWithLaunchType()
+	{
+		if (!IsInsideTree())
+			return;
+		switch (LaunchType)
+		{
+			case LaunchType.MouseButtonDown:
+			case LaunchType.TriggerVolume:
+				if (CollisionArea == null)
+				{
+					CollisionArea = this.GetChild<Area>() ?? new Area();
+					AddChild(CollisionArea);
+					CollisionArea.Connect("input_event", this, nameof(_InputEvent));
+					CollisionArea.Owner = GetTree().EditedSceneRoot;
+
+					var CollisionShape = CollisionArea.GetChild<CollisionShape>() ?? new CollisionShape();
+					CollisionArea.AddChild(CollisionShape);
+					CollisionShape.Owner = GetTree().EditedSceneRoot;
+
+
+				}
+				break;
+			case LaunchType.OnStart:
+				if (CollisionArea != null)
+				{
+					CollisionArea.QueueFree();
+					CollisionArea = null;
+				}
+				break;
+		}
+	}
 
 	public MREComponent MREComponent;
 
@@ -45,6 +92,7 @@ public class LaunchMRE : Spatial
 	// Use this for initialization
 	public override void _Ready()
 	{
+		UpdateEditorSceneWithLaunchType();
 		MREComponent = new MREComponent();
 		MREComponent.Name = "MREComponent";
 		MREComponent.MREURL = MREURL;
@@ -56,7 +104,6 @@ public class LaunchMRE : Spatial
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
 		MREComponent.UserNode = GetNode(UserNode);
-		AddChild(MREComponent.UserNode);
 		AddChild(MREComponent);
 	}
 
@@ -69,21 +116,25 @@ public class LaunchMRE : Spatial
 		}
 	}
 
-	public override void _Input(InputEvent inputEvent)
+	public void _InputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 clickPosition, Vector3 clickNormal, int shapeIdx)
 	{
-		/*
-		if ((inputEvent as InputEventMouseButton).IsPressed())
+		if ((inputEvent is InputEventMouseButton e) && e.IsPressed())
 		{
 			if (LaunchType == LaunchType.MouseButtonDown && MREComponent != null)
 			{
+				if (CollisionArea != null)
+				{
+					CollisionArea.QueueFree();
+					CollisionArea = null;
+				}
 				StartApp();
 			}
 		}
-		*/
 	}
 
 	private void StartApp()
 	{
+		if (Engine.EditorHint) return;
 		GD.Print("Starting MRE app.");
 		MREComponent?.EnableApp();
 		_running = true;
