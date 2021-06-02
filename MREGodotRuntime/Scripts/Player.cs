@@ -1,14 +1,10 @@
 using Godot;
-using System;
 
 public class Player : KinematicBody
 {
-    // Declare member variables here. Examples:
-    // private int a = 2;
-    // private string b = "text";
-    private float speed = 5f;
-    private float cameraSpeed = 0.5f;
-    private float spin = 0.05f;
+    private float speed = 4f;
+    private float cameraSpeed = 0.3f;
+    private bool cameraMove = false;
     private Camera camera;
     private Vector2 mouseDelta = new Vector2();
 
@@ -20,6 +16,7 @@ public class Player : KinematicBody
 
     public override void _PhysicsProcess(float delta)
     {
+        if (!cameraMove) return;
         camera.RotationDegrees = new Vector3(camera.RotationDegrees.x - mouseDelta.y * cameraSpeed,
                                              camera.RotationDegrees.y - mouseDelta.x * cameraSpeed,
                                              camera.RotationDegrees.z);
@@ -44,7 +41,7 @@ public class Player : KinematicBody
         {
             velocity -= camera.GlobalTransform.basis.z;
         }
-        velocity = MoveAndSlide(velocity);
+        velocity = MoveAndSlide(velocity * speed);
 
     }
 
@@ -53,6 +50,15 @@ public class Player : KinematicBody
         if (inputEvent is InputEventMouseMotion e)
         {
             mouseDelta = e.Relative;
+        }
+        else if (inputEvent is InputEventMouseButton eventMouseButton)
+        {
+            if (!cameraMove && eventMouseButton.Pressed)
+                cameraMove = true;
+        }
+        else if (Input.IsActionPressed("ui_cancel"))
+        {
+            cameraMove = false;
         }
     }
 
