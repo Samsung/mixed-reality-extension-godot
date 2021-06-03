@@ -159,6 +159,15 @@ namespace MixedRealityExtension.Core
 		public MWVector3 Size { get; set; }
 
 		/// <summary>
+		/// The primary axis of the capsule (x = 0, y = 1, z = 2)
+		/// </summary>
+		public int? Direction
+		{
+			get => Size?.LargestComponentIndex();
+
+		}
+
+		/// <summary>
 		/// The height of the capsule along its primary axis, including end caps
 		/// </summary>
 		public float? Height
