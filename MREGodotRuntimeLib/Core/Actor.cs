@@ -473,7 +473,7 @@ namespace MixedRealityExtension.Core
 						}
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "z")
 						{
-							output.Transform.Local.Position.Z = localPos.z;
+							output.Transform.Local.Position.Z = -localPos.z;
 						}
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
@@ -516,7 +516,7 @@ namespace MixedRealityExtension.Core
 						}
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "z")
 						{
-							output.Transform.App.Position.Z = AppTransform.Position.Z;
+							output.Transform.App.Position.Z = -AppTransform.Position.Z;
 						}
 					}
 					if (generateAll || path.PathParts[2] == "rotation")

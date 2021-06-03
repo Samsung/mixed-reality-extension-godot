@@ -406,6 +406,8 @@ namespace MixedRealityExtension.Patching
 		{
 			if (patch.Position != null)
 			{
+				if (patch.Position.Z.HasValue)
+					patch.Position.Z *= -1;
 				_this.Transform = new Transform(_this.Transform.basis, _this.Transform.origin.GetPatchApplied(current.Position.ApplyPatch(patch.Position)));
 			}
 
@@ -426,6 +428,8 @@ namespace MixedRealityExtension.Patching
 		{
 			if (patch.Position != null)
 			{
+				if (patch.Position.Z.HasValue)
+					patch.Position.Z *= -1;
 				var newAppPos = appRoot.ToLocal(_this.GlobalTransform.origin).GetPatchApplied(current.Position.ApplyPatch(patch.Position));
 				_this.GlobalTransform = new Transform(_this.GlobalTransform.basis, appRoot.ToGlobal(newAppPos));
 			}
