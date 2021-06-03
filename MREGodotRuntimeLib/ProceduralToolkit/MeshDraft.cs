@@ -686,8 +686,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 		{
 			for (int i = 0; i < vertices.Count; i++)
 			{
-				vertices[i] = (rotation*vertices[i]).GetEuler();
-				normals[i] = (rotation*normals[i]).GetEuler();
+				vertices[i] = rotation.GetEuler()*vertices[i];
+				normals[i] = rotation.GetEuler()*normals[i];
 			}
 			return this;
 		}
