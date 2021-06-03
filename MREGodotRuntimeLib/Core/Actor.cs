@@ -1062,6 +1062,7 @@ namespace MixedRealityExtension.Core
 			{
 				// clear parent
 				ParentId = Guid.Empty;
+				Node3D.GetParent().RemoveChild(Node3D);
 				App.SceneRoot.AddChild(Node3D);
 			}
 			else if (parentId.Value != ParentId && newParent != null)
@@ -1082,6 +1083,7 @@ namespace MixedRealityExtension.Core
 						var freshParent = App.FindActor(ParentId) as Actor;
 						if (this != null && freshParent != null && Parent != freshParent)
 						{
+							Node3D.GetParent().RemoveChild(Node3D);
 							freshParent.Node3D.AddChild(Node3D);
 						}
 					}
