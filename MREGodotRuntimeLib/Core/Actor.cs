@@ -1019,13 +1019,11 @@ namespace MixedRealityExtension.Core
 					colliderGeometry.Patch(App, capsuleCollider);
 					godotCollisionShape = capsuleCollider;
 					break;
-					/*FIXME
 				case ColliderType.Mesh:
-					var meshCollider =  gameObject.AddComponent<MeshCollider>();
+					var meshCollider = new CollisionShape() { Shape = new ConcavePolygonShape() };
 					colliderGeometry.Patch(App, meshCollider);
 					godotCollisionShape = meshCollider;
 					break;
-					*/
 				default:
 					App.Logger.LogWarning("Cannot add the given collider type to the actor " +
 						$"during runtime.  Collider Type: {colliderPatch.Geometry.Shape}");
