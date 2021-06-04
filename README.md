@@ -3,6 +3,8 @@
 The Mixed Reality Extension SDK Godot library makes it easy for any Godot app or game to support user generated content (UGC) built with the [Mixed Reality Extension SDK](
 https://github.com/Microsoft/mixed-reality-extension-sdk). It also makes it easy to test an MRE within a simple environment inside the Godot editor.
 
+This project was forked from [Mixed Reality Extension Unity](https://github.com/Microsoft/mixed-reality-extension-unity).
+
 
 ## Prerequisites
 * Install Git
