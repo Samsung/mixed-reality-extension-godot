@@ -229,13 +229,13 @@ namespace MixedRealityExtension.Core
 		{
 			ProcessActorCommand(payload.ActorId, payload, onCompleteCallback);
 		}
-
+*/
 		[CommandHandler(typeof(SetMediaState))]
 		private void OnSetMediaState(SetMediaState payload, Action onCompleteCallback)
 		{
 			ProcessActorCommand(payload.ActorId, payload, onCompleteCallback);
 		}
-*/
+
 		[CommandHandler(typeof(InterpolateActor))]
 		private void OnInterpolateActor(InterpolateActor payload, Action onCompleteCallback)
 		{

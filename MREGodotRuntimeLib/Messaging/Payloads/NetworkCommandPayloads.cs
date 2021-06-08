@@ -323,7 +323,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// </summary>
 		public MWSetAnimationStateOptions State { get; set; }
 	}
-/*FIXME
+
 	/// <summary>
 	/// App => Engine
 	/// Payload for when the app wants to set animation state.
@@ -356,7 +356,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 		public MediaStateOptions Options { get; set; }
 
 	}
-*/
+
 	/// <summary>
 	/// App => Engine
 	/// Payload for when the app wants to interpolate actor properties (position, rotation, scale. Other fields in the future).

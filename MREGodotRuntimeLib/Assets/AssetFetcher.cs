@@ -6,7 +6,7 @@ using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-//using UnityEngine.Networking;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Assets
 {
@@ -51,14 +51,7 @@ namespace MixedRealityExtension.Assets
 				return result;
 			}
 
-			//FIXME
-			//runner.StartCoroutine(LoadCoroutine());
-
-			// Spin asynchronously until the request completes.
-			while (!result.IsPopulated)
-			{
-				await Task.Delay(10);
-			}
+			await LoadCoroutine(runner);
 
 			// handle caching
 			if (!string.IsNullOrEmpty(ifNoneMatch) && result.ReturnCode == 304)
@@ -78,68 +71,71 @@ namespace MixedRealityExtension.Assets
 
 			MREAPI.AppsAPI.AssetCache.ReleaseLoadingLock(uri);
 			return result;
-/*FIXME
-			IEnumerator LoadCoroutine()
+
+			async Task LoadCoroutine(Node runner)
 			{
 				DownloadHandler handler;
-				if (typeof(T) == typeof(UnityEngine.AudioClip))
+				if (typeof(T) == typeof(Godot.AudioStream))
 				{
-					handler = new DownloadHandlerAudioClip(uri, AudioType.UNKNOWN);
+					handler = new DownloadHandlerAudioStream(uri, AudioType.Unknown);
 				}
+				/*FIXME
 				else if (typeof(T) == typeof(UnityEngine.Texture))
 				{
 					handler = new DownloadHandlerTexture(false);
 				}
+				*/
 				else
 				{
 					result.FailureMessage = $"Unknown download type: {typeof(T)}";
-					yield break;
+					return;
 				}
 
 				// Spin asynchronously until the load throttler would allow us through.
 				while (AssetLoadThrottling.WouldThrottle())
 				{
-					yield return null;
+					await runner.ToSignal(Engine.GetMainLoop(), "idle_frame");
 				}
 
 				using (var scope = new AssetLoadThrottling.AssetLoadScope())
-				using (var www = new UnityWebRequest(uri, "GET", handler, null))
+				using (var www = new GodotWebRequest(uri, HTTPClient.Method.Get, handler))
 				{
 					if (!string.IsNullOrEmpty(ifNoneMatch))
 					{
 						www.SetRequestHeader("If-None-Match", ifNoneMatch);
 					}
 
-					yield return www.SendWebRequest();
-					if (www.isNetworkError)
+					Error error = www.SendWebRequest();
+					if (error != 0)
 					{
 						result.ReturnCode = -1;
-						result.FailureMessage = www.error;
+						result.FailureMessage = error.ToString();
 					}
 					else
 					{
-						result.ReturnCode = www.responseCode;
-						result.ETag = www.GetResponseHeader("ETag") ?? Constants.UnversionedAssetVersion;
+						result.ReturnCode = www.GetResponseCode();
+						result.ETag = www.GetResponseHeadersAsDictionary()["ETag"] as string ?? Constants.UnversionedAssetVersion;
 
-						if (www.isHttpError)
+						if (result.ReturnCode >= 200 && result.ReturnCode <= 299)
 						{
-							result.FailureMessage = $"[{www.responseCode}] {uri}";
-						}
-						else if (www.responseCode >= 200 && www.responseCode <= 299)
-						{
-							if (typeof(T).IsAssignableFrom(typeof(UnityEngine.AudioClip)))
+							if (typeof(T).IsAssignableFrom(typeof(AudioStream)))
 							{
-								result.Asset = ((DownloadHandlerAudioClip)handler).audioClip as T;
+								result.Asset = ((DownloadHandlerAudioStream)handler).AudioStream as T;
 							}
+							/*FIXME
 							else if (typeof(T).IsAssignableFrom(typeof(UnityEngine.Texture)))
 							{
 								result.Asset = ((DownloadHandlerTexture)handler).texture as T;
 							}
+							*/
+						}
+						else
+						{
+							result.FailureMessage = $"[{result.ReturnCode}] {uri}";
 						}
 					}
 				}
 			}
-*/
 		}
 	}
 }

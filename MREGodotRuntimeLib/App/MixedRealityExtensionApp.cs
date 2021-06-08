@@ -171,6 +171,8 @@ namespace MixedRealityExtension.App
 
 		internal IConnectionInternal Conn => _conn;
 
+		internal SoundManager SoundManager { get; private set; }
+
 		internal Permissions GrantedPermissions = Permissions.None;
 
 		internal PhysicsBridge PhysicsBridge { get; } = null;
@@ -202,6 +204,7 @@ namespace MixedRealityExtension.App
 				PhysicsBridge = new PhysicsBridge();
 			}
 
+			SoundManager = new SoundManager(this);
 			AnimationManager = new AnimationManager(this);
 			_commandManager = new CommandManager(new Dictionary<Type, ICommandHandlerContext>()
 			{
@@ -493,6 +496,7 @@ namespace MixedRealityExtension.App
 				}
 			}
 
+			SoundManager.Update();
 			_commandManager.Update();
 			AnimationManager.Update();
 		}

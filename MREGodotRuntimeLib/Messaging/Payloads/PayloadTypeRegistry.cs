@@ -47,7 +47,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(SetAnimationState), "set-animation-state")]
 	[PayloadType(typeof(SetAuthoritative), "set-authoritative")]
 	[PayloadType(typeof(SetBehavior), "set-behavior")]
-	//[PayloadType(typeof(SetMediaState), "set-media-state")]
+	[PayloadType(typeof(SetMediaState), "set-media-state")]
 	[PayloadType(typeof(ShowDialog), "show-dialog")]
 	[PayloadType(typeof(StateRestore), "state-restore")]
 	[PayloadType(typeof(SyncAnimations), "sync-animations")]

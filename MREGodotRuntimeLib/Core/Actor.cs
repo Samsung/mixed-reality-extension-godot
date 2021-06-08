@@ -1869,7 +1869,7 @@ namespace MixedRealityExtension.Core
 				.SetAnimationState(payload.AnimationName, payload.State.Time, payload.State.Speed, payload.State.Enabled);
 			onCompleteCallback?.Invoke();
 		}
-
+*/
 		[CommandHandler(typeof(SetMediaState))]
 		private void OnSetMediaState(SetMediaState payload, Action onCompleteCallback)
 		{
@@ -1886,10 +1886,10 @@ namespace MixedRealityExtension.Core
 
 						App.AssetManager.OnSet(payload.MediaAssetId, asset =>
 						{
-							if (asset.Asset is AudioClip audioClip)
+							if (asset.Asset is AudioStream audioClip)
 							{
-								AudioSource soundInstance = App.SoundManager.AddSoundInstance(this, payload.Id, audioClip, payload.Options);
-								if (soundInstance)
+								AudioStreamPlayer3D soundInstance = App.SoundManager.AddSoundInstance(this, payload.Id, audioClip, payload.Options);
+								if (soundInstance != null)
 								{
 									mediaInstance.Instance = soundInstance;
 								}
@@ -1899,6 +1899,7 @@ namespace MixedRealityExtension.Core
 									_mediaInstances.Remove(payload.Id);
 								}
 							}
+							/*FIXME
 							else if (asset.Asset is VideoStreamDescription videoStreamDescription)
 							{
 								var factory = MREAPI.AppsAPI.VideoPlayerFactory
@@ -1907,6 +1908,7 @@ namespace MixedRealityExtension.Core
 								videoPlayer.Play(videoStreamDescription, payload.Options);
 								mediaInstance.Instance = videoPlayer;
 							}
+							*/
 							else
 							{
 								App.Logger.LogError($"Failed to start media instance with asset id: {payload.MediaAssetId}\n");
@@ -1935,14 +1937,16 @@ namespace MixedRealityExtension.Core
 							{
 								if (mediaInstance.Instance != null)
 								{
-									if (mediaInstance.Instance is AudioSource soundInstance)
+									if (mediaInstance.Instance is AudioStreamPlayer3D soundInstance)
 									{
 										App.SoundManager.ApplyMediaStateOptions(this, soundInstance, payload.Options, payload.Id, false);
 									}
+									/*FIXME
 									else if (mediaInstance.Instance is IVideoPlayer videoPlayer)
 									{
 										videoPlayer.ApplyMediaStateOptions(payload.Options);
 									}
+									*/
 								}
 							});
 						}
@@ -1958,9 +1962,9 @@ namespace MixedRealityExtension.Core
 			{
 				if (mediaInstance.Instance != null)
 				{
-					if (mediaInstance.Instance is AudioSource soundInstance)
+					if (mediaInstance.Instance is AudioStreamPlayer3D soundInstance)
 					{
-						if (soundInstance.isPlaying)
+						if (soundInstance.Playing)
 						{
 							return false;
 						}
@@ -1975,18 +1979,19 @@ namespace MixedRealityExtension.Core
 		{
 			if (mediaInstance.Instance != null)
 			{
-				if (mediaInstance.Instance is AudioSource soundInstance)
+				if (mediaInstance.Instance is AudioStreamPlayer3D soundInstance)
 				{
 					App.SoundManager.DestroySoundInstance(soundInstance, id);
 				}
+				/*FXIME
 				else if (mediaInstance.Instance is IVideoPlayer videoPlayer)
 				{
 					videoPlayer.Destroy();
 				}
+				*/
 				mediaInstance.Instance = null;
 			}
 		}
-*/
 
 		[CommandHandler(typeof(InterpolateActor))]
 		private void OnInterpolateActor(InterpolateActor payload, Action onCompleteCallback)

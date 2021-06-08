@@ -488,13 +488,13 @@ namespace MixedRealityExtension.Assets
 					response.FailureMessage = $"Cannot create mesh {def.Id} without a primitive definition";
 				}
 			}
-/*
+
 			// create sounds
 			else if (unityAsset == null && def.Sound != null)
 			{
 				var soundUri = new Uri(_app.ServerAssetUri, def.Sound.Value.Uri);
 				source = new AssetSource(AssetContainerType.None, soundUri.AbsoluteUri);
-				var result = await AssetFetcher<UnityEngine.AudioClip>.LoadTask(_owner, soundUri);
+				var result = await AssetFetcher<AudioStream>.LoadTask(_owner, soundUri);
 				unityAsset = result.Asset;
 				source.Version = result.ETag;
 				if (result.FailureMessage != null)
@@ -502,7 +502,7 @@ namespace MixedRealityExtension.Assets
 					response.FailureMessage = result.FailureMessage;
 				}
 			}
-
+/*
 			// create video streams
 			else if (unityAsset == null && def.VideoStream != null)
 			{
@@ -663,18 +663,18 @@ namespace MixedRealityExtension.Assets
 					}
 				};
 			}
-			/*
-			else if (unityAsset is AudioClip sound)
+			else if (unityAsset is AudioStream sound)
 			{
 				return new Asset()
 				{
 					Id = id,
 					Sound = new MWSound()
 					{
-						Duration = sound.length
+						Duration = sound.GetLength()
 					}
 				};
 			}
+			/*
 			else if (unityAsset is VideoStreamDescription videoStream)
 			{
 				return new Asset()
