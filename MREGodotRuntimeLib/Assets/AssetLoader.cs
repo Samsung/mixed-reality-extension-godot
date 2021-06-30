@@ -81,6 +81,15 @@ namespace MixedRealityExtension.Assets
 			var asset = _app.AssetManager.GetById(prefabId)?.Asset as Node;
 			Spatial prefab = asset.Duplicate() as Spatial;
 
+			// restore assigned animation.
+			var animationPlayer = asset.GetChild<AnimationPlayer>();
+			if (animationPlayer != null)
+			{
+				var prefabAnimationPlayer = prefab.GetNode<AnimationPlayer>(animationPlayer.Name);
+				prefabAnimationPlayer.AssignedAnimation = animationPlayer.AssignedAnimation;
+				prefabAnimationPlayer.Play();
+			}
+
 			Spatial parent = GetGameObjectFromParentId(parentId);
 			parent.AddChild(prefab);
 /*
