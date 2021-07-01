@@ -48,11 +48,11 @@ namespace MixedRealityExtension.Factories
 					// default capsule is Y-aligned; rotate if necessary
 					if (dims.LargestComponentIndex() == 0)
 					{
-						meshDraft.Rotate(new Quat(new Vector3(0, 0, 90)));
+						meshDraft.Rotate(Vector3.Forward, Mathf.Pi / 2);
 					}
 					else if (dims.LargestComponentIndex() == 2)
 					{
-						meshDraft.Rotate(new Quat(new Vector3(90, 0, 0)));
+						meshDraft.Rotate(Vector3.Right, Mathf.Pi / 2);
 					}
 					break;
 
@@ -85,11 +85,11 @@ namespace MixedRealityExtension.Factories
 					// default cylinder is Y-aligned; rotate if necessary
 					if (dims.X == height)
 					{
-						meshDraft.Rotate(new Quat(new Vector3(0, 0, 90)));
+						meshDraft.Rotate(Vector3.Forward, Mathf.Pi / 2);
 					}
 					else if (dims.Z == height)
 					{
-						meshDraft.Rotate(new Quat(new Vector3(90, 0, 0)));
+						meshDraft.Rotate(Vector3.Right, Mathf.Pi / 2);
 					}
 					break;
 

@@ -680,14 +680,14 @@ namespace MixedRealityExtension.ProceduralToolkit
 		}
 
 		/// <summary>
-		/// Rotates draft vertices by <paramref name="rotation"/>
+		/// Rotates draft vertices around a given <paramref name="axis"/> vector by <paramref name="phi"/> radians.
 		/// </summary>
-		public MeshDraft Rotate(Quat rotation)
+		public MeshDraft Rotate(Vector3 axis, float phi)
 		{
 			for (int i = 0; i < vertices.Count; i++)
 			{
-				vertices[i] = rotation.GetEuler()*vertices[i];
-				normals[i] = rotation.GetEuler()*normals[i];
+				vertices[i] = vertices[i].Rotated(axis, phi);
+				normals[i] = normals[i].Rotated(axis, phi);
 			}
 			return this;
 		}
