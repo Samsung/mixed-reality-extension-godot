@@ -111,7 +111,7 @@ namespace MixedRealityExtension.Assets
 					MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(collisionLayer, collider);
 				}
 
-				if (go.GetType() == typeof(Spatial))
+				if (go is Spatial)
 				{
 					var newActor = Actor.Instantiate((Spatial)go);
 					actorList.Add(newActor);
