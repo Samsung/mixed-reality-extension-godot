@@ -51,6 +51,11 @@ namespace MixedRealityExtension.Core
 		Capsule,
 
 		/// <summary>
+		/// Cylinder shaped collider.
+		/// </summary>
+		Cylinder,
+
+		/// <summary>
 		/// Mesh collider.
 		/// </summary>
 		Mesh

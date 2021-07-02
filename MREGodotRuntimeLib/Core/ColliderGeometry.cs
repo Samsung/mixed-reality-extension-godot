@@ -140,6 +140,78 @@ namespace MixedRealityExtension.Core
 	}
 
 	/// <summary>
+	/// Class that describes a cylinder-shaped collision volume
+	/// </summary>
+	public class CylinderColliderGeometry : ColliderGeometry
+	{
+		/// <inheritdoc />
+		public override ColliderType Shape => ColliderType.Cylinder;
+
+		/// <summary>
+		/// The centerpoint of the collider in local space
+		/// </summary>
+		public MWVector3 Center { get; set; }
+
+		/// <summary>
+		/// The rotation of the collider in local space
+		/// </summary>
+		public Quat Rotation { get; set; }
+
+		/// <summary>
+		/// The bounding box of the cylinder.
+		/// </summary>
+		public MWVector3 Dimensions { get; set; }
+
+		internal override void Patch(MixedRealityExtensionApp app, GodotCollisionShape collider)
+		{
+			if (collider.Shape is CylinderShape cylinderShape)
+			{
+				Vector3 newCenter = Vector3.Zero;
+				Basis basis = Basis.Identity;
+				if (Center != null)
+				{
+					newCenter.x = Center.X;
+					newCenter.y = Center.Y;
+					newCenter.z = Center.Z;
+				}
+
+				if (Dimensions != null)
+				{
+					float radius;
+					float height;
+					if (Mathf.IsEqualApprox(Dimensions.X, Dimensions.Y))
+					{
+						height = Dimensions.Z;
+						radius = Dimensions.X / 2;
+					}
+					else if (Mathf.IsEqualApprox(Dimensions.X, Dimensions.Z))
+					{
+						height = Dimensions.Y;
+						radius = Dimensions.X / 2;
+					}
+					else
+					{
+						height = Dimensions.X;
+						radius = Dimensions.Y / 2;
+					}
+					cylinderShape.Radius = radius;
+					cylinderShape.Height = height;
+
+					if (Dimensions.X == height)
+					{
+						basis = basis.Rotated(Vector3.Forward, Mathf.Pi / 2);
+					}
+					else if (Dimensions.Z == height)
+					{
+						basis = basis.Rotated(Vector3.Right, Mathf.Pi / 2);
+					}
+				}
+				collider.Transform = new Transform(basis, newCenter);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Class that describes a capsule-shaped collision volume
 	/// </summary>
 	public class CapsuleColliderGeometry : ColliderGeometry
@@ -172,7 +244,7 @@ namespace MixedRealityExtension.Core
 		/// </summary>
 		public float? Height
 		{
-			get => Size?.LargestComponentValue();
+			get => Size?.LargestComponentValue() - 2 * Radius;
 		}
 
 		/// <summary>
@@ -187,20 +259,31 @@ namespace MixedRealityExtension.Core
 		{
 			if (collider.Shape is CapsuleShape capsuleShape)
 			{
+				Vector3 newCenter = Vector3.Zero;
+				Basis basis = Basis.Identity;
 				if (Center != null)
 				{
-					Vector3 newCenter;
 					newCenter.x = Center.X;
 					newCenter.y = Center.Y;
 					newCenter.z = Center.Z;
-					collider.Transform = new Transform(Basis.Identity, newCenter);
 				}
 
 				if (Size != null)
 				{
 					capsuleShape.Radius = Radius.Value;
 					capsuleShape.Height = Height.Value;
+
+					// default capsule Shape is Z-aligned; rotate if necessary
+					if (Size.LargestComponentIndex() == 0)
+					{
+						basis = basis.Rotated(Vector3.Up, Mathf.Pi / 2);
+					}
+					else if (Size.LargestComponentIndex() == 1)
+					{
+						basis = basis.Rotated(Vector3.Right, Mathf.Pi / 2);
+					}
 				}
+				collider.Transform = new Transform(basis, newCenter);
 			}
 		}
 	}

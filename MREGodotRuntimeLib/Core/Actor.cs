@@ -1019,6 +1019,11 @@ namespace MixedRealityExtension.Core
 					colliderGeometry.Patch(App, capsuleCollider);
 					godotCollisionShape = capsuleCollider;
 					break;
+				case ColliderType.Cylinder:
+					var cylinderCollider =  new CollisionShape() { Shape = new CylinderShape() };
+					colliderGeometry.Patch(App, cylinderCollider);
+					godotCollisionShape = cylinderCollider;
+					break;
 				case ColliderType.Mesh:
 					var meshCollider = new CollisionShape() { Shape = new ConcavePolygonShape() };
 					colliderGeometry.Patch(App, meshCollider);

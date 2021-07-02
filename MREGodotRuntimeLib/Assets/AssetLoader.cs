@@ -734,9 +734,9 @@ namespace MixedRealityExtension.Assets
 					};
 				case PrimitiveShape.Cylinder:
 					dims = dims ?? new MWVector3(0.2f, 1, 0.2f);
-					return new MeshColliderGeometry()
+					return new CylinderColliderGeometry()
 					{
-						MeshId = meshId
+						Dimensions = dims
 					};
 				case PrimitiveShape.Plane:
 					dims = dims ?? new MWVector3(1, 0, 1);
