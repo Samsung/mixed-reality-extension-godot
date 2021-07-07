@@ -1378,7 +1378,7 @@ namespace MixedRealityExtension.Core
 					Vector3 appPos;
 					appPos.x = transform.Position.X;
 					appPos.y = transform.Position.Y;
-					appPos.z = transform.Position.Z;
+					appPos.z = -transform.Position.Z;
 					newPos = App.SceneRoot.ToGlobal(appPos);
 				}
 

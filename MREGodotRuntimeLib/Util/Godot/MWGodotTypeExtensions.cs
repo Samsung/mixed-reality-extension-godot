@@ -110,6 +110,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 			}
 
 			_this.Position.FromGodotVector3(appRoot.ToLocal(transform.GlobalTransform.origin));
+			_this.Position.Z *= -1;
 			_this.Rotation.FromGodotQuaternion((appRoot.GlobalTransform.basis * transform.GlobalTransform.basis).Quat());
 		}
 
