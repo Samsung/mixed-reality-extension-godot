@@ -111,7 +111,7 @@ public class MREComponent : Spatial
 				permissionManager: new SimplePermissionManager(GrantedPermissions),
 				behaviorFactory: new BehaviorFactory(),
 				//dialogFactory: DialogFactory,
-				//libraryFactory: new ResourceFactory(),
+				libraryFactory: new ResourceFactory(),
 				//gltfImporterFactory: new VertexShadedGltfImporterFactory(),
 				//materialPatcher: new VertexMaterialPatcher(),
 				logger: new MRELogger()

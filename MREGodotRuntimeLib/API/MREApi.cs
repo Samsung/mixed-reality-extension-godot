@@ -46,7 +46,7 @@ namespace MixedRealityExtension.API
 			// missing features if omitted
 			IBehaviorFactory behaviorFactory = null,
 			//IDialogFactory dialogFactory = null,
-			//ILibraryResourceFactory libraryFactory = null,
+			ILibraryResourceFactory libraryFactory = null,
 			//IVideoPlayerFactory videoPlayerFactory = null,
 			// reasonable defaults provided
 			IPrimitiveFactory primitiveFactory = null,
@@ -64,7 +64,7 @@ namespace MixedRealityExtension.API
 			// missing features if omitted
 			AppsAPI.BehaviorFactory = behaviorFactory;
 			//AppsAPI.DialogFactory = dialogFactory;
-			//AppsAPI.LibraryResourceFactory = libraryFactory;
+			AppsAPI.LibraryResourceFactory = libraryFactory;
 			//AppsAPI.VideoPlayerFactory = videoPlayerFactory;
 
 			// reasonable defaults provided
@@ -120,6 +120,8 @@ namespace MixedRealityExtension.API
 		internal ITextFactory TextFactory { get; set; }
 
 		internal IPrimitiveFactory PrimitiveFactory { get; set; }
+
+		internal ILibraryResourceFactory LibraryResourceFactory { get; set; }
 
 		internal IGLTFImporterFactory GLTFImporterFactory { get; set; }
 

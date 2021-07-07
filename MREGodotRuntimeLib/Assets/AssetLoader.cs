@@ -56,17 +56,17 @@ namespace MixedRealityExtension.Assets
 			var parent = _app.FindActor(parentId ?? Guid.Empty) as Actor;
 			return parent?.Node3D ?? _app.SceneRoot;
 		}
-/*FIXME
+
 		internal async Task<IList<Actor>> CreateFromLibrary(string resourceId, Guid? parentId)
 		{
 			var factory = MREAPI.AppsAPI.LibraryResourceFactory
 				?? throw new ArgumentException("Cannot spawn resource from non-existent library.");
 
 			var spawnedGO = await factory.CreateFromLibrary(resourceId, GetGameObjectFromParentId(parentId));
-			spawnedGO.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
-			return new List<Actor>() { spawnedGO.AddComponent<Actor>() };
+			//spawnedGO.layer = MREAPI.AppsAPI.LayerApplicator.DefaultLayer;
+			return new List<Actor>() { Actor.Instantiate(spawnedGO) };
 		}
-*/
+
 		internal IList<Actor> CreateEmpty(Guid? parentId)
 		{
 			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;

@@ -864,6 +864,21 @@ namespace MixedRealityExtension.App
 			}
 		}
 
+		[CommandHandler(typeof(CreateFromLibrary))]
+		private async void OnCreateFromLibrary(CreateFromLibrary payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var actors = await _assetLoader.CreateFromLibrary(payload.ResourceId, payload.Actor?.ParentId);
+				ProcessCreatedActors(payload, actors, onCompleteCallback);
+			}
+			catch (Exception e)
+			{
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.PushError(e.ToString());
+			}
+		}
+
 		[CommandHandler(typeof(CreateEmpty))]
 		private void OnCreateEmpty(CreateEmpty payload, Action onCompleteCallback)
 		{
