@@ -1022,25 +1022,23 @@ namespace MixedRealityExtension.App
 
 			void ProcessActors2(Spatial node3D)
 			{
-				/*FIXME
-				var actor = xfrm.gameObject.GetComponent<Actor>();
-				var nativeAnim = xfrm.gameObject.GetComponent<UnityEngine.Animation>();
-				if (nativeAnim != null && createdActors.Contains(actor))
+				var actor = node3D as Actor;
+				var animationPlayer = node3D.GetChild<Godot.AnimationPlayer>();
+				if (animationPlayer != null && createdActors.Contains(actor))
 				{
-					var animTargets = xfrm.gameObject.GetComponent<PrefabAnimationTargets>();
-					int stateIndex = 0;
-					foreach (AnimationState state in nativeAnim)
+					var animTargets = node3D.GetChild<PrefabAnimationTargets>();
+					int animIndex = 0;
+					foreach (string animationString in animationPlayer.GetAnimationList())
 					{
-						var anim = new NativeAnimation(AnimationManager, guids.Next(), nativeAnim, state);
+						var anim = new NativeAnimation(AnimationManager, guids.Next(), animationPlayer, animationPlayer.GetAnimation(animationString));
 						anim.TargetIds = animTargets != null
-							? animTargets.GetTargets(xfrm, stateIndex++, addRootToTargets: true).Select(a => a.Id).ToList()
+							? animTargets.GetTargets(node3D, animIndex++, addRootToTargets: true).Select(a => a.Id).ToList()
 							: new List<Guid>() { actor.Id };
 
 						AnimationManager.RegisterAnimation(anim);
 						createdAnims.Add(anim);
 					}
 				}
-				*/
 			}
 		}
 

@@ -87,20 +87,19 @@ namespace MixedRealityExtension.Assets
 			{
 				var prefabAnimationPlayer = prefab.GetNode<AnimationPlayer>(animationPlayer.Name);
 				prefabAnimationPlayer.AssignedAnimation = animationPlayer.AssignedAnimation;
-				prefabAnimationPlayer.Play();
 			}
 
 			Spatial parent = GetGameObjectFromParentId(parentId);
 			parent.AddChild(prefab);
-/*
+
 			// copy animation target mapping
-			var sourceMap = prefab.GetComponent<PrefabAnimationTargets>();
-			var destMap = instance.GetComponent<PrefabAnimationTargets>();
+			var sourceMap = prefab.GetChild<PrefabAnimationTargets>();
+			var destMap = asset.GetChild<PrefabAnimationTargets>();
 			if (sourceMap != null && destMap != null)
 			{
 				destMap.AnimationTargets = sourceMap.AnimationTargets;
 			}
-*/
+
 			// note: actor properties are set in App#ProcessCreatedActors
 			var actorList = new List<Actor>();
 			MWGOTreeWalker.VisitTree(prefab, go =>
@@ -363,17 +362,17 @@ namespace MixedRealityExtension.Assets
 
 						Node rootObject = importer.LastLoadedScene;
 						rootObject.Name = gltfRoot.Scenes[i].Name ?? $"scene:{i}";
-						/* FIXME
-						var animation = rootObject.GetComponent<UnityEngine.Animation>();
+
+						var animation = rootObject.GetChild<Godot.AnimationPlayer>();
 						if (animation != null)
 						{
-							animation.playAutomatically = false;
+							animation.AssignedAnimation = null;
 
 							// initialize mapping so we know which gameobjects are targeted by which animation clips
-							var mapping = rootObject.AddComponent<PrefabAnimationTargets>();
+							var mapping = new PrefabAnimationTargets();
+							rootObject.AddChild(mapping);
 							mapping.Initialize(gltfRoot, i);
 						}
-						*/
 
 						assets.Add(rootObject);
 					}
