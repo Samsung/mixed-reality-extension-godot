@@ -414,8 +414,8 @@ namespace MixedRealityExtension.Patching
 			if (patch.Rotation != null)
 			{
 				var Rotation = new Quat();
-				Rotation = Rotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation)).Normalized();
-				_this.Rotation = Rotation.GetEuler();
+				Rotation = Rotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
+				_this.Rotation = Rotation.GetEuler() * -1f;
 			}
 
 			if (patch.Scale != null)

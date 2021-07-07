@@ -52,7 +52,7 @@ namespace MixedRealityExtension.Factories
 					}
 					else if (dims.LargestComponentIndex() == 2)
 					{
-						meshDraft.Rotate(Vector3.Right, Mathf.Pi / 2);
+						meshDraft.Rotate(Vector3.Right, -Mathf.Pi / 2);
 					}
 					break;
 
@@ -89,7 +89,7 @@ namespace MixedRealityExtension.Factories
 					}
 					else if (dims.Z == height)
 					{
-						meshDraft.Rotate(Vector3.Right, Mathf.Pi / 2);
+						meshDraft.Rotate(Vector3.Right, -Mathf.Pi / 2);
 					}
 					break;
 
