@@ -116,6 +116,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 		public static MWVector3 ToLocalMWVector3(this MWVector3 _this, Vector3 point, Spatial objectRoot)
 		{
 			_this.FromGodotVector3(objectRoot.ToLocal(point));
+			_this.Z = -_this.Z;
 			return _this;
 		}
 
