@@ -44,9 +44,11 @@ namespace MixedRealityExtension.Core
 		{
 			var parent = node3D.GetParent();
 			ulong objId = node3D.GetInstanceId();
+			var name = node3D.Name;
 
 			node3D.SetScript(Resource);
 			var newNode = GD.InstanceFromId(objId) as Actor;
+			newNode.Name = name;
 			newNode.SetProcess(true);
 
 			return newNode;
