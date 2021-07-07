@@ -38,7 +38,10 @@ public class SimpleText : IText
 		get { return dynamicFont.Size / 200; }
 		private set
 		{
-			dynamicFont.Size = (int)(value * 200);
+			int scaledValue = (int)(value * 200);
+			if (scaledValue < 1)
+				return;
+			dynamicFont.Size = scaledValue;
 			resizeContainer();
 		}
 	}
