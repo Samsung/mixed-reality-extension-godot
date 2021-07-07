@@ -1015,7 +1015,7 @@ namespace MixedRealityExtension.App
 
 				foreach (object node in actor.GetChildren())
 				{
-					if (node.GetType() == typeof(Spatial) || node.GetType() == typeof(Actor))
+					if (node is Spatial)
 						ProcessActors((Spatial)node, actor);
 				}
 			}
