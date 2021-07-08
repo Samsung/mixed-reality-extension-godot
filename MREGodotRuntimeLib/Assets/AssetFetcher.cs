@@ -79,12 +79,10 @@ namespace MixedRealityExtension.Assets
 				{
 					handler = new DownloadHandlerAudioStream(uri, AudioType.Unknown);
 				}
-				/*FIXME
-				else if (typeof(T) == typeof(UnityEngine.Texture))
+				else if (typeof(T) == typeof(Godot.Texture))
 				{
-					handler = new DownloadHandlerTexture(false);
+					handler = new DownloadHandlerTexture(uri);
 				}
-				*/
 				else
 				{
 					result.FailureMessage = $"Unknown download type: {typeof(T)}";
@@ -114,7 +112,7 @@ namespace MixedRealityExtension.Assets
 					else
 					{
 						result.ReturnCode = www.GetResponseCode();
-						result.ETag = www.GetResponseHeadersAsDictionary()["ETag"] as string ?? Constants.UnversionedAssetVersion;
+						result.ETag = www.GetResponseHeader("ETag") ?? Constants.UnversionedAssetVersion;
 
 						if (result.ReturnCode >= 200 && result.ReturnCode <= 299)
 						{
@@ -122,12 +120,10 @@ namespace MixedRealityExtension.Assets
 							{
 								result.Asset = ((DownloadHandlerAudioStream)handler).AudioStream as T;
 							}
-							/*FIXME
-							else if (typeof(T).IsAssignableFrom(typeof(UnityEngine.Texture)))
+							else if (typeof(T).IsAssignableFrom(typeof(Godot.Texture)))
 							{
-								result.Asset = ((DownloadHandlerTexture)handler).texture as T;
+								result.Asset = ((DownloadHandlerTexture)handler).Texture as T;
 							}
-							*/
 						}
 						else
 						{
