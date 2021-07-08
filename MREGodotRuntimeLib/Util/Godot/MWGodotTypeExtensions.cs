@@ -30,8 +30,8 @@ namespace MixedRealityExtension.Util.GodotHelper
 		public static MWQuaternion FromGodotQuaternion(this MWQuaternion _this, Quat other)
 		{
 			_this.W = other.w;
-			_this.X = other.x;
-			_this.Y = other.y;
+			_this.X = -other.x;
+			_this.Y = -other.y;
 			_this.Z = other.z;
 			return _this;
 		}
@@ -93,6 +93,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 			}
 
 			_this.Position.FromGodotVector3(spatial.Transform.origin);
+			_this.Position.Z *= -1;
 			_this.Rotation.FromGodotQuaternion(new Quat(spatial.Rotation));
 			_this.Scale.FromGodotVector3(spatial.Scale);
 		}

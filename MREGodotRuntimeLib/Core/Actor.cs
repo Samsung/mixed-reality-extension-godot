@@ -481,8 +481,8 @@ namespace MixedRealityExtension.Core
 					if (generateAll || path.PathParts[2] == "rotation")
 					{
 						var localRot = new Quat(Node3D.Rotation);
-						output.Transform.Local.Rotation.X = localRot.x;
-						output.Transform.Local.Rotation.Y = localRot.y;
+						output.Transform.Local.Rotation.X = -localRot.x;
+						output.Transform.Local.Rotation.Y = -localRot.y;
 						output.Transform.Local.Rotation.Z = localRot.z;
 						output.Transform.Local.Rotation.W = localRot.w;
 					}
@@ -518,7 +518,7 @@ namespace MixedRealityExtension.Core
 						}
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "z")
 						{
-							output.Transform.App.Position.Z = -AppTransform.Position.Z;
+							output.Transform.App.Position.Z = AppTransform.Position.Z;
 						}
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
@@ -1386,8 +1386,8 @@ namespace MixedRealityExtension.Core
 				{
 					Quat appRot;
 					appRot.w = transform.Rotation.W;
-					appRot.x = transform.Rotation.X;
-					appRot.y = transform.Rotation.Y;
+					appRot.x = -transform.Rotation.X;
+					appRot.y = -transform.Rotation.Y;
 					appRot.z = transform.Rotation.Z;
 					newRot = new Quat(App.SceneRoot.GlobalTransform.basis) * appRot;
 				}

@@ -41,6 +41,7 @@ namespace MixedRealityExtension.Factories
 			{
 				_textureOffset.FromGodotVector3(material.Uv1Offset);
 				_textureOffset.ApplyPatch(patch.MainTextureOffset);
+				_textureOffset.Y *= -1;
 				material.Uv1Offset = _textureOffset.ToVector3();
 			}
 

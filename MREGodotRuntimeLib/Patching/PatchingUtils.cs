@@ -404,42 +404,59 @@ namespace MixedRealityExtension.Patching
 
 		public static void ApplyLocalPatch(this Spatial _this, MWScaledTransform current, ScaledTransformPatch patch)
 		{
+			var localPosition = _this.Transform.origin;
+			var localRotation = _this.Transform.basis.RotationQuat();
+			var localScale = _this.Transform.basis.Scale;
+
 			if (patch.Position != null)
 			{
-				if (patch.Position.Z.HasValue)
-					patch.Position.Z *= -1;
-				_this.Transform = new Transform(_this.Transform.basis, _this.Transform.origin.GetPatchApplied(current.Position.ApplyPatch(patch.Position)));
+				localPosition = localPosition.GetPatchApplied(current.Position.ApplyPatch(patch.Position));
+				localPosition.z *= -1;
 			}
 
 			if (patch.Rotation != null)
 			{
-				var Rotation = new Quat();
-				Rotation = Rotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
-				_this.Rotation = Rotation.GetEuler() * -1f;
+				localRotation = localRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
+				localRotation.x *= -1;
+				localRotation.y *= -1;
 			}
 
 			if (patch.Scale != null)
 			{
-				_this.Scale = _this.Scale.GetPatchApplied(current.Scale.ApplyPatch(patch.Scale));
+				localScale = localScale.GetPatchApplied(current.Scale.ApplyPatch(patch.Scale));
 			}
+
+			var basis = new Basis(localRotation);
+			basis.Scale = localScale;
+			_this.Transform = new Transform(basis, localPosition);
 		}
 
 		public static void ApplyAppPatch(this Spatial _this, Spatial appRoot, MWTransform current, TransformPatch patch)
 		{
+			var globalPosition = _this.GlobalTransform.origin;
+			var globalRotation = _this.GlobalTransform.basis.RotationQuat();
+			var globalScale = _this.GlobalTransform.basis.Scale;
+
 			if (patch.Position != null)
 			{
-				if (patch.Position.Z.HasValue)
-					patch.Position.Z *= -1;
-				var newAppPos = appRoot.ToLocal(_this.GlobalTransform.origin).GetPatchApplied(current.Position.ApplyPatch(patch.Position));
-				_this.GlobalTransform = new Transform(_this.GlobalTransform.basis, appRoot.ToGlobal(newAppPos));
+				globalPosition = appRoot.ToLocal(_this.GlobalTransform.origin).GetPatchApplied(current.Position.ApplyPatch(patch.Position));
+				globalPosition = appRoot.ToGlobal(globalPosition);
+				globalPosition.z *= -1;
 			}
 
 			if (patch.Rotation != null)
 			{
-				var currAppRotation = appRoot.Transform.Inverse() * _this.Transform;
-				var newAppRotation = currAppRotation.basis.Quat().GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
-				_this.Transform = new Transform(newAppRotation, _this.Transform.origin);
+				var appRotation = appRoot.GlobalTransform.basis.RotationQuat();
+				var currAppRotation = appRotation.Inverse() * globalRotation;
+				var newAppRotation = currAppRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
+				globalRotation = appRotation * newAppRotation;
+				globalRotation.x *= -1;
+				globalRotation.y *= -1;
 			}
+
+			var basis = new Basis(globalRotation);
+			basis.Scale = globalScale;
+			_this.Transform = new Transform(basis, globalPosition);
 		}
 	}
 }

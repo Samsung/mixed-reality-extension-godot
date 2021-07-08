@@ -427,6 +427,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 			Vector3 point = normal*radius;
 			lowerVertex = point - halfHeightUp;
 			upperVertex = point + halfHeightUp;
+			lowerVertex.z *= -1;
+			upperVertex.z *= -1;
+			normal.z *= -1;
 
 			vertices.Add(upperVertex);
 			normals.Add(normal);
@@ -586,6 +589,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				for (int x = 0; x <= horizontalSegments; x++)
 				{
 					Vector3 point = surfaceFunction(radius, height, currentHorizontalAngle, currentVerticalAngle);
+					point.z *= -1;
 					draft.vertices.Add(point);
 					draft.normals.Add(point.Normalized());
 					if (generateUV)
@@ -609,12 +613,12 @@ namespace MixedRealityExtension.ProceduralToolkit
 					int i3 = (ring + 1)*horizontalCount + i + 1;
 
 					draft.triangles.Add(i0);
-					draft.triangles.Add(i2);
 					draft.triangles.Add(i1);
+					draft.triangles.Add(i2);
 
 					draft.triangles.Add(i2);
-					draft.triangles.Add(i3);
 					draft.triangles.Add(i1);
+					draft.triangles.Add(i3);
 				}
 			}
 			return draft;
