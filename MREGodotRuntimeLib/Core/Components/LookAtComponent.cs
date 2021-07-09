@@ -74,7 +74,6 @@ namespace MixedRealityExtension.Core.Components
 			}
 
 			parent.LookAt(pos, Vector3.Up);
-			parent.RotateObjectLocal(Vector3.Up, Mathf.Pi);
 			if (_lookAtMode == LookAtMode.TargetY)
 			{
 				parent.Rotation = new Vector3(0, parent.Rotation.y, parent.Rotation.z);
