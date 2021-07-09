@@ -1179,7 +1179,7 @@ namespace MixedRealityExtension.Core
 				if (MeshId != Guid.Empty)
 				{
 					// guarantee meshInstance
-					if (meshInstance == null)
+					if (meshInstance == null || !Godot.Object.IsInstanceValid(meshInstance))
 					{
 						meshInstance = new MeshInstance();
 						Node3D.AddChild(meshInstance);
@@ -1218,6 +1218,7 @@ namespace MixedRealityExtension.Core
 				// clean up unused components
 				else
 				{
+					MeshInstance.QueueFree();
 					if (Collider != null && Collider.Shape == ColliderType.Auto)
 					{
 						_collider.Free();

@@ -387,7 +387,8 @@ namespace MixedRealityExtension.App
 		{
 			foreach (Node node in _ownedNodes)
 			{
-				node.QueueFree();
+				if (Godot.Object.IsInstanceValid(node))
+					node.QueueFree();
 			}
 
 			_ownedNodes.Clear();
