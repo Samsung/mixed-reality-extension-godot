@@ -1,19 +1,127 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://MREGodotRuntime/Scripts/Player.cs" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scripts/Player/InputSource.cs" type="Script" id=2]
+[ext_resource path="res://MREGodotRuntime/Scripts/DialogFactory.cs" type="Script" id=3]
+[ext_resource path="res://MREGodotRuntime/Scripts/Fonts/NanumSquareRound/NanumSquareRoundR.ttf" type="DynamicFontData" id=4]
 
 [sub_resource type="CapsuleShape" id=1]
 radius = 0.3
 height = 0.0769818
 
-[sub_resource type="GradientTexture" id=2]
+[sub_resource type="ViewportTexture" id=2]
+viewport_path = NodePath("DialogFactory/Viewport")
 
-[sub_resource type="GradientTexture" id=3]
+[sub_resource type="SpatialMaterial" id=3]
+resource_local_to_scene = true
+flags_transparent = true
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource( 2 )
 
-[sub_resource type="GradientTexture" id=4]
+[sub_resource type="QuadMesh" id=4]
+resource_local_to_scene = true
+material = SubResource( 3 )
 
-[sub_resource type="GradientTexture" id=5]
+[sub_resource type="StyleBoxFlat" id=5]
+bg_color = Color( 0.431373, 0.431373, 0.431373, 0.278431 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0, 0, 0, 0.294118 )
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+expand_margin_left = 50.0
+expand_margin_right = 50.0
+expand_margin_top = 20.0
+expand_margin_bottom = 20.0
+
+[sub_resource type="DynamicFont" id=6]
+size = 40
+use_filter = true
+font_data = ExtResource( 4 )
+
+[sub_resource type="Theme" id=7]
+default_font = SubResource( 6 )
+WindowDialog/colors/title_color = Color( 0, 0, 0, 1 )
+WindowDialog/constants/close_h_ofs = 18
+WindowDialog/constants/close_v_ofs = 18
+WindowDialog/constants/scaleborder_size = 4
+WindowDialog/constants/title_height = 20
+WindowDialog/fonts/title_font = null
+WindowDialog/icons/close = null
+WindowDialog/icons/close_highlight = null
+WindowDialog/styles/panel = SubResource( 5 )
+
+[sub_resource type="StyleBoxFlat" id=8]
+content_margin_left = 20.0
+content_margin_right = 20.0
+content_margin_top = 21.0
+bg_color = Color( 1, 1, 1, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0, 0, 0, 1 )
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="Theme" id=9]
+TextEdit/colors/background_color = Color( 0, 0, 0, 0 )
+TextEdit/colors/bookmark_color = Color( 0.08, 0.49, 0.98, 1 )
+TextEdit/colors/brace_mismatch_color = Color( 1, 0.2, 0.2, 1 )
+TextEdit/colors/breakpoint_color = Color( 0.8, 0.8, 0.4, 0.2 )
+TextEdit/colors/caret_background_color = Color( 0, 0, 0, 1 )
+TextEdit/colors/caret_color = Color( 0.88, 0.88, 0.88, 1 )
+TextEdit/colors/code_folding_color = Color( 0.8, 0.8, 0.8, 0.8 )
+TextEdit/colors/completion_background_color = Color( 0.17, 0.16, 0.2, 1 )
+TextEdit/colors/completion_existing_color = Color( 0.87, 0.87, 0.87, 0.13 )
+TextEdit/colors/completion_font_color = Color( 0.67, 0.67, 0.67, 1 )
+TextEdit/colors/completion_scroll_color = Color( 1, 1, 1, 1 )
+TextEdit/colors/completion_selected_color = Color( 0.26, 0.26, 0.27, 1 )
+TextEdit/colors/current_line_color = Color( 0.25, 0.25, 0.26, 0.8 )
+TextEdit/colors/executing_line_color = Color( 0.2, 0.8, 0.2, 0.4 )
+TextEdit/colors/font_color = Color( 0.88, 0.88, 0.88, 1 )
+TextEdit/colors/font_color_readonly = Color( 0.88, 0.88, 0.88, 0.5 )
+TextEdit/colors/font_color_selected = Color( 0, 0, 0, 1 )
+TextEdit/colors/function_color = Color( 0.4, 0.64, 0.81, 1 )
+TextEdit/colors/line_number_color = Color( 0.67, 0.67, 0.67, 0.4 )
+TextEdit/colors/mark_color = Color( 1, 0.4, 0.4, 0.4 )
+TextEdit/colors/member_variable_color = Color( 0.9, 0.31, 0.35, 1 )
+TextEdit/colors/number_color = Color( 0.92, 0.58, 0.2, 1 )
+TextEdit/colors/safe_line_number_color = Color( 0.67, 0.78, 0.67, 0.6 )
+TextEdit/colors/selection_color = Color( 0.49, 0.49, 0.49, 1 )
+TextEdit/colors/symbol_color = Color( 0.94, 0.94, 0.94, 1 )
+TextEdit/colors/word_highlighted_color = Color( 0.8, 0.9, 0.9, 0.15 )
+TextEdit/constants/completion_lines = 7
+TextEdit/constants/completion_max_width = 50
+TextEdit/constants/completion_scroll_width = 3
+TextEdit/constants/line_spacing = 4
+TextEdit/fonts/font = null
+TextEdit/icons/fold = null
+TextEdit/icons/folded = null
+TextEdit/icons/space = null
+TextEdit/icons/tab = null
+TextEdit/styles/completion = null
+TextEdit/styles/focus = null
+TextEdit/styles/normal = SubResource( 8 )
+TextEdit/styles/read_only = null
+
+[sub_resource type="DynamicFont" id=10]
+size = 34
+font_data = ExtResource( 4 )
+
+[sub_resource type="GradientTexture" id=11]
+
+[sub_resource type="GradientTexture" id=12]
+
+[sub_resource type="GradientTexture" id=13]
+
+[sub_resource type="GradientTexture" id=14]
 
 [node name="Player" type="KinematicBody"]
 script = ExtResource( 1 )
@@ -33,6 +141,43 @@ shape = SubResource( 1 )
 
 [node name="socket-head" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
+
+[node name="DialogFactory" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5 )
+visible = false
+mesh = SubResource( 4 )
+material/0 = null
+script = ExtResource( 3 )
+inputSource = NodePath("../MainCamera")
+
+[node name="Viewport" type="Viewport" parent="DialogFactory"]
+size = Vector2( 1000, 1000 )
+transparent_bg = true
+render_target_v_flip = true
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="DialogFactory/Viewport"]
+visible = true
+theme = SubResource( 7 )
+window_title = ""
+dialog_text = " "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Node2D" type="Node2D" parent="DialogFactory/Viewport/ConfirmationDialog"]
+
+[node name="TextEdit" type="TextEdit" parent="DialogFactory/Viewport/ConfirmationDialog/Node2D"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 40.0
+margin_bottom = 21.0
+theme = SubResource( 9 )
+custom_fonts/font = SubResource( 10 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Enter text..."
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="HUD" type="Control" parent="."]
 anchor_right = 1.0
@@ -67,7 +212,7 @@ margin_top = 4.5
 margin_right = 2.5
 margin_bottom = 20.5
 mouse_filter = 2
-texture = SubResource( 2 )
+texture = SubResource( 11 )
 expand = true
 __meta__ = {
 "_edit_use_anchors_": false
@@ -83,7 +228,7 @@ margin_top = -20.5
 margin_right = 2.5
 margin_bottom = -4.5
 mouse_filter = 2
-texture = SubResource( 3 )
+texture = SubResource( 12 )
 expand = true
 __meta__ = {
 "_edit_use_anchors_": false
@@ -100,7 +245,7 @@ margin_right = 0.5
 margin_bottom = 12.5
 rect_rotation = 90.0
 mouse_filter = 2
-texture = SubResource( 4 )
+texture = SubResource( 13 )
 expand = true
 
 [node name="Right" type="TextureRect" parent="HUD/Crosshair"]
@@ -114,5 +259,5 @@ margin_right = 24.5
 margin_bottom = 12.5
 rect_rotation = 90.0
 mouse_filter = 2
-texture = SubResource( 5 )
+texture = SubResource( 14 )
 expand = true

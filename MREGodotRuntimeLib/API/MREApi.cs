@@ -45,7 +45,7 @@ namespace MixedRealityExtension.API
 			IPermissionManager permissionManager,
 			// missing features if omitted
 			IBehaviorFactory behaviorFactory = null,
-			//IDialogFactory dialogFactory = null,
+			IDialogFactory dialogFactory = null,
 			ILibraryResourceFactory libraryFactory = null,
 			//IVideoPlayerFactory videoPlayerFactory = null,
 			// reasonable defaults provided
@@ -63,7 +63,7 @@ namespace MixedRealityExtension.API
 
 			// missing features if omitted
 			AppsAPI.BehaviorFactory = behaviorFactory;
-			//AppsAPI.DialogFactory = dialogFactory;
+			AppsAPI.DialogFactory = dialogFactory;
 			AppsAPI.LibraryResourceFactory = libraryFactory;
 			//AppsAPI.VideoPlayerFactory = videoPlayerFactory;
 
@@ -126,6 +126,8 @@ namespace MixedRealityExtension.API
 		internal IGLTFImporterFactory GLTFImporterFactory { get; set; }
 
 		internal IMaterialPatcher MaterialPatcher { get; set; }
+
+		internal IDialogFactory DialogFactory { get; set; }
 
 		internal IPermissionManager PermissionManager { get; set; }
 

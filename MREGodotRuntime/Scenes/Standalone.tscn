@@ -6,10 +6,10 @@
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
 MREURL = "ws://localhost:3901"
-SessionID = "testbed"
 AppID = "helloworld"
-EphemeralAppID = "helloworld-temp"
 UserNode = NodePath("Player")
+EphemeralAppID = "helloworld-temp"
+SessionID = "testbed"
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3 )
