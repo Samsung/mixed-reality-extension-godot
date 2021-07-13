@@ -73,6 +73,8 @@ public class MREComponent : Spatial
 
 	public IMixedRealityExtensionApp MREApp { get; private set; }
 
+	public DialogFactory DialogFactory;
+
 	public event AppEventHandler OnConnecting;
 
 	public event AppEventHandler OnConnected;
@@ -110,7 +112,7 @@ public class MREComponent : Spatial
 				textFactory: new SimpleTextFactory(),
 				permissionManager: new SimplePermissionManager(GrantedPermissions),
 				behaviorFactory: new BehaviorFactory(),
-				//dialogFactory: DialogFactory,
+				dialogFactory: DialogFactory,
 				libraryFactory: new ResourceFactory(),
 				//gltfImporterFactory: new VertexShadedGltfImporterFactory(),
 				//materialPatcher: new VertexMaterialPatcher(),
