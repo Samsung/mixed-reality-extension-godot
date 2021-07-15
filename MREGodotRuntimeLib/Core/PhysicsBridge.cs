@@ -195,7 +195,7 @@ namespace MixedRealityExtension.Core
 			// -set transforms/velocities for key framed bodies
 
 			// get all the prediction time infos in this struct
-			PredictionTimeParameters timeInfo = new PredictionTimeParameters(1000f / Engine.IterationsPerSecond);
+			PredictionTimeParameters timeInfo = new PredictionTimeParameters(1f / Engine.IterationsPerSecond);
 
 			// start the predictor
 			_predictor.StartBodyPredicitonForNextFrame();
@@ -212,11 +212,13 @@ namespace MixedRealityExtension.Core
 				{
 					if (rb.IsKeyframed)
 					{
-						rb.RigidBody.Mode = Godot.RigidBody.ModeEnum.Kinematic;
+						if (rb.RigidBody.Mode != Godot.RigidBody.ModeEnum.Kinematic)
+							rb.RigidBody.Mode = Godot.RigidBody.ModeEnum.Kinematic;
 					}
 					else
 					{
-						rb.RigidBody.Mode = Godot.RigidBody.ModeEnum.Rigid;
+						if (rb.RigidBody.Mode != Godot.RigidBody.ModeEnum.Rigid)
+							rb.RigidBody.Mode = Godot.RigidBody.ModeEnum.Rigid;
 					}
 					continue;
 				}

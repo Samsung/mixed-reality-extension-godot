@@ -53,7 +53,7 @@ namespace MixedRealityExtension.Core
 
 			return newNode;
 		}
-
+		private Spatial TransformNode => (Spatial)_rigidbody ?? this;
 		private GodotRigidBody _rigidbody;
 		private GodotLight _light;
 		private GodotCollisionShape _collider;
@@ -135,7 +135,7 @@ namespace MixedRealityExtension.Core
 				if (_localTransform == null)
 				{
 					_localTransform = new MWScaledTransform();
-					_localTransform.ToLocalTransform(Node3D);
+					_localTransform.ToLocalTransform(TransformNode);
 				}
 
 				return _localTransform;
@@ -155,7 +155,7 @@ namespace MixedRealityExtension.Core
 				if (_appTransform == null)
 				{
 					_appTransform = new MWTransform();
-					_appTransform.ToAppTransform(Node3D, App.SceneRoot);
+					_appTransform.ToAppTransform(TransformNode, App.SceneRoot);
 				}
 
 				return _appTransform;
@@ -372,7 +372,7 @@ namespace MixedRealityExtension.Core
 				if (IsGrabbed || _grabbedLastSync)
 				{
 					var appTransform = new MWTransform();
-					appTransform.ToAppTransform(Node3D, App.SceneRoot);
+					appTransform.ToAppTransform(TransformNode, App.SceneRoot);
 
 					var actorCorrection = new ActorCorrection()
 					{
@@ -393,20 +393,20 @@ namespace MixedRealityExtension.Core
 
 		internal void ApplyPatch(ActorPatch actorPatch)
 		{
-			//PatchExclusive(actorPatch.ExclusiveToUser);
+			PatchExclusive(actorPatch.ExclusiveToUser);
 			PatchName(actorPatch.Name);
-			//PatchOwner(actorPatch.Owner);
+			PatchOwner(actorPatch.Owner);
 			PatchParent(actorPatch.ParentId);
 			PatchAppearance(actorPatch.Appearance);
 			PatchTransform(actorPatch.Transform);
+			PatchLight(actorPatch.Light);
+			PatchRigidBody(actorPatch.RigidBody);
 			PatchCollider(actorPatch.Collider);
 			PatchText(actorPatch.Text);
 			PatchAttachment(actorPatch.Attachment);
 			PatchLookAt(actorPatch.LookAt);
-			PatchLight(actorPatch.Light);
-			PatchSubscriptions(actorPatch.Subscriptions);
-			PatchRigidBody(actorPatch.RigidBody);
 			PatchGrabbable(actorPatch.Grabbable);
+			PatchSubscriptions(actorPatch.Subscriptions);
 		}
 
 		internal void ApplyCorrection(ActorCorrection actorCorrection)
@@ -461,10 +461,10 @@ namespace MixedRealityExtension.Core
 			{
 				if (generateAll || path.PathParts[1] == "local")
 				{
-					LocalTransform.ToLocalTransform(Node3D);
+					LocalTransform.ToLocalTransform(TransformNode);
 					if (generateAll || path.PathParts[2] == "position")
 					{
-						var localPos = Node3D.Transform.origin;
+						var localPos = TransformNode.Transform.origin;
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
 						{
 							output.Transform.Local.Position.X = localPos.x;
@@ -480,7 +480,7 @@ namespace MixedRealityExtension.Core
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
 					{
-						var localRot = new Quat(Node3D.Rotation);
+						var localRot = new Quat(TransformNode.Rotation);
 						output.Transform.Local.Rotation.X = -localRot.x;
 						output.Transform.Local.Rotation.Y = -localRot.y;
 						output.Transform.Local.Rotation.Z = localRot.z;
@@ -488,7 +488,7 @@ namespace MixedRealityExtension.Core
 					}
 					if (generateAll || path.PathParts[2] == "scale")
 					{
-						var localScale = Node3D.Scale;
+						var localScale = TransformNode.Scale;
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
 						{
 							output.Transform.Local.Scale.X = localScale.x;
@@ -505,7 +505,7 @@ namespace MixedRealityExtension.Core
 				}
 				if (generateAll || path.PathParts[1] == "app")
 				{
-					AppTransform.ToAppTransform(Node3D, App.SceneRoot);
+					AppTransform.ToAppTransform(TransformNode, App.SceneRoot);
 					if (generateAll || path.PathParts[2] == "position")
 					{
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
@@ -523,7 +523,7 @@ namespace MixedRealityExtension.Core
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
 					{
-						var localRot = new Quat(Node3D.Rotation);
+						var localRot = new Quat(TransformNode.Rotation);
 						output.Transform.App.Rotation.X = AppTransform.Rotation.X;
 						output.Transform.App.Rotation.Y = AppTransform.Rotation.Y;
 						output.Transform.App.Rotation.Z = AppTransform.Rotation.Z;
@@ -641,8 +641,8 @@ namespace MixedRealityExtension.Core
 
 			if (flags.HasFlag(ActorComponentType.Transform))
 			{
-				__methodVar_localTransform.ToLocalTransform(Node3D);
-				__methodVar_appTransform.ToAppTransform(Node3D, App.SceneRoot);
+				__methodVar_localTransform.ToLocalTransform(TransformNode);
+				__methodVar_appTransform.ToAppTransform(TransformNode, App.SceneRoot);
 
 				actorPatch.Transform = new ActorTransformPatch()
 				{
@@ -935,8 +935,18 @@ namespace MixedRealityExtension.Core
 		{
 			if (_rigidbody == null)
 			{
-				_rigidbody = new GodotRigidBody();
-				AddChild(_rigidbody);
+				var parent = GetParent();
+				_rigidbody = new GodotRigidBody()
+				{
+					PhysicsMaterialOverride = new PhysicsMaterial(),
+					GlobalTransform = GlobalTransform
+				};
+
+				parent.AddChild(_rigidbody);
+				parent.RemoveChild(this);
+				_rigidbody.AddChild(this);
+				this.Transform = Transform.Identity;
+
 				RigidBody = new RigidBody(_rigidbody, App.SceneRoot);
 
 				if (App.UsePhysicsBridge)
@@ -1038,15 +1048,19 @@ namespace MixedRealityExtension.Core
 			}
 
 			_collider = godotCollisionShape;
-/*FIXME
+
 			// update bounciness and frictions 
-			if (colliderPatch.Bounciness.HasValue)
-				_collider.material.bounciness = colliderPatch.Bounciness.Value;
-			if (colliderPatch.StaticFriction.HasValue)
-				_collider.material.staticFriction = colliderPatch.StaticFriction.Value;
-			if (colliderPatch.DynamicFriction.HasValue)
-				_collider.material.dynamicFriction = colliderPatch.DynamicFriction.Value;
-*/
+			if (_rigidbody != null)
+			{
+				if (colliderPatch.Bounciness.HasValue)
+					_rigidbody.PhysicsMaterialOverride.Bounce = colliderPatch.Bounciness.Value;
+				if (colliderPatch.StaticFriction.HasValue)
+				{
+					GD.PushWarning("StaticFriction is not supported in godot mre. please use DynamicFriction instead.");
+				}
+				if (colliderPatch.DynamicFriction.HasValue)
+					_rigidbody.PhysicsMaterialOverride.Friction = colliderPatch.DynamicFriction.Value;
+			}
 			if (Collider == null)
 			{
 				Collider = new Collider();
@@ -1069,15 +1083,15 @@ namespace MixedRealityExtension.Core
 			{
 				// clear parent
 				ParentId = Guid.Empty;
-				Node3D.GetParent().RemoveChild(Node3D);
-				App.SceneRoot.AddChild(Node3D);
+				TransformNode.GetParent().RemoveChild(TransformNode);
+				App.SceneRoot.AddChild(TransformNode);
 			}
 			else if (parentId.Value != ParentId && newParent != null)
 			{
 				// reassign parent
 				ParentId = parentId.Value;
-				Node3D.GetParent().RemoveChild(Node3D);
-				((Actor)newParent).Node3D.AddChild(Node3D);
+				TransformNode.GetParent().RemoveChild(TransformNode);
+				((Actor)newParent).Node3D.AddChild(TransformNode);
 			}
 			else if (parentId.Value != ParentId)
 			{
@@ -1090,8 +1104,8 @@ namespace MixedRealityExtension.Core
 						var freshParent = App.FindActor(ParentId) as Actor;
 						if (this != null && freshParent != null && Parent != freshParent)
 						{
-							Node3D.GetParent().RemoveChild(Node3D);
-							freshParent.Node3D.AddChild(Node3D);
+							TransformNode.GetParent().RemoveChild(TransformNode);
+							freshParent.Node3D.AddChild(TransformNode);
 						}
 					}
 				}, null);
@@ -1106,7 +1120,7 @@ namespace MixedRealityExtension.Core
 				base.Name = Name;
 			}
 		}
-/*
+
 		private void PatchExclusive(Guid? exclusiveToUser)
 		{
 			if (App.UsePhysicsBridge && exclusiveToUser.HasValue)
@@ -1156,7 +1170,7 @@ namespace MixedRealityExtension.Core
 				}
 			}
 		}
-*/
+
 		private void PatchAppearance(AppearancePatch appearance)
 		{
 			if (appearance == null)
@@ -1307,22 +1321,22 @@ namespace MixedRealityExtension.Core
 			RigidBody.RigidBodyTransformUpdate transformUpdate = new RigidBody.RigidBodyTransformUpdate();
 			if (transformPatch.Local != null)
 			{
-				var parent = GetParent() as Spatial;
+				var parent = TransformNode.GetParent() as Spatial;
 				// In case of rigid body:
 				// - Apply scale directly.
-				Scale = Scale.GetPatchApplied(LocalTransform.Scale.ApplyPatch(transformPatch.Local.Scale));
+				_rigidbody.Scale = _rigidbody.Scale.GetPatchApplied(LocalTransform.Scale.ApplyPatch(transformPatch.Local.Scale));
 
 				// - Apply position and rotation via rigid body from local to world space.
 				if (transformPatch.Local.Position != null)
 				{
-					var localPosition = Transform.origin.GetPatchApplied(LocalTransform.Position.ApplyPatch(transformPatch.Local.Position));
+					var localPosition = LocalTransform.Position.ApplyPatch(transformPatch.Local.Position).ToVector3();
 					transformUpdate.Position = parent.ToGlobal(localPosition);
 				}
 
 				if (transformPatch.Local.Rotation != null)
 				{
-					var localRotation = new Quat(Rotation).GetPatchApplied(LocalTransform.Rotation.ApplyPatch(transformPatch.Local.Rotation));
-					transformUpdate.Rotation = new Quat(parent.GlobalTransform.basis) * localRotation;
+					var localRotation = LocalTransform.Rotation.ApplyPatch(transformPatch.Local.Rotation).ToQuaternion();
+					transformUpdate.Rotation = parent.GlobalTransform.basis.RotationQuat() * localRotation;
 				}
 			}
 
@@ -1343,11 +1357,11 @@ namespace MixedRealityExtension.Core
 				if (transformPatch.App.Rotation != null)
 				{
 					// New app space rotation
-					var newAppRot = (new Quat(GlobalTransform.basis) * appTransform.Rotation)
+					var newAppRot = (TransformNode.GlobalTransform.basis.RotationQuat() * appTransform.Rotation)
 						.GetPatchApplied(AppTransform.Rotation.ApplyPatch(transformPatch.App.Rotation));
 
 					// Transform new app rotation to world space.
-					transformUpdate.Rotation = newAppRot * new Quat(GlobalTransform.basis);
+					transformUpdate.Rotation = newAppRot * TransformNode.GlobalTransform.basis.RotationQuat();
 				}
 			}
 
@@ -1367,7 +1381,7 @@ namespace MixedRealityExtension.Core
 				// We need to lerp at the transform level with the transform lerper.
 				if (_transformLerper == null)
 				{
-					_transformLerper = new TransformLerper(this);
+					_transformLerper = new TransformLerper(TransformNode);
 				}
 
 				// Convert the app relative transform for the correction to world position relative to our app root.
@@ -1542,15 +1556,18 @@ namespace MixedRealityExtension.Core
 						_pendingColliderPatch.Enabled = colliderPatch.Enabled.Value;
 					if (colliderPatch.IsTrigger.HasValue)
 						_pendingColliderPatch.IsTrigger = colliderPatch.IsTrigger.Value;
-/*FIXME
-					// update bounciness and frictions 
-					if (colliderPatch.Bounciness.HasValue)
-						_collider.material.bounciness = colliderPatch.Bounciness.Value;
-					if (colliderPatch.StaticFriction.HasValue)
-						_collider.material.staticFriction = colliderPatch.StaticFriction.Value;
-					if (colliderPatch.DynamicFriction.HasValue)
-						_collider.material.dynamicFriction = colliderPatch.DynamicFriction.Value;
-*/
+
+					if (_rigidbody != null)
+					{
+						if (colliderPatch.Bounciness.HasValue)
+							_rigidbody.PhysicsMaterialOverride.Bounce = colliderPatch.Bounciness.Value;
+						if (colliderPatch.StaticFriction.HasValue)
+						{
+							GD.PushWarning("StaticFriction is not supported in godot mre. please use DynamicFriction instead.");
+						}
+						if (colliderPatch.DynamicFriction.HasValue)
+							_rigidbody.PhysicsMaterialOverride.Friction = colliderPatch.DynamicFriction.Value;
+					}
 				}
 				else if (_pendingColliderPatch == null)
 				{
@@ -1653,12 +1670,12 @@ namespace MixedRealityExtension.Core
 		{
 			var transformPatch = new ActorTransformPatch()
 			{
-				Local = PatchingUtilMethods.GenerateLocalTransformPatch(LocalTransform, this),
-				App = PatchingUtilMethods.GenerateAppTransformPatch(AppTransform, this, App.SceneRoot)
+				Local = PatchingUtilMethods.GenerateLocalTransformPatch(LocalTransform, TransformNode),
+				App = PatchingUtilMethods.GenerateAppTransformPatch(AppTransform, TransformNode, App.SceneRoot)
 			};
 
-			LocalTransform.ToLocalTransform(this);
-			AppTransform.ToAppTransform(this, App.SceneRoot);
+			LocalTransform.ToLocalTransform(TransformNode);
+			AppTransform.ToAppTransform(TransformNode, App.SceneRoot);
 
 			actorPatch.Transform = transformPatch.IsPatched() ? transformPatch : null;
 		}
@@ -1712,6 +1729,11 @@ namespace MixedRealityExtension.Core
 			foreach (var component in _components.Values)
 			{
 				component.CleanUp();
+			}
+
+			if (_rigidbody != null)
+			{
+				_rigidbody.QueueFree();
 			}
 		}
 
@@ -2052,9 +2074,9 @@ namespace MixedRealityExtension.Core
 		}
 
 		#endregion
-/*FIXME
-		#region Command Handlers - Rigid Body Commands
 
+		#region Command Handlers - Rigid Body Commands
+/*FIXME
 		[CommandHandler(typeof(RBMovePosition))]
 		private void OnRBMovePosition(RBMovePosition payload, Action onCompleteCallback)
 		{
@@ -2068,13 +2090,14 @@ namespace MixedRealityExtension.Core
 			RigidBody?.RigidBodyMoveRotation(new MWQuaternion().ApplyPatch(payload.Rotation));
 			onCompleteCallback?.Invoke();
 		}
-
+*/
 		[CommandHandler(typeof(RBAddForce))]
 		private void OnRBAddForce(RBAddForce payload, Action onCompleteCallback)
 		{
 			bool isOwner = Owner.HasValue ? Owner.Value == App.LocalUser.Id : CanSync();
 			if (isOwner)
 			{
+				payload.Force.Z *= -1;
 				RigidBody?.RigidBodyAddForce(new MWVector3().ApplyPatch(payload.Force));
 			}
 
@@ -2093,6 +2116,8 @@ namespace MixedRealityExtension.Core
 		[CommandHandler(typeof(RBAddTorque))]
 		private void OnRBAddTorque(RBAddTorque payload, Action onCompleteCallback)
 		{
+			payload.Torque.X *= -1;
+			payload.Torque.Y *= -1;
 			RigidBody?.RigidBodyAddTorque(new MWVector3().ApplyPatch(payload.Torque));
 			onCompleteCallback?.Invoke();
 		}
@@ -2100,11 +2125,12 @@ namespace MixedRealityExtension.Core
 		[CommandHandler(typeof(RBAddRelativeTorque))]
 		private void OnRBAddRelativeTorque(RBAddRelativeTorque payload, Action onCompleteCallback)
 		{
+			payload.RelativeTorque.X *= -1;
+			payload.RelativeTorque.Y *= -1;
 			RigidBody?.RigidBodyAddRelativeTorque(new MWVector3().ApplyPatch(payload.RelativeTorque));
 			onCompleteCallback?.Invoke();
 		}
 
 		#endregion
-*/
 	}
 }

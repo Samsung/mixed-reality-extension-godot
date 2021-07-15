@@ -227,7 +227,7 @@ namespace MixedRealityExtension.Patching
 						false => MRECollisionDetectionMode.Discrete
 					}),
 				ConstraintFlags = GeneratePatch(_old.ConstraintFlags, _new.GetMRERigidBodyConstraints()),
-				DetectCollisions = GeneratePatch(_old.DetectCollisions, !_new.GetChild<CollisionShape>().Disabled),
+				DetectCollisions = GeneratePatch(_old.DetectCollisions, !_new.GetChild<CollisionShape>()?.Disabled ?? false),
 				Mass = GeneratePatch(_old.Mass, _new.Mass),
 				UseGravity = GeneratePatch(_old.UseGravity, !Mathf.IsZeroApprox(_new.GravityScale)),
 			};

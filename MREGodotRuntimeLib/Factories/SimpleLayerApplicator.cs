@@ -40,19 +40,53 @@ namespace MixedRealityExtension.Factories
 		{
 			if (!layer.HasValue) return;
 
+			//clear collision layer and mask.
+			area.CollisionMask = 0;
+			area.CollisionLayer = 0;
 			switch (layer)
 			{
 				case CollisionLayer.Default:
-					area.CollisionLayer = defaultLayer;
+					area.SetCollisionLayerBit(defaultLayer, true);
+					area.SetCollisionMaskBit(defaultLayer, true);
+					area.SetCollisionMaskBit(navigationLayer, true);
 					break;
 				case CollisionLayer.Navigation:
-					area.CollisionLayer = navigationLayer;
+					area.SetCollisionLayerBit(navigationLayer, true);
+					area.SetCollisionMaskBit(navigationLayer, true);
 					break;
 				case CollisionLayer.Hologram:
-					area.CollisionLayer = hologramLayer;
+					area.SetCollisionLayerBit(hologramLayer, true);
+					area.SetCollisionMaskBit(hologramLayer, true);
 					break;
 				case CollisionLayer.UI:
-					area.CollisionLayer = uiLayer;
+					break;
+			}
+		}
+
+		/// <inheritdoc />
+		public virtual void ApplyLayerToCollider(CollisionLayer? layer, PhysicsBody physicsBody)
+		{
+			if (!layer.HasValue) return;
+
+			//clear collision layer and mask.
+			physicsBody.CollisionMask = 0;
+			physicsBody.CollisionLayer = 0;
+			switch (layer)
+			{
+				case CollisionLayer.Default:
+					physicsBody.SetCollisionLayerBit(defaultLayer, true);
+					physicsBody.SetCollisionMaskBit(defaultLayer, true);
+					physicsBody.SetCollisionMaskBit(navigationLayer, true);
+					break;
+				case CollisionLayer.Navigation:
+					physicsBody.SetCollisionLayerBit(navigationLayer, true);
+					physicsBody.SetCollisionMaskBit(navigationLayer, true);
+					break;
+				case CollisionLayer.Hologram:
+					physicsBody.SetCollisionLayerBit(hologramLayer, true);
+					physicsBody.SetCollisionMaskBit(hologramLayer, true);
+					break;
+				case CollisionLayer.UI:
 					break;
 			}
 		}

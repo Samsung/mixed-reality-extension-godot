@@ -74,14 +74,14 @@ namespace MixedRealityExtension.Core
 					rigidBody.MoveRotation(_sceneRoot.rotation * rotation.ToQuaternion());
 				});
 		}
-
+*/
 		/// <inheritdoc />
 		public void RigidBodyAddForce(MWVector3 force)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddForce(_sceneRoot.ToGlobal(force.ToVector3()));
+					rigidBody.AddCentralForce(_sceneRoot.ToGlobal(force.ToVector3()));
 				});
 		}
 
@@ -91,7 +91,7 @@ namespace MixedRealityExtension.Core
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddForceAtPosition(_sceneRoot.ToGlobal(force.ToVector3()), _sceneRoot.ToGlobal(position.ToVector3()));
+					rigidBody.AddForce(_sceneRoot.ToGlobal(position.ToVector3()), _sceneRoot.ToGlobal(force.ToVector3()));
 				});
 		}
 
@@ -111,10 +111,10 @@ namespace MixedRealityExtension.Core
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddRelativeTorque(_sceneRoot.ToGlobal(relativeTorque.ToVector3()));
+					rigidBody.AddTorque(_sceneRoot.ToGlobal(relativeTorque.ToVector3()));
 				});
 		}
-*/
+
 		internal void Update()
 		{
 			if (_rigidbody == null)
@@ -142,7 +142,7 @@ namespace MixedRealityExtension.Core
 
 			// No need to read Position or Rotation. They're write-only from the patch to the component.
 			Mass = rigidbody.Mass;
-			DetectCollisions = !rigidbody.GetChild<CollisionShape>().Disabled;
+			DetectCollisions = !rigidbody.GetChild<CollisionShape>()?.Disabled ?? false;
 			CollisionDetectionMode = rigidbody.ContinuousCd switch
 			{
 				true => MRECollisionDetectionMode.Continuous,
@@ -164,7 +164,11 @@ namespace MixedRealityExtension.Core
 				}
 				if (patch.AngularVelocity != null && patch.AngularVelocity.IsPatched())
 				{
-					_rigidbody.AngularVelocity = _rigidbody.AngularVelocity.GetPatchApplied(_sceneRoot.ToGlobal(AngularVelocity.ApplyPatch(patch.AngularVelocity).ToVector3()));
+					var angularVelocity =_sceneRoot.ToGlobal(AngularVelocity.ApplyPatch(patch.AngularVelocity).ToVector3());
+					angularVelocity.x = Mathf.Deg2Rad(angularVelocity.x);
+					angularVelocity.y = Mathf.Deg2Rad(angularVelocity.y);
+					angularVelocity.z = Mathf.Deg2Rad(angularVelocity.z);
+					_rigidbody.AngularVelocity = _rigidbody.AngularVelocity.GetPatchApplied(angularVelocity);
 				}
 			}
 
@@ -201,8 +205,8 @@ namespace MixedRealityExtension.Core
 			if (patch.ConstraintFlags.HasValue)
 			{
 				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezePositionX)) _rigidbody.AxisLockLinearX = true;
-				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezePositionY)) _rigidbody.AxisLockLinearX = true;
-				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezePositionZ)) _rigidbody.AxisLockLinearX = true;
+				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezePositionY)) _rigidbody.AxisLockLinearY = true;
+				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezePositionZ)) _rigidbody.AxisLockLinearZ = true;
 				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezeRotationX)) _rigidbody.AxisLockAngularX = true;
 				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezeRotationY)) _rigidbody.AxisLockAngularY = true;
 				if ((bool)patch.ConstraintFlags?.HasFlag(MRERigidBodyConstraints.FreezeRotationZ)) _rigidbody.AxisLockAngularZ = true;
@@ -211,26 +215,18 @@ namespace MixedRealityExtension.Core
 
 		internal void UpdateTransform(RigidBodyTransformUpdate update)
 		{
-			Vector3 origin;
-			Basis basis;
+			Vector3 origin = _rigidbody.GlobalTransform.origin;
+			Basis basis = _rigidbody.GlobalTransform.basis;
 
 			if (update.Position != null)
 			{
 				origin = update.Position.Value;
 			}
-			else
-			{
-				origin = _rigidbody.Transform.origin;
-			}
 			if (update.Rotation != null)
 			{
 				basis = new Basis(update.Rotation.Value);
 			}
-			else
-			{
-				basis = _rigidbody.Transform.basis;
-			}
-			_rigidbody.Transform = new Transform(basis, origin);
+			_rigidbody.GlobalTransform = new Transform(basis, origin);
 		}
 
 		internal void SynchronizeEngine(RigidBodyTransformUpdate update)

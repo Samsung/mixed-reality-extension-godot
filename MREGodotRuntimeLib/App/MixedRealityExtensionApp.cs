@@ -59,7 +59,7 @@ namespace MixedRealityExtension.App
 		private float _timeSinceLastPhysicsUpdate = 0.0f;
 		private bool _shouldSendPhysicsUpdate = false;
 
-		private float _fixedDeltaTime = 1000f / Engine.IterationsPerSecond;
+		private float _fixedDeltaTime = 1f / Engine.IterationsPerSecond;
 
 		private enum AppState
 		{
@@ -388,7 +388,12 @@ namespace MixedRealityExtension.App
 			foreach (Node node in _ownedNodes)
 			{
 				if (Godot.Object.IsInstanceValid(node))
-					node.QueueFree();
+				{
+					if (node is Actor actorNode)
+						actorNode.Destroy();
+					else
+						node.QueueFree();
+				}
 			}
 
 			_ownedNodes.Clear();

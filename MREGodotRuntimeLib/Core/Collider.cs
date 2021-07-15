@@ -80,22 +80,25 @@ namespace MixedRealityExtension.Core
 		private CollisionShape _collider;
 		private Actor _ownerActor;
 		private ColliderEventType _colliderEventSubscriptions = ColliderEventType.None;
+		private Godot.PhysicsBody _physicsbody; // rigidbody or staticbody
 
 		/// <inheritdoc />
 		public bool IsEnabled => !_collider.Disabled;
-/*FIXME
-		/// <inheritdoc />
-		public bool IsTrigger => _collider.isTrigger;
 
 		/// <inheritdoc />
-		public float Bounciness => _collider.material.bounciness;
+		public bool IsTrigger => _physicsbody?.GetChild<CollisionShape>() == null ? true : false;
 
 		/// <inheritdoc />
-		public float StaticFriction => _collider.material.staticFriction;
+		public float Bounciness => _physicsbody is Godot.RigidBody rigidBody
+				? rigidBody.PhysicsMaterialOverride.Bounce : ((StaticBody)_physicsbody).PhysicsMaterialOverride.Bounce;
 
 		/// <inheritdoc />
-		public float DynamicFriction => _collider.material.dynamicFriction;
-*/
+		public float StaticFriction => DynamicFriction;
+
+		/// <inheritdoc />
+		public float DynamicFriction => _physicsbody is Godot.RigidBody rigidBody
+				? rigidBody.PhysicsMaterialOverride.Friction : ((StaticBody)_physicsbody).PhysicsMaterialOverride.Friction;
+
 		// /// <inheritdoc />
 		//public CollisionLayer CollisionLayer { get; set; }
 
@@ -106,6 +109,20 @@ namespace MixedRealityExtension.Core
 		{
 			_ownerActor = collisionShape.GetParent().GetParent<Actor>()
 				?? throw new Exception("An MRE collider must be associated with an MRE actor.");
+			if (_physicsbody == null)
+			{
+				_physicsbody = _ownerActor.GetParent() as Godot.RigidBody;
+				if (_physicsbody == null)
+				{
+					_physicsbody = new StaticBody()
+					{
+						Name = "StaticBody",
+						PhysicsMaterialOverride = new PhysicsMaterial()
+					};
+					_ownerActor.AddChild(_physicsbody);
+				}
+				_physicsbody.AddChild(collisionShape.Duplicate());
+			}
 			_collider = collisionShape;
 
 			if (shape.HasValue)
@@ -133,14 +150,32 @@ namespace MixedRealityExtension.Core
 		internal void ApplyPatch(ColliderPatch patch)
 		{
 			_collider.Disabled = _collider.Disabled.GetPatchApplied(!IsEnabled.ApplyPatch(patch.Enabled));
-			/*FIXME
-			_collider.isTrigger = _collider.isTrigger.GetPatchApplied(IsTrigger.ApplyPatch(patch.IsTrigger));
-			_collider.material.bounciness = _collider.material.bounciness.GetPatchApplied(Bounciness.ApplyPatch(patch.Bounciness));
-			_collider.material.staticFriction = _collider.material.staticFriction.GetPatchApplied(StaticFriction.ApplyPatch(patch.StaticFriction));
-			_collider.material.dynamicFriction = _collider.material.dynamicFriction.GetPatchApplied(DynamicFriction.ApplyPatch(patch.DynamicFriction));
-			*/
+			var physicsBodyCollisionShape = _physicsbody?.GetChild<CollisionShape>();
+			if (physicsBodyCollisionShape != null)
+				physicsBodyCollisionShape.Disabled = _collider.Disabled;
 
+			if (patch.IsTrigger ?? false)
+			{
+				var rigidbodyShape = _physicsbody.GetChild<CollisionShape>();
+				if (rigidbodyShape != null)
+					_physicsbody.RemoveChild(rigidbodyShape);
+			}
+
+			if (patch.StaticFriction.HasValue)
+				GD.PushWarning("StaticFriction is not supported in godot mre. please use DynamicFriction instead.");
+
+			if (_physicsbody is Godot.RigidBody rigidBody)
+			{
+				rigidBody.PhysicsMaterialOverride.Bounce = rigidBody.PhysicsMaterialOverride.Bounce.GetPatchApplied(Bounciness.ApplyPatch(patch.Bounciness));
+				rigidBody.PhysicsMaterialOverride.Friction = rigidBody.PhysicsMaterialOverride.Friction.GetPatchApplied(DynamicFriction.ApplyPatch(patch.DynamicFriction));
+			}
+			if (_physicsbody is Godot.StaticBody staticBody)
+			{
+				staticBody.PhysicsMaterialOverride.Bounce = staticBody.PhysicsMaterialOverride.Bounce.GetPatchApplied(Bounciness.ApplyPatch(patch.Bounciness));
+				staticBody.PhysicsMaterialOverride.Friction = staticBody.PhysicsMaterialOverride.Friction.GetPatchApplied(DynamicFriction.ApplyPatch(patch.DynamicFriction));
+			}
 			MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(patch.Layer, this);
+			MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(patch.Layer, _physicsbody);
 
 			if (patch.EventSubscriptions != null)
 			{
@@ -150,6 +185,26 @@ namespace MixedRealityExtension.Core
 				foreach (var sub in patch.EventSubscriptions)
 				{
 					_colliderEventSubscriptions |= sub;
+					if (sub == ColliderEventType.CollisionEnter || sub == ColliderEventType.CollisionExit)
+					{
+						if (_physicsbody is Godot.RigidBody rigid)
+						{
+							rigid.ContactMonitor = true;
+							rigid.ContactsReported = 32;
+							if (sub == ColliderEventType.CollisionEnter)
+								rigid.Connect("body_shape_entered", this, nameof(OnBodyShapeEnter));
+							else if (sub == ColliderEventType.CollisionExit)
+								rigid.Connect("body_shape_exited", this, nameof(OnBodyShapeExit));
+						}
+					}
+					else if (sub == ColliderEventType.TriggerEnter)
+					{
+						Connect("area_entered", this, nameof(OnAreaEnter));
+					}
+					else if (sub == ColliderEventType.TriggerExit)
+					{
+						Connect("area_exited", this, nameof(OnAreaExit));
+					}
 				}
 			}
 		}
@@ -218,58 +273,50 @@ namespace MixedRealityExtension.Core
 			return colliderGeo == null ? null : new ColliderPatch()
 			{
 				Enabled = !_collider.Disabled,
-				/*FIXME
-				IsTrigger = _collider.isTrigger,
-				Bounciness = _collider.material.bounciness,
-				StaticFriction = _collider.material.staticFriction,
-				DynamicFriction = _collider.material.dynamicFriction,
-				*/
+				IsTrigger = IsTrigger,
+				Bounciness = Bounciness,
+				StaticFriction = StaticFriction,
+				DynamicFriction = DynamicFriction,
 				Layer = MREAPI.AppsAPI.LayerApplicator.DetermineLayerOfCollider(this),
 
 				Geometry = colliderGeo
 			};
 		}
-/*FIXME
-		private void OnTriggerEnter(GodotCollisionObject other)
+
+		private void OnAreaEnter(Area area)
 		{
-			if (_colliderEventSubscriptions.HasFlag(ColliderEventType.TriggerEnter))
+			if (area is Collider collider && collider._physicsbody is Godot.RigidBody)
 			{
-				SendTriggerEvent(ColliderEventType.TriggerEnter, other);
+				SendAreaEvent(ColliderEventType.TriggerEnter, area);
 			}
 		}
 
-		private void OnTriggerExit(GodotCollisionObject other)
+		private void OnAreaExit(Area area)
 		{
-			if (_colliderEventSubscriptions.HasFlag(ColliderEventType.TriggerExit))
+			if (area is Collider collider && collider._physicsbody is Godot.RigidBody)
 			{
-				SendTriggerEvent(ColliderEventType.TriggerExit, other);
+				SendAreaEvent(ColliderEventType.TriggerExit, area);
 			}
 		}
 
-		private void OnCollisionEnter(UnityCollision collision)
+		private void OnBodyShapeEnter(int bodyId, CollisionObject body, int bodyShape, int areaShape)
 		{
-			if (_colliderEventSubscriptions.HasFlag(ColliderEventType.CollisionEnter))
-			{
-				SendCollisionEvent(ColliderEventType.CollisionEnter, collision);
-			}
+			SendBodyEvent(ColliderEventType.CollisionEnter, bodyId, body, areaShape);
 		}
 
-		private void OnCollisionExit(UnityCollision collision)
+		private void OnBodyShapeExit(int bodyId, CollisionObject body, int bodyShape, int areaShape)
 		{
-			if (_colliderEventSubscriptions.HasFlag(ColliderEventType.CollisionExit))
-			{
-				SendCollisionEvent(ColliderEventType.CollisionExit, collision);
-			}
+			SendBodyEvent(ColliderEventType.CollisionExit, bodyId, body, areaShape);
 		}
 
-		private void SendTriggerEvent(ColliderEventType eventType, GodotCollisionObject otherCollider)
+		private void SendAreaEvent(ColliderEventType eventType, Area area)
 		{
 			if (!_ownerActor.App.IsAuthoritativePeer && !_ownerActor.IsGrabbed)
 			{
 				return;
 			}
 
-			var otherActor = otherCollider.gameObject.GetComponent<Actor>();
+			var otherActor = area.GetParent<Actor>();
 			if (otherActor != null && otherActor.App.InstanceId == _ownerActor.App.InstanceId)
 			{
 				_ownerActor.App.EventManager.QueueEvent(
@@ -277,40 +324,56 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		private void SendCollisionEvent(ColliderEventType eventType, UnityCollision collision)
+		private void SendBodyEvent(ColliderEventType eventType, int bodyId, CollisionObject body, int areaShape)
 		{
 			if (!_ownerActor.App.IsAuthoritativePeer && !_ownerActor.IsGrabbed)
 			{
 				return;
 			}
 
-			var otherActor = collision.collider.gameObject.GetComponent<Actor>();
+			Actor otherActor = null;
+			if (body is Godot.RigidBody rigidBody)
+			{
+				otherActor = rigidBody.GetChild<Actor>();
+			}
+			else if (body is Godot.StaticBody staticBody)
+			{
+				otherActor = staticBody.GetParent<Actor>();
+			}
+
 			if (otherActor != null && otherActor.App.InstanceId == _ownerActor.App.InstanceId)
 			{
-				var sceneRoot = _ownerActor.App.SceneRoot.transform;
+				var sceneRoot = _ownerActor.App.SceneRoot;
+				var state = PhysicsServer.BodyGetDirectState(_physicsbody.GetRid());
+				MREContactPoint[] contacts = new MREContactPoint[state.GetContactCount()];
+				Vector3 totalImpulse = Vector3.Zero;
+				int contactObjectIndex = 0;
 
-				var contacts = collision.contacts.Select((contact) =>
+				for (int i = 0; i < contacts.Length; i++)
 				{
-					return new MREContactPoint()
+					var ColliderObject = (Spatial)state.GetContactColliderObject(i);
+					contacts[i] = new MREContactPoint()
 					{
-						Normal = sceneRoot.InverseTransformDirection(contact.normal).CreateMWVector3(),
-						Point = sceneRoot.InverseTransformPoint(contact.point).CreateMWVector3(),
-						Separation = contact.separation
+						Normal = sceneRoot.ToLocal(ColliderObject.ToGlobal(state.GetContactLocalNormal(i))).CreateMWVector3(),
+						Point = sceneRoot.ToLocal(state.GetContactColliderPosition(i)).CreateMWVector3(),
+						Separation = 0 // not support
 					};
-				});
+					totalImpulse += ColliderObject.ToGlobal(state.GetContactLocalNormal(i)) * state.GetContactImpulse(i);
+					if (bodyId == (int)state.GetContactColliderId(0))
+						contactObjectIndex = i;
+				}
 
 				var collisionData = new CollisionData()
 				{
 					otherActorId = otherActor.Id,
 					Contacts = contacts,
-					Impulse = sceneRoot.InverseTransformDirection(collision.impulse).CreateMWVector3(),
-					RelativeVelocity = collision.relativeVelocity.CreateMWVector3()
+					Impulse = sceneRoot.ToLocal(totalImpulse).CreateMWVector3(),
+					RelativeVelocity = state.GetContactColliderVelocityAtPosition(contactObjectIndex).CreateMWVector3()
 				};
 
 				_ownerActor.App.EventManager.QueueEvent(
 					new CollisionEvent(_ownerActor.Id, eventType, collisionData));
 			}
 		}
-		*/
 	}
 }

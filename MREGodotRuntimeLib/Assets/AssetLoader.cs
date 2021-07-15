@@ -70,9 +70,9 @@ namespace MixedRealityExtension.Assets
 		internal IList<Actor> CreateEmpty(Guid? parentId)
 		{
 			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
-			GetGameObjectFromParentId(parentId).AddChild(newGO);
-
 			Actor actor = Actor.Instantiate(newGO);
+			GetGameObjectFromParentId(parentId).AddChild(actor);
+
 			return new List<Actor>() { actor };
 		}
 
