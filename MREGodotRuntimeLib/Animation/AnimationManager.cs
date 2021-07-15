@@ -146,7 +146,7 @@ namespace MixedRealityExtension.Animation
 					{
 						AnimOutputPatches.Remove(id);
 					}
-					else if (actor != null)
+					else if (actor != null && Godot.Object.IsInstanceValid(actor))
 					{
 						actor.ApplyPatch(actorPatch);
 						if (SendUpdates.Contains(id))
