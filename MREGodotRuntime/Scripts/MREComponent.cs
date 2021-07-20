@@ -174,7 +174,7 @@ public class MREComponent : Spatial
 			MREApp?.RPC.SendRPC("button-up", "space", false);
 		}
 		*/
-		MREApp?.Update(delta);
+		MREApp?.Update();
 	}
 
 	private void MREApp_OnAppShutdown()

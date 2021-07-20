@@ -422,7 +422,8 @@ namespace MixedRealityExtension.App
 				{
 					// Sending snapshot which represents the state before physics step is done,
 					// hence we are using time stamp from the start of the fixed update.
-					SendPhysicsUpdate(_fixedDeltaTime);
+
+					SendPhysicsUpdate(OS.GetTicksMsec() * 0.001f);
 				}
 
 				PhysicsBridge.FixedUpdate(SceneRoot);
@@ -458,7 +459,7 @@ namespace MixedRealityExtension.App
 
 			//low frequency server upload transform stream
 			{
-				float systemTime = OS.GetTicksMsec() / 1000f;
+				float systemTime = OS.GetTicksMsec() * 0.001f;
 				if (PhysicsBridge.shouldSendLowFrequencyTransformUpload(systemTime))
 				{
 					PhysicsTranformServerUploadPatch serverUploadPatch =
@@ -477,7 +478,7 @@ namespace MixedRealityExtension.App
 		}
 
 		/// <inheritdoc />
-		public void Update(float delta)
+		public void Update()
 		{
 			// Process events then we will update the connection.
 			EventManager.ProcessEvents();
@@ -498,7 +499,7 @@ namespace MixedRealityExtension.App
 				{
 					// Sending snapshot which represents the state after physics step is done,
 					// hence we need to add time step to the time stamp from the start of the fixed update.
-					SendPhysicsUpdate(delta + _fixedDeltaTime);
+					SendPhysicsUpdate(OS.GetTicksMsec() * 0.001f + _fixedDeltaTime);
 				}
 			}
 

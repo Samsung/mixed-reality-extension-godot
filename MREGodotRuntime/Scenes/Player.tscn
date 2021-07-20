@@ -4,6 +4,8 @@
 [ext_resource path="res://MREGodotRuntime/Scripts/Player/InputSource.cs" type="Script" id=2]
 
 [sub_resource type="CapsuleShape" id=1]
+radius = 0.3
+height = 0.0769818
 
 [sub_resource type="GradientTexture" id=2]
 

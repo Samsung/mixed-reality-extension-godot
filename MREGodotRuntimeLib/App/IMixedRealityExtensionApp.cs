@@ -151,7 +151,7 @@ namespace MixedRealityExtension.App
 		/// <summary>
 		/// Update the remote app runtime.
 		/// </summary>
-		void Update(float delta);
+		void Update();
 
 		/// <summary>
 		/// User is joining the app.

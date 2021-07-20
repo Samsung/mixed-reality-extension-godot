@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using MixedRealityExtension.Animation;
 using MixedRealityExtension.Core.Physics;
@@ -63,37 +64,88 @@ namespace MixedRealityExtension.Patching.Types
 
 			if (TransformCount > 0)
 			{
-				/* FIXME: hmm,, i have no idea how to convert this..
-				// copy transform to native array to reinterpret it to byte array without 'unsafe' code
-				// todo: we should use native array in snapshot anyway.
-				Unity.Collections.NativeArray<Snapshot.TransformInfo> transforms =
-						new Unity.Collections.NativeArray<Snapshot.TransformInfo>(snapshot.Transforms.ToArray(), Unity.Collections.Allocator.Temp);
-
-				NativeSlice<byte> blob = new NativeSlice<Snapshot.TransformInfo>(transforms).SliceConvert<byte>();
-				TransformsBLOB = blob.ToArray();
-				*/
+				TransformsBLOB = ConvertTransformList(snapshot.Transforms);
 			}
 		}
 
 		internal Snapshot ToSnapshot()
 		{
-			/* FIXME: hmm,, i have no idea how to convert this..
 			if (TransformCount > 0)
 			{
-				Unity.Collections.NativeArray<byte> blob =
-				new Unity.Collections.NativeArray<byte>(TransformsBLOB, Unity.Collections.Allocator.Temp);
-
-				// todo: use native array in snapshot
-				Unity.Collections.NativeSlice<Snapshot.TransformInfo> transforms = new NativeSlice<byte>(blob).SliceConvert<Snapshot.TransformInfo>();
-				return new Snapshot(Time, new List<Snapshot.TransformInfo>(transforms.ToArray()), Flags);
+				return new Snapshot(Time, ConvertTransformBLOB(TransformsBLOB), Flags);
 			}
-			*/
-
+ 
 			return new Snapshot(Time, new List<Snapshot.TransformInfo>(), Flags);
 		}
 
 		/// returns true if this snapshot should be send even if it has no transforms
 		public bool DoSendThisPatch() { return (TransformCount > 0 || Flags != Snapshot.SnapshotFlags.NoFlags); }
+
+		private List<Snapshot.TransformInfo> ConvertTransformBLOB(byte[] blob)
+		{
+			List<Snapshot.TransformInfo> transformInfoList = new List<Snapshot.TransformInfo>();
+			using (MemoryStream memoryStream = new MemoryStream(blob))
+			using (BinaryReader binaryReader = new BinaryReader(memoryStream))
+			{
+				for (int i = 0; i < memoryStream.Length / 48; i++)
+				{
+					var guidBytes = binaryReader.ReadBytes(16);
+					Guid guid = new Guid(guidBytes);
+
+					MotionType motionType = (MotionType)binaryReader.ReadByte();
+
+					//skip 3 bytes
+					binaryReader.ReadBytes(3);
+
+					Vector3 position = new Vector3();
+					position.x = binaryReader.ReadSingle();
+					position.y = binaryReader.ReadSingle();
+					position.z = -binaryReader.ReadSingle();
+
+					Quat rotation = new Quat();
+					rotation.x = -binaryReader.ReadSingle();
+					rotation.y = -binaryReader.ReadSingle();
+					rotation.z = binaryReader.ReadSingle();
+					rotation.w = binaryReader.ReadSingle();
+
+					var rigidBodyTransform = new RigidBodyTransform()
+					{
+						Position = position,
+						Rotation = rotation,
+					};
+					var transformInfo = new Snapshot.TransformInfo(guid, rigidBodyTransform, motionType);
+					transformInfoList.Add(transformInfo);
+				}
+			}
+			return transformInfoList;
+		}
+
+		private byte[] ConvertTransformList(List<Snapshot.TransformInfo> list)
+		{
+			using (MemoryStream memoryStream = new MemoryStream())
+			using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
+			{
+				foreach (var transformInfo in list)
+				{
+					var blob = new byte[48];
+					Buffer.BlockCopy(transformInfo.RigidBodyId.ToByteArray(), 0, blob, 0, 16);
+					blob[16] = (byte)transformInfo.MotionType;
+					blob[17] = 0;
+					blob[18] = 0;
+					blob[19] = 0;
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Position.x), 0, blob, 20, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Position.y), 0, blob, 24, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Position.z), 0, blob, 28, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Rotation.x), 0, blob, 32, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Rotation.y), 0, blob, 36, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Rotation.z), 0, blob, 40, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Rotation.w), 0, blob, 44, 4);
+					binaryWriter.Write(blob);
+				}
+
+				return memoryStream.ToArray();
+			}
+		}
 
 		/// <summary>
 		/// source app id (of the sender)

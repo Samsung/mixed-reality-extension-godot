@@ -244,11 +244,11 @@ namespace MixedRealityExtension.Core
 
 					// get the key framed stream, and compute implicit velocities
 					Godot.Vector3 keyFramedPos = root.ToGlobal(transform.Position);
-					Godot.Quat keyFramedOrientation = root.Transform.basis.Quat() * transform.Rotation;
+					Godot.Quat keyFramedOrientation = root.GlobalTransform.basis.RotationQuat() * transform.Rotation;
 					Godot.Vector3 JBLinearVelocity =
-						root.Transform.basis.GetEuler() * snapshot.RigidBodies.Values[index].LinearVelocity;
+						root.GlobalTransform.basis.GetEuler() * snapshot.RigidBodies.Values[index].LinearVelocity;
 					Godot.Vector3 JBAngularVelocity =
-						root.Transform.basis.GetEuler() * snapshot.RigidBodies.Values[index].AngularVelocity;
+						root.GlobalTransform.basis.GetEuler() * snapshot.RigidBodies.Values[index].AngularVelocity;
 					// if there is a really new update then also store the implicit velocity
 					if (rb.lastTimeKeyFramedUpdate < timeOfSnapshot)
 					{
@@ -258,15 +258,15 @@ namespace MixedRealityExtension.Core
 
 #if MRE_PHYSICS_DEBUG
 						// test the source of large velocities
-						if (rb.lastValidLinerVelocityOrPos.sqrMagnitude > _maxEstimatedLinearVelocity * _maxEstimatedLinearVelocity)
+						if (rb.lastValidLinerVelocityOrPos.LengthSquared() > _maxEstimatedLinearVelocity * _maxEstimatedLinearVelocity)
 						{
 							// limited debug version
-							Debug.Log(" ACTIVE SPEED LIMIT TRAP RB: " //+ rb.Id.ToString() + " got update lin vel:"
+							GD.Print(" ACTIVE SPEED LIMIT TRAP RB: " //+ rb.Id.ToString() + " got update lin vel:"
 								+ rb.lastValidLinerVelocityOrPos + " ang vel:" + rb.lastValidAngularVelocityorAng
 								+ " time:" + timeOfSnapshot
 								+ " newR:" + rb.lastTimeKeyFramedUpdate
-								+ " hasupdate:" + snapshot.RigidBodies.Values[index].HasUpdate
-								+  " DangE:" + eulerAngles + " DangR:" + radianAngles );
+								+ " hasupdate:" + snapshot.RigidBodies.Values[index].HasUpdate);
+								//+  " DangE:" + eulerAngles + " DangR:" + radianAngles );
 						}
 #endif
 
@@ -285,21 +285,21 @@ namespace MixedRealityExtension.Core
 						if (true)
 						{
 						    // limited debug version
-							Debug.Log(" Remote body: " + rb.Id.ToString() + " got update lin vel:"
+							GD.Print(" Remote body: " + rb.Id.ToString() + " got update lin vel:"
 								+ rb.lastValidLinerVelocityOrPos + " ang vel:" + rb.lastValidAngularVelocityorAng
 								+ " time:" + timeOfSnapshot + " newR:" + rb.lastTimeKeyFramedUpdate);
 						}
 						else
 						{
-							Debug.Log(" Remote body: " + rb.Id.ToString() + " got update lin vel:"
+							GD.Print(" Remote body: " + rb.Id.ToString() + " got update lin vel:"
 								+ rb.lastValidLinerVelocityOrPos + " ang vel:" + rb.lastValidAngularVelocityorAng
 								//+ " DangE:" + eulerAngles + " DangR:" + radianAngles
 								+ " time:" + timeOfSnapshot + " newp:" + keyFramedPos
 								+ " newR:" + keyFramedOrientation
-								+ " oldP:" + rb.RigidBody.transform.position
-								+ " oldR:" + rb.RigidBody.transform.rotation
+								+ " oldP:" + rb.RigidBody.GlobalTransform.origin
+								+ " oldR:" + rb.RigidBody.GlobalTransform.basis.RotationQuat()
 								+ " OriginalRot:" + transform.Rotation
-								+ " keyF:" + rb.RigidBody.isKinematic
+								//+ " keyF:" + rb.RigidBody.isKinematic
 								+ " KF:" + rb.IsKeyframed);
 						}
 #endif
@@ -315,16 +315,16 @@ namespace MixedRealityExtension.Core
 							rb.lastValidAngularVelocityorAng = new Vector3(0.0F, 0.0F, 0.0F);
 						}
 #if MRE_PHYSICS_DEBUG
-						Debug.Log(" Remote body: " + rb.Id.ToString() + " got update lin vel:"
+						GD.Print(" Remote body: " + rb.Id.ToString() + " got update lin vel:"
 							+ rb.lastValidLinerVelocityOrPos + " ang vel:" + rb.lastValidAngularVelocityorAng
 							//+ " DangE:" + eulerAngles + " DangR:" + radianAngles
 							+ " time:" + timeOfSnapshot + " newp:" + keyFramedPos
 							+ " newR:" + keyFramedOrientation
-							+ " incUpdateDt:" + invUpdateDT
-							+ " oldP:" + rb.RigidBody.transform.position
-							+ " oldR:" + rb.RigidBody.transform.rotation
+							+ " incUpdateDt:" + timeInfo.DT
+							+ " oldP:" + rb.RigidBody.GlobalTransform.origin
+							+ " oldR:" + rb.RigidBody.GlobalTransform.basis.RotationQuat()
 							+ " OriginalRot:" + transform.Rotation
-							+ " keyF:" + rb.RigidBody.isKinematic
+							//+ " keyF:" + rb.RigidBody.isKinematic
 							+ " KF:" + rb.IsKeyframed);
 #endif
 					}
@@ -385,8 +385,8 @@ namespace MixedRealityExtension.Core
 
 				RigidBodyTransform transform;
 				{
-					transform.Position = root.ToLocal(rb.RigidBody.Transform.origin);
-					transform.Rotation = (root.Transform.basis.Inverse() * rb.RigidBody.Transform.basis).Quat();
+					transform.Position = root.ToLocal(rb.RigidBody.GlobalTransform.origin);
+					transform.Rotation = (root.GlobalTransform.basis.Inverse() * rb.RigidBody.GlobalTransform.basis).RotationQuat();
 				}
 
 				numOwnedBodies++;
@@ -442,10 +442,10 @@ namespace MixedRealityExtension.Core
 
 				transforms.Add(new Snapshot.TransformInfo(rb.Id, transform, mType));
 #if MRE_PHYSICS_DEBUG
-				Debug.Log(" SEND Remote body: " + rb.Id.ToString() + " OriginalRot:" + transform.Rotation
-					+ " RigidBodyRot:" + rb.RigidBody.transform.rotation
-					+ " lv:" + rb.RigidBody.velocity + " av:" + rb.RigidBody.angularVelocity
-					+ " posDiff:" + posDiff + " rotDiff:" + rotDiff + " isKeyF:" + rb.IsKeyframed);
+				GD.Print(" SEND Remote body: " //+ rb.Id.ToString() + " OriginalRot:" + transform.Rotation
+					//+ " RigidBodyRot:" + rb.RigidBody.GlobalTransform.basis.RotationQuat()
+					+ " lv:" + rb.RigidBody.LinearVelocity //+ " av:" + rb.RigidBody.AngularVelocity
+					+ " posDiff:" + posDiff/* + " rotDiff:" + rotDiff + " isKeyF:" + rb.IsKeyframed*/);
 #endif
 			}
 
@@ -463,9 +463,9 @@ namespace MixedRealityExtension.Core
 			var ret = new Snapshot(time, transforms, snapshotFlag);
 
 #if MRE_PHYSICS_DEBUG
-			Debug.Log(" Client:" + " Total number of sleeping bodies: " + numSleepingBodies + " total RBs" + _rigidBodies.Count
-			 + " num owned " + numOwnedBodies + " num sent transforms " + transforms.Count
-			 + " send:"  +  ret.DoSendThisSnapshot() );
+			GD.Print(" Client:" + " Total number of sleeping bodies: " + numSleepingBodies + " total RBs" + _rigidBodies.Count
+			+ " num owned " + numOwnedBodies + " num sent transforms " + transforms.Count
+			+ " send:"  +  ret.DoSendThisSnapshot() );
 #endif
 
 			return ret;
@@ -512,9 +512,9 @@ namespace MixedRealityExtension.Core
 
 						var update = new PhysicsTranformServerUploadPatch.OneActorUpdate(
 							actor.Id,
-							actor.Transform.origin, actor.Transform.basis.Quat(),
-							actor.App.SceneRoot.ToLocal(actor.Transform.origin),
-							(actor.App.SceneRoot.Transform.basis.Inverse() * actor.Transform.basis).Quat()
+							actor.GlobalTransform.origin, actor.GlobalTransform.basis.RotationQuat(),
+							actor.App.SceneRoot.ToLocal(actor.GlobalTransform.origin),
+							(actor.App.SceneRoot.GlobalTransform.basis.Inverse() * actor.GlobalTransform.basis).Quat()
 							);
 
 						// todo see if we sent this update already
