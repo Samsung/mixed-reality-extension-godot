@@ -101,7 +101,7 @@ namespace MixedRealityExtension.Core
 					newSize.x = Size.X;
 					newSize.y = Size.Y;
 					newSize.z = Size.Z;
-					boxShape.Extents = newSize;
+					boxShape.Extents = newSize * 0.999998f;
 				}
 			}
 		}

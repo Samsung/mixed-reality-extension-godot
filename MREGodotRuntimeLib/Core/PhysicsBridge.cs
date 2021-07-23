@@ -244,11 +244,11 @@ namespace MixedRealityExtension.Core
 
 					// get the key framed stream, and compute implicit velocities
 					Godot.Vector3 keyFramedPos = root.ToGlobal(transform.Position);
-					Godot.Quat keyFramedOrientation = root.GlobalTransform.basis.RotationQuat() * transform.Rotation;
+					Godot.Quat keyFramedOrientation = root.GlobalTransform.basis.Quat() * transform.Rotation;
 					Godot.Vector3 JBLinearVelocity =
-						root.GlobalTransform.basis.GetEuler() * snapshot.RigidBodies.Values[index].LinearVelocity;
+						root.GlobalTransform.basis.Xform(snapshot.RigidBodies.Values[index].LinearVelocity);
 					Godot.Vector3 JBAngularVelocity =
-						root.GlobalTransform.basis.GetEuler() * snapshot.RigidBodies.Values[index].AngularVelocity;
+						root.GlobalTransform.basis.Xform(snapshot.RigidBodies.Values[index].AngularVelocity);
 					// if there is a really new update then also store the implicit velocity
 					if (rb.lastTimeKeyFramedUpdate < timeOfSnapshot)
 					{
@@ -386,7 +386,7 @@ namespace MixedRealityExtension.Core
 				RigidBodyTransform transform;
 				{
 					transform.Position = root.ToLocal(rb.RigidBody.GlobalTransform.origin);
-					transform.Rotation = (root.GlobalTransform.basis.Inverse() * rb.RigidBody.GlobalTransform.basis).RotationQuat();
+					transform.Rotation = (root.GlobalTransform.basis.Inverse() * rb.RigidBody.GlobalTransform.basis).Quat();
 				}
 
 				numOwnedBodies++;
@@ -509,10 +509,9 @@ namespace MixedRealityExtension.Core
 						// MUST be the same as  PatchingUtilMethods.GenerateLocalTransformPatch
 						// and  PatchingUtilMethods.GenerateAppTransformPatch
 						//update.localTransforms.Position = actor.transform.position;
-
 						var update = new PhysicsTranformServerUploadPatch.OneActorUpdate(
 							actor.Id,
-							actor.GlobalTransform.origin, actor.GlobalTransform.basis.RotationQuat(),
+							actor.GlobalTransform.origin, actor.GlobalTransform.basis.Quat(),
 							actor.App.SceneRoot.ToLocal(actor.GlobalTransform.origin),
 							(actor.App.SceneRoot.GlobalTransform.basis.Inverse() * actor.GlobalTransform.basis).Quat()
 							);

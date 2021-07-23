@@ -51,7 +51,7 @@ namespace MixedRealityExtension.Core.Physics
 		const float limitCollisionInterpolation = 0.2f;
 		const float collisionRelDistLimit = 0.8f;
 
-		const float radiusExpansionFactor = 0.53f; // to detect potential collisions
+		const float radiusExpansionFactor = 1.3f; // to detect potential collisions
 		const float inCollisionRangeRelativeDistanceFactor = 1.25f;
 
 		const float interpolationPosEpsilon = 0.01f;
@@ -126,16 +126,22 @@ namespace MixedRealityExtension.Core.Physics
 					Godot.Vector3 posdiff = rb.RigidBody.GlobalTransform.origin - interpolatedPos;
 					Vector3 rigidBodyOrigin = rb.RigidBody.GlobalTransform.origin;
 					Basis rigidBodyBasis = rb.RigidBody.GlobalTransform.basis;
+					bool originNeedUpdate = false;
+					bool basisNeedUpdate = false;
 					if (posdiff.Length() > interpolationPosEpsilon)
 					{
 						rigidBodyOrigin = interpolatedPos;
+						originNeedUpdate = true;
 					}
-					float angleDiff = Math.Abs(Mathf.Rad2Deg(rigidBodyBasis.GetEuler().AngleTo(interpolatedQuad.GetEuler())));
+					float angleDiff = Math.Abs(rigidBodyBasis.GetEuler().AngleTo(interpolatedQuad.GetEuler()));
 					if (angleDiff > interpolationAngularEps)
 					{
 						rigidBodyBasis = new Basis(interpolatedQuad);
+						basisNeedUpdate = true;
 					}
-					rb.RigidBody.GlobalTransform = new Transform(rigidBodyBasis, rigidBodyOrigin);
+
+					if (originNeedUpdate || basisNeedUpdate)
+						rb.RigidBody.GlobalTransform = new Transform(rigidBodyBasis, rigidBodyOrigin);
 
 					// apply velocity damping if we are in the interpolation phase 
 					if (collisionInfo.monitorInfo.keyframedInterpolationRatio >= velocityDampingInterpolationValueStart)
@@ -357,7 +363,6 @@ namespace MixedRealityExtension.Core.Physics
 					}
 				}
 			} // end for each 
-
 		} // end of PredictAllRemoteBodiesWithOwnedBodies
 
 		private Vector3 ClosestPointOnBounds(Godot.RigidBody from, Godot.RigidBody to)
@@ -366,28 +371,60 @@ namespace MixedRealityExtension.Core.Physics
 			var aabb = toCollisionShape.Shape.GetDebugMesh().GetAabb();
 			var aabbPosition = aabb.Position;
 			var aabbEnd = aabb.End;
-			Vector3[] collisionPoint = new Vector3[8];
-			collisionPoint[0] = aabbPosition;
-			collisionPoint[1] = new Vector3(aabbPosition.x, aabbPosition.y, aabbEnd.z);
-			collisionPoint[2] = new Vector3(aabbEnd.x, aabbPosition.y, aabbEnd.z);
-			collisionPoint[3] = new Vector3(aabbEnd.x, aabbPosition.y, aabbPosition.z);
-			collisionPoint[4] = new Vector3(aabbPosition.x, aabbEnd.y, aabbPosition.z);
-			collisionPoint[5] = new Vector3(aabbPosition.x, aabbEnd.y, aabbEnd.z);
-			collisionPoint[6] = new Vector3(aabbEnd.x, aabbEnd.y, aabbPosition.z);
-			collisionPoint[7] = aabbEnd;
 
-			var shortest = to.GlobalTransform.origin.DistanceSquaredTo(from.GlobalTransform.origin);
-			Vector3 ret = Vector3.Zero;
-			foreach (var point in collisionPoint.Select(x => x + to.GlobalTransform.origin))
+			Vector3[] aabbPoints = new Vector3[8];
+			aabbPoints[0] = aabbPosition;
+			aabbPoints[1] = new Vector3(aabbPosition.x, aabbPosition.y, aabbEnd.z);
+			aabbPoints[2] = new Vector3(aabbEnd.x, aabbPosition.y, aabbEnd.z);
+			aabbPoints[3] = new Vector3(aabbEnd.x, aabbPosition.y, aabbPosition.z);
+			aabbPoints[4] = new Vector3(aabbPosition.x, aabbEnd.y, aabbPosition.z);
+			aabbPoints[5] = new Vector3(aabbPosition.x, aabbEnd.y, aabbEnd.z);
+			aabbPoints[6] = new Vector3(aabbEnd.x, aabbEnd.y, aabbPosition.z);
+			aabbPoints[7] = aabbEnd;
+/* AABB Points
+  /|\ Y
+[4]|_____________ [6]
+   |\           |\
+   | \          | \
+   |  \ [5]     |  \
+   |   \____________\ [7]
+   |    |       |    |
+[0]|___ | ______|[3]-|------> X
+    \   |        \   |
+     \  |         \  |
+      \ |          \ |
+       \|___________\|
+     [1]\            [2]
+         \
+         _\/ Z
+*/
+			int[,] collisionTriangles = new int[12, 3] {
+				{0, 1, 2}, {0, 2, 3}, {0, 4, 5}, {0, 1, 5},
+				{1, 2, 5}, {2, 5, 7}, {2, 3, 7}, {3, 6, 7},
+				{3, 4, 6}, {0, 3, 4}, {4, 5, 6}, {5, 6, 7}
+			};
+
+			var shortest = float.MaxValue;
+			var localPositionFrom = from.GlobalTransform.origin - to.GlobalTransform.origin;
+			Vector3 closestPoint = to.GlobalTransform.origin;
+			for (int i = 0; i < 12; i++)
 			{
-				var distance = point.DistanceSquaredTo(from.GlobalTransform.origin);
+				var triangleA = aabbPoints[collisionTriangles[i, 0]];
+				var triangleB = aabbPoints[collisionTriangles[i, 1]];
+				var triangleC = aabbPoints[collisionTriangles[i, 2]];
+				var intersectionPoint = Geometry.SegmentIntersectsTriangle(localPositionFrom, Vector3.Zero, triangleA, triangleB, triangleC);
+				if (intersectionPoint == null) continue;
+				var distance = ((Vector3)intersectionPoint).LengthSquared();
 				if (shortest > distance)
 				{
 					shortest = distance;
-					ret = point;
+					closestPoint = (Vector3)intersectionPoint;
 				}
 			}
-			return ret;
+
+			if (shortest == float.MaxValue)
+				return to.GlobalTransform.origin;
+			return closestPoint + to.GlobalTransform.origin;
 		}
 
 		public void Clear()
