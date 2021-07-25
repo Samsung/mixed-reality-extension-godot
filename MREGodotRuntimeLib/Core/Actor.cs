@@ -1330,12 +1330,15 @@ namespace MixedRealityExtension.Core
 				if (transformPatch.Local.Position != null)
 				{
 					var localPosition = LocalTransform.Position.ApplyPatch(transformPatch.Local.Position).ToVector3();
+					localPosition.z *= -1;
 					transformUpdate.Position = parent.ToGlobal(localPosition);
 				}
 
 				if (transformPatch.Local.Rotation != null)
 				{
 					var localRotation = LocalTransform.Rotation.ApplyPatch(transformPatch.Local.Rotation).ToQuaternion();
+					localRotation.x *= -1;
+					localRotation.y *= -1;
 					transformUpdate.Rotation = parent.GlobalTransform.basis.RotationQuat() * localRotation;
 				}
 			}
