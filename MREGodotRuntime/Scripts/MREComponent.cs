@@ -162,6 +162,14 @@ public class MREComponent : Spatial
 		{
 			GD.Print($"{testName}: {message}");
 		}));
+
+		MREApp.RPC.OnReceive("drawing:drawing-start", new RPCHandler<Guid>((actorId) =>
+		{
+			var actor = ((MixedRealityExtensionApp)MREApp).FindActor(actorId) as Actor;
+			var origin = actor.GlobalTransform.origin;
+			origin.z *= -1;
+			MREApp.RPC.SendRPC("drawing:drawing-start", origin);
+		}));
 	}
 	public override void _PhysicsProcess(float delta)
 	{

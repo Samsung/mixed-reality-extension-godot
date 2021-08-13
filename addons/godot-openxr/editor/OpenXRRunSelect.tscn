@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/godot-openxr/editor/OpenXRRunSelect.gd" type="Script" id=1]
+
+[node name="OpenXRRunSelect" type="OptionButton"]
+hint_tooltip = "Select the OpenXR runtime test your project with"
+text = "Default"
+items = [ "Default", null, false, 0, null, "Monado", null, false, 0, null ]
+selected = 0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="item_selected" from="." to="." method="_on_OpenXRRunSelect_item_selected"]
