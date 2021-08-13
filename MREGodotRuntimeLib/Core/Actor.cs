@@ -1013,11 +1013,7 @@ namespace MixedRealityExtension.Core
 			switch (colliderType)
 			{
 				case ColliderType.Box:
-					var boxCollider = new CollisionShape() {
-						Shape = new BoxShape() {
-							Extents = new Vector3(0.5f, 0.5f, 0.5f)
-						}
-					};
+					var boxCollider = new CollisionShape() { Shape = new BoxShape() };
 					colliderGeometry.Patch(App, boxCollider);
 					godotCollisionShape = boxCollider;
 					break;
