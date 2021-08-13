@@ -1228,7 +1228,8 @@ namespace MixedRealityExtension.Core
 				// clean up unused components
 				else
 				{
-					MeshInstance.QueueFree();
+					if (MeshInstance != null)
+						MeshInstance.QueueFree();
 					if (Collider != null && Collider.Shape == ColliderType.Auto)
 					{
 						_collider.Free();

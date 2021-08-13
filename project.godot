@@ -27,7 +27,11 @@ window/stretch/aspect="keep"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "MREGodot" )
+enabled=PoolStringArray( "res://addons/MREGodot/plugin.cfg", "res://addons/godot-openxr/plugin.cfg" )
+
+[gdnative]
+
+singletons=[ "res://addons/godot-openxr/godot_openxr.gdnlib" ]
 
 [input]
 
@@ -61,6 +65,11 @@ Fire2={
 "events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":2,"pressed":false,"doubleclick":false,"script":null)
  ]
 }
+shift={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777237,"unicode":0,"echo":false,"script":null)
+ ]
+}
 
 [mono]
 
@@ -68,5 +77,5 @@ debugger_agent/wait_timeout=5000
 
 [rendering]
 
-quality/filters/msaa=4
+vram_compression/import_etc=true
 environment/default_environment="res://default_env.tres"
