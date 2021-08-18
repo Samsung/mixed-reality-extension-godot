@@ -5,8 +5,8 @@
 
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
-MREURL = "ws://localhost:3901"
 SessionID = "testbed"
+MREURL = "ws://localhost:3901"
 AppID = "helloworld"
 EphemeralAppID = "helloworld-temp"
 UserNode = NodePath("Player")

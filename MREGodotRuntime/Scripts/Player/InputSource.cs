@@ -23,7 +23,7 @@ namespace Assets.Scripts.User
 			// You still want to hit all layers, but only interact with these.
 			uint layerMask = (1 << 0) | (1 << 5) | (1 << 10);
 
-			rayCast = GetNode<RayCast>("RayCast");
+			rayCast = (RayCast)FindNode("RayCast");
 			rayCast.CastTo = new Vector3(0, 0, -100);
 			rayCast.CollisionMask = layerMask;
 

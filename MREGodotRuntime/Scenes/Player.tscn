@@ -1,11 +1,13 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://MREGodotRuntime/Scripts/Player.cs" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scripts/Player/InputSource.cs" type="Script" id=2]
+[ext_resource path="res://MREGodotRuntime/Scenes/Hand_Right.glb" type="PackedScene" id=3]
+[ext_resource path="res://MREGodotRuntime/Scripts/Hand_Right.cs" type="Script" id=4]
 
 [sub_resource type="CapsuleShape" id=1]
-radius = 0.3
-height = 0.0769818
+radius = 0.0563646
+height = 0.0459115
 
 [sub_resource type="GradientTexture" id=2]
 
@@ -22,13 +24,18 @@ script = ExtResource( 1 )
 current = true
 script = ExtResource( 2 )
 
-[node name="RayCast" type="RayCast" parent="MainCamera"]
+[node name="Hand_Right" parent="MainCamera" instance=ExtResource( 3 )]
+transform = Transform( -4.59137e-08, -7.48723e-10, -1, -0.321869, 0.946784, 1.40693e-08, 0.946784, 0.321869, -4.37114e-08, 0.685138, 0, -0.865883 )
+script = ExtResource( 4 )
+
+[node name="socket-right-index" type="MeshInstance" parent="MainCamera/Hand_Right"]
+transform = Transform( -3.49691e-08, -2.08616e-07, 0.8, -6.66134e-16, 0.8, 2.08616e-07, -0.8, 1.86517e-14, -3.49691e-08, -0.138515, -0.17721, 0.115418 )
+
+[node name="RayCast" type="RayCast" parent="MainCamera/Hand_Right"]
+transform = Transform( -0.00494982, -0.0925854, 0.320179, 0.00209233, 0.3202, 0.0926235, -0.33329, 0.00338517, -0.00417375, 0.301481, -0.039078, 0.119564 )
 enabled = true
 cast_to = Vector3( 0, 0, -1 )
 collide_with_areas = true
-
-[node name="socket-center-eye" type="Spatial" parent="MainCamera"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.426 )
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
@@ -39,6 +46,7 @@ disabled = true
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
 
 [node name="HUD" type="Control" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2

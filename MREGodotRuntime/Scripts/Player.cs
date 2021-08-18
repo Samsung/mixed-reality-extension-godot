@@ -56,9 +56,13 @@ public class Player : KinematicBody
             if (!cameraMove && eventMouseButton.Pressed)
                 cameraMove = true;
         }
-        else if (Input.IsActionPressed("ui_cancel"))
+        else if (Input.IsActionPressed("ui_cancel") || Input.IsActionPressed("shift"))
         {
             cameraMove = false;
+        }
+        else if (Input.IsActionJustReleased("shift"))
+        {
+            cameraMove = true;
         }
     }
 
