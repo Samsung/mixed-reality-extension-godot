@@ -37,12 +37,6 @@ public class ThumbMetacarpal : MeshInstance
     {
         Vector3 newPosition = (ThumbProximal.GlobalTransform.origin + IndexProximal.GlobalTransform.origin + LittleProximal.GlobalTransform.origin) / 3;
 
-        if (!tween.IsActive() && newPosition.DistanceSquaredTo(oldPosition) > 0.01f)
-        {
-            tween.InterpolateProperty(target, "global_transform:origin", oldPosition, newPosition, 0.1f);
-            tween.Start();
-            oldPosition = newPosition;
-        }
         RayCast.LookAt(target.GlobalTransform.origin, Vector3.Up);
     }
 
