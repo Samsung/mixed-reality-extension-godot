@@ -7,19 +7,28 @@ public class ThumbMetacarpal : MeshInstance
     Area IndexTipArea;
     RayCast RayCast;
     MeshInstance MiddleMetacarpal;
+    MeshInstance ThumbProximal;
+    MeshInstance IndexProximal;
+    MeshInstance MiddleProximal;
     public override void _Ready()
     {
         ThumbTipArea = GetNode<Area>("ThumbProximal/ThumbDistal/ThumbTip/ThumbTipArea");
         IndexTipArea = GetNode<Area>("../IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip/IndexTipArea");
         RayCast = GetNode<RayCast>("../RayCast");
         MiddleMetacarpal = GetNode<MeshInstance>("../MiddleMetacarpal/MiddleProximal");
+
+        ThumbProximal = GetNode<MeshInstance>("../ThumbMetacarpal/ThumbProximal");
+        IndexProximal = GetNode<MeshInstance>("../IndexMetacarpal/IndexProximal");
+        MiddleProximal = GetNode<MeshInstance>("../MiddleMetacarpal/MiddleProximal");
+
         ThumbTipArea.Connect("area_entered", this, nameof(OnAreaEnter));
         ThumbTipArea.Connect("area_exited", this, nameof(OnAreaExit));
     }
 
     public override void _Process(float delta)
     {
-        RayCast.LookAt(MiddleMetacarpal.GlobalTransform.origin, Vector3.Up);
+        Vector3 origin = (ThumbProximal.GlobalTransform.origin + IndexProximal.GlobalTransform.origin + MiddleProximal.GlobalTransform.origin) / 3;
+        RayCast.LookAt(origin, Vector3.Up);
     }
 
     private void OnAreaEnter(Area area)

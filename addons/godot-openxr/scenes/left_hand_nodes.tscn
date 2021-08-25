@@ -139,7 +139,7 @@ mesh = SubResource( 4 )
 material/0 = null
 
 [node name="MiddleMetacarpal" type="MeshInstance" parent="Wrist"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.005, 0, -0.0327337 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.005, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -274,7 +274,6 @@ mesh = SubResource( 4 )
 material/0 = null
 
 [node name="RayCast" type="RayCast" parent="Wrist"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0303689 )
 enabled = true
 collide_with_areas = true
 
