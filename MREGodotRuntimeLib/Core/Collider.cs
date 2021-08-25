@@ -311,11 +311,12 @@ namespace MixedRealityExtension.Core
 
 		private void SendAreaEvent(ColliderEventType eventType, Area area)
 		{
+			/* temporary comment
 			if (!_ownerActor.App.IsAuthoritativePeer && !_ownerActor.IsGrabbed)
 			{
 				return;
 			}
-
+			*/
 			var otherActor = area.GetParent<Actor>();
 			if (otherActor != null && otherActor.App.InstanceId == _ownerActor.App.InstanceId)
 			{
