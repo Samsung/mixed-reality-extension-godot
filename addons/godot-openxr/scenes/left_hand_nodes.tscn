@@ -281,3 +281,7 @@ collide_with_areas = true
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -2.52969 )
 mesh = SubResource( 6 )
 material/0 = null
+
+[node name="Tween" type="Tween" parent="Wrist"]
+
+[node name="Target" type="Spatial" parent="Wrist"]

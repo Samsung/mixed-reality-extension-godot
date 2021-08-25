@@ -10,6 +10,11 @@ public class ThumbMetacarpal : MeshInstance
     MeshInstance ThumbProximal;
     MeshInstance IndexProximal;
     MeshInstance MiddleProximal;
+    MeshInstance LittleProximal;
+
+    Spatial target;
+    Tween tween;
+    Vector3 oldPosition;
     public override void _Ready()
     {
         ThumbTipArea = GetNode<Area>("ThumbProximal/ThumbDistal/ThumbTip/ThumbTipArea");
@@ -20,6 +25,9 @@ public class ThumbMetacarpal : MeshInstance
         ThumbProximal = GetNode<MeshInstance>("../ThumbMetacarpal/ThumbProximal");
         IndexProximal = GetNode<MeshInstance>("../IndexMetacarpal/IndexProximal");
         MiddleProximal = GetNode<MeshInstance>("../MiddleMetacarpal/MiddleProximal");
+        LittleProximal = GetNode<MeshInstance>("../LittleMetacarpal/LittleProximal");
+        tween = GetNode<Tween>("../Tween");
+        target = GetNode<Spatial>("../Target");
 
         ThumbTipArea.Connect("area_entered", this, nameof(OnAreaEnter));
         ThumbTipArea.Connect("area_exited", this, nameof(OnAreaExit));
@@ -27,8 +35,15 @@ public class ThumbMetacarpal : MeshInstance
 
     public override void _Process(float delta)
     {
-        Vector3 origin = (ThumbProximal.GlobalTransform.origin + IndexProximal.GlobalTransform.origin + MiddleProximal.GlobalTransform.origin) / 3;
-        RayCast.LookAt(origin, Vector3.Up);
+        Vector3 newPosition = (ThumbProximal.GlobalTransform.origin + IndexProximal.GlobalTransform.origin + LittleProximal.GlobalTransform.origin) / 3;
+
+        if (!tween.IsActive() && newPosition.DistanceSquaredTo(oldPosition) > 0.01f)
+        {
+            tween.InterpolateProperty(target, "global_transform:origin", oldPosition, newPosition, 0.1f);
+            tween.Start();
+            oldPosition = newPosition;
+        }
+        RayCast.LookAt(target.GlobalTransform.origin, Vector3.Up);
     }
 
     private void OnAreaEnter(Area area)
