@@ -11,6 +11,7 @@ namespace Assets.Scripts.User
 		private Tool _currentTool;
 
 		internal RayCast rayCast;
+		internal MeshInstance RayCastMesh;
 		public Node UserNode;
 
 		public CSGTorus CollisionPoint;
@@ -28,6 +29,7 @@ namespace Assets.Scripts.User
 			rayCast = (RayCast)GetParent().FindNode("RayCast");
 			rayCast.CastTo = new Vector3(0, 0, -100);
 			rayCast.CollisionMask = layerMask;
+			RayCastMesh = (MeshInstance)rayCast.GetChild(0);
 
 			CollisionPoint = new CSGTorus()
 			{
