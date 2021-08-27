@@ -13,6 +13,8 @@ namespace Assets.Scripts.User
 		internal RayCast rayCast;
 		public Node UserNode;
 
+		public CSGTorus CollisionPoint;
+
 		public Tool CurrentTool => _currentTool;
 
 		public static readonly Guid UserId = new Guid();
@@ -26,6 +28,16 @@ namespace Assets.Scripts.User
 			rayCast = (RayCast)GetParent().FindNode("RayCast");
 			rayCast.CastTo = new Vector3(0, 0, -100);
 			rayCast.CollisionMask = layerMask;
+
+			CollisionPoint = new CSGTorus()
+			{
+				InnerRadius = 0.06f,
+				OuterRadius = 0.03f,
+				Sides = 16,
+			};
+			CollisionPoint.Visible = false;
+			CollisionPoint.MaterialOverride = new SpatialMaterial();
+			GetTree().Root.CallDeferred("add_child", CollisionPoint);
 
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);

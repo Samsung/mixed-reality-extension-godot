@@ -34,8 +34,8 @@ height = 1.0
 radius = 0.0141474
 
 [sub_resource type="CylinderMesh" id=6]
-top_radius = 0.001
-bottom_radius = 0.001
+top_radius = 0.005
+bottom_radius = 0.005
 height = 5.0
 radial_segments = 4
 

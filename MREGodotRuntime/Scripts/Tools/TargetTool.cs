@@ -177,20 +177,55 @@ namespace Assets.Scripts.Tools
 		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
+
 			if (inputSource.rayCast.IsColliding())
 			{
 				hitPoint = inputSource.rayCast.GetCollisionPoint();
+
 				for (var node = (inputSource.rayCast.GetCollider() as Node); node != null; node = node.GetParent())
 				{
 					if (node is MixedRealityExtension.Core.Actor a)
 					{
 						if (node.GetChild<TargetBehavior>() != null)
+						{
+							var hitPointNormal = inputSource.rayCast.GetCollisionNormal();
+							if (!inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = true;
+							var newTransform = LookAtHitPoint((Vector3)hitPoint, hitPointNormal, inputSource.CollisionPoint.GlobalTransform.basis.y);
+
+							if (inputSource.CollisionPoint.GlobalTransform.origin.DistanceSquaredTo((Vector3)hitPoint) > 0.0000001)
+							{
+								inputSource.CollisionPoint.GlobalTransform = newTransform;
+							}
 							return node as Spatial;
+						}
+						else
+						{
+							if (inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = false;
+						}
 					}
 				}
 			}
+			else
+			{
+				if (inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = false;
+			}
 
 			return null;
+		}
+
+		private Transform LookAtHitPoint(Vector3 hitPoint, Vector3 hitPointNormal, Vector3 up)
+		{
+			Transform transform = new Transform(Basis.Identity, hitPoint);
+
+			//Y vector
+			transform.basis.y = hitPointNormal.Normalized();
+			transform.basis.z = -up;
+			transform.basis.x = transform.basis.z.Cross(transform.basis.y).Normalized();
+
+			//Recompute z = y cross X
+			transform.basis.z = transform.basis.y.Cross(transform.basis.x).Normalized();
+			transform.basis = transform.basis.Orthonormalized();
+			return transform;
 		}
 
 		void OnDestroy()

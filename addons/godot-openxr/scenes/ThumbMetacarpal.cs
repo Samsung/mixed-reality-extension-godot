@@ -10,6 +10,7 @@ public class ThumbMetacarpal : MeshInstance
     MeshInstance ThumbProximal;
     MeshInstance IndexProximal;
     MeshInstance MiddleProximal;
+    MeshInstance RingProximal;
     MeshInstance LittleProximal;
 
     Spatial target;
@@ -25,6 +26,7 @@ public class ThumbMetacarpal : MeshInstance
         ThumbProximal = GetNode<MeshInstance>("../ThumbMetacarpal/ThumbProximal");
         IndexProximal = GetNode<MeshInstance>("../IndexMetacarpal/IndexProximal");
         MiddleProximal = GetNode<MeshInstance>("../MiddleMetacarpal/MiddleProximal");
+        RingProximal = GetNode<MeshInstance>("../RingMetacarpal/RingProximal");
         LittleProximal = GetNode<MeshInstance>("../LittleMetacarpal/LittleProximal");
         tween = GetNode<Tween>("../Tween");
         target = GetNode<Spatial>("../Target");
@@ -35,9 +37,9 @@ public class ThumbMetacarpal : MeshInstance
 
     public override void _Process(float delta)
     {
-        Vector3 newPosition = (ThumbProximal.GlobalTransform.origin + IndexProximal.GlobalTransform.origin + LittleProximal.GlobalTransform.origin) / 3;
+        Vector3 newPosition = (ThumbProximal.GlobalTransform.origin + MiddleProximal.GlobalTransform.origin + RingProximal.GlobalTransform.origin + LittleProximal.GlobalTransform.origin) / 4;
 
-        RayCast.LookAt(target.GlobalTransform.origin, Vector3.Up);
+        RayCast.LookAt(newPosition, Vector3.Up);
     }
 
     private void OnAreaEnter(Area area)
