@@ -26,6 +26,7 @@ namespace Assets.Scripts.Tools
 					if (mwUser != null)
 					{
 						buttonBehavior.Context.StartButton(mwUser, CurrentTargetPoint);
+						((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
 					}
 				}
 			}
@@ -41,6 +42,11 @@ namespace Assets.Scripts.Tools
 						buttonBehavior.Context.Click(mwUser, CurrentTargetPoint);
 					}
 				}
+			}
+			else
+			{
+				SpatialMaterial material = (SpatialMaterial)inputSource.CollisionPoint.MaterialOverride;
+				material.AlbedoColor = new Color(1, 1, 1);
 			}
 		}
 
