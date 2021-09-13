@@ -11,8 +11,9 @@ render_mode unshaded,cull_disabled;
 
 uniform float thickness = 0.02;
 uniform float smoothness = 0.01;
-uniform vec3 origin;
-uniform vec3 backward;
+uniform vec3 border_color = vec3(0.42, 0.48, 0.61);
+uniform vec3 origin; // BackPlate Global origin
+uniform vec3 backward; // BackPlate backward
 varying vec3 v;
 
 void vertex() {
@@ -20,19 +21,14 @@ void vertex() {
 }
 
 void fragment() {
-	if (dot(backward, (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz - origin) < 0.0)
-	{
-	    discard;
-	}
-
 	float a = smoothstep(thickness, thickness + smoothness, length(abs(v.xy) - 1.0));
 	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.yz) - 1.0));
 	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.xz) - 1.0));
 
-	vec3 c = mix(vec3(0.42, 0.48f, 0.61f), vec3(0.42, 0.48f, 0.61f), a);
-	if (mix(1, 0, a) <= 0.5)
-		ALPHA = 0.005;
-	ALBEDO = c;
+	vec3 global_vertex = (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz;
+
+	ALBEDO = border_color;
+	ALPHA = mix(step(0, dot(backward, global_vertex - origin)) * 0.7, 0, a);
 }
  "
 
@@ -40,6 +36,7 @@ void fragment() {
 shader = SubResource( 1 )
 shader_param/thickness = 0.02
 shader_param/smoothness = 0.01
+shader_param/border_color = Vector3( 0.42, 0.48, 0.61 )
 shader_param/origin = null
 shader_param/backward = null
 
