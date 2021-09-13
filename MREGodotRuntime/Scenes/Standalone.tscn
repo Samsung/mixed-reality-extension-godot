@@ -1,15 +1,122 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://MREGodotRuntime/Scripts/LaunchMRE.cs" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scenes/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Toolkit/NearInteractionTouchable.cs" type="Script" id=3]
+[ext_resource path="res://Toolkit/PressableButton.cs" type="Script" id=4]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+render_mode unshaded,cull_disabled;
+
+uniform float thickness = 0.02;
+uniform float smoothness = 0.01;
+uniform vec3 origin;
+uniform vec3 backward;
+varying vec3 v;
+
+void vertex() {
+	v = VERTEX;
+}
+
+void fragment() {
+	if (dot(backward, (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz - origin) < 0.0)
+	{
+	    discard;
+	}
+
+	float a = smoothstep(thickness, thickness + smoothness, length(abs(v.xy) - 1.0));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.yz) - 1.0));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.xz) - 1.0));
+
+	vec3 c = mix(vec3(0.42, 0.48f, 0.61f), vec3(0.42, 0.48f, 0.61f), a);
+	if (mix(1, 0, a) <= 0.5)
+		ALPHA = 0.005;
+	ALBEDO = c;
+}
+ "
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/thickness = 0.02
+shader_param/smoothness = 0.01
+shader_param/origin = null
+shader_param/backward = null
+
+[sub_resource type="CubeMesh" id=3]
+material = SubResource( 2 )
+
+[sub_resource type="BoxShape" id=4]
+
+[sub_resource type="Shader" id=7]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform float border = 0.02;
+float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius)
+{
+	return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
+}
+void fragment()
+{
+	float edgeSoftness = 0.005;
+	float radius = 0.02;
+	float thickness = 0.01;
+	float distance = roundedBoxSDF(UV - 0.5, vec2(0.49), radius);
+	float smmothedAlpha = 1f - smoothstep(-edgeSoftness, edgeSoftness, abs(distance) - thickness);
+	ALBEDO = mix(vec4(0.086f, 0.2, 0.5f, 1f), vec4(0.42, 0.48f, 0.61f, smmothedAlpha), smmothedAlpha).xyz;
+}"
+
+[sub_resource type="ShaderMaterial" id=8]
+shader = SubResource( 7 )
+shader_param/border = 0.02
+
+[sub_resource type="QuadMesh" id=9]
+material = SubResource( 8 )
+size = Vector2( 2, 2 )
 
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
-UserNode = NodePath("Player")
 AppID = "helloworld"
-MREURL = "ws://localhost:3901"
 EphemeralAppID = "helloworld-temp"
+UserNode = NodePath("Player")
+MREURL = "ws://localhost:3901"
 SessionID = "testbed"
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.60656 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.835685 )
+
+[node name="Button" type="Spatial" parent="."]
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.494666, -0.26891, 0.071322 )
+
+[node name="PressableButton" type="Spatial" parent="Button"]
+script = ExtResource( 4 )
+movingButtonVisualsNodePath = NodePath("../FrontPlate")
+startPushDistance = 0.032
+maxPushDistance = 0.008
+pressDistance = 0.002
+releaseDistanceDelta = 0.004
+nearInteractionTouchableSurfaceNodePath = NodePath("../NearInteractionTouchable")
+
+[node name="NearInteractionTouchable" type="Spatial" parent="Button"]
+script = ExtResource( 3 )
+touchableCollider = NodePath("../Area/CollisionShape")
+baseToolkit = NodePath("../PressableButton")
+
+[node name="FrontPlate" type="MeshInstance" parent="Button"]
+mesh = SubResource( 3 )
+material/0 = null
+
+[node name="Area" type="Area" parent="Button"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Button/Area"]
+shape = SubResource( 4 )
+
+[node name="BackPlate" type="MeshInstance" parent="Button"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1 )
+mesh = SubResource( 9 )
+material/0 = null
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 0.478309, 0.280267, -0.832269, 0, 0.947707, 0.319141, 0.878192, -0.152648, 0.453297, 0.347309, -0.162608, 0.204774 )
+current = true

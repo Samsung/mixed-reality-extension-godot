@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://addons/godot-openxr/scenes/center_ball_material.tres" type="Material" id=1]
 [ext_resource path="res://addons/godot-openxr/scenes/hand.gd" type="Script" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://addons/godot-openxr/scenes/bone_material.tres" type="Material" id=4]
 [ext_resource path="res://addons/godot-openxr/OpenXRHand.gdns" type="Script" id=5]
 [ext_resource path="res://MREGodotRuntime/Scripts/ThumbTip.cs" type="Script" id=6]
+[ext_resource path="res://addons/godot-openxr/scenes/IndexTip.cs" type="Script" id=7]
 
 [sub_resource type="SphereMesh" id=1]
 material = ExtResource( 1 )
@@ -26,6 +27,25 @@ material = ExtResource( 4 )
 top_radius = 0.005
 bottom_radius = 0.005
 height = 1.0
+
+[sub_resource type="Animation" id=4]
+resource_name = "touch"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("../../../../..:translation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ), Vector3( 0, 0, -0.06 ) ]
+}
+
+[sub_resource type="SphereShape" id=5]
+radius = 0.01
 
 [node name="Right_hand" type="Spatial"]
 script = ExtResource( 5 )
@@ -95,11 +115,20 @@ mesh = SubResource( 2 )
 material/0 = null
 
 [node name="IndexTip" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.0521882 )
 mesh = SubResource( 2 )
 material/0 = null
+script = ExtResource( 7 )
 
 [node name="socket-right-index" type="Spatial" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
+anims/touch = SubResource( 4 )
+
+[node name="Area" type="Area" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip/Area"]
+shape = SubResource( 5 )
 
 [node name="IndexDistal_Bone" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal"]
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
