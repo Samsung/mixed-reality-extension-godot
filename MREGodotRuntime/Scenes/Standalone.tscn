@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://MREGodotRuntime/Scripts/LaunchMRE.cs" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scenes/Player.tscn" type="PackedScene" id=2]
@@ -7,7 +7,7 @@
 
 [sub_resource type="Shader" id=1]
 code = "shader_type spatial;
-render_mode unshaded,cull_disabled;
+render_mode cull_disabled, blend_add, ambient_light_disabled;
 
 uniform float thickness = 0.02;
 uniform float smoothness = 0.01;
@@ -16,6 +16,7 @@ uniform vec3 origin; // BackPlate Global origin
 uniform vec3 backward; // BackPlate backward
 varying vec3 v;
 
+uniform sampler2D texture_transmission : hint_white;
 void vertex() {
 	v = VERTEX;
 }
@@ -29,6 +30,7 @@ void fragment() {
 
 	ALBEDO = border_color;
 	ALPHA = mix(step(0, dot(backward, global_vertex - origin)) * 0.7, 0, a);
+	TRANSMISSION = texture(texture_transmission, UV).rgb;
 }
  "
 
@@ -43,9 +45,20 @@ shader_param/backward = null
 [sub_resource type="CubeMesh" id=3]
 material = SubResource( 2 )
 
-[sub_resource type="BoxShape" id=4]
+[sub_resource type="SpatialMaterial" id=4]
+flags_disable_ambient_light = true
+params_blend_mode = 1
 
-[sub_resource type="Shader" id=7]
+[sub_resource type="QuadMesh" id=5]
+material = SubResource( 4 )
+size = Vector2( 2, 2 )
+
+[sub_resource type="BoxShape" id=6]
+extents = Vector3( 1, 1, 0.001 )
+
+[sub_resource type="BoxShape" id=7]
+
+[sub_resource type="Shader" id=8]
 code = "shader_type spatial;
 render_mode unshaded;
 
@@ -64,19 +77,19 @@ void fragment()
 	ALBEDO = mix(vec4(0.086f, 0.2, 0.5f, 1f), vec4(0.42, 0.48f, 0.61f, smmothedAlpha), smmothedAlpha).xyz;
 }"
 
-[sub_resource type="ShaderMaterial" id=8]
-shader = SubResource( 7 )
+[sub_resource type="ShaderMaterial" id=9]
+shader = SubResource( 8 )
 shader_param/border = 0.02
 
-[sub_resource type="QuadMesh" id=9]
-material = SubResource( 8 )
+[sub_resource type="QuadMesh" id=10]
+material = SubResource( 9 )
 size = Vector2( 2, 2 )
 
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
+UserNode = NodePath("Player")
 AppID = "helloworld"
 EphemeralAppID = "helloworld-temp"
-UserNode = NodePath("Player")
 MREURL = "ws://localhost:3901"
 SessionID = "testbed"
 
@@ -97,21 +110,42 @@ nearInteractionTouchableSurfaceNodePath = NodePath("../NearInteractionTouchable"
 
 [node name="NearInteractionTouchable" type="Spatial" parent="Button"]
 script = ExtResource( 3 )
-touchableCollider = NodePath("../Area/CollisionShape")
+touchableCollider = NodePath("../TouchableArea/CollisionShape")
 baseToolkit = NodePath("../PressableButton")
 
 [node name="FrontPlate" type="MeshInstance" parent="Button"]
+layers = 3
 mesh = SubResource( 3 )
 material/0 = null
 
-[node name="Area" type="Area" parent="Button"]
+[node name="HighlightPlate" type="MeshInstance" parent="Button/FrontPlate"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1 )
+layers = 4
+mesh = SubResource( 5 )
+material/0 = null
 
-[node name="CollisionShape" type="CollisionShape" parent="Button/Area"]
-shape = SubResource( 4 )
+[node name="OmniLight" type="OmniLight" parent="Button/FrontPlate/HighlightPlate"]
+transform = Transform( 31.25, 0, 0, 0, 31.25, 0, 0, 0, 31.25, 0, 0, 0.580178 )
+visible = false
+omni_range = 0.0398032
+omni_attenuation = 3.24901
+
+[node name="HighlightArea" type="Area" parent="Button/FrontPlate/HighlightPlate"]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape" type="CollisionShape" parent="Button/FrontPlate/HighlightPlate/HighlightArea"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.001 )
+shape = SubResource( 6 )
+
+[node name="TouchableArea" type="Area" parent="Button"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Button/TouchableArea"]
+shape = SubResource( 7 )
 
 [node name="BackPlate" type="MeshInstance" parent="Button"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1 )
-mesh = SubResource( 9 )
+mesh = SubResource( 10 )
 material/0 = null
 
 [node name="Camera" type="Camera" parent="."]

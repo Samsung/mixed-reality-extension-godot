@@ -130,6 +130,25 @@ anims/touch = SubResource( 4 )
 [node name="CollisionShape" type="CollisionShape" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip/Area"]
 shape = SubResource( 5 )
 
+[node name="ProximityVisibleLight" type="OmniLight" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
+light_energy = 1.46
+light_cull_mask = 4293918722
+omni_range = 0.0923046
+
+[node name="ProximityLight" type="OmniLight" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
+light_energy = 0.66
+light_cull_mask = 4293918724
+omni_range = 0.0339852
+omni_attenuation = 1.46409
+
+[node name="RayCast" type="RayCast" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0474379 )
+enabled = true
+cast_to = Vector3( 0, 0, -1 )
+collision_mask = 2
+collide_with_areas = true
+collide_with_bodies = false
+
 [node name="IndexDistal_Bone" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal"]
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
 mesh = SubResource( 3 )
