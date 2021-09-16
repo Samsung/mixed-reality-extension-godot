@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://addons/godot-openxr/scenes/center_ball_material.tres" type="Material" id=1]
 [ext_resource path="res://addons/godot-openxr/scenes/hand.gd" type="Script" id=2]
@@ -45,7 +45,28 @@ tracks/0/keys = {
 }
 
 [sub_resource type="SphereShape" id=5]
+margin = 0.001
 radius = 0.01
+
+[sub_resource type="SphereMesh" id=6]
+radius = 0.03
+height = 0.06
+
+[sub_resource type="Animation" id=7]
+resource_name = "Pluse"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0.001, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ), Vector3( 1, 1, 1 ) ]
+}
 
 [node name="Right_hand" type="Spatial"]
 script = ExtResource( 5 )
@@ -126,9 +147,22 @@ script = ExtResource( 7 )
 anims/touch = SubResource( 4 )
 
 [node name="Area" type="Area" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
+collision_layer = 0
+collision_mask = 32
 
 [node name="CollisionShape" type="CollisionShape" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip/Area"]
 shape = SubResource( 5 )
+
+[node name="PulseShadow" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip/Area"]
+transform = Transform( 0.5996, 0, 0, 0, 0.5996, 0, 0, 0, 0.5996, 0, 0, -0.0256391 )
+layers = 4
+cast_shadow = 3
+mesh = SubResource( 6 )
+material/0 = null
+
+[node name="ShadowAnimationPlayer" type="AnimationPlayer" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip/Area/PulseShadow"]
+autoplay = "Pluse"
+anims/Pluse = SubResource( 7 )
 
 [node name="ProximityVisibleLight" type="OmniLight" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
 light_energy = 1.46
@@ -137,7 +171,9 @@ omni_range = 0.0923046
 
 [node name="ProximityLight" type="OmniLight" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
 light_energy = 0.66
+light_indirect_energy = 0.0
 light_cull_mask = 4293918724
+shadow_enabled = true
 omni_range = 0.0339852
 omni_attenuation = 1.46409
 
@@ -145,9 +181,8 @@ omni_attenuation = 1.46409
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0474379 )
 enabled = true
 cast_to = Vector3( 0, 0, -1 )
-collision_mask = 2
+collision_mask = 64
 collide_with_areas = true
-collide_with_bodies = false
 
 [node name="IndexDistal_Bone" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal"]
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
