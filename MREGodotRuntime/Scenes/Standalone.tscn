@@ -6,26 +6,27 @@
 
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
-UserNode = NodePath("Player")
 AppID = "helloworld"
+UserNode = NodePath("Player")
 SessionID = "testbed"
 MREURL = "ws://localhost:3901"
 EphemeralAppID = "helloworld-temp"
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.835685 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.842866 )
 
 [node name="Button" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.367055, -0.26891, 0.071322 )
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.364337, -0.27185, 0.0568785 )
 
 [node name="Button2" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.431055, -0.26891, 0.071322 )
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.427516, -0.272089, 0.0567297 )
 
 [node name="Button3" parent="." instance=ExtResource( 3 )]
-
-[node name="Button4" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.558069, -0.26891, 0.071322 )
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.489825, -0.271225, 0.0580557 )
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 0.478309, 0.280267, -0.832269, 0, 0.947707, 0.319141, 0.878192, -0.152648, 0.453297, 0.365056, -0.183603, 0.204774 )
+transform = Transform( 0.728754, 0.399158, -0.556409, 0, 0.812542, 0.582903, 0.684776, -0.424793, 0.592143, 0.360915, -0.173784, 0.167975 )
 current = true
+
+[node name="Camera2" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.0134908, 0.125632, 0.00181241 )
