@@ -17,6 +17,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         bool hasStarted = false;
 
+        private float pulseDelta = -0.6f;
+
         /// <summary>
         /// The object that is being pushed.
         /// </summary>
@@ -280,6 +282,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         private MeshInstance BackPlate;
         private ShaderMaterial FrontPlateMaterial;
+        private ShaderMaterial HighlightPlateMaterial;
 
         public override void _Ready()
         {
@@ -299,6 +302,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             FrontPlateMaterial = ((MeshInstance)movingButtonVisuals).Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
             FrontPlateMaterial.SetShaderParam("origin", BackPlate.GlobalTransform.origin);
             FrontPlateMaterial.SetShaderParam("backward", BackPlate.GlobalTransform.basis.z);
+            HighlightPlateMaterial = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate").Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
         }
 
         public override void _ExitTree()
@@ -319,11 +323,32 @@ namespace Microsoft.MixedReality.Toolkit.UI
             if (IsTouching)
             {
                 UpdateTouch();
+
+                //pulse
+                if (IsPressing)
+                {
+                    if (pulseDelta < 0f)
+                    {
+                        pulseDelta += delta * 3;
+                        HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
+                    }
+                }
+                else if (pulseDelta > -0.6f)
+                {
+                    pulseDelta = -0.6f;
+                    HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
+                }
             }
             else if (currentPushDistance < startPushDistance)
             {
                 GD.Print("currentPushDistance : " + currentPushDistance + ", startPushDistance : " + startPushDistance);
                 RetractButton(delta);
+
+                if (pulseDelta > -0.6f)
+                {
+                    pulseDelta = -0.6f;
+                    HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
+                }
             }
         }
 
@@ -547,7 +572,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
             // If we're in a press, check if the press is released now.
             else
             {
-                float releaseDistance = pressDistance - releaseDistanceDelta;
+                float releaseDistance = pressDistance + releaseDistanceDelta;
+
                 if (pushDistance >= releaseDistance)
                 {
                     IsPressing = false;

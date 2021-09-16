@@ -1,0 +1,174 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://Toolkit/PressableButton.cs" type="Script" id=1]
+[ext_resource path="res://Toolkit/NearInteractionTouchable.cs" type="Script" id=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+render_mode cull_disabled, blend_add, ambient_light_disabled;
+
+uniform float thickness = 0.02;
+uniform float smoothness = 0.01;
+uniform vec3 border_color = vec3(0.42, 0.48, 0.61);
+uniform vec3 origin; // BackPlate Global origin
+uniform vec3 backward; // BackPlate backward
+varying vec3 v;
+
+uniform sampler2D texture_transmission : hint_white;
+void vertex() {
+	v = VERTEX;
+}
+
+void fragment() {
+	float a = smoothstep(thickness, thickness + smoothness, length(abs(v.xy) - 1.0));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.yz) - 1.0));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.xz) - 1.0));
+
+	vec3 global_vertex = (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz;
+
+	ALBEDO = border_color;
+	ALPHA = mix(step(0, dot(backward, global_vertex - origin)) * 0.7, 0, a);
+	TRANSMISSION = texture(texture_transmission, UV).rgb;
+}
+ "
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/thickness = 0.02
+shader_param/smoothness = 0.01
+shader_param/border_color = Vector3( 0.42, 0.48, 0.61 )
+shader_param/origin = null
+shader_param/backward = null
+
+[sub_resource type="CubeMesh" id=3]
+material = SubResource( 2 )
+
+[sub_resource type="Shader" id=4]
+code = "shader_type spatial;
+render_mode blend_add,depth_draw_opaque,cull_back,diffuse_burley,specular_schlick_ggx,ambient_light_disabled;
+uniform vec4 albedo : hint_color;
+uniform sampler2D texture_albedo : hint_albedo;
+uniform float specular;
+uniform float metallic;
+uniform float roughness : hint_range(0,1);
+uniform float point_size : hint_range(0,128);
+uniform float pulse_delta = -1;
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+
+void vertex() {
+	UV=UV*uv1_scale.xy+uv1_offset.xy;
+}
+
+void fragment() {
+	vec2 base_uv = UV;
+	vec4 albedo_tex = texture(texture_albedo,base_uv);
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+	METALLIC = metallic;
+	ROUGHNESS = roughness;
+	SPECULAR = specular;
+}
+
+void light() {
+	DIFFUSE_LIGHT = mix(vec3(0), ATTENUATION, step(pulse_delta, -ATTENUATION));
+}
+"
+
+[sub_resource type="ShaderMaterial" id=5]
+shader = SubResource( 4 )
+shader_param/albedo = Color( 1, 1, 1, 1 )
+shader_param/specular = 0.5
+shader_param/metallic = 0.0
+shader_param/roughness = 1.0
+shader_param/point_size = 1.0
+shader_param/pulse_delta = -1.0
+shader_param/uv1_scale = Vector3( 1, 1, 1 )
+shader_param/uv1_offset = Vector3( 0, 0, 0 )
+shader_param/uv2_scale = Vector3( 1, 1, 1 )
+shader_param/uv2_offset = Vector3( 0, 0, 0 )
+
+[sub_resource type="QuadMesh" id=6]
+material = SubResource( 5 )
+size = Vector2( 2, 2 )
+
+[sub_resource type="BoxShape" id=7]
+extents = Vector3( 1, 1, 0.001 )
+
+[sub_resource type="BoxShape" id=8]
+
+[sub_resource type="Shader" id=9]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform float border = 0.02;
+float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius)
+{
+	return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
+}
+void fragment()
+{
+	float edgeSoftness = 0.005;
+	float radius = 0.02;
+	float thickness = 0.01;
+	float distance = roundedBoxSDF(UV - 0.5, vec2(0.49), radius);
+	float smmothedAlpha = 1f - smoothstep(-edgeSoftness, edgeSoftness, abs(distance) - thickness);
+	ALBEDO = mix(vec4(0.086f, 0.2, 0.5f, 1f), vec4(0.42, 0.48f, 0.61f, smmothedAlpha), smmothedAlpha).xyz;
+}"
+
+[sub_resource type="ShaderMaterial" id=10]
+shader = SubResource( 9 )
+shader_param/border = 0.02
+
+[sub_resource type="QuadMesh" id=11]
+material = SubResource( 10 )
+size = Vector2( 2, 2 )
+
+[node name="Button" type="Spatial"]
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.494666, -0.26891, 0.071322 )
+
+[node name="PressableButton" type="Spatial" parent="."]
+script = ExtResource( 1 )
+movingButtonVisualsNodePath = NodePath("../FrontPlate")
+startPushDistance = 0.032
+maxPushDistance = 0.008
+pressDistance = 0.012
+releaseDistanceDelta = 0.004
+nearInteractionTouchableSurfaceNodePath = NodePath("../NearInteractionTouchable")
+
+[node name="NearInteractionTouchable" type="Spatial" parent="."]
+script = ExtResource( 2 )
+touchableCollider = NodePath("../TouchableArea/CollisionShape")
+baseToolkit = NodePath("../PressableButton")
+
+[node name="FrontPlate" type="MeshInstance" parent="."]
+layers = 3
+mesh = SubResource( 3 )
+material/0 = null
+
+[node name="HighlightPlate" type="MeshInstance" parent="FrontPlate"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1 )
+layers = 4
+mesh = SubResource( 6 )
+material/0 = null
+
+[node name="HighlightArea" type="Area" parent="FrontPlate/HighlightPlate"]
+collision_layer = 64
+collision_mask = 0
+
+[node name="CollisionShape" type="CollisionShape" parent="FrontPlate/HighlightPlate/HighlightArea"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.001 )
+shape = SubResource( 7 )
+
+[node name="TouchableArea" type="Area" parent="."]
+collision_layer = 32
+collision_mask = 0
+
+[node name="CollisionShape" type="CollisionShape" parent="TouchableArea"]
+shape = SubResource( 8 )
+
+[node name="BackPlate" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1 )
+mesh = SubResource( 11 )
+material/0 = null
