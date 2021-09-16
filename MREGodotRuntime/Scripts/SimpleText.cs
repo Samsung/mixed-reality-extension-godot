@@ -6,13 +6,15 @@ using MixedRealityExtension.Patching.Types;
 using System.Collections.Generic;
 using Godot;
 
-public class SimpleText : IText
+public class SimpleText : MeshInstance, IText
 {
 	private readonly MeshInstance textMeshInstance;
 	private readonly QuadMesh textMesh;
 	private readonly RichTextLabel label;
 	private readonly DynamicFont dynamicFont;
 	private readonly Viewport textViewport;
+
+	private Spatial parent;
 
 	private string plainContents;
 	private float height;
@@ -22,15 +24,15 @@ public class SimpleText : IText
 	/// <inheritdoc />
 	public bool Enabled
 	{
-		get { return textMeshInstance.Visible; }
-		private set { textMeshInstance.Visible = value; }
+		get { return Visible; }
+		private set { Visible = value; }
 	}
 
 	/// <inheritdoc />
 	public string Contents
 	{
 		get { return plainContents; }
-		private set
+		set
 		{
 			if (label.Text == value)
 				return;
@@ -45,7 +47,7 @@ public class SimpleText : IText
 	public float Height
 	{
 		get { return height; }
-		private set
+		set
 		{
 			if (Mathf.IsEqualApprox(height, value))
 				return;
@@ -76,7 +78,7 @@ public class SimpleText : IText
 	public TextAnchorLocation Anchor
 	{
 		get => anchor;
-		private set
+		set
 		{
 			if (anchor == value)
 				return;
@@ -135,16 +137,36 @@ public class SimpleText : IText
 		}
 	}
 
-	public SimpleText(IActor actor)
+	public override void _Ready()
 	{
-		textMesh = new QuadMesh();
-		textMeshInstance = new MeshInstance()
+		Name = "FontMesh";
+		Mesh = textMesh;
+
+		parent.CallDeferred("add_child", textMeshInstance);
+		label.AddFontOverride("normal_font", dynamicFont);
+
+		textViewport.CallDeferred("add_child", label);
+		CallDeferred("add_child", textViewport);
+
+		var viewportTexture = textViewport.GetTexture();
+		viewportTexture.Flags |= (uint)Texture.FlagsEnum.Filter;
+
+		var textMeshMaterial = new SpatialMaterial()
 		{
-			Name = "FontMesh",
-			Mesh = textMesh
+			FlagsTransparent = true,
+			ParamsCullMode = SpatialMaterial.CullMode.Disabled,
+			AlbedoTexture = viewportTexture,
 		};
 
-		actor.Node3D.AddChild(textMeshInstance);
+		Mesh.SurfaceSetMaterial(0, textMeshMaterial);
+
+	}
+
+	public SimpleText(Spatial parent)
+	{
+		textMesh = new QuadMesh();
+
+		this.parent = parent;
 
 		textViewport = new Viewport() {
 			Size = new Vector2(500, 500),
@@ -159,24 +181,7 @@ public class SimpleText : IText
 			FontData = ResourceLoader.Load<DynamicFontData>("MREGodotRuntime/Scripts/Fonts/NanumSquareRound/NanumSquareRoundR.ttf"),
 			Size = 400
 		};
-		label.AddFontOverride("normal_font", dynamicFont);
-		//label.Connect("resized", actor.Node3D, nameof(resizeContainer));
 
-		textViewport.AddChild(label);
-		textMeshInstance.AddChild(textViewport);
-
-		var viewportTexture = textViewport.GetTexture();
-		viewportTexture.Flags |= (uint)Texture.FlagsEnum.Filter;
-
-		var textMeshMaterial = new SpatialMaterial()
-		{
-			FlagsTransparent = true,
-			ParamsCullMode = SpatialMaterial.CullMode.Disabled,
-			AlbedoTexture = viewportTexture,
-		};
-		
-
-		textMeshInstance.Mesh.SurfaceSetMaterial(0, textMeshMaterial);
 
 		// set defaults
 		Enabled = true;
@@ -220,6 +225,6 @@ public class SimpleText : IText
 		textViewport.Size = label.RectSize;
 		textMesh.Size = new Vector2(label.RectSize.x / 428.84f, lines.Length) * Height;
 
-		textMeshInstance.Translation = Pivot[Anchor] * textMeshInstance.Scale * new Vector3(textMesh.Size.x, textMesh.Size.y, 0) / 2;
+		Translation = Pivot[Anchor] * Scale * new Vector3(textMesh.Size.x, textMesh.Size.y, 0) / 2;
 	}
 }

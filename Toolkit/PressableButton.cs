@@ -115,6 +115,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public bool EnforceFrontPush { get => enforceFrontPush; private set => enforceFrontPush = value; }
 
         [Export]
+        private string text = "";
+
+        [Export]
         private NodePath nearInteractionTouchableSurfaceNodePath;
         private NearInteractionTouchableSurface nearInteractionTouchableSurface => GetNode<NearInteractionTouchableSurface>(nearInteractionTouchableSurfaceNodePath);
 
@@ -135,6 +138,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
         private Dictionary<Spatial, Vector3> touchPoints = new Dictionary<Spatial, Vector3>();
 
         private float currentPushDistance = 0.0f;
+
+        private Spatial TextNode;
 
         /// <summary>
         /// Current push distance relative to the start push plane.
@@ -281,6 +286,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         private Vector3 PushSpaceSourceParentPosition => (PushSpaceSourceTransform.GetParent() != null) ? PushSpaceSourceTransform.GetParent<Spatial>().GlobalTransform.origin : Vector3.Zero;
 
         private MeshInstance BackPlate;
+        private MeshInstance HighlightPlate;
         private ShaderMaterial FrontPlateMaterial;
         private ShaderMaterial HighlightPlateMaterial;
 
@@ -298,14 +304,24 @@ namespace Microsoft.MixedReality.Toolkit.UI
             // Ensure everything is set to initial positions correctly.
             UpdateMovingVisualsPosition();
 
+
             BackPlate = GetNode<MeshInstance>("../BackPlate");
             FrontPlateMaterial = ((MeshInstance)movingButtonVisuals).Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
             FrontPlateMaterial.SetShaderParam("origin", BackPlate.GlobalTransform.origin);
             FrontPlateMaterial.SetShaderParam("backward", BackPlate.GlobalTransform.basis.z);
 
-            var HighlightPlate = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate");
+            HighlightPlate = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate");
             HighlightPlateMaterial = (ShaderMaterial)HighlightPlate.MaterialOverride.Duplicate(true);
             HighlightPlate.MaterialOverride = HighlightPlateMaterial;
+
+            TextNode = new SimpleText(this)
+            {
+                Contents = text,
+                Anchor = MixedRealityExtension.Core.Interfaces.TextAnchorLocation.MiddleCenter,
+                Height = 0.5f,
+            };
+            CallDeferred("add_child", TextNode);
+            TextNode.CallDeferred("set_transform", new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2));
         }
 
         public override void _ExitTree()
@@ -323,6 +339,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         public override void _Process(float delta)
         {
+            TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
             if (IsTouching)
             {
                 UpdateTouch();
@@ -335,11 +352,15 @@ namespace Microsoft.MixedReality.Toolkit.UI
                         pulseDelta += delta * 3;
                         HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
                     }
+                    TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(GlobalTransform.basis.z.Normalized() * 0.001f + GlobalTransform.origin));
                 }
-                else if (pulseDelta > -0.6f)
+                else
                 {
-                    pulseDelta = -0.6f;
-                    HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
+                    if (pulseDelta > -0.6f)
+                    {
+                        pulseDelta = -0.6f;
+                        HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
+                    }
                 }
             }
             else if (currentPushDistance < startPushDistance)

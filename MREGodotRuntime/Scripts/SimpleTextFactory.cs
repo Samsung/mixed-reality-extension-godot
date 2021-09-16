@@ -6,6 +6,6 @@ public class SimpleTextFactory : ITextFactory
 {
 	public IText CreateText(IActor actor)
 	{
-		return new SimpleText(actor);
+		return new SimpleText(actor.Node3D);
 	}
 }
