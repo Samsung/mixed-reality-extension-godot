@@ -302,7 +302,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
             FrontPlateMaterial = ((MeshInstance)movingButtonVisuals).Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
             FrontPlateMaterial.SetShaderParam("origin", BackPlate.GlobalTransform.origin);
             FrontPlateMaterial.SetShaderParam("backward", BackPlate.GlobalTransform.basis.z);
-            HighlightPlateMaterial = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate").Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
+
+            var HighlightPlate = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate");
+            HighlightPlateMaterial = (ShaderMaterial)HighlightPlate.MaterialOverride.Duplicate(true);
+            HighlightPlate.MaterialOverride = HighlightPlateMaterial;
         }
 
         public override void _ExitTree()

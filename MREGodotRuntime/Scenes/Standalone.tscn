@@ -1,137 +1,31 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://MREGodotRuntime/Scripts/LaunchMRE.cs" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scenes/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Toolkit/PressableButtonGodot.tscn" type="PackedScene" id=3]
 
-[sub_resource type="SphereMesh" id=1]
-
-[sub_resource type="Shader" id=2]
-code = "shader_type spatial;
-render_mode blend_add,depth_draw_opaque,cull_back,diffuse_burley,specular_schlick_ggx,ambient_light_disabled;
-uniform vec4 albedo : hint_color;
-uniform sampler2D texture_albedo : hint_albedo;
-uniform float specular;
-uniform float metallic;
-uniform float roughness : hint_range(0,1);
-uniform float point_size : hint_range(0,128);
-uniform vec3 uv1_scale;
-uniform vec3 uv1_offset;
-uniform vec3 uv2_scale;
-uniform vec3 uv2_offset;
-
-
-void vertex() {
-	UV=UV*uv1_scale.xy+uv1_offset.xy;
-}
-
-
-
-
-void fragment() {
-	vec2 base_uv = UV;
-	vec4 albedo_tex = texture(texture_albedo,base_uv);
-	ALBEDO = albedo.rgb * albedo_tex.rgb;
-	METALLIC = metallic;
-	ROUGHNESS = roughness;
-	SPECULAR = specular;
-}
-
-void light() {
-	//DIFFUSE_LIGHT += clamp(dot(NORMAL, LIGHT), 0.0, 1.0) * ATTENUATION * ALBEDO;
-	/*
-	if (ATTENUATION.r > 0.6)
-	{
-		DIFFUSE_LIGHT = vec3(0);
-	}
-	else
-		DIFFUSE_LIGHT = ATTENUATION;
-		*/
-	DIFFUSE_LIGHT = mix(vec3(0), ATTENUATION, step(-0.01, -ATTENUATION));
-	// * sin(TIME * 3.0);
-}
-"
-
-[sub_resource type="ShaderMaterial" id=3]
-shader = SubResource( 2 )
-shader_param/albedo = Color( 1, 1, 1, 1 )
-shader_param/specular = 0.5
-shader_param/metallic = 0.0
-shader_param/roughness = 1.0
-shader_param/point_size = 1.0
-shader_param/uv1_scale = Vector3( 1, 1, 1 )
-shader_param/uv1_offset = Vector3( 0, 0, 0 )
-shader_param/uv2_scale = Vector3( 1, 1, 1 )
-shader_param/uv2_offset = Vector3( 0, 0, 0 )
-
-[sub_resource type="CubeMesh" id=4]
-material = SubResource( 3 )
-
-[sub_resource type="Animation" id=5]
-resource_name = "New Anim"
-step = 0.01
-tracks/0/type = "value"
-tracks/0/path = NodePath("MeshInstance:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Vector3( 0, 0, 0 ), Vector3( 1, 1, 1 ) ]
-}
-
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
-AppID = "helloworld"
-MREURL = "ws://localhost:3901"
 UserNode = NodePath("Player")
-EphemeralAppID = "helloworld-temp"
+AppID = "helloworld"
 SessionID = "testbed"
+MREURL = "ws://localhost:3901"
+EphemeralAppID = "helloworld-temp"
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.835685 )
 
 [node name="Button" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.368253, -0.26891, 0.071322 )
-visible = false
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.367055, -0.26891, 0.071322 )
 
 [node name="Button2" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.431626, -0.26891, 0.071322 )
-visible = false
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.431055, -0.26891, 0.071322 )
 
 [node name="Button3" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.495342, -0.26891, 0.071322 )
 
 [node name="Button4" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.559178, -0.26891, 0.071322 )
-visible = false
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.558069, -0.26891, 0.071322 )
 
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 0.478309, 0.280267, -0.832269, 0, 0.947707, 0.319141, 0.878192, -0.152648, 0.453297, 0.365056, -0.183603, 0.204774 )
 current = true
-
-[node name="OmniLight" type="OmniLight" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.11107, 1.14472 )
-light_cull_mask = 4293918736
-shadow_enabled = true
-omni_range = 0.741511
-omni_attenuation = 2.0
-
-[node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 1.51296 )
-visible = false
-layers = 17
-cast_shadow = 3
-mesh = SubResource( 1 )
-material/0 = null
-
-[node name="MeshInstance2" type="MeshInstance" parent="."]
-layers = 17
-mesh = SubResource( 4 )
-material/0 = null
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-"anims/New Anim" = SubResource( 5 )
