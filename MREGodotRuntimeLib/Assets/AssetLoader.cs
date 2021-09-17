@@ -76,6 +76,15 @@ namespace MixedRealityExtension.Assets
 			return new List<Actor>() { actor };
 		}
 
+		internal IList<Actor> CreateFromToolkitButton(Guid? parentId)
+		{
+			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
+			Actor actor = Actor.Instantiate(newGO);
+			GetGameObjectFromParentId(parentId).AddChild(actor);
+
+			return new List<Actor>() { actor };
+		}
+
 		internal IList<Actor> CreateFromPrefab(Guid prefabId, Guid? parentId, CollisionLayer? collisionLayer)
 		{
 			var asset = _app.AssetManager.GetById(prefabId)?.Asset as Node;
@@ -421,7 +430,7 @@ namespace MixedRealityExtension.Assets
 				{
 					// do nothing; sound asset properties are immutable
 				}
-				
+
 				else if (def.Mesh != null)
 				{
 					// do nothing; mesh properties are immutable
@@ -644,7 +653,7 @@ namespace MixedRealityExtension.Assets
 				Godot.Collections.Array array = arrayMesh.SurfaceGetArrays(0);
 				var aabb = arrayMesh.GetAabb();
 				var vertexCount = (array[(int)ArrayMesh.ArrayType.Vertex] as Array).Length;
-				
+
 
 				return new Asset()
 				{

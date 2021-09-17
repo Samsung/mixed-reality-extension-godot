@@ -29,7 +29,6 @@ text = "button3"
 
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 0.728754, 0.399158, -0.556409, 0, 0.812542, 0.582903, 0.684776, -0.424793, 0.592143, 0.360915, -0.173784, 0.167975 )
-current = true
 
 [node name="Camera2" type="Camera" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.0134908, 0.125632, 0.00181241 )

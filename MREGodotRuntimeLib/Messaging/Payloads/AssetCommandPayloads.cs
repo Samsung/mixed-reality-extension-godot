@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using MixedRealityExtension.Assets;
 using MixedRealityExtension.Core;
+using MixedRealityExtension.Patching.Types;
 
 namespace MixedRealityExtension.Messaging.Payloads
 {
@@ -73,6 +74,18 @@ namespace MixedRealityExtension.Messaging.Payloads
 		/// Assign all colliders in this prefab to this layer
 		/// </summary>
 		public CollisionLayer? CollisionLayer;
+	}
+
+	/// <summary>
+	/// App => Engine
+	/// Instructs the engine to instantiate the Toolkit Buottn.
+	/// </summary>
+	public class CreateFromToolkitButton : CreateActor
+	{
+		/// <summary>
+		/// The main color of the button
+		/// </summary>
+		public ColorPatch Color;
 	}
 
 	/// <summary>

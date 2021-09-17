@@ -21,6 +21,7 @@ using MixedRealityExtension.RPC;
 using MixedRealityExtension.Util;
 using MixedRealityExtension.Util.Logging;
 using MixedRealityExtension.Util.GodotHelper;
+using Microsoft.MixedReality.Toolkit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,7 @@ namespace MixedRealityExtension.App
 		internal readonly AnimationManager AnimationManager;
 		private readonly AssetManager _assetManager;
 		private readonly Node _ownerScript;
+		private PackedScene _buttonScene;
 
 		private IConnectionInternal _conn;
 
@@ -382,7 +384,7 @@ namespace MixedRealityExtension.App
 				OnAppShutdown?.Invoke();
 			}
 		}
-		
+
 		private void FreeResources()
 		{
 			foreach (Node node in _ownedNodes)
@@ -926,6 +928,30 @@ namespace MixedRealityExtension.App
 			{
 				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
 				GD.Print(e);
+			}
+		}
+
+		[CommandHandler(typeof(CreateFromToolkitButton))]
+		private void OnCreateFromToolkitButton(CreateFromToolkitButton payload, Action onCompleteCallback)
+		{
+			try
+			{
+				if (_buttonScene == null) _buttonScene = ResourceLoader.Load<PackedScene>("res://Toolkit/PressableButtonGodot.tscn");
+				var actors = _assetLoader.CreateFromToolkitButton(payload.Actor?.ParentId);
+				ProcessCreatedActors(payload, actors, onCompleteCallback);
+
+				foreach (var actor in actors)
+				{
+					var button = _buttonScene.Instance<PressableButtonGodot>();
+					actor.AddChild(button);
+					button.ApplyColor(payload.Color);
+				}
+
+			}
+			catch (Exception e)
+			{
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.PushError(e.ToString());
 			}
 		}
 

@@ -1,5 +1,9 @@
 using Godot;
-using System;
+
+using MixedRealityExtension.Patching.Types;
+using MixedRealityExtension.Core.Types;
+using MixedRealityExtension.Patching;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -8,11 +12,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		[Export]
 		private string text = "";
 
+		[Export]
+		private Color backPlateColor = new Color(0.086f, 0.2f, 0.5f, 1f);
+		public Color BackPlateColor { get => backPlateColor; set => backPlateColor = value; }
+
 		private float pulseDelta = -0.6f;
 		private MeshInstance BackPlate;
 		private MeshInstance HighlightPlate;
 		private HighlightArea HighlightArea;
 		private ShaderMaterial FrontPlateMaterial;
+		private ShaderMaterial BackPlateMaterial;
 		private ShaderMaterial HighlightPlateMaterial;
 		private SimpleText TextNode;
 
@@ -30,7 +39,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		public override void _Ready()
 		{
 			BackPlate = GetNode<MeshInstance>("BackPlate");
-			BackPlate.MaterialOverride = BackPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
+			BackPlateMaterial = BackPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
+			BackPlate.MaterialOverride = BackPlateMaterial;
+			BackPlateMaterial.SetShaderParam("color", backPlateColor);
 
 			FrontPlateMaterial = ((MeshInstance)movingButtonVisuals).MaterialOverride.Duplicate(true) as ShaderMaterial;
 			((MeshInstance)movingButtonVisuals).MaterialOverride = FrontPlateMaterial;
@@ -108,6 +119,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void _on_HighlightArea_unfocused()
 		{
 			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, Vector3.Zero);
+		}
+
+		internal void ApplyColor(ColorPatch color)
+		{
+			MWColor MWColor = new MWColor();
+			BackPlateColor = BackPlateColor.GetPatchApplied(MWColor.ApplyPatch(color));
+			BackPlateMaterial.SetShaderParam("color", backPlateColor);
 		}
 	}
 }
