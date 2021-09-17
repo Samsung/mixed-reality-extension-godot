@@ -94,11 +94,14 @@ extents = Vector3( 1, 1, 0.001 )
 code = "shader_type spatial;
 render_mode unshaded;
 
+uniform vec4 color: hint_color = vec4(0.086f, 0.2f, 0.5f, 1f);
 uniform float border = 0.02;
+
 float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius)
 {
 	return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
 }
+
 void fragment()
 {
 	float edgeSoftness = 0.005;
@@ -106,11 +109,12 @@ void fragment()
 	float thickness = 0.01;
 	float distance = roundedBoxSDF(UV - 0.5, vec2(0.49), radius);
 	float smmothedAlpha = 1f - smoothstep(-edgeSoftness, edgeSoftness, abs(distance) - thickness);
-	ALBEDO = mix(vec4(0.086f, 0.2, 0.5f, 1f), vec4(0.42, 0.48f, 0.61f, smmothedAlpha), smmothedAlpha).xyz;
+	ALBEDO = mix(color, vec4(0.42, 0.48f, 0.61f, smmothedAlpha), smmothedAlpha).xyz;
 }"
 
 [sub_resource type="ShaderMaterial" id=13]
 shader = SubResource( 12 )
+shader_param/color = Color( 0.086, 0.2, 0.5, 1 )
 shader_param/border = 0.02
 
 [sub_resource type="QuadMesh" id=11]

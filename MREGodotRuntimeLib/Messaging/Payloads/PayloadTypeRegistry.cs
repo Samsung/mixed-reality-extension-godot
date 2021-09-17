@@ -19,6 +19,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(CreateEmpty), "create-empty")]
 	[PayloadType(typeof(CreateFromLibrary), "create-from-library")]
 	[PayloadType(typeof(CreateFromPrefab), "create-from-prefab")]
+	[PayloadType(typeof(CreateFromToolkitButton), "create-from-toolkit-button")]
 	[PayloadType(typeof(CollisionEventRaised), "collision-event-raised")]
 	[PayloadType(typeof(DestroyActors), "destroy-actors")]
 	[PayloadType(typeof(DestroyAnimations), "destroy-animations")]
