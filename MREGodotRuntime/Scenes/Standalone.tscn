@@ -7,22 +7,25 @@
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
 AppID = "helloworld"
+EphemeralAppID = "helloworld-temp"
 UserNode = NodePath("Player")
 SessionID = "testbed"
 MREURL = "ws://localhost:3901"
-EphemeralAppID = "helloworld-temp"
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.842866 )
 
 [node name="Button" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.364337, -0.27185, 0.0568785 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.364337, -0.27185, 0.0568785 )
+text = "button1"
 
 [node name="Button2" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.427516, -0.272089, 0.0567297 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.427516, -0.272089, 0.0567297 )
+text = "button2"
 
 [node name="Button3" parent="." instance=ExtResource( 3 )]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0.489825, -0.271225, 0.0580557 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.489825, -0.271225, 0.0580557 )
+text = "button3"
 
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 0.728754, 0.399158, -0.556409, 0, 0.812542, 0.582903, 0.684776, -0.424793, 0.592143, 0.360915, -0.173784, 0.167975 )

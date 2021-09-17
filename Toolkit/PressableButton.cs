@@ -17,8 +17,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         bool hasStarted = false;
 
-        private float pulseDelta = -0.6f;
-
         /// <summary>
         /// The object that is being pushed.
         /// </summary>
@@ -115,20 +113,20 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public bool EnforceFrontPush { get => enforceFrontPush; private set => enforceFrontPush = value; }
 
         [Export]
-        private string text = "";
-
-        [Export]
-        private NodePath nearInteractionTouchableSurfaceNodePath;
+        protected NodePath nearInteractionTouchableSurfaceNodePath;
         private NearInteractionTouchableSurface nearInteractionTouchableSurface => GetNode<NearInteractionTouchableSurface>(nearInteractionTouchableSurfaceNodePath);
 
         [Signal]
-        public delegate void TouchBegin();
+        public delegate void touch_begin();
+
         [Signal]
-        public delegate void  TouchEnd();
+        public delegate void touch_end();
+
         [Signal]
-        public delegate void  ButtonPressed();
+        public delegate void button_pressed();
+
         [Signal]
-        public delegate void  ButtonReleased();
+        public delegate void button_released();
 
         #region Private Members
 
@@ -138,8 +136,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         private Dictionary<Spatial, Vector3> touchPoints = new Dictionary<Spatial, Vector3>();
 
         private float currentPushDistance = 0.0f;
-
-        private Spatial TextNode;
 
         /// <summary>
         /// Current push distance relative to the start push plane.
@@ -162,7 +158,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
                     if (isTouching)
                     {
-                        EmitSignal(nameof(TouchBegin));
+                        EmitSignal(nameof(touch_begin));
                     }
                     else
                     {
@@ -171,7 +167,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
                         {
                             IsPressing = false;
                         }
-                        EmitSignal(nameof(TouchEnd));
+                        EmitSignal(nameof(touch_end));
                     }
                 }
             }
@@ -285,11 +281,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         private Vector3 PushSpaceSourceParentPosition => (PushSpaceSourceTransform.GetParent() != null) ? PushSpaceSourceTransform.GetParent<Spatial>().GlobalTransform.origin : Vector3.Zero;
 
-        private MeshInstance BackPlate;
-        private MeshInstance HighlightPlate;
-        private ShaderMaterial FrontPlateMaterial;
-        private ShaderMaterial HighlightPlateMaterial;
-
         public override void _Ready()
         {
             hasStarted = true;
@@ -303,25 +294,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
             // Ensure everything is set to initial positions correctly.
             UpdateMovingVisualsPosition();
-
-
-            BackPlate = GetNode<MeshInstance>("../BackPlate");
-            FrontPlateMaterial = ((MeshInstance)movingButtonVisuals).Mesh.SurfaceGetMaterial(0) as ShaderMaterial;
-            FrontPlateMaterial.SetShaderParam("origin", BackPlate.GlobalTransform.origin);
-            FrontPlateMaterial.SetShaderParam("backward", BackPlate.GlobalTransform.basis.z);
-
-            HighlightPlate = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate");
-            HighlightPlateMaterial = (ShaderMaterial)HighlightPlate.MaterialOverride.Duplicate(true);
-            HighlightPlate.MaterialOverride = HighlightPlateMaterial;
-
-            TextNode = new SimpleText(this)
-            {
-                Contents = text,
-                Anchor = MixedRealityExtension.Core.Interfaces.TextAnchorLocation.MiddleCenter,
-                Height = 0.5f,
-            };
-            CallDeferred("add_child", TextNode);
-            TextNode.CallDeferred("set_transform", new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2));
         }
 
         public override void _ExitTree()
@@ -339,40 +311,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         public override void _Process(float delta)
         {
-            TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
             if (IsTouching)
             {
                 UpdateTouch();
-
-                //pulse
-                if (IsPressing)
-                {
-                    if (pulseDelta < 0f)
-                    {
-                        pulseDelta += delta * 3;
-                        HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
-                    }
-                    TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(GlobalTransform.basis.z.Normalized() * 0.001f + GlobalTransform.origin));
-                }
-                else
-                {
-                    if (pulseDelta > -0.6f)
-                    {
-                        pulseDelta = -0.6f;
-                        HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
-                    }
-                }
             }
             else if (currentPushDistance < startPushDistance)
             {
-                GD.Print("currentPushDistance : " + currentPushDistance + ", startPushDistance : " + startPushDistance);
                 RetractButton(delta);
-
-                if (pulseDelta > -0.6f)
-                {
-                    pulseDelta = -0.6f;
-                    HighlightPlateMaterial.SetShaderParam("pulse_delta", pulseDelta);
-                }
             }
         }
 
@@ -492,9 +437,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
             touchPoints.Add(eventData.Controller, eventData.InputData);
 
             IsTouching = true;
-
-            FrontPlateMaterial.SetShaderParam("origin", BackPlate.GlobalTransform.origin);
-            FrontPlateMaterial.SetShaderParam("backward", BackPlate.GlobalTransform.basis.z);
         }
 
         void IMixedRealityTouchHandler.OnTouchUpdated(HandTrackingInputEventData eventData)
@@ -561,7 +503,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             if (movingButtonVisuals != null)
             {
                 // Always move relative to startPushDistance
-                movingButtonVisuals.Transform = new Transform(movingButtonVisuals.Transform.basis, GetLocalPositionAlongPushDirection(currentPushDistance - startPushDistance) / movingButtonVisuals.GlobalTransform.basis.Scale);
+                movingButtonVisuals.Transform = new Transform(movingButtonVisuals.Transform.basis, GetLocalPositionAlongPushDirection(currentPushDistance - startPushDistance));
             }
         }
 
@@ -589,7 +531,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 if (pushDistance <= pressDistance)
                 {
                     IsPressing = true;
-                    EmitSignal(nameof(ButtonPressed));
+                    EmitSignal(nameof(button_pressed));
                     //PulseProximityLight();
                 }
             }
@@ -601,7 +543,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 if (pushDistance >= releaseDistance)
                 {
                     IsPressing = false;
-                    EmitSignal(nameof(ButtonReleased));
+                    EmitSignal(nameof(button_released));
                 }
             }
         }

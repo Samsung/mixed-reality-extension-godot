@@ -139,10 +139,9 @@ public class SimpleText : MeshInstance, IText
 
 	public override void _Ready()
 	{
-		Name = "FontMesh";
 		Mesh = textMesh;
 
-		parent.CallDeferred("add_child", textMeshInstance);
+		parent?.CallDeferred("add_child", textMeshInstance);
 		label.AddFontOverride("normal_font", dynamicFont);
 
 		textViewport.CallDeferred("add_child", label);
@@ -159,14 +158,10 @@ public class SimpleText : MeshInstance, IText
 		};
 
 		Mesh.SurfaceSetMaterial(0, textMeshMaterial);
-
 	}
-
-	public SimpleText(Spatial parent)
+	public SimpleText()
 	{
 		textMesh = new QuadMesh();
-
-		this.parent = parent;
 
 		textViewport = new Viewport() {
 			Size = new Vector2(500, 500),
@@ -182,7 +177,6 @@ public class SimpleText : MeshInstance, IText
 			Size = 400
 		};
 
-
 		// set defaults
 		Enabled = true;
 		Contents = "";
@@ -191,6 +185,11 @@ public class SimpleText : MeshInstance, IText
 
 		Justify = TextJustify.Left;
 		Font = FontFamily.SansSerif;
+	}
+
+	public SimpleText(Spatial parent) : this()
+	{
+		this.parent = parent;
 	}
 
 	public void ApplyPatch(TextPatch patch)
