@@ -10,6 +10,11 @@ func update_lengths():
 		if finger and finger.get_child_count() >= 2:
 			# our first node is our joint, and our second joint is the bone to that joint
 			var joint = finger.get_child(0)
+			if joint:
+				var child_transform = joint.global_transform
+				finger.look_at(child_transform.origin, Vector3.UP)
+				joint.global_transform = child_transform
+
 			var bone = finger.get_child(1)
 			while joint and bone:
 				var bone_len = joint.translation.length()
@@ -18,9 +23,14 @@ func update_lengths():
 				bone.scale = Vector3(1.0, bone_len, 1.0)
 				bone.translation = Vector3(0.0, 0.0, -bone_len / 2.0)
 
-				if joint.get_child_count() >= 2:
-					bone = joint.get_child(1) as MeshInstance
-					joint = joint.get_child(0) as MeshInstance
+				if joint.get_child_count() == 2:
+					var parent = joint as Spatial
+					bone = joint.get_child(1)
+					joint = joint.get_child(0)
+
+					var child_transform = joint.global_transform
+					parent.look_at(child_transform.origin, Vector3.UP)
+					joint.global_transform = child_transform
 				else:
 					# the end...
 					joint = null

@@ -1,11 +1,10 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://addons/godot-openxr/scenes/center_ball_material.tres" type="Material" id=1]
 [ext_resource path="res://addons/godot-openxr/OpenXRHand.gdns" type="Script" id=2]
 [ext_resource path="res://addons/godot-openxr/scenes/left_hand_material.tres" type="Material" id=3]
 [ext_resource path="res://addons/godot-openxr/scenes/bone_material.tres" type="Material" id=4]
 [ext_resource path="res://addons/godot-openxr/scenes/hand.gd" type="Script" id=5]
-[ext_resource path="res://addons/godot-openxr/scenes/ThumbMetacarpal.cs" type="Script" id=6]
 
 [sub_resource type="SphereMesh" id=1]
 material = ExtResource( 1 )
@@ -33,12 +32,6 @@ height = 1.0
 [sub_resource type="SphereShape" id=5]
 radius = 0.0141474
 
-[sub_resource type="CylinderMesh" id=6]
-top_radius = 0.005
-bottom_radius = 0.005
-height = 1.0
-radial_segments = 4
-
 [node name="Left_hand" type="Spatial"]
 script = ExtResource( 2 )
 
@@ -51,7 +44,6 @@ script = ExtResource( 5 )
 transform = Transform( 0.946029, 0, 0.324082, 0, 1, 0, -0.324082, 0, 0.946029, -0.0993336, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
-script = ExtResource( 6 )
 
 [node name="ThumbProximal" type="MeshInstance" parent="Wrist/ThumbMetacarpal"]
 transform = Transform( 1, 0, 0, -1.49012e-08, 1, 0, 2.98023e-08, 0, 1, -7.45058e-09, 3.82459e-10, -0.05 )
@@ -272,16 +264,3 @@ material/0 = null
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
 mesh = SubResource( 4 )
 material/0 = null
-
-[node name="RayCast" type="RayCast" parent="Wrist"]
-enabled = true
-collide_with_areas = true
-
-[node name="MeshInstance" type="MeshInstance" parent="Wrist/RayCast"]
-transform = Transform( 1, 0, 0, 0, -2.18557e-07, -1, 0, 5, -4.37114e-08, 0, 0, -2.5 )
-mesh = SubResource( 6 )
-material/0 = null
-
-[node name="Tween" type="Tween" parent="Wrist"]
-
-[node name="Target" type="Spatial" parent="Wrist"]

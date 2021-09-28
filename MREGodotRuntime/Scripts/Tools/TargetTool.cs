@@ -118,7 +118,7 @@ namespace Assets.Scripts.Tools
 						CurrentTargetPoint,
 						newTarget,
 						hitPoint.Value,
-						newBehavior, 
+						newBehavior,
 						inputSource);
 				}
 			}
@@ -182,7 +182,7 @@ namespace Assets.Scripts.Tools
 			{
 				hitPoint = inputSource.rayCast.GetCollisionPoint();
 				var distance = ((Vector3)hitPoint).DistanceTo(inputSource.rayCast.GlobalTransform.origin);
-				inputSource.RayCastMesh.Scale = new Vector3(1, distance, 1);
+				inputSource.RayCastMesh.Scale = new Vector3(1, 1, distance);
 				inputSource.RayCastMesh.Translation = new Vector3(0, 0, -distance / 2);
 
 				for (var node = (inputSource.rayCast.GetCollider() as Node); node != null; node = node.GetParent())
@@ -210,8 +210,8 @@ namespace Assets.Scripts.Tools
 			}
 			else
 			{
-				inputSource.RayCastMesh.Scale = new Vector3(1, 5, 1);
-				inputSource.RayCastMesh.Translation = new Vector3(0, 0, -2.5f);
+				inputSource.RayCastMesh.Scale = new Vector3(1, 1, 1.5f);
+				inputSource.RayCastMesh.Translation = new Vector3(0, 0, -0.75f);
 				if (inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = false;
 			}
 
