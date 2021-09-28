@@ -26,8 +26,8 @@ namespace Assets.Scripts.User
 			// You still want to hit all layers, but only interact with these.
 			uint layerMask = (1 << 0) | (1 << 5) | (1 << 10);
 
-			rayCast = (RayCast)GetParent().FindNode("RayCast");
-			rayCast.CastTo = new Vector3(0, 0, -100);
+			rayCast = (RayCast)GetParent().FindNode("HandRay");
+			rayCast.CastTo = new Vector3(0, 0, -1.5f);
 			rayCast.CollisionMask = layerMask;
 			RayCastMesh = (MeshInstance)rayCast.GetChild(0);
 
