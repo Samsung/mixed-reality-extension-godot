@@ -714,7 +714,7 @@ namespace MixedRealityExtension.Core
 				// TODO: Add ability to flag an actor for "high-frequency" updates
 				if (OS.GetTicksMsec() >= _nextUpdateTime)
 				{
-					
+
 					_nextUpdateTime = OS.GetTicksMsec() + 200f + (float)GD.RandRange(-100, 100);
 					SynchronizeApp();
 
@@ -1045,7 +1045,7 @@ namespace MixedRealityExtension.Core
 
 			_collider = godotCollisionShape;
 
-			// update bounciness and frictions 
+			// update bounciness and frictions
 			if (_rigidbody != null)
 			{
 				if (colliderPatch.Bounciness.HasValue)
@@ -2067,7 +2067,8 @@ namespace MixedRealityExtension.Core
 				behaviorComponent.SetBehaviorContext(context);
 
 				// We need to update the new behavior's grabbable flag from the actor so that it can be grabbed in the case we cleared the previous behavior.
-				((ITargetBehavior)context.Behavior).Grabbable = Grabbable;
+				if (context is ITargetBehavior)
+					((ITargetBehavior)context.Behavior).Grabbable = Grabbable;
 			}
 
 			onCompleteCallback?.Invoke();

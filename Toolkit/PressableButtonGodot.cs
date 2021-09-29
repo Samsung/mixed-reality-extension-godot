@@ -5,6 +5,10 @@ using MixedRealityExtension.Core.Types;
 using MixedRealityExtension.Patching;
 using MixedRealityExtension.Util.GodotHelper;
 
+using Assets.Scripts.Tools;
+using Assets.Scripts.Behaviors;
+using MixedRealityExtension.Core;
+
 namespace Microsoft.MixedReality.Toolkit.UI
 {
 	public class PressableButtonGodot : PressableButton
@@ -66,6 +70,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 			Connect("touch_begin", this, nameof(_on_PressableButtonGodot_touch_begin));
 			Connect("touch_end", this, nameof(_on_PressableButtonGodot_touch_end));
+			Connect("button_released", this, nameof(_on_PressableButtonGodot_button_released));
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -109,6 +114,17 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void _on_PressableButtonGodot_touch_end()
 		{
 			RevertProximityLight();
+		}
+
+		private void _on_PressableButtonGodot_button_released()
+		{
+			var actor = GetParent() as Actor;
+			if (actor == null) return;
+			var buttonBehavior = actor.GetBehavior<ToolkitButtonBehavior>();
+			if (buttonBehavior != null)
+			{
+				buttonBehavior.Context.Click(actor.LocalUser, Vector3.Zero);
+			}
 		}
 
 		private void _on_HighlightArea_focused()

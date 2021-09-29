@@ -30,5 +30,12 @@ namespace Assets.Scripts.Behaviors
 			targetBehavior.SetContext(context);
 			return targetBehavior;
 		}
+
+		public IToolkitButtonBehavior GetOrCreateToolkitButtonBehavior(IActor actor, ToolkitButtonBehaviorContext context)
+		{
+			var buttonBehavior = actor.Node3D.GetChild<ToolkitButtonBehavior>() ?? actor.Node3D.AddNode(new ToolkitButtonBehavior() { Name = "ToolkitButtonBehavior" });
+			buttonBehavior.SetContext(context);
+			return buttonBehavior;
+		}
 	}
 }
