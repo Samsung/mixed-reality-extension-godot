@@ -1,16 +1,17 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://MREGodotRuntime/Scripts/LaunchMRE.cs" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scenes/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Toolkit/PressableButtonGodot.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Toolkit/TogglePressableButtonGodot.tscn" type="PackedScene" id=4]
 
 [node name="MRENode" type="Spatial"]
 script = ExtResource( 1 )
+AppID = "helloworld"
 EphemeralAppID = "helloworld-temp"
 UserNode = NodePath("Player")
 MREURL = "ws://localhost:3901"
 SessionID = "testbed"
-AppID = "helloworld"
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.842866 )
@@ -32,3 +33,7 @@ transform = Transform( 0.728754, 0.399158, -0.556409, 0, 0.812542, 0.582903, 0.6
 
 [node name="Camera2" type="Camera" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.0134908, 0.125632, 0.00181241 )
+
+[node name="TogglePressableButtonGodot" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.554124, -0.271095, 0.0580626 )
+text = "Toggle"
