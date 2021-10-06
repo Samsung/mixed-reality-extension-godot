@@ -1,0 +1,206 @@
+[gd_scene load_steps=19 format=2]
+
+[ext_resource path="res://Toolkit/NearInteractionTouchable.cs" type="Script" id=1]
+[ext_resource path="res://MREGodotRuntime/Scripts/SimpleText.cs" type="Script" id=2]
+[ext_resource path="res://Toolkit/HighlightArea.cs" type="Script" id=3]
+[ext_resource path="res://Toolkit/TogglePressableButtonGodot.cs" type="Script" id=4]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+render_mode cull_disabled, blend_add, ambient_light_disabled;
+
+uniform float thickness = 0.02;
+uniform float smoothness = 0.01;
+uniform vec3 border_color = vec3(0.42, 0.48, 0.61);
+uniform vec3 origin; // BackPlate Global origin
+uniform vec3 backward; // BackPlate backward
+varying vec3 v;
+
+uniform sampler2D texture_transmission : hint_white;
+void vertex() {
+	v = VERTEX;
+}
+
+void fragment() {
+	float a = smoothstep(thickness, thickness + smoothness, length(abs(v.xy) - 1.0));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.yz) - 1.0));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.xz) - 1.0));
+
+	vec3 global_vertex = (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz;
+
+	ALBEDO = border_color;
+	ALPHA = mix(step(0, dot(backward, global_vertex - origin)) * 0.7, 0, a);
+	TRANSMISSION = texture(texture_transmission, UV).rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/thickness = 0.02
+shader_param/smoothness = 0.01
+shader_param/border_color = Vector3( 0.42, 0.48, 0.61 )
+shader_param/origin = null
+shader_param/backward = null
+
+[sub_resource type="CubeMesh" id=3]
+
+[sub_resource type="Shader" id=4]
+code = "shader_type spatial;
+render_mode blend_add,depth_draw_opaque,cull_back,diffuse_burley,specular_schlick_ggx,ambient_light_disabled;
+uniform vec4 albedo : hint_color;
+uniform sampler2D texture_albedo : hint_albedo;
+uniform float pulse_delta = -1;
+uniform float border = 0.02;
+uniform vec3 border_color = vec3(0);//vec3(0.42f, 0.48f, 0.61f);
+
+float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius)
+{
+	return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
+}
+
+void fragment() {
+	vec2 base_uv = UV;
+	vec4 albedo_tex = texture(texture_albedo,base_uv);
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+
+	float edgeSoftness = 0.005;
+	float radius = 0.02;
+	float thickness = 0.01;
+	float distance = roundedBoxSDF(UV - 0.5, vec2(0.49), radius);
+	float smmothedAlpha = 1f - smoothstep(-edgeSoftness, edgeSoftness, abs(distance) - thickness);
+	EMISSION = mix(vec4(0f, 0f, 0f, 1f), vec4(border_color, smmothedAlpha), smmothedAlpha).xyz;
+}
+
+void light() {
+	DIFFUSE_LIGHT = mix(vec3(0), ATTENUATION, step(pulse_delta, -ATTENUATION));
+}
+"
+
+[sub_resource type="ShaderMaterial" id=5]
+shader = SubResource( 4 )
+shader_param/albedo = null
+shader_param/pulse_delta = -1.0
+shader_param/border = 0.02
+shader_param/border_color = Vector3( 0, 0, 0 )
+
+[sub_resource type="QuadMesh" id=6]
+size = Vector2( 2, 2 )
+
+[sub_resource type="BoxShape" id=7]
+extents = Vector3( 1, 1, 0.001 )
+
+[sub_resource type="BoxShape" id=8]
+
+[sub_resource type="Shader" id=9]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform vec4 color: hint_color = vec4(0.086f, 0.2f, 0.5f, 1f);
+uniform float border = 0.02;
+
+float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius)
+{
+	return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
+}
+
+void fragment()
+{
+	float edgeSoftness = 0.005;
+	float radius = 0.02;
+	float thickness = 0.01;
+	float distance = roundedBoxSDF(UV - 0.5, vec2(0.49), radius);
+	float smmothedAlpha = 1f - smoothstep(-edgeSoftness, edgeSoftness, abs(distance) - thickness);
+	ALBEDO = mix(color, vec4(0.42, 0.48f, 0.61f, smmothedAlpha), smmothedAlpha).xyz;
+}"
+
+[sub_resource type="ShaderMaterial" id=10]
+shader = SubResource( 9 )
+shader_param/color = Color( 0.086, 0.2, 0.5, 1 )
+shader_param/border = 0.02
+
+[sub_resource type="QuadMesh" id=11]
+size = Vector2( 2, 2 )
+
+[sub_resource type="Shader" id=12]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform vec4 color: hint_color = vec4(0.2137f, 0.4254f, 0.9f, 1f);
+
+float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius)
+{
+	return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
+}
+
+void fragment()
+{
+	float edgeSoftness = 0.005;
+	float radius = 0.09;
+	float thickness = 0.01;
+	float distance = roundedBoxSDF(UV - 0.5, vec2(0.45), radius);
+	float smmothedAlbedo = 1f - smoothstep(-edgeSoftness, edgeSoftness, abs(distance) - thickness);
+	ALBEDO = mix(color, vec4(0.42, 0.48f, 0.61f, smmothedAlbedo), smmothedAlbedo).xyz;
+	float smmothedAlpha = 1f - smoothstep(0f, edgeSoftness * 2f, distance);
+	ALPHA = mix(0.0, 1.0, smmothedAlpha);
+}"
+
+[sub_resource type="ShaderMaterial" id=13]
+shader = SubResource( 12 )
+shader_param/color = Color( 0.2137, 0.4254, 0.9, 1 )
+
+[sub_resource type="QuadMesh" id=14]
+size = Vector2( 2, 2 )
+
+[node name="TogglePressableButtonGodot" type="Spatial"]
+script = ExtResource( 4 )
+
+[node name="NearInteractionTouchable" type="Spatial" parent="."]
+script = ExtResource( 1 )
+touchableCollider = NodePath("../TouchableArea/CollisionShape")
+baseToolkit = NodePath("..")
+
+[node name="FrontPlate" type="MeshInstance" parent="."]
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0, 0, 0 )
+layers = 3
+material_override = SubResource( 2 )
+mesh = SubResource( 3 )
+material/0 = null
+
+[node name="HighlightPlate" type="MeshInstance" parent="FrontPlate"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1 )
+layers = 4
+material_override = SubResource( 5 )
+mesh = SubResource( 6 )
+material/0 = null
+
+[node name="HighlightArea" type="Area" parent="FrontPlate/HighlightPlate"]
+collision_layer = 64
+collision_mask = 0
+script = ExtResource( 3 )
+
+[node name="CollisionShape" type="CollisionShape" parent="FrontPlate/HighlightPlate/HighlightArea"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.001 )
+shape = SubResource( 7 )
+
+[node name="TouchableArea" type="Area" parent="."]
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.016, 0, 0, 0.0160871 )
+collision_layer = 32
+collision_mask = 0
+
+[node name="CollisionShape" type="CollisionShape" parent="TouchableArea"]
+shape = SubResource( 8 )
+
+[node name="BackPlate" type="MeshInstance" parent="."]
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.01, 0, 0, -0.001 )
+material_override = SubResource( 10 )
+mesh = SubResource( 11 )
+material/0 = null
+
+[node name="Text" type="MeshInstance" parent="."]
+script = ExtResource( 2 )
+
+[node name="BackPlateToggleState" type="MeshInstance" parent="."]
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 1, 0, 0, 0 )
+visible = false
+material_override = SubResource( 13 )
+mesh = SubResource( 14 )
+material/0 = null
