@@ -8,13 +8,10 @@ using Godot;
 
 public class SimpleText : MeshInstance, IText
 {
-	private readonly MeshInstance textMeshInstance;
 	private readonly QuadMesh textMesh;
 	private readonly RichTextLabel label;
 	private readonly DynamicFont dynamicFont;
 	private readonly Viewport textViewport;
-
-	private Spatial parent;
 
 	private string plainContents;
 	private float height;
@@ -141,7 +138,6 @@ public class SimpleText : MeshInstance, IText
 	{
 		Mesh = textMesh;
 
-		parent?.CallDeferred("add_child", textMeshInstance);
 		label.AddFontOverride("normal_font", dynamicFont);
 
 		textViewport.CallDeferred("add_child", label);
@@ -159,6 +155,7 @@ public class SimpleText : MeshInstance, IText
 
 		Mesh.SurfaceSetMaterial(0, textMeshMaterial);
 	}
+
 	public SimpleText()
 	{
 		textMesh = new QuadMesh();
@@ -189,7 +186,7 @@ public class SimpleText : MeshInstance, IText
 
 	public SimpleText(Spatial parent) : this()
 	{
-		this.parent = parent;
+		parent?.CallDeferred("add_child", this);
 	}
 
 	public void ApplyPatch(TextPatch patch)
