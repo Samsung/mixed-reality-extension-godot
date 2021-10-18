@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://addons/godot-openxr/scenes/center_ball_material.tres" type="Material" id=1]
 [ext_resource path="res://addons/godot-openxr/scenes/hand.gd" type="Script" id=2]
@@ -47,11 +47,7 @@ tracks/0/keys = {
 "values": [ Vector3( 0.061, -0.056, 0 ), Vector3( 0.061, -0.056, -0.06 ) ]
 }
 
-[sub_resource type="SphereShape" id=5]
-margin = 0.001
-radius = 0.01
-
-[sub_resource type="PlaneMesh" id=6]
+[sub_resource type="PlaneMesh" id=5]
 size = Vector2( 0.01, 1 )
 
 [node name="Right_hand" type="Spatial"]
@@ -132,13 +128,6 @@ script = ExtResource( 7 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
 anims/touch = SubResource( 4 )
-
-[node name="Area" type="Area" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
-collision_layer = 0
-collision_mask = 32
-
-[node name="CollisionShape" type="CollisionShape" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip/Area"]
-shape = SubResource( 5 )
 
 [node name="ProximityVisibleLight" type="OmniLight" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
 light_energy = 1.46
@@ -320,7 +309,7 @@ collide_with_areas = true
 
 [node name="HandRayMesh" type="MeshInstance" parent="Wrist/HandRay"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, -0.75 )
-mesh = SubResource( 6 )
+mesh = SubResource( 5 )
 material/0 = null
 script = ExtResource( 10 )
 

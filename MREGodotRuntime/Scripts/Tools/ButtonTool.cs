@@ -8,6 +8,7 @@ namespace Assets.Scripts.Tools
 {
 	public class ButtonTool : TargetTool
 	{
+		private PokeTool pokeTool = new PokeTool();
 		protected override void UpdateTool(InputSource inputSource)
 		{
 			base.UpdateTool(inputSource);
@@ -16,6 +17,8 @@ namespace Assets.Scripts.Tools
 			{
 				return;
 			}
+
+			pokeTool.UpdateTool(inputSource);
 
 			if (Input.IsActionPressed("Fire1"))
 			{
@@ -58,6 +61,10 @@ namespace Assets.Scripts.Tools
 			TargetBehavior newBehavior,
 			InputSource inputSource)
 		{
+			if (oldTarget != null && pokeTool.CurrentTouchableObjectDown == oldTarget)
+			{
+				pokeTool.OnTargetChanged(inputSource);
+			}
 			base.OnTargetChanged(
 				oldTarget,
 				oldTargetPosition,
@@ -91,6 +98,17 @@ namespace Assets.Scripts.Tools
 					}
 				}
 			}
+		}
+
+		protected override Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		{
+			Spatial target = pokeTool.FindTarget(inputSource);
+			if (target != null)
+			{
+				hitPoint = pokeTool.Position;
+				return target;
+			}
+			return base.FindTarget(inputSource, out hitPoint);
 		}
 	}
 }
