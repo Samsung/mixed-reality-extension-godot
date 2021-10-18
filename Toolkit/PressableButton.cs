@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.MixedReality.Toolkit.Input;
+using Assets.Scripts.Tools;
 using System.Collections.Generic;
 using Godot;
 
@@ -133,7 +134,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         // The maximum distance before the button is reset to its initial position when retracting.
         private const float MaxRetractDistanceBeforeReset = 0.0001f;
 
-        private Dictionary<Spatial, Vector3> touchPoints = new Dictionary<Spatial, Vector3>();
+        private Dictionary<PokeTool, Vector3> touchPoints = new Dictionary<PokeTool, Vector3>();
 
         private float currentPushDistance = 0.0f;
 
@@ -390,72 +391,53 @@ namespace Microsoft.MixedReality.Toolkit.UI
 */
         private bool HasPassedThroughStartPlane(HandTrackingInputEventData eventData)
         {
-            var nearInteractionTouchable = (NearInteractionTouchable)eventData.Controller;
-
+            PokeTool poke = eventData.PokeTool;
+            if (poke != null && poke.CurrentTouchableObjectDown != null)
             {
-
-                float previousDistance = GetDistanceAlongPushDirection(eventData.PreviousPosition);
+                // Extrapolate to get previous position.
+                float previousDistance = GetDistanceAlongPushDirection(poke.PreviousPosition);
                 return previousDistance >= StartPushDistance;
-            }
-            /*
-            foreach (var pointer in eventData.InputSource.Pointers)
-            {
-                // In the case that the input source has multiple poke pointers, this code
-                // will reason over the first such pointer that is actually interacting with
-                // an object. For input sources that have a single poke pointer, this is one
-                // and the same (i.e. this event will only fire for this object when the poke
-                // pointer is touching this object).
-                PokePointer poke = pointer as PokePointer;
-                if (poke && poke.CurrentTouchableObjectDown)
-                {
-                    // Extrapolate to get previous position.
-                    float previousDistance = GetDistanceAlongPushDirection(poke.PreviousPosition);
-                    return previousDistance <= StartPushDistance;
-                }
             }
 
             return false;
-            */
         }
 
         void IMixedRealityTouchHandler.OnTouchStarted(HandTrackingInputEventData eventData)
         {
-            if (touchPoints.ContainsKey(eventData.Controller))
+            if (touchPoints.ContainsKey(eventData.PokeTool))
             {
                 return;
             }
 
             // Back-Press Detection:
             // Accept touch only if controller pushed from the front.
-            /*
             if (enforceFrontPush && !HasPassedThroughStartPlane(eventData))
             {
                 return;
             }
-            */
 
-            touchPoints.Add(eventData.Controller, eventData.InputData);
+            touchPoints.Add(eventData.PokeTool, eventData.PokeTool.Position);
 
             IsTouching = true;
         }
 
         void IMixedRealityTouchHandler.OnTouchUpdated(HandTrackingInputEventData eventData)
         {
-            if (touchPoints.ContainsKey(eventData.Controller))
+            if (touchPoints.ContainsKey(eventData.PokeTool))
             {
-                touchPoints[eventData.Controller] = eventData.InputData;
+                touchPoints[eventData.PokeTool] = eventData.PokeTool.Position;
             }
         }
 
         void IMixedRealityTouchHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
         {
-            if (touchPoints.ContainsKey(eventData.Controller))
+            if (touchPoints.ContainsKey(eventData.PokeTool))
             {
                 // When focus is lost, before removing controller, update the respective touch point to give a last chance for checking if pressed occurred
-                touchPoints[eventData.Controller] = eventData.InputData;
+                touchPoints[eventData.PokeTool] = eventData.PokeTool.Position;
                 UpdateTouch();
 
-                touchPoints.Remove(eventData.Controller);
+                touchPoints.Remove(eventData.PokeTool);
 
                 IsTouching = (touchPoints.Count > 0);
             }

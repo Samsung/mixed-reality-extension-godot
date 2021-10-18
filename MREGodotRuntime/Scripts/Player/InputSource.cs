@@ -12,6 +12,7 @@ namespace Assets.Scripts.User
 
 		internal RayCast rayCast;
 		internal MeshInstance RayCastMesh;
+		internal Spatial PokePointer;
 		public Node UserNode;
 
 		public CSGTorus CollisionPoint;
@@ -26,6 +27,8 @@ namespace Assets.Scripts.User
 			// You still want to hit all layers, but only interact with these.
 			uint layerMask = (1 << 0) | (1 << 5) | (1 << 10);
 
+			PokePointer = GetNode<Spatial>("../Right_hand/Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip");
+
 			rayCast = (RayCast)GetParent().FindNode("HandRay");
 			rayCast.CastTo = new Vector3(0, 0, -1.5f);
 			rayCast.CollisionMask = layerMask;
@@ -33,12 +36,15 @@ namespace Assets.Scripts.User
 
 			CollisionPoint = new CSGTorus()
 			{
-				InnerRadius = 0.06f,
-				OuterRadius = 0.03f,
+				InnerRadius = 0.02f,
+				OuterRadius = 0.01f,
 				Sides = 16,
 			};
 			CollisionPoint.Visible = false;
-			CollisionPoint.MaterialOverride = new SpatialMaterial();
+			CollisionPoint.MaterialOverride = new SpatialMaterial()
+			{
+				FlagsFixedSize = true
+			};
 			GetTree().Root.CallDeferred("add_child", CollisionPoint);
 
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
