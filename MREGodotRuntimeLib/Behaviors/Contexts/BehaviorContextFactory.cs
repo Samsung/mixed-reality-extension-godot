@@ -23,7 +23,6 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			s_factoryMethods.Add(BehaviorType.Target, CreateTargetBehaviorContext);
 			s_factoryMethods.Add(BehaviorType.Button, CreateButtonBehaviorContext);
 			s_factoryMethods.Add(BehaviorType.Pen, CreatePenBehaviorContext);
-			s_factoryMethods.Add(BehaviorType.ToolkitButton, CreateTookitButtonBehaviorContext);
 		}
 
 		internal static BehaviorContextBase CreateContext(BehaviorType behaviorType, IActor actor, WeakReference<MixedRealityExtensionApp> appRef)
@@ -72,16 +71,6 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			var context = new PenBehaviorContext();
 			var penBehavior = behaviorFactory.GetOrCreatePenBehavior(actor, context);
 			if (penBehavior == null) throw new NullReferenceException("Application failed to create a pen behavior for the MRE runtime.");
-			context.Initialize(penBehavior, appRef, actor);
-			return context;
-		}
-
-		private static BehaviorContextBase CreateTookitButtonBehaviorContext(IActor actor, WeakReference<MixedRealityExtensionApp> appRef)
-		{
-			var behaviorFactory = MREAPI.AppsAPI.BehaviorFactory;
-			var context = new ToolkitButtonBehaviorContext();
-			var penBehavior = behaviorFactory.GetOrCreateToolkitButtonBehavior(actor, context);
-			if (penBehavior == null) throw new NullReferenceException("Application failed to create a tookit button behavior for the MRE runtime.");
 			context.Initialize(penBehavior, appRef, actor);
 			return context;
 		}

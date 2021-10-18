@@ -32,13 +32,7 @@ namespace MixedRealityExtension.Behaviors
 		/// The pen behavior type.
 		/// </summary>
 		[BehaviorContextType(typeof(PenBehaviorContext))]
-		Pen = 4,
-
-		/// <summary>
-		/// The toolkit-button behavior type.
-		/// </summary>
-		[BehaviorContextType(typeof(ToolkitButtonBehaviorContext))]
-		ToolkitButton = 8
+		Pen = 4
 	}
 
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
