@@ -80,7 +80,7 @@ namespace Microsoft.MixedReality.Toolkit.Input
         public override Vector3 LocalPressDirection => -localForward;
 
         [Export]
-        protected Vector2 bounds = Vector2.Zero;
+        protected Vector2 bounds = Vector2.One;
 
         /// <summary>
         /// Bounds or size of the 2D NearInteractionTouchablePlane
@@ -100,84 +100,6 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// BoxCollider used to calculate bounds and local center, if not set before runtime the gameObjects's BoxCollider will be used by default
         /// </summary>
         public CollisionShape TouchableCollider => GetNode<CollisionShape>(touchableCollider);
-
-
-        [Export]
-        private NodePath baseToolkit;
-
-        public IMixedRealityTouchHandler BaseToolkit => GetNode<IMixedRealityTouchHandler>(baseToolkit);
-
-        public bool Pressed { get; private set;}
-        private bool entered = false;
-        private Spatial currentTouchableObjectDown;
-        private Vector3 previousPoint = Vector3.Zero;
-        Area area;
-        public override void _Ready()
-        {
-            area = TouchableCollider.GetParent<Area>();
-            area.Connect("area_shape_entered", this, nameof(OnAreaShapeEnter));
-            area.Connect("area_shape_exited", this, nameof(OnAreaShapeExit));
-        }
-
-        public override void _PhysicsProcess(float delta)
-        {
-            if (currentTouchableObjectDown == null)
-            {
-                return;
-            }
-            var collisionPoint = currentTouchableObjectDown.GlobalTransform.origin - currentTouchableObjectDown.GlobalTransform.basis.z.Normalized() * 0.01f;
-            if (entered)
-            {
-                if (!Pressed)
-                {
-                    Pressed = true;
-                    //BaseToolkit.OnTouchStarted(new HandTrackingInputEventData(this, collisionPoint, previousPoint));
-                }
-                else
-                {
-                    /*
-                    var previousPointLocal = area.ToLocal(previousPoint);
-                    var collisionPointLocal = area.ToLocal(collisionPoint);
-                    var touchMoveVector = collisionPointLocal - previousPointLocal;
-                    if (area.Transform.basis.z.Dot(touchMoveVector) < 0) //push
-                    {
-
-                    }
-                    else
-                    {
-
-                    }
-                    */
-                    BaseToolkit.OnTouchUpdated(new HandTrackingInputEventData(this, collisionPoint, previousPoint));
-                }
-            }
-            else
-            {
-                Pressed = false;
-                //BaseToolkit.OnTouchCompleted(new HandTrackingInputEventData(this, collisionPoint, previousPoint));
-            }
-            previousPoint = collisionPoint;
-        }
-
-        private void OnAreaShapeEnter(int areaId, Area otherArea, int areaShape, int localShape)
-        {
-            currentTouchableObjectDown = otherArea;
-            var collisionPoint = otherArea.GlobalTransform.origin - otherArea.GlobalTransform.basis.z.Normalized() * 0.01f;
-
-            entered = true;
-            BaseToolkit.OnTouchStarted(new HandTrackingInputEventData(this, collisionPoint, collisionPoint));
-            previousPoint = collisionPoint;
-        }
-
-        private void OnAreaShapeExit(int areaId, Area otherArea, int areaShape, int localShape)
-        {
-            currentTouchableObjectDown = otherArea;
-            var collisionPoint = otherArea.GlobalTransform.origin - otherArea.GlobalTransform.basis.z.Normalized() * 0.01f;
-
-            entered = false;
-            BaseToolkit.OnTouchCompleted(new HandTrackingInputEventData(this, collisionPoint, previousPoint));
-            previousPoint = collisionPoint;
-        }
 
         internal protected override void OnValidate()
         {

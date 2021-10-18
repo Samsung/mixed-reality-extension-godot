@@ -174,7 +174,7 @@ namespace Assets.Scripts.Tools
 			OnGrabStateChanged(args.OldGrabState, args.NewGrabState, args.InputSource);
 		}
 
-		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		protected virtual Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
 
