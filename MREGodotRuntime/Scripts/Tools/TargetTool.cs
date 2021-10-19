@@ -11,7 +11,10 @@ namespace Assets.Scripts.Tools
 	public class TargetTool : Tool
 	{
 		private GrabTool _grabTool = new GrabTool();
+		protected PokeTool pokeTool = new PokeTool();
 		private TargetBehavior _currentTargetBehavior;
+
+		public bool IsNearObject;
 
 		public Spatial Target { get; private set; }
 
@@ -77,7 +80,17 @@ namespace Assets.Scripts.Tools
 			}
 
 			Vector3? hitPoint;
-			var newTarget = FindTarget(inputSource, out hitPoint);
+			var newTarget = pokeTool.FindTarget(inputSource, out hitPoint);
+			if (newTarget != null)
+			{
+				IsNearObject = true;
+				pokeTool.UpdateTool(inputSource);
+			}
+			else
+			{
+				IsNearObject = false;
+				newTarget = FindTarget(inputSource, out hitPoint);
+			}
 			if ((Target == null || !Godot.Object.IsInstanceValid(Target)) && (newTarget == null || !Godot.Object.IsInstanceValid(newTarget)))
 			{
 				return;
@@ -144,12 +157,17 @@ namespace Assets.Scripts.Tools
 			TargetBehavior newBehavior,
 			InputSource inputSource)
 		{
-			if (oldTarget != null && Godot.Object.IsInstanceValid(oldTarget))
+			if (Godot.Object.IsInstanceValid(oldTarget) && pokeTool.CurrentTouchableObjectDown == oldTarget)
+			{
+				pokeTool.OnTargetChanged(inputSource);
+			}
+
+			if (oldTarget != null && Godot.Object.IsInstanceValid(oldTarget) && !IsNearObject)
 			{
 				_currentTargetBehavior.Context.EndTargeting(_currentTargetBehavior.GetMWUnityUser(inputSource.UserNode), oldTargetPoint);
 			}
 
-			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget))
+			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget) && !IsNearObject)
 			{
 				newBehavior.Context.StartTargeting(newBehavior.GetMWUnityUser(inputSource.UserNode), newTargetPoint);
 			}
@@ -174,7 +192,7 @@ namespace Assets.Scripts.Tools
 			OnGrabStateChanged(args.OldGrabState, args.NewGrabState, args.InputSource);
 		}
 
-		protected virtual Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
 
