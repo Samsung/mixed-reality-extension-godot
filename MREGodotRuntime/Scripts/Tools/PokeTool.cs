@@ -1,9 +1,7 @@
 using Assets.Scripts.Behaviors;
 using Assets.Scripts.User;
-using System.Linq;
 using Godot;
 using Godot.Collections;
-using MixedRealityExtension.Util.GodotHelper;
 using MixedRealityExtension.Core;
 using Microsoft.MixedReality.Toolkit.Input;
 
@@ -19,9 +17,11 @@ namespace Assets.Scripts.Tools
 		public float TouchableDistance { get; } = 0.2f;
 		public Spatial CurrentTouchableObjectDown { get; private set; }
 		public Vector3 PreviousPosition { get; private set; } = Vector3.Zero;
-		public Vector3 Position { get; private set; }
+		public Vector3 IntersectionPosition { get; private set; }
 
 		private Spatial CurrentPointerTarget;
+		private Vector3 RayStartPoint;
+		private Vector3 RayEndPoint;
 
 		public PokeTool()
 		{
@@ -31,22 +31,24 @@ namespace Assets.Scripts.Tools
 				CollideWithAreas = true,
 				CollideWithBodies = true,
 				ShapeRid = shape,
-				Margin = 0.04f
+				Margin = 0.02f
 			};
 		}
 
-		internal Spatial FindTarget(InputSource inputSource)
+		internal Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			spaceState = inputSource.GetWorld().DirectSpaceState;
 			shapeQueryParameters.Transform = inputSource.PokePointer.GlobalTransform;
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
-			Spatial actor = null;
+
 			BaseNearInteractionTouchable touchable = null;
+			hitPoint = null;
 
 			foreach (Dictionary intersectResult in intersectShapes)
 			{
 				var closestDistance = float.PositiveInfinity;
 				var collider = (Spatial)intersectResult["collider"];
+				Spatial actor = null;
 
 				for (actor = collider; actor != null; actor = actor.GetParent<Spatial>())
 					if (actor is Actor) break;
@@ -87,27 +89,33 @@ namespace Assets.Scripts.Tools
 			}
 
 			ClosestProximityTouchable = touchable;
-			return null;
-		}
 
-		internal void UpdateTool(InputSource inputSource)
-		{
-			spaceState = inputSource.GetWorld().DirectSpaceState;
-			Vector3 from = inputSource.PokePointer.GlobalTransform.origin + inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * TouchableDistance;
+			RayStartPoint = inputSource.PokePointer.GlobalTransform.origin + inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * TouchableDistance;
 			Vector3 to = -inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * 1.5f;
-			var IntersectRayResult = spaceState.IntersectRay(from, to, collideWithAreas: true);
-			if (IntersectRayResult.Count > 0 && ClosestProximityTouchable != null)
+			var IntersectRayResult = spaceState.IntersectRay(RayStartPoint, to, collideWithAreas: true);
+			if (IntersectRayResult.Count > 0)
 			{
-				Vector3 intersectionPoint = (Vector3)IntersectRayResult["position"];
+				Vector3 rayEndPoint = (Vector3)IntersectRayResult["position"];
 				var collider = (Spatial)IntersectRayResult["collider"];
 				Spatial actor;
 				for (actor = collider; actor != null; actor = actor.GetParent<Spatial>())
 					if (actor is Actor) break;
 				if (actor == null)
-					return;
+					return null;
 				CurrentPointerTarget = actor;
-				float distToTouchable = from.DistanceTo(intersectionPoint) - TouchableDistance;
-				Position = inputSource.PokePointer.GlobalTransform.origin - inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * 0.01f;
+				IntersectionPosition = inputSource.PokePointer.GlobalTransform.origin - inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * 0.01f;
+				hitPoint = IntersectionPosition;
+				RayEndPoint = rayEndPoint;
+			}
+
+			return touchable;
+		}
+
+		internal void UpdateTool(InputSource inputSource)
+		{
+			if (CurrentPointerTarget != null && ClosestProximityTouchable != null)
+			{
+				float distToTouchable = RayStartPoint.DistanceTo(RayEndPoint) - TouchableDistance;
 
 				bool newIsDown = distToTouchable < 0.0f;
 				bool newIsUp = distToTouchable > ClosestProximityTouchable.DebounceThreshold;
@@ -129,7 +137,7 @@ namespace Assets.Scripts.Tools
 				}
 			}
 
-			PreviousPosition = from;
+			PreviousPosition = RayStartPoint;
 		}
 
 		private void TryRaisePokeDown(InputSource inputSource)
@@ -146,7 +154,7 @@ namespace Assets.Scripts.Tools
 						var mwUser = buttonBehavior.GetMWUnityUser(inputSource.UserNode);
 						if (mwUser != null)
 						{
-							buttonBehavior.Context.StartButton(mwUser, Position);
+							buttonBehavior.Context.StartButton(mwUser, IntersectionPosition);
 							((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
 						}
 					}
@@ -171,10 +179,11 @@ namespace Assets.Scripts.Tools
 					var mwUser = buttonBehavior.GetMWUnityUser(inputSource.UserNode);
 					if (mwUser != null)
 					{
-						buttonBehavior.Context.EndButton(mwUser, Position);
-						buttonBehavior.Context.Click(mwUser, Position);
+						buttonBehavior.Context.EndButton(mwUser, IntersectionPosition);
+						buttonBehavior.Context.Click(mwUser, IntersectionPosition);
 					}
 				}
+
 				if (ClosestProximityTouchable.node is IMixedRealityTouchHandler handler)
 					handler.OnTouchCompleted(new HandTrackingInputEventData(this));
 				CurrentTouchableObjectDown = null;

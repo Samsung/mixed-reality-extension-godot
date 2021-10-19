@@ -416,7 +416,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 return;
             }
 
-            touchPoints.Add(eventData.PokeTool, eventData.PokeTool.Position);
+            touchPoints.Add(eventData.PokeTool, eventData.PokeTool.IntersectionPosition);
 
             IsTouching = true;
         }
@@ -425,7 +425,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             if (touchPoints.ContainsKey(eventData.PokeTool))
             {
-                touchPoints[eventData.PokeTool] = eventData.PokeTool.Position;
+                touchPoints[eventData.PokeTool] = eventData.PokeTool.IntersectionPosition;
             }
         }
 
@@ -434,7 +434,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             if (touchPoints.ContainsKey(eventData.PokeTool))
             {
                 // When focus is lost, before removing controller, update the respective touch point to give a last chance for checking if pressed occurred
-                touchPoints[eventData.PokeTool] = eventData.PokeTool.Position;
+                touchPoints[eventData.PokeTool] = eventData.PokeTool.IntersectionPosition;
                 UpdateTouch();
 
                 touchPoints.Remove(eventData.PokeTool);
