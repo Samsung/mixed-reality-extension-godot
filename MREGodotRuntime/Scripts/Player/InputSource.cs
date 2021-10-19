@@ -19,6 +19,8 @@ namespace Assets.Scripts.User
 
 		public Tool CurrentTool => _currentTool;
 
+		public Spatial Hand { get; private set; }
+
 		public static readonly Guid UserId = new Guid();
 
 		public override void _Ready()
@@ -27,7 +29,8 @@ namespace Assets.Scripts.User
 			// You still want to hit all layers, but only interact with these.
 			uint layerMask = (1 << 0) | (1 << 5) | (1 << 10);
 
-			PokePointer = GetNode<Spatial>("../Right_hand/Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip");
+			Hand = GetNode<Spatial>("../Right_hand");
+			PokePointer = Hand.FindNode("IndexTip") as Spatial;
 
 			rayCast = (RayCast)GetParent().FindNode("HandRay");
 			rayCast.CastTo = new Vector3(0, 0, -1.5f);
