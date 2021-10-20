@@ -7,7 +7,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Assets.Scripts.Tools
 {
-	public class PokeTool
+	public class PokeTool : Tool
 	{
 		RID shape = PhysicsServer.ShapeCreate(PhysicsServer.ShapeType.Sphere);
 		PhysicsDirectSpaceState spaceState;
@@ -117,7 +117,7 @@ namespace Assets.Scripts.Tools
 			return touchableActor;
 		}
 
-		internal void UpdateTool(InputSource inputSource)
+		protected override void UpdateTool(InputSource inputSource)
 		{
 			if (CurrentPointerTarget != null && ClosestProximityTouchable != null)
 			{
@@ -145,6 +145,8 @@ namespace Assets.Scripts.Tools
 
 			PreviousPosition = RayStartPoint;
 		}
+
+		public override void CleanUp() { }
 
 		private void TryRaisePokeDown(InputSource inputSource)
 		{
