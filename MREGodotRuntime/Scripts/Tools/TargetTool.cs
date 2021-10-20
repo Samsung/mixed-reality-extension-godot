@@ -35,6 +35,7 @@ namespace Assets.Scripts.Tools
 		public override void OnToolHeld(InputSource inputSource)
 		{
 			base.OnToolHeld(inputSource);
+			pokeTool.OnToolHeld(inputSource);
 
 			Vector3? hitPoint;
 			var newTarget = FindTarget(inputSource, out hitPoint);
@@ -57,6 +58,7 @@ namespace Assets.Scripts.Tools
 		public override void OnToolDropped(InputSource inputSource)
 		{
 			base.OnToolDropped(inputSource);
+			pokeTool.OnToolDropped(inputSource);
 
 			OnTargetChanged(
 				Target,
@@ -79,18 +81,10 @@ namespace Assets.Scripts.Tools
 				}
 			}
 
+			pokeTool.Update(inputSource);
 			Vector3? hitPoint;
-			var newTarget = pokeTool.FindTarget(inputSource, out hitPoint);
-			if (newTarget != null)
-			{
-				IsNearObject = true;
-				pokeTool.UpdateTool(inputSource);
-			}
-			else
-			{
-				IsNearObject = false;
-				newTarget = FindTarget(inputSource, out hitPoint);
-			}
+
+			var newTarget = FindTarget(inputSource, out hitPoint);
 			if ((Target == null || !Godot.Object.IsInstanceValid(Target)) && (newTarget == null || !Godot.Object.IsInstanceValid(newTarget)))
 			{
 				return;
@@ -195,6 +189,15 @@ namespace Assets.Scripts.Tools
 		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
+			Spatial nearTarget = pokeTool.FindTarget(inputSource, out hitPoint);
+			if (nearTarget != null)
+			{
+				IsNearObject = true;
+				return nearTarget;
+			}
+
+			hitPoint = null;
+			IsNearObject = false;
 
 			if (inputSource.rayCast.IsColliding())
 			{
