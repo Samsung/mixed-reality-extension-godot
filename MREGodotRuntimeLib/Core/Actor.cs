@@ -292,6 +292,8 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
+		internal bool Touchable { get; private set; }
+
 		#endregion
 
 		#region Methods - Internal
@@ -1651,6 +1653,29 @@ namespace MixedRealityExtension.Core
 					}
 				}
 				Grabbable = grabbable.Value;
+			}
+		}
+
+		internal void PatchTouchable(bool? touchable)
+		{
+			if (touchable != null && touchable.Value != Touchable)
+			{
+				// Update existing behavior or add a basic target behavior if there isn't one already.
+				var behaviorComponent = GetActorComponent<BehaviorComponent>();
+				if (behaviorComponent == null)
+				{
+					behaviorComponent = GetOrCreateActorComponent<BehaviorComponent>();
+					var context = BehaviorContextFactory.CreateContext(BehaviorType.Button, this, new WeakReference<MixedRealityExtensionApp>(App));
+
+					if (context == null)
+					{
+						GD.PushError("Failed to create a behavior context.  Touch will not work without one.");
+						return;
+					}
+
+					behaviorComponent.SetBehaviorContext(context);
+				}
+				Touchable = touchable.Value;
 			}
 		}
 
