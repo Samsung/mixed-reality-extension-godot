@@ -944,6 +944,7 @@ namespace MixedRealityExtension.App
 				{
 					var button = _buttonScene.Instance<PressableButtonGodot>();
 					actor.AddChild(button);
+					actor.PatchTouchable(true);
 					button.ApplyColor(payload.Color);
 				}
 
