@@ -42,18 +42,21 @@ namespace Assets.Scripts.Tools
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
 			BaseNearInteractionTouchable touchable = null;
+			Spatial touchableActor = null;
 			hitPoint = null;
 
 			foreach (Dictionary intersectResult in intersectShapes)
 			{
 				var closestDistance = float.PositiveInfinity;
 				var collider = (Spatial)intersectResult["collider"];
-				Spatial actor = null;
 
-				for (actor = collider; actor != null; actor = actor.GetParent<Spatial>())
-					if (actor is Actor) break;
+				for (touchableActor = collider; touchableActor != null; touchableActor = touchableActor.GetParent<Spatial>())
+					if (touchableActor is Actor) break;
 
-				touchable = FindBaseNearInteractionTouchable(actor);
+				if (touchableActor == null || !((Actor)touchableActor).Touchable)
+					return null;
+
+				touchable = FindBaseNearInteractionTouchable(touchableActor);
 
 				BaseNearInteractionTouchable FindBaseNearInteractionTouchable(Node node)
 				{
@@ -98,17 +101,20 @@ namespace Assets.Scripts.Tools
 				Vector3 rayEndPoint = (Vector3)IntersectRayResult["position"];
 				var collider = (Spatial)IntersectRayResult["collider"];
 				Spatial actor;
+
 				for (actor = collider; actor != null; actor = actor.GetParent<Spatial>())
 					if (actor is Actor) break;
-				if (actor == null)
+
+				if (actor == null || !((Actor)actor).Touchable)
 					return null;
+
 				CurrentPointerTarget = actor;
 				IntersectionPosition = inputSource.PokePointer.GlobalTransform.origin - inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * 0.01f;
 				hitPoint = IntersectionPosition;
 				RayEndPoint = rayEndPoint;
 			}
 
-			return touchable;
+			return touchableActor;
 		}
 
 		internal void UpdateTool(InputSource inputSource)
