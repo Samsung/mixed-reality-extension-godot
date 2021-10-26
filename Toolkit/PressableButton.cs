@@ -134,7 +134,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         // The maximum distance before the button is reset to its initial position when retracting.
         private const float MaxRetractDistanceBeforeReset = 0.0001f;
 
-        private Dictionary<PokeTool, Vector3> touchPoints = new Dictionary<PokeTool, Vector3>();
+        private Dictionary<Tool, Vector3> touchPoints = new Dictionary<Tool, Vector3>();
 
         private float currentPushDistance = 0.0f;
 
@@ -389,9 +389,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
         }
 */
-        private bool HasPassedThroughStartPlane(HandTrackingInputEventData eventData)
+        private bool HasPassedThroughStartPlane(TouchInputEventData eventData)
         {
-            PokeTool poke = eventData.PokeTool;
+            PokeTool poke = eventData.Tool as PokeTool;
             if (poke != null && poke.CurrentTouchableObjectDown != null)
             {
                 // Extrapolate to get previous position.
@@ -402,9 +402,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
             return false;
         }
 
-        void IMixedRealityTouchHandler.OnTouchStarted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchStarted(TouchInputEventData eventData)
         {
-            if (touchPoints.ContainsKey(eventData.PokeTool))
+            if (touchPoints.ContainsKey(eventData.Tool))
             {
                 return;
             }
@@ -416,28 +416,28 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 return;
             }
 
-            touchPoints.Add(eventData.PokeTool, eventData.PokeTool.IntersectionPosition);
+            touchPoints.Add(eventData.Tool, eventData.InputData);
 
             IsTouching = true;
         }
 
-        void IMixedRealityTouchHandler.OnTouchUpdated(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchUpdated(TouchInputEventData eventData)
         {
-            if (touchPoints.ContainsKey(eventData.PokeTool))
+            if (touchPoints.ContainsKey(eventData.Tool))
             {
-                touchPoints[eventData.PokeTool] = eventData.PokeTool.IntersectionPosition;
+                touchPoints[eventData.Tool] = eventData.InputData;
             }
         }
 
-        void IMixedRealityTouchHandler.OnTouchCompleted(HandTrackingInputEventData eventData)
+        void IMixedRealityTouchHandler.OnTouchCompleted(TouchInputEventData eventData)
         {
-            if (touchPoints.ContainsKey(eventData.PokeTool))
+            if (touchPoints.ContainsKey(eventData.Tool))
             {
                 // When focus is lost, before removing controller, update the respective touch point to give a last chance for checking if pressed occurred
-                touchPoints[eventData.PokeTool] = eventData.PokeTool.IntersectionPosition;
+                touchPoints[eventData.Tool] = eventData.InputData;
                 UpdateTouch();
 
-                touchPoints.Remove(eventData.PokeTool);
+                touchPoints.Remove(eventData.Tool);
 
                 IsTouching = (touchPoints.Count > 0);
             }
