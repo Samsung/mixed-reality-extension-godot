@@ -42,21 +42,22 @@ namespace Assets.Scripts.Tools
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
 			BaseNearInteractionTouchable touchable = null;
-			Spatial touchableActor = null;
+
 			hitPoint = null;
 
 			foreach (Dictionary intersectResult in intersectShapes)
 			{
 				var closestDistance = float.PositiveInfinity;
 				var collider = (Spatial)intersectResult["collider"];
+				Spatial actor = null;
 
-				for (touchableActor = collider; touchableActor != null; touchableActor = touchableActor.GetParent<Spatial>())
-					if (touchableActor is Actor) break;
+				for (actor = collider; actor != null; actor = actor.GetParent<Spatial>())
+					if (actor is Actor) break;
 
-				if (touchableActor == null || !((Actor)touchableActor).Touchable)
+				if (actor == null || !((Actor)actor).Touchable)
 					return null;
 
-				touchable = FindBaseNearInteractionTouchable(touchableActor);
+				touchable = FindBaseNearInteractionTouchable(actor);
 
 				BaseNearInteractionTouchable FindBaseNearInteractionTouchable(Node node)
 				{
@@ -112,9 +113,12 @@ namespace Assets.Scripts.Tools
 				IntersectionPosition = inputSource.PokePointer.GlobalTransform.origin - inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * 0.01f;
 				hitPoint = IntersectionPosition;
 				RayEndPoint = rayEndPoint;
+
+				if (ClosestProximityTouchable != null)
+					return CurrentPointerTarget;
 			}
 
-			return touchableActor;
+			return null;
 		}
 
 		protected override void UpdateTool(InputSource inputSource)
@@ -164,11 +168,11 @@ namespace Assets.Scripts.Tools
 						{
 							buttonBehavior.Context.StartButton(mwUser, IntersectionPosition);
 							((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
+
+							var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityTouchHandler>(CurrentTouchableObjectDown);
+							if (handler != null) handler.OnTouchStarted(new TouchInputEventData(this, IntersectionPosition));
 						}
 					}
-
-					if (ClosestProximityTouchable.node is IMixedRealityTouchHandler handler)
-						handler.OnTouchStarted(new HandTrackingInputEventData(this));
 				}
 			}
 			else
@@ -189,11 +193,12 @@ namespace Assets.Scripts.Tools
 					{
 						buttonBehavior.Context.EndButton(mwUser, IntersectionPosition);
 						buttonBehavior.Context.Click(mwUser, IntersectionPosition);
+
+						var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityTouchHandler>(CurrentTouchableObjectDown);
+						if (handler != null) handler.OnTouchCompleted(new TouchInputEventData(this, IntersectionPosition));
 					}
 				}
 
-				if (ClosestProximityTouchable.node is IMixedRealityTouchHandler handler)
-					handler.OnTouchCompleted(new HandTrackingInputEventData(this));
 				CurrentTouchableObjectDown = null;
 			}
 		}
@@ -202,8 +207,8 @@ namespace Assets.Scripts.Tools
 		{
 			if (CurrentTouchableObjectDown != null)
 			{
-				if (ClosestProximityTouchable.node is IMixedRealityTouchHandler handler)
-					handler.OnTouchUpdated(new HandTrackingInputEventData(this));
+				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityTouchHandler>(CurrentTouchableObjectDown);
+				if (handler != null) handler.OnTouchUpdated(new TouchInputEventData(this, IntersectionPosition));
 			}
 		}
 
