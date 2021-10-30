@@ -1,9 +1,5 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
-using MixedRealityExtension.Behaviors.Actions;
-using Godot;
-using System;
+﻿using Godot;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace Microsoft.MixedReality.Toolkit.Input
 {
@@ -11,15 +7,15 @@ namespace Microsoft.MixedReality.Toolkit.Input
     {
         public static T FindEventHandler<T>(Node node) where T : class
         {
-            if (node is T EventHandler)
-                return EventHandler;
-
-            foreach (Node child in node.GetChildren())
+            var handler = node.GetChild<T>();
+            while (handler == null)
             {
-                var touchableChild = FindEventHandler<T>(child);
-                if (touchableChild != null) return touchableChild;
+                node = node.GetParent<Node>();
+                if (node == null) return null;
+                handler = node.GetChild<T>();
             }
-            return null;
+
+            return handler;
         }
     }
 }
