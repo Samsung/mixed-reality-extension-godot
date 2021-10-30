@@ -100,6 +100,7 @@ namespace Assets.Scripts.Tools
 
 				CurrentTargetPoint = hitPoint.Value;
 				_currentTargetBehavior.Context.UpdateTargetPoint(mwUser, CurrentTargetPoint);
+				OnTargetPointUpdated(CurrentTargetPoint);
 				return;
 			}
 
@@ -169,6 +170,11 @@ namespace Assets.Scripts.Tools
 			CurrentTargetPoint = newTargetPoint;
 			Target = newTarget;
 			_currentTargetBehavior = newBehavior;
+		}
+
+		protected virtual void OnTargetPointUpdated(Vector3 point)
+		{
+
 		}
 
 		protected virtual void OnGrabStateChanged(GrabState oldGrabState, GrabState newGrabState, InputSource inputSource)
