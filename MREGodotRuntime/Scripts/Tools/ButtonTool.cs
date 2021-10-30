@@ -3,11 +3,14 @@
 using Assets.Scripts.Behaviors;
 using Assets.Scripts.User;
 using Godot;
+using Microsoft.MixedReality.Toolkit.Input;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace Assets.Scripts.Tools
 {
 	public class ButtonTool : TargetTool
 	{
+		private bool pressed;
 		protected override void UpdateTool(InputSource inputSource)
 		{
 			base.UpdateTool(inputSource);
@@ -17,7 +20,7 @@ namespace Assets.Scripts.Tools
 				return;
 			}
 
-			if (Input.IsActionPressed("Fire1"))
+			if (Input.IsActionJustPressed("Fire1"))
 			{
 				var buttonBehavior = Target.GetBehavior<ButtonBehavior>();
 				if (buttonBehavior != null)
@@ -29,6 +32,9 @@ namespace Assets.Scripts.Tools
 						((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
 					}
 				}
+				pressed = true;
+				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityPointerHandler>(Target);
+				handler?.OnPointerDown(new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 			else if (Input.IsActionJustReleased("Fire1"))
 			{
@@ -42,6 +48,9 @@ namespace Assets.Scripts.Tools
 						buttonBehavior.Context.Click(mwUser, CurrentTargetPoint);
 					}
 				}
+				pressed = false;
+				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityPointerHandler>(Target);
+				handler?.OnPointerUp(new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 			else
 			{
@@ -90,6 +99,15 @@ namespace Assets.Scripts.Tools
 						newButtonBehavior.Context.StartHover(mwUser, newTargetPosition);
 					}
 				}
+			}
+		}
+
+		protected override void OnTargetPointUpdated(Vector3 point)
+		{
+			if (pressed)
+			{
+				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityPointerHandler>(Target);
+				handler?.OnPointerDragged(new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 		}
 	}
