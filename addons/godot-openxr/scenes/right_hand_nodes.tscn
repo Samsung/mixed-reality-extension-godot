@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://addons/godot-openxr/scenes/center_ball_material.tres" type="Material" id=1]
 [ext_resource path="res://addons/godot-openxr/scenes/hand.gd" type="Script" id=2]
@@ -9,7 +9,6 @@
 [ext_resource path="res://addons/godot-openxr/scenes/IndexTip.cs" type="Script" id=7]
 [ext_resource path="res://addons/godot-openxr/scenes/ThumbMetacarpal.cs" type="Script" id=8]
 [ext_resource path="res://Hand_Right2.tscn" type="PackedScene" id=9]
-[ext_resource path="res://addons/godot-openxr/scenes/HandRayMesh.cs" type="Script" id=10]
 
 [sub_resource type="SphereMesh" id=1]
 material = ExtResource( 1 )
@@ -46,9 +45,6 @@ tracks/0/keys = {
 "update": 0,
 "values": [ Vector3( 0.061, -0.056, 0 ), Vector3( 0.061, -0.056, -0.06 ) ]
 }
-
-[sub_resource type="PlaneMesh" id=5]
-size = Vector2( 0.01, 1 )
 
 [node name="Right_hand" type="Spatial"]
 script = ExtResource( 5 )
@@ -301,17 +297,6 @@ material/0 = null
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
 mesh = SubResource( 3 )
 material/0 = null
-
-[node name="HandRay" type="RayCast" parent="Wrist"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.177752, 0.148555, -0.25533 )
-enabled = true
-collide_with_areas = true
-
-[node name="HandRayMesh" type="MeshInstance" parent="Wrist/HandRay"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, -0.75 )
-mesh = SubResource( 5 )
-material/0 = null
-script = ExtResource( 10 )
 
 [node name="Hand_Right2" parent="Wrist" instance=ExtResource( 9 )]
 transform = Transform( -4.40745e-09, -4.34886e-08, -1, -0.994904, 0.100831, 0, 0.100831, 0.994904, -4.37114e-08, -0.0608492, 0.0561047, -0.134 )
