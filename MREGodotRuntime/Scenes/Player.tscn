@@ -33,4 +33,4 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.354911, -0.272587, -0.5 )
 
 [node name="Right_hand" parent="." instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.287451, -0.147161, -0.0875298 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.287451, -0.147161, -0.56136 )
