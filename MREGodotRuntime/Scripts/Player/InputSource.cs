@@ -35,7 +35,7 @@ namespace Assets.Scripts.User
 			player = GetParent<Spatial>();
 			spaceState = GetWorld().DirectSpaceState;
 
-			Hand = GetNode<Spatial>("../Right_hand");
+			Hand = GetNode<Spatial>("../MRTK_R_Hand");
 			RayCastMesh = new MeshInstance()
 			{
 				Mesh = new PlaneMesh()
@@ -142,6 +142,16 @@ namespace Assets.Scripts.User
 			else if (Input.IsActionJustReleased("hand_touch"))
 			{
 				animationPlayerTouch.PlayBackwards("touch");
+			}
+			if (Input.IsActionJustPressed("Fire2"))
+			{
+				var animationPlayer = Hand.GetNode<AnimationPlayer>("AnimationPlayer");
+				animationPlayer?.Play("Pinch");
+			}
+			else if (Input.IsActionJustReleased("Fire2"))
+			{
+				var animationPlayer = Hand.GetNode<AnimationPlayer>("AnimationPlayer");
+				animationPlayer?.PlayBackwards("Pinch");
 			}
 		}
 	}
