@@ -26,6 +26,7 @@ using MWSound = MixedRealityExtension.Assets.Sound;
 using MWVideoStream = MixedRealityExtension.Assets.VideoStream;
 using GodotGLTF.Loader;
 using GodotGLTF;
+using Microsoft.MixedReality.Toolkit.UI;
 
 namespace MixedRealityExtension.Assets
 {
@@ -36,6 +37,12 @@ namespace MixedRealityExtension.Assets
 		private readonly MixedRealityExtensionApp _app;
 
 		private readonly Node _owner;
+		internal readonly static Dictionary<Type, PackedScene> PackedToolkitScene = new Dictionary<Type, PackedScene>()
+		{
+			{ typeof(PressableButtonGodot), ResourceLoader.Load<PackedScene>("res://Toolkit/PressableButtonGodot.tscn") },
+			{ typeof(PinchSlider), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSlider.tscn") },
+			{ typeof(PinchSliderThumb), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSliderThumb.tscn") }
+		};
 
 		//private readonly AsyncCoroutineHelper _asyncHelper;
 
@@ -68,15 +75,6 @@ namespace MixedRealityExtension.Assets
 		}
 
 		internal IList<Actor> CreateEmpty(Guid? parentId)
-		{
-			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
-			Actor actor = Actor.Instantiate(newGO);
-			GetGameObjectFromParentId(parentId).AddChild(actor);
-
-			return new List<Actor>() { actor };
-		}
-
-		internal IList<Actor> CreateFromToolkitButton(Guid? parentId)
 		{
 			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
 			Actor actor = Actor.Instantiate(newGO);
