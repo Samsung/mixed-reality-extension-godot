@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-using System.Collections;
 using System.Collections.Generic;
 using Godot;
 using MixedRealityExtension.App;
 using MixedRealityExtension.PluginInterfaces;
 using System;
+using Godot.Collections;
 
 public class DialogFactory : MeshInstance, IDialogFactory
 {
@@ -33,7 +33,7 @@ public class DialogFactory : MeshInstance, IDialogFactory
 		label = GetNode<ConfirmationDialog>("Viewport/ConfirmationDialog");
 		input = GetNode<TextEdit>("Viewport/ConfirmationDialog/Node2D/TextEdit");
 		viewport = GetNode<Viewport>("Viewport");
-		
+
 		label.AnchorTop = 0.5f;
 		label.AnchorLeft = 0.5f;
 		label.AnchorRight = 0.5f;
@@ -60,7 +60,13 @@ public class DialogFactory : MeshInstance, IDialogFactory
 	{
 		if (Visible && Input.IsActionJustReleased("Fire1"))
 		{
-			var collisionPoint = ToLocal(inputSourceNode.rayCast.GetCollisionPoint());
+			Vector3 collisionPoint = Vector3.Zero;
+			Dictionary RayIntersectionResult = inputSourceNode.IntersectRay();
+			if (RayIntersectionResult.Count > 0)
+			{
+				collisionPoint = (Vector3)RayIntersectionResult["position"];
+			}
+			collisionPoint = ToLocal(collisionPoint);
 
 			InputEventMouseButton inputEvent = new InputEventMouseButton();
 			inputEvent.Position = new Vector2((collisionPoint.x + 0.5f) * 1000, (collisionPoint.y - 0.5f) * -1000);
@@ -85,7 +91,7 @@ public class DialogFactory : MeshInstance, IDialogFactory
 
 		activeDialog = queue.Dequeue();
 		label.DialogText = activeDialog.text;
-		
+
 		if (activeDialog.allowInput)
 		{
 			label.DialogText += "\n\n";

@@ -5,6 +5,7 @@ using Assets.Scripts.User;
 using System.Linq;
 using Godot;
 using MixedRealityExtension.Util.GodotHelper;
+using Godot.Collections;
 
 namespace Assets.Scripts.Tools
 {
@@ -205,20 +206,22 @@ namespace Assets.Scripts.Tools
 			hitPoint = null;
 			IsNearObject = false;
 
-			if (inputSource.rayCast.IsColliding())
+			Dictionary RayIntersectionResult = inputSource.IntersectRay();
+
+			if (RayIntersectionResult.Count > 0)
 			{
-				hitPoint = inputSource.rayCast.GetCollisionPoint();
-				var distance = ((Vector3)hitPoint).DistanceTo(inputSource.rayCast.GlobalTransform.origin);
+				hitPoint = (Vector3)RayIntersectionResult["position"];
+				var distance = ((Vector3)hitPoint).DistanceTo(inputSource.Hand.GlobalTransform.origin);
 				inputSource.RayCastMesh.Scale = new Vector3(1, 1, distance);
 				inputSource.RayCastMesh.Translation = new Vector3(0, 0, -distance / 2);
 
-				for (var node = (inputSource.rayCast.GetCollider() as Node); node != null; node = node.GetParent())
+				for (var node = (Spatial)RayIntersectionResult["collider"]; node != null; node = node.GetParent<Spatial>())
 				{
 					if (node is MixedRealityExtension.Core.Actor a)
 					{
 						if (node.GetChild<TargetBehavior>() != null)
 						{
-							var hitPointNormal = inputSource.rayCast.GetCollisionNormal();
+							var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
 							if (!inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = true;
 							var newTransform = LookAtHitPoint((Vector3)hitPoint, hitPointNormal, inputSource.CollisionPoint.GlobalTransform.basis.y);
 
@@ -226,7 +229,7 @@ namespace Assets.Scripts.Tools
 							{
 								inputSource.CollisionPoint.GlobalTransform = newTransform;
 							}
-							return node as Spatial;
+							return node;
 						}
 						else
 						{
