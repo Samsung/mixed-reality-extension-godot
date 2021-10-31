@@ -32,6 +32,8 @@ using Regex = System.Text.RegularExpressions.Regex;
 using System.Text;
 using System.Security.Cryptography;
 using System.Threading;
+using Microsoft.MixedReality.Toolkit.Input;
+using MixedRealityExtension.Behaviors.Contexts;
 
 namespace MixedRealityExtension.App
 {
@@ -44,7 +46,6 @@ namespace MixedRealityExtension.App
 		internal readonly AnimationManager AnimationManager;
 		private readonly AssetManager _assetManager;
 		private readonly Node _ownerScript;
-		private PackedScene _buttonScene;
 
 		private IConnectionInternal _conn;
 
@@ -936,18 +937,83 @@ namespace MixedRealityExtension.App
 		{
 			try
 			{
-				if (_buttonScene == null) _buttonScene = ResourceLoader.Load<PackedScene>("res://Toolkit/PressableButtonGodot.tscn");
-				var actors = _assetLoader.CreateFromToolkitButton(payload.Actor?.ParentId);
+				var actors = _assetLoader.CreateEmpty(payload.Actor?.ParentId);
 				ProcessCreatedActors(payload, actors, onCompleteCallback);
 
 				foreach (var actor in actors)
 				{
-					var button = _buttonScene.Instance<PressableButtonGodot>();
+					var button = AssetLoader.PackedToolkitScene[typeof(PressableButtonGodot)].Instance<PressableButtonGodot>();
 					actor.AddChild(button);
 					actor.PatchTouchable(true);
 					button.ApplyColor(payload.Color);
 				}
+			}
+			catch (Exception e)
+			{
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.PushError(e.ToString());
+			}
+		}
 
+		[CommandHandler(typeof(CreateFromToolkitPinchSlider))]
+		private void OnCreateFromToolkitPinchSlider(CreateFromToolkitPinchSlider payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var actors = _assetLoader.CreateEmpty(payload.Actor?.ParentId);
+				ProcessCreatedActors(payload, actors, onCompleteCallback);
+
+				foreach (var actor in actors)
+				{
+					var pinchSlider = AssetLoader.PackedToolkitScene[typeof(PinchSlider)].Instance<PinchSlider>();
+					var thumb = FindActor(payload.ThumbId) as Actor;
+					pinchSlider.ThumbActor = thumb;
+					thumb.ParentId = actor.Id;
+					actor.AddChild(pinchSlider);
+
+					var nearInteractionGrabbable = new NearInteractionGrabbable();
+					actor.AddChild(nearInteractionGrabbable);
+
+					var behaviorComponent = actor.GetOrCreateActorComponent<BehaviorComponent>();
+					var context = BehaviorContextFactory.CreateContext(Behaviors.BehaviorType.Button, actor, new WeakReference<MixedRealityExtensionApp>(this));
+					if (context == null)
+					{
+						GD.PushError($"Failed to create behavior for behavior type BehaviorType.Button");
+					}
+					behaviorComponent.SetBehaviorContext(context);
+				}
+			}
+			catch (Exception e)
+			{
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.PushError(e.ToString());
+			}
+		}
+
+		[CommandHandler(typeof(CreateFromToolkitPinchSliderThumb))]
+		private void OnCreateFromToolkitPinchSliderThumb(CreateFromToolkitPinchSliderThumb payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var actors = _assetLoader.CreateEmpty(payload.Actor?.ParentId);
+				ProcessCreatedActors(payload, actors, onCompleteCallback);
+
+				foreach (var actor in actors)
+				{
+					var pinchSliderThumb = AssetLoader.PackedToolkitScene[typeof(PinchSliderThumb)].Instance<PinchSliderThumb>();
+					actor.AddChild(pinchSliderThumb);
+
+					var nearInteractionGrabbable = new NearInteractionGrabbable();
+					actor.AddChild(nearInteractionGrabbable);
+
+					var behaviorComponent = actor.GetOrCreateActorComponent<BehaviorComponent>();
+					var context = BehaviorContextFactory.CreateContext(Behaviors.BehaviorType.Button, actor, new WeakReference<MixedRealityExtensionApp>(this));
+					if (context == null)
+					{
+						GD.PushError($"Failed to create behavior for behavior type BehaviorType.Button");
+					}
+					behaviorComponent.SetBehaviorContext(context);
+				}
 			}
 			catch (Exception e)
 			{
