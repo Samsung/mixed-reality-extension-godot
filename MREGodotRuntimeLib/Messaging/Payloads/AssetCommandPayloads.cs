@@ -90,6 +90,23 @@ namespace MixedRealityExtension.Messaging.Payloads
 
 	/// <summary>
 	/// App => Engine
+	/// Instructs the engine to instantiate the Toolkit Pinch Slider.
+	/// </summary>
+	public class CreateFromToolkitPinchSlider : CreateActor
+	{
+		public Guid ThumbId;
+	}
+
+	/// <summary>
+	/// App => Engine
+	/// Instructs the engine to instantiate the Toolkit Pinch Slider Thumb.
+	/// </summary>
+	public class CreateFromToolkitPinchSliderThumb : CreateActor
+	{
+	}
+
+	/// <summary>
+	/// App => Engine
 	/// Generate a new native asset with the included properties
 	/// </summary>
 	public class CreateAsset : NetworkCommandPayload
