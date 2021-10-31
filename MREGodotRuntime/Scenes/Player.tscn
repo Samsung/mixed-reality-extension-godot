@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://addons/godot-openxr/OpenXRConfig.gdns" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scenes/Player.gd" type="Script" id=2]
 [ext_resource path="res://MREGodotRuntime/Scripts/Player/InputSource.cs" type="Script" id=3]
+[ext_resource path="res://addons/godot-openxr/scenes/MRTK_R_Hand.tscn" type="PackedScene" id=4]
 [ext_resource path="res://addons/godot-openxr/scenes/right_hand_nodes.tscn" type="PackedScene" id=5]
 [ext_resource path="res://addons/godot-openxr/scenes/left_hand_nodes.tscn" type="PackedScene" id=6]
 
@@ -31,6 +32,13 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
 
 [node name="Left_hand" parent="." instance=ExtResource( 6 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.354911, -0.272587, -0.5 )
+visible = false
+script = null
 
 [node name="Right_hand" parent="." instance=ExtResource( 5 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.287451, -0.147161, -0.56136 )
+visible = false
+script = null
+
+[node name="MRTK_R_Hand" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.124828, -0.006109, -0.308115 )
