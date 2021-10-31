@@ -28,14 +28,14 @@ namespace Assets.Scripts.User
 		private const uint LayerMask = (1 << 0) | (1 << 5) | (1 << 10);
 		private PhysicsDirectSpaceState spaceState;
 		private Spatial player;
+		private AnimationPlayer animationPlayerTouch;
 
 		public override void _Ready()
 		{
-			Hand = GetNode<Spatial>("../Right_hand");
-			PokePointer = Hand.FindNode("IndexTip") as Spatial;
 			player = GetParent<Spatial>();
 			spaceState = GetWorld().DirectSpaceState;
 
+			Hand = GetNode<Spatial>("../Right_hand");
 			RayCastMesh = new MeshInstance()
 			{
 				Mesh = new PlaneMesh()
@@ -44,6 +44,19 @@ namespace Assets.Scripts.User
 				}
 			};
 			Hand.CallDeferred("add_child", RayCastMesh);
+
+			PokePointer = new Spatial();
+			Hand.AddChild(PokePointer);
+			var proximityLight = new OmniLight()
+			{
+				OmniRange = 0.0339852f,
+				OmniAttenuation = 1.46409f,
+				LightEnergy = 0.66f,
+				LightIndirectEnergy = 0,
+				ShadowEnabled = true,
+				LightCullMask = 4,
+			};
+			Hand.AddChild(proximityLight);
 
 			CollisionPoint = new CSGTorus()
 			{
@@ -60,6 +73,17 @@ namespace Assets.Scripts.User
 
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
+
+			// Animation Players for the test.
+			var animTouch = new Animation();
+			var track = animTouch.AddTrack(Animation.TrackType.Value);
+			animTouch.Length = 0.3f;
+			animTouch.TrackSetPath(track, this.GetPathTo(Hand) + ":translation");
+			animTouch.TrackInsertKey(track, 0, Hand.Transform.origin);
+			animTouch.TrackInsertKey(track, 0.3f, Hand.Transform.origin - Hand.Transform.basis.z * 0.06f);
+			animationPlayerTouch = new AnimationPlayer();
+			animationPlayerTouch.AddAnimation("touch", animTouch);
+			AddChild(animationPlayerTouch);
 		}
 
 		public void HoldTool(Type toolType)
@@ -107,6 +131,18 @@ namespace Assets.Scripts.User
 			_currentTool.Update(this);
 			var localPosition = RayCastMesh.ToLocal(player.GlobalTransform.origin) * Scale;
 			RayCastMesh.Rotate(Transform.basis.z.Normalized(), Mathf.Atan2(localPosition.y, localPosition.x) - Mathf.Pi / 2);
+		}
+
+		public override void _Input(InputEvent ev)
+		{
+			if (Input.IsActionJustPressed("hand_touch"))
+			{
+				animationPlayerTouch.Play("touch");
+			}
+			else if (Input.IsActionJustReleased("hand_touch"))
+			{
+				animationPlayerTouch.PlayBackwards("touch");
+			}
 		}
 	}
 }

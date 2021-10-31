@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://addons/godot-openxr/scenes/center_ball_material.tres" type="Material" id=1]
 [ext_resource path="res://addons/godot-openxr/scenes/hand.gd" type="Script" id=2]
@@ -6,8 +6,6 @@
 [ext_resource path="res://addons/godot-openxr/scenes/bone_material.tres" type="Material" id=4]
 [ext_resource path="res://addons/godot-openxr/OpenXRHand.gdns" type="Script" id=5]
 [ext_resource path="res://MREGodotRuntime/Scripts/ThumbTip.cs" type="Script" id=6]
-[ext_resource path="res://addons/godot-openxr/scenes/IndexTip.cs" type="Script" id=7]
-[ext_resource path="res://addons/godot-openxr/scenes/ThumbMetacarpal.cs" type="Script" id=8]
 [ext_resource path="res://Hand_Right2.tscn" type="PackedScene" id=9]
 
 [sub_resource type="SphereMesh" id=1]
@@ -30,28 +28,12 @@ top_radius = 0.005
 bottom_radius = 0.005
 height = 1.0
 
-[sub_resource type="Animation" id=4]
-resource_name = "touch"
-length = 0.3
-tracks/0/type = "value"
-tracks/0/path = NodePath("../../../../..:translation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.3 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Vector3( 0.061, -0.056, 0 ), Vector3( 0.061, -0.056, -0.06 ) ]
-}
-
 [node name="Right_hand" type="Spatial"]
 script = ExtResource( 5 )
 hand = 1
 
 [node name="Wrist" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0608492, -0.0561047, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.181, -0.151, 0.306 )
 mesh = SubResource( 1 )
 material/0 = null
 script = ExtResource( 2 )
@@ -60,7 +42,6 @@ script = ExtResource( 2 )
 transform = Transform( 0.951057, 0, -0.309017, 0, 1, 0, 0.309017, 0, 0.951057, -0.0692335, 0, -0.0460943 )
 mesh = SubResource( 2 )
 material/0 = null
-script = ExtResource( 8 )
 
 [node name="ThumbProximal" type="MeshInstance" parent="Wrist/ThumbMetacarpal"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0474696, 0, -0.0345762 )
@@ -118,32 +99,8 @@ material/0 = null
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00697044, 0, -0.0469604 )
 mesh = SubResource( 2 )
 material/0 = null
-script = ExtResource( 7 )
 
 [node name="socket-right-index" type="Spatial" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
-anims/touch = SubResource( 4 )
-
-[node name="ProximityVisibleLight" type="OmniLight" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
-light_energy = 1.46
-light_cull_mask = 4293918722
-omni_range = 0.0923046
-
-[node name="ProximityLight" type="OmniLight" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
-light_energy = 0.66
-light_indirect_energy = 0.0
-light_cull_mask = 4293918724
-shadow_enabled = true
-omni_range = 0.0339852
-omni_attenuation = 1.46409
-
-[node name="RayCast" type="RayCast" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0474379 )
-enabled = true
-cast_to = Vector3( 0, 0, -1 )
-collision_mask = 64
-collide_with_areas = true
 
 [node name="IndexDistal_Bone" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal"]
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )

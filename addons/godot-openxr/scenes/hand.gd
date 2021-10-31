@@ -43,4 +43,3 @@ func _physics_process(delta):
 func _process(delta):
 	# cheating because we can't extend gdns scripts...
 	var parent = get_parent()
-	parent.visible = true #parent.is_active()
