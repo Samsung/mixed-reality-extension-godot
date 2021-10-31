@@ -10,6 +10,8 @@ namespace Assets.Scripts.User
 	public class InputSource : Camera
 	{
 		private Tool _currentTool;
+		private bool isPinching;
+		private bool pinchChaged;
 
 		internal MeshInstance RayCastMesh;
 		internal Spatial PokePointer;
@@ -20,6 +22,33 @@ namespace Assets.Scripts.User
 		public Tool CurrentTool => _currentTool;
 
 		public Spatial Hand { get; private set; }
+
+		public bool IsPinching
+		{
+			get => isPinching;
+			set
+			{
+				PinchChaged = isPinching != value;
+				isPinching = value;
+			}
+		}
+
+		public bool PinchChaged
+		{
+			get
+			{
+				var ret = pinchChaged;
+				if (pinchChaged) pinchChaged = false;
+				return ret;
+			}
+			private set
+			{
+				pinchChaged = value;
+			}
+		}
+
+		public Spatial ThumbTip { get; private set; }
+		public Spatial IndexTip { get; private set; }
 
 		public static readonly Guid UserId = new Guid();
 
@@ -36,6 +65,9 @@ namespace Assets.Scripts.User
 			spaceState = GetWorld().DirectSpaceState;
 
 			Hand = GetNode<Spatial>("../MRTK_R_Hand");
+			ThumbTip = Hand.GetNode<Spatial>("R_Hand_MRTK_Rig2/Skeleton/Thumb_Tip");
+			IndexTip = Hand.GetNode<Spatial>("R_Hand_MRTK_Rig2/Skeleton/Pointer_Tip");
+
 			RayCastMesh = new MeshInstance()
 			{
 				Mesh = new PlaneMesh()
@@ -128,7 +160,12 @@ namespace Assets.Scripts.User
 
 		public override void _Process(float delta)
 		{
+			if ((ThumbTip.GlobalTransform.origin.DistanceTo(IndexTip.GlobalTransform.origin) < 0.03f) ^ isPinching)
+			{
+				IsPinching = !isPinching;
+			}
 			_currentTool.Update(this);
+
 			var localPosition = RayCastMesh.ToLocal(player.GlobalTransform.origin) * Scale;
 			RayCastMesh.Rotate(Transform.basis.z.Normalized(), Mathf.Atan2(localPosition.y, localPosition.x) - Mathf.Pi / 2);
 		}

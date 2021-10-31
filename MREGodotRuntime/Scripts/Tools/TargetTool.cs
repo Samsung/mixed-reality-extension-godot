@@ -13,7 +13,8 @@ namespace Assets.Scripts.Tools
 	public class TargetTool : Tool
 	{
 		private GrabTool _grabTool = new GrabTool();
-		protected PokeTool pokeTool = new PokeTool();
+		private PokeTool pokeTool = new PokeTool();
+		private SphereTool sphereTool = new SphereTool();
 		private TargetBehavior _currentTargetBehavior;
 
 		public bool IsNearObject;
@@ -38,6 +39,7 @@ namespace Assets.Scripts.Tools
 		{
 			base.OnToolHeld(inputSource);
 			pokeTool.OnToolHeld(inputSource);
+			sphereTool.OnToolHeld(inputSource);
 
 			Vector3? hitPoint;
 			var newTarget = FindTarget(inputSource, out hitPoint);
@@ -84,6 +86,7 @@ namespace Assets.Scripts.Tools
 			}
 
 			pokeTool.Update(inputSource);
+			sphereTool.Update(inputSource);
 			Vector3? hitPoint;
 
 			var newTarget = FindTarget(inputSource, out hitPoint);
@@ -203,7 +206,7 @@ namespace Assets.Scripts.Tools
 		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
-			Spatial nearTarget = pokeTool.FindTarget(inputSource, out hitPoint);
+			Spatial nearTarget = inputSource.IsPinching ? sphereTool.FindTarget(inputSource, out hitPoint) : pokeTool.FindTarget(inputSource, out hitPoint);
 			if (nearTarget != null)
 			{
 				IsNearObject = true;

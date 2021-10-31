@@ -163,7 +163,19 @@ tracks/21/keys = PoolRealArray( 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0.2, 1, 0, 0
 [node name="MRTK_R_Hand" instance=ExtResource( 1 )]
 
 [node name="R_Hand_MRTK_Rig2" parent="." index="0"]
-transform = Transform( -1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.00478703, -0.00622308, -0.00957398 )
+transform = Transform( -1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0.0042479, -0.00781748, 0.00955884 )
+
+[node name="Skeleton" parent="R_Hand_MRTK_Rig2" index="0"]
+bones/8/bound_children = [ NodePath("Pointer_Tip") ]
+bones/16/bound_children = [ NodePath("Thumb_Tip") ]
+
+[node name="Pointer_Tip" type="BoneAttachment" parent="R_Hand_MRTK_Rig2/Skeleton" index="1"]
+transform = Transform( -0.251861, 0.0214216, 0.967526, -0.83959, 0.492379, -0.229459, -0.481305, -0.870118, -0.106026, 0.00771045, 0.00878777, 0.012066 )
+bone_name = "R_Pointer_end"
+
+[node name="Thumb_Tip" type="BoneAttachment" parent="R_Hand_MRTK_Rig2/Skeleton" index="2"]
+transform = Transform( -0.743089, 0.664111, 0.0823167, -0.290442, -0.209246, -0.933734, -0.602879, -0.717756, 0.348374, 0.0416378, -0.0714855, -0.0177933 )
+bone_name = "R_Thumb_end"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1"]
 anims/Pinch = SubResource( 1 )
