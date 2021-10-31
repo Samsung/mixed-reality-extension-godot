@@ -4,10 +4,11 @@ using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Core.Types;
 using MixedRealityExtension.Patching;
 using MixedRealityExtension.Util.GodotHelper;
+using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
-	public class PressableButtonGodot : PressableButton
+	public class PressableButtonGodot : PressableButton, IMixedRealityFocusHandler
 	{
 		[Export]
 		private string text = "";
@@ -54,8 +55,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 			HighlightArea = HighlightPlate.GetNode<HighlightArea>("HighlightArea");
 			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, Vector3.Zero);
-			HighlightArea.Connect("focused", this, nameof(_on_HighlightArea_focused));
-			HighlightArea.Connect("unfocused", this, nameof(_on_HighlightArea_unfocused));
 
 			TextNode = GetNode<SimpleText>("Text");
 			TextNode.Contents = text;
@@ -111,21 +110,21 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			RevertProximityLight();
 		}
 
-		private void _on_HighlightArea_focused()
-		{
-			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, HighlightArea.BorderColor);
-		}
-
-		private void _on_HighlightArea_unfocused()
-		{
-			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, Vector3.Zero);
-		}
-
 		internal void ApplyColor(ColorPatch color)
 		{
 			MWColor MWColor = new MWColor();
 			BackPlateColor = BackPlateColor.GetPatchApplied(MWColor.ApplyPatch(color));
 			BackPlateMaterial.SetShaderParam("color", backPlateColor);
+		}
+
+		public void OnFocusEnter(MixedRealityFocusEventData eventData)
+		{
+			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, HighlightArea.BorderColor);
+		}
+
+		public void OnFocusExit(MixedRealityFocusEventData eventData)
+		{
+			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, Vector3.Zero);
 		}
 	}
 }
