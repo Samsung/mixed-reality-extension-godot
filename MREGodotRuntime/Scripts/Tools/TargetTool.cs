@@ -6,6 +6,7 @@ using System.Linq;
 using Godot;
 using MixedRealityExtension.Util.GodotHelper;
 using Godot.Collections;
+using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Assets.Scripts.Tools
 {
@@ -161,11 +162,17 @@ namespace Assets.Scripts.Tools
 			if (oldTarget != null && Godot.Object.IsInstanceValid(oldTarget) && !IsNearObject)
 			{
 				_currentTargetBehavior.Context.EndTargeting(_currentTargetBehavior.GetMWUnityUser(inputSource.UserNode), oldTargetPoint);
+
+				var handler = IMixedRealityFocusHandler.FindEventHandler<IMixedRealityFocusHandler>(oldTarget);
+				handler?.OnFocusExit(new MixedRealityFocusEventData(this, oldTarget, newTarget));
 			}
 
 			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget) && !IsNearObject)
 			{
 				newBehavior.Context.StartTargeting(newBehavior.GetMWUnityUser(inputSource.UserNode), newTargetPoint);
+
+				var handler = IMixedRealityFocusHandler.FindEventHandler<IMixedRealityFocusHandler>(newTarget);
+				handler?.OnFocusEnter(new MixedRealityFocusEventData(this, oldTarget, newTarget));
 			}
 
 			CurrentTargetPoint = newTargetPoint;

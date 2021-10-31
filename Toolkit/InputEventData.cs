@@ -17,4 +17,14 @@ namespace Microsoft.MixedReality.Toolkit.Input
 
         public Tool Tool { get; set; }
     }
+
+    public abstract class InputEventData
+    {
+        public InputEventData(Tool tool)
+        {
+            Tool = tool;
+        }
+
+        public Tool Tool { get; set; }
+    }
 }
