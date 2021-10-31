@@ -3,6 +3,7 @@
 using Assets.Scripts.Tools;
 using System;
 using Godot;
+using Godot.Collections;
 
 namespace Assets.Scripts.User
 {
@@ -10,7 +11,6 @@ namespace Assets.Scripts.User
 	{
 		private Tool _currentTool;
 
-		internal RayCast rayCast;
 		internal MeshInstance RayCastMesh;
 		internal Spatial PokePointer;
 		public Node UserNode;
@@ -23,19 +23,27 @@ namespace Assets.Scripts.User
 
 		public static readonly Guid UserId = new Guid();
 
+		// Only target layers 0 (Default), 5 (UI), and 10 (Hologram).
+		// You still want to hit all layers, but only interact with these.
+		private const uint LayerMask = (1 << 0) | (1 << 5) | (1 << 10);
+		private PhysicsDirectSpaceState spaceState;
+		private Spatial player;
+
 		public override void _Ready()
 		{
-			// Only target layers 0 (Default), 5 (UI), and 10 (Hologram).
-			// You still want to hit all layers, but only interact with these.
-			uint layerMask = (1 << 0) | (1 << 5) | (1 << 10);
-
 			Hand = GetNode<Spatial>("../Right_hand");
 			PokePointer = Hand.FindNode("IndexTip") as Spatial;
+			player = GetParent<Spatial>();
+			spaceState = GetWorld().DirectSpaceState;
 
-			rayCast = (RayCast)GetParent().FindNode("HandRay");
-			rayCast.CastTo = new Vector3(0, 0, -1.5f);
-			rayCast.CollisionMask = layerMask;
-			RayCastMesh = (MeshInstance)rayCast.GetChild(0);
+			RayCastMesh = new MeshInstance()
+			{
+				Mesh = new PlaneMesh()
+				{
+					Size = new Vector2(0.01f, 1),
+				}
+			};
+			Hand.CallDeferred("add_child", RayCastMesh);
 
 			CollisionPoint = new CSGTorus()
 			{
@@ -77,6 +85,14 @@ namespace Assets.Scripts.User
 			}
 		}
 
+		public Dictionary IntersectRay()
+		{
+			var forward = -Hand.GlobalTransform.basis.z.Normalized();
+			var from = Hand.GlobalTransform.origin - forward * 0.05f;
+			var to = Hand.GlobalTransform.origin + forward * 1.5f;
+			return spaceState.IntersectRay(from, to, null, LayerMask, true, true);
+		}
+
 		public override void _EnterTree()
 		{
 			UserNode = Owner;
@@ -89,6 +105,8 @@ namespace Assets.Scripts.User
 		public override void _Process(float delta)
 		{
 			_currentTool.Update(this);
+			var localPosition = RayCastMesh.ToLocal(player.GlobalTransform.origin) * Scale;
+			RayCastMesh.Rotate(Transform.basis.z.Normalized(), Mathf.Atan2(localPosition.y, localPosition.x) - Mathf.Pi / 2);
 		}
 	}
 }
