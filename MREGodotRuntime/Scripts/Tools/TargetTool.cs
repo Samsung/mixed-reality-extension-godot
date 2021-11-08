@@ -89,6 +89,7 @@ namespace Assets.Scripts.Tools
 			sphereTool.Update(inputSource);
 			Vector3? hitPoint;
 
+			Position = inputSource.Hand.GlobalTransform.origin;
 			var newTarget = FindTarget(inputSource, out hitPoint);
 			if ((Target == null || !Godot.Object.IsInstanceValid(Target)) && (newTarget == null || !Godot.Object.IsInstanceValid(newTarget)))
 			{

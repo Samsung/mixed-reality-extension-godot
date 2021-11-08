@@ -125,6 +125,7 @@ namespace Assets.Scripts.Tools
 		{
 			if (CurrentPointerTarget != null && ClosestProximityTouchable != null)
 			{
+				Position = inputSource.Hand.GlobalTransform.origin;
 				float distToTouchable = RayStartPoint.DistanceTo(RayEndPoint) - TouchableDistance;
 
 				bool newIsDown = distToTouchable < 0.0f;

@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 using Assets.Scripts.User;
+using Godot;
 
 namespace Assets.Scripts.Tools
 {
 	public abstract class Tool
 	{
 		public bool IsHeld { get; private set; }
+
+		public Vector3 Position { get; protected set; }
 
 		public void Update(InputSource inputSource)
 		{
