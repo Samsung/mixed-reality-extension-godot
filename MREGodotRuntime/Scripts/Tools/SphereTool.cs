@@ -101,7 +101,6 @@ namespace Assets.Scripts.Tools
 		{
 			if (currentGrabbableActor != null)
 			{
-				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityPointerHandler>(currentGrabbableActor);
 				if (inputSource.PinchChaged)
 				{
 					if (inputSource.IsPinching)
@@ -109,18 +108,21 @@ namespace Assets.Scripts.Tools
 						if (!isSelectPressed)
 						{
 							isSelectPressed = true;
-							handler?.OnPointerDown(new MixedRealityPointerEventData(this, hitPoint));
+							currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDown),
+																						new MixedRealityPointerEventData(this, hitPoint));
 						}
 					}
 					else
 					{
 						isSelectPressed = false;
-						handler?.OnPointerUp(new MixedRealityPointerEventData(this, hitPoint));
+						currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerUp),
+																					new MixedRealityPointerEventData(this, hitPoint));
 					}
 				}
 				else if (isSelectPressed)
 				{
-					handler?.OnPointerDragged(new MixedRealityPointerEventData(this, hitPoint));
+					currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged),
+																				new MixedRealityPointerEventData(this, hitPoint));
 				}
 
 			}

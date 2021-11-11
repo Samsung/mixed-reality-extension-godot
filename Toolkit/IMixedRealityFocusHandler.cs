@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Godot;
+
 namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
@@ -11,11 +13,13 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// <summary>
         /// The Focus Enter event is raised on this Spatial whenever a TargetTool's focus enters this Parent Actor.
         /// </summary>
-        void OnFocusEnter(MixedRealityFocusEventData eventData);
+        [Signal]
+        delegate void OnFocusEnter(MixedRealityFocusEventData eventData);
 
         /// <summary>
         /// The Focus Exit event is raised on this Spatial whenever a TargetTool's focus leaves this  Parent Actor.
         /// </summary>
-        void OnFocusExit(MixedRealityFocusEventData eventData);
+        [Signal]
+        delegate void OnFocusExit(MixedRealityFocusEventData eventData);
     }
 }

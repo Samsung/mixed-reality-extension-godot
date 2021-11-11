@@ -285,6 +285,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public override void _Ready()
         {
             hasStarted = true;
+            this.RegisterHandler<IMixedRealityTouchHandler>();
 /*
             if (gameObject.layer == 2)
             {
@@ -402,7 +403,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             return false;
         }
 
-        void IMixedRealityTouchHandler.OnTouchStarted(TouchInputEventData eventData)
+        void OnTouchStarted(TouchInputEventData eventData)
         {
             if (touchPoints.ContainsKey(eventData.Tool))
             {
@@ -421,7 +422,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             IsTouching = true;
         }
 
-        void IMixedRealityTouchHandler.OnTouchUpdated(TouchInputEventData eventData)
+        void OnTouchUpdated(TouchInputEventData eventData)
         {
             if (touchPoints.ContainsKey(eventData.Tool))
             {
@@ -429,7 +430,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
         }
 
-        void IMixedRealityTouchHandler.OnTouchCompleted(TouchInputEventData eventData)
+        void OnTouchCompleted(TouchInputEventData eventData)
         {
             if (touchPoints.ContainsKey(eventData.Tool))
             {

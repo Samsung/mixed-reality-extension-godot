@@ -51,7 +51,7 @@ namespace Assets.Scripts.Tools
 				var collider = (Spatial)intersectResult["collider"];
 				Spatial actor = null;
 
-				for (actor = collider; actor != null; actor = actor.GetParent<Spatial>())
+				for (actor = collider; actor != null; actor = actor.GetParent() as Spatial)
 					if (actor is Actor) break;
 
 				if (actor == null || !((Actor)actor).Touchable)
@@ -103,7 +103,7 @@ namespace Assets.Scripts.Tools
 				var collider = (Spatial)IntersectRayResult["collider"];
 				Spatial actor;
 
-				for (actor = collider; actor != null; actor = actor.GetParent<Spatial>())
+				for (actor = collider; actor != null; actor = actor.GetParent() as Spatial)
 					if (actor is Actor) break;
 
 				if (actor == null || !((Actor)actor).Touchable)
@@ -169,8 +169,8 @@ namespace Assets.Scripts.Tools
 							buttonBehavior.Context.StartButton(mwUser, IntersectionPosition);
 							((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
 
-							var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityTouchHandler>(CurrentTouchableObjectDown);
-							if (handler != null) handler.OnTouchStarted(new TouchInputEventData(this, IntersectionPosition));
+							CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchStarted),
+																							new TouchInputEventData(this, IntersectionPosition));
 						}
 					}
 				}
@@ -194,8 +194,8 @@ namespace Assets.Scripts.Tools
 						buttonBehavior.Context.EndButton(mwUser, IntersectionPosition);
 						buttonBehavior.Context.Click(mwUser, IntersectionPosition);
 
-						var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityTouchHandler>(CurrentTouchableObjectDown);
-						if (handler != null) handler.OnTouchCompleted(new TouchInputEventData(this, IntersectionPosition));
+						CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchCompleted),
+																						new TouchInputEventData(this, IntersectionPosition));
 					}
 				}
 
@@ -207,8 +207,8 @@ namespace Assets.Scripts.Tools
 		{
 			if (CurrentTouchableObjectDown != null)
 			{
-				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityTouchHandler>(CurrentTouchableObjectDown);
-				if (handler != null) handler.OnTouchUpdated(new TouchInputEventData(this, IntersectionPosition));
+				CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchUpdated),
+																				new TouchInputEventData(this, IntersectionPosition));
 			}
 		}
 
