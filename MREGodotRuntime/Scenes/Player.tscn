@@ -41,4 +41,4 @@ visible = false
 script = null
 
 [node name="MRTK_R_Hand" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.124828, -0.006109, -0.308115 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0809927, -0.006109, -0.150688 )
