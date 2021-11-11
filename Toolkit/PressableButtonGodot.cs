@@ -62,7 +62,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			TextNode = GetNode<SimpleText>("Text");
 			TextNode.Contents = text;
 			TextNode.Anchor = MixedRealityExtension.Core.Interfaces.TextAnchorLocation.MiddleCenter;
-			TextNode.Height = 0.4f;
+			TextNode.Height = 0.2f;
 			TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
 			TextNode.Scale = new Vector3(0.032f, 0.032f, 0.032f);
 
