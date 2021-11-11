@@ -89,6 +89,13 @@ namespace Assets.Scripts.User
 				LightCullMask = 4,
 			};
 			Hand.AddChild(proximityLight);
+			var proximityVisibleLight = new OmniLight()
+			{
+				OmniRange = 0.0923046f,
+				LightEnergy = 1.46f,
+				LightCullMask = 2,
+			};
+			Hand.AddChild(proximityVisibleLight);
 
 			CollisionPoint = new CSGTorus()
 			{
