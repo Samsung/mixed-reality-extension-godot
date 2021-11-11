@@ -21,9 +21,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private MeshInstance BackPlate;
 		private MeshInstance HighlightPlate;
 		private HighlightArea HighlightArea;
-		private ShaderMaterial FrontPlateMaterial;
-		private ShaderMaterial BackPlateMaterial;
-		private ShaderMaterial HighlightPlateMaterial;
+		private ShaderMaterial FrontPlateMaterial => (ShaderMaterial)((MeshInstance)movingButtonVisuals).MaterialOverride;
+		private ShaderMaterial BackPlateMaterial => (ShaderMaterial)BackPlate.MaterialOverride;
+		private ShaderMaterial HighlightPlateMaterial => (ShaderMaterial)HighlightPlate.MaterialOverride;
 		private SimpleText TextNode;
 
 		public PressableButtonGodot()
@@ -43,18 +43,15 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			this.RegisterHandler<IMixedRealityFocusHandler>();
 
 			BackPlate = GetNode<MeshInstance>("BackPlate");
-			BackPlateMaterial = BackPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
-			BackPlate.MaterialOverride = BackPlateMaterial;
+			BackPlate.MaterialOverride = BackPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
 			BackPlateMaterial.SetShaderParam("color", backPlateColor);
 
-			FrontPlateMaterial = ((MeshInstance)movingButtonVisuals).MaterialOverride.Duplicate(true) as ShaderMaterial;
-			((MeshInstance)movingButtonVisuals).MaterialOverride = FrontPlateMaterial;
+			((MeshInstance)movingButtonVisuals).MaterialOverride = ((MeshInstance)movingButtonVisuals).MaterialOverride.Duplicate(true) as ShaderMaterial;
 			FrontPlateMaterial.SetShaderParam("origin", BackPlate.GlobalTransform.origin);
 			FrontPlateMaterial.SetShaderParam("backward", BackPlate.GlobalTransform.basis.z);
 
 			HighlightPlate = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate");
-			HighlightPlateMaterial = (ShaderMaterial)HighlightPlate.MaterialOverride.Duplicate(true);
-			HighlightPlate.MaterialOverride = HighlightPlateMaterial;
+			HighlightPlate.MaterialOverride = HighlightPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
 
 			HighlightArea = HighlightPlate.GetNode<HighlightArea>("HighlightArea");
 			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, Vector3.Zero);
