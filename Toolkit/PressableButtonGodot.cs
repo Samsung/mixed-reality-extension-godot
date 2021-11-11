@@ -39,6 +39,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		public override void _Ready()
 		{
+			base._Ready();
+			this.RegisterHandler<IMixedRealityFocusHandler>();
+
 			BackPlate = GetNode<MeshInstance>("BackPlate");
 			BackPlateMaterial = BackPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
 			BackPlate.MaterialOverride = BackPlateMaterial;

@@ -166,16 +166,16 @@ namespace Assets.Scripts.Tools
 			{
 				_currentTargetBehavior.Context.EndTargeting(_currentTargetBehavior.GetMWUnityUser(inputSource.UserNode), oldTargetPoint);
 
-				var handler = IMixedRealityFocusHandler.FindEventHandler<IMixedRealityFocusHandler>(oldTarget);
-				handler?.OnFocusExit(new MixedRealityFocusEventData(this, oldTarget, newTarget));
+				oldTarget.HandleEvent<IMixedRealityFocusHandler>(nameof(IMixedRealityFocusHandler.OnFocusExit),
+																new MixedRealityFocusEventData(this, oldTarget, newTarget));
 			}
 
 			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget) && !IsNearObject)
 			{
 				newBehavior.Context.StartTargeting(newBehavior.GetMWUnityUser(inputSource.UserNode), newTargetPoint);
 
-				var handler = IMixedRealityFocusHandler.FindEventHandler<IMixedRealityFocusHandler>(newTarget);
-				handler?.OnFocusEnter(new MixedRealityFocusEventData(this, oldTarget, newTarget));
+				newTarget.HandleEvent<IMixedRealityFocusHandler>(nameof(IMixedRealityFocusHandler.OnFocusEnter),
+																new MixedRealityFocusEventData(this, oldTarget, newTarget));
 			}
 
 			CurrentTargetPoint = newTargetPoint;
@@ -239,7 +239,8 @@ namespace Assets.Scripts.Tools
 							{
 								inputSource.CollisionPoint.GlobalTransform = newTransform;
 							}
-							return node;
+
+							return a;
 						}
 						else
 						{
