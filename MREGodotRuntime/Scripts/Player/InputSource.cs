@@ -57,7 +57,7 @@ namespace Assets.Scripts.User
 		private const uint LayerMask = (1 << 0) | (1 << 5) | (1 << 10);
 		private PhysicsDirectSpaceState spaceState;
 		private Spatial player;
-		private AnimationPlayer animationPlayerTouch;
+		private float handLocalOrigin;
 
 		public override void _Ready()
 		{
@@ -106,16 +106,7 @@ namespace Assets.Scripts.User
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
 
-			// Animation Players for the test.
-			var animTouch = new Animation();
-			var track = animTouch.AddTrack(Animation.TrackType.Value);
-			animTouch.Length = 0.3f;
-			animTouch.TrackSetPath(track, this.GetPathTo(Hand) + ":translation");
-			animTouch.TrackInsertKey(track, 0, Hand.Transform.origin);
-			animTouch.TrackInsertKey(track, 0.3f, Hand.Transform.origin - Hand.Transform.basis.z * 0.06f);
-			animationPlayerTouch = new AnimationPlayer();
-			animationPlayerTouch.AddAnimation("touch", animTouch);
-			AddChild(animationPlayerTouch);
+			handLocalOrigin = Hand.Translation.z;
 		}
 
 		public void HoldTool(Type toolType)
@@ -170,15 +161,17 @@ namespace Assets.Scripts.User
 			RayCastMesh.Rotate(Transform.basis.z.Normalized(), Mathf.Atan2(localPosition.y, localPosition.x) - Mathf.Pi / 2);
 		}
 
-		public override void _Input(InputEvent ev)
+		public override void _PhysicsProcess(float delta)
 		{
-			if (Input.IsActionJustPressed("hand_touch"))
+			if (Input.IsActionPressed("hand_touch"))
 			{
-				animationPlayerTouch.Play("touch");
+				if (Hand.Translation.z > handLocalOrigin - 0.05f)
+					Hand.Translation -= Hand.Transform.basis.z * 0.0048f;
 			}
-			else if (Input.IsActionJustReleased("hand_touch"))
+			else
 			{
-				animationPlayerTouch.PlayBackwards("touch");
+				if (Hand.Translation.z < handLocalOrigin)
+					Hand.Translation += Hand.Transform.basis.z * 0.0048f;
 			}
 			if (Input.IsActionJustPressed("Fire2"))
 			{

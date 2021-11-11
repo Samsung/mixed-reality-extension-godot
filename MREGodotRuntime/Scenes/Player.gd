@@ -3,7 +3,8 @@ extends ARVROrigin
 export (NodePath) var viewport = null
 var mouse_delta = Vector2()
 var camera_move = false
-var camera_speed = 0.003
+var camera_speed = 0.0015
+var hand = null
 
 func initialise() -> bool:
 	var interface = ARVRServer.find_interface("OpenXR")
@@ -28,6 +29,7 @@ func initialise() -> bool:
 
 func _ready():
 	initialise()
+	hand = get_node("MRTK_R_Hand")
 
 func _process(delta):
 	if !camera_move: return;
@@ -43,8 +45,12 @@ func _process(delta):
 	elif (Input.is_action_pressed("move_left")):
 		translation -= transform.basis.x * delta;
 
-	rotation.x -= mouse_delta.y * camera_speed
-	rotation.y -= mouse_delta.x * camera_speed
+	if (Input.is_action_pressed("shift")):
+		hand.transform.origin.x += mouse_delta.x * camera_speed
+		hand.transform.origin.y -= mouse_delta.y * camera_speed
+	else:
+		rotation.x -= mouse_delta.y * camera_speed
+		rotation.y -= mouse_delta.x * camera_speed
 
 	mouse_delta = Vector2();
 
