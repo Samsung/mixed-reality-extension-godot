@@ -9,7 +9,7 @@
 code = "shader_type spatial;
 render_mode cull_disabled, blend_add, ambient_light_disabled;
 
-uniform float thickness = 0.02;
+uniform float thickness = 0.01;
 uniform float smoothness = 0.01;
 uniform vec3 border_color = vec3(0.42, 0.48, 0.61);
 uniform vec3 origin; // BackPlate Global origin
@@ -22,9 +22,9 @@ void vertex() {
 }
 
 void fragment() {
-	float a = smoothstep(thickness, thickness + smoothness, length(abs(v.xy) - 1.0));
-	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.yz) - 1.0));
-	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.xz) - 1.0));
+	float a = smoothstep(thickness, thickness + smoothness, length(abs(v.xy) - 0.5));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.yz) - 0.5));
+	a *= smoothstep(thickness, thickness + smoothness, length(abs(v.xz) - 0.5));
 
 	vec3 global_vertex = (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz;
 
@@ -35,13 +35,14 @@ void fragment() {
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
-shader_param/thickness = 0.02
+shader_param/thickness = 0.01
 shader_param/smoothness = 0.01
 shader_param/border_color = Vector3( 0.42, 0.48, 0.61 )
 shader_param/origin = null
 shader_param/backward = null
 
 [sub_resource type="CubeMesh" id=3]
+size = Vector3( 1, 1, 1 )
 
 [sub_resource type="Shader" id=4]
 code = "shader_type spatial;
@@ -83,12 +84,12 @@ shader_param/border = 0.02
 shader_param/border_color = Vector3( 0, 0, 0 )
 
 [sub_resource type="QuadMesh" id=6]
-size = Vector2( 2, 2 )
 
 [sub_resource type="BoxShape" id=7]
-extents = Vector3( 1, 1, 0.001 )
+extents = Vector3( 0.5, 0.5, 0.001 )
 
 [sub_resource type="BoxShape" id=8]
+extents = Vector3( 0.5, 0.5, 0.5 )
 
 [sub_resource type="Shader" id=9]
 code = "shader_type spatial;
@@ -118,10 +119,12 @@ shader_param/color = Color( 0.086, 0.2, 0.5, 1 )
 shader_param/border = 0.02
 
 [sub_resource type="QuadMesh" id=11]
-size = Vector2( 2, 2 )
 
 [node name="PressableButtonGodot" type="Spatial"]
 script = ExtResource( 4 )
+startPushDistance = 0.016
+maxPushDistance = 0.004
+pressDistance = 0.006
 
 [node name="NearInteractionTouchable" type="Spatial" parent="."]
 script = ExtResource( 2 )
@@ -135,7 +138,7 @@ mesh = SubResource( 3 )
 material/0 = null
 
 [node name="HighlightPlate" type="MeshInstance" parent="FrontPlate"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5 )
 layers = 4
 material_override = SubResource( 5 )
 mesh = SubResource( 6 )
@@ -147,7 +150,6 @@ collision_mask = 0
 script = ExtResource( 3 )
 
 [node name="CollisionShape" type="CollisionShape" parent="FrontPlate/HighlightPlate/HighlightArea"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.001 )
 shape = SubResource( 7 )
 
 [node name="TouchableArea" type="Area" parent="."]
@@ -156,6 +158,7 @@ collision_layer = 32
 collision_mask = 0
 
 [node name="CollisionShape" type="CollisionShape" parent="TouchableArea"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5 )
 shape = SubResource( 8 )
 
 [node name="BackPlate" type="MeshInstance" parent="."]
