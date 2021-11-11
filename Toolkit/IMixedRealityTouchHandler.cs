@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Godot;
+
 namespace Microsoft.MixedReality.Toolkit.Input
 {
     /// <summary>
@@ -15,7 +17,8 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// A Touch motion is defined as occurring within the bounds of an object (transitive).
         /// </remarks>
         /// <param name="eventData">Contains information about the HandTrackingInputSource.</param>
-        void OnTouchStarted(TouchInputEventData eventData);
+        [Signal]
+        delegate void OnTouchStarted(TouchInputEventData eventData);
 
         /// <summary>
         /// When a Touch motion ends, this handler receives the event.
@@ -24,7 +27,8 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// A Touch motion is defined as occurring within the bounds of an object (transitive).
         /// </remarks>
         /// <param name="eventData">Contains information about the HandTrackingInputSource.</param>
-        void OnTouchCompleted(TouchInputEventData eventData);
+        [Signal]
+        delegate void OnTouchCompleted(TouchInputEventData eventData);
 
         /// <summary>
         /// When a Touch motion is updated, this handler receives the event.
@@ -33,6 +37,7 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// A Touch motion is defined as occurring within the bounds of an object (transitive).
         /// </remarks>
         /// <param name="eventData">Contains information about the HandTrackingInputSource.</param>
-        void OnTouchUpdated(TouchInputEventData eventData);
+        [Signal]
+        delegate void OnTouchUpdated(TouchInputEventData eventData);
     }
 }

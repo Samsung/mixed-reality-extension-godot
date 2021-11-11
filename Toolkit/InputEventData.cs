@@ -2,7 +2,7 @@
 
 namespace Microsoft.MixedReality.Toolkit.Input
 {
-    public abstract class InputEventData<T>
+    public abstract class InputEventData<T> : Godot.Object
     {
         /// <summary>
         /// The input data of the event.
@@ -18,7 +18,7 @@ namespace Microsoft.MixedReality.Toolkit.Input
         public Tool Tool { get; set; }
     }
 
-    public abstract class InputEventData
+    public abstract class InputEventData : Godot.Object
     {
         public InputEventData(Tool tool)
         {

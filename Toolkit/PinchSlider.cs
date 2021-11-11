@@ -247,6 +247,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			{
 				throw new Exception($"Slider thumb on Spatial {Name} is not specified. Did you forget to set it?");
 			}
+
+			this.RegisterHandler<IMixedRealityPointerHandler>();
+			this.RegisterHandler<IMixedRealityTouchHandler>();
+
 			thumbActor.GetParent<Node>().RemoveChild(thumbActor);
 			AddChild(thumbActor);
 			UpdateThumbActor();

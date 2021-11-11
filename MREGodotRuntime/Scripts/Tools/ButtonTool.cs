@@ -33,8 +33,9 @@ namespace Assets.Scripts.Tools
 					}
 				}
 				pressed = true;
-				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityPointerHandler>(Target);
-				handler?.OnPointerDown(new MixedRealityPointerEventData(this, CurrentTargetPoint));
+
+				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDown),
+															new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 			else if (Input.IsActionJustReleased("Fire1"))
 			{
@@ -49,8 +50,9 @@ namespace Assets.Scripts.Tools
 					}
 				}
 				pressed = false;
-				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityPointerHandler>(Target);
-				handler?.OnPointerUp(new MixedRealityPointerEventData(this, CurrentTargetPoint));
+
+				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerUp),
+															new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 			else
 			{
@@ -106,8 +108,8 @@ namespace Assets.Scripts.Tools
 		{
 			if (pressed)
 			{
-				var handler = IMixedRealityEventHandler.FindEventHandler<IMixedRealityPointerHandler>(Target);
-				handler?.OnPointerDragged(new MixedRealityPointerEventData(this, CurrentTargetPoint));
+				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged),
+														new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 		}
 	}
