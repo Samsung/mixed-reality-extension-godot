@@ -1,6 +1,4 @@
-﻿using Microsoft.MixedReality.Toolkit.Input;
-using System.Collections.Generic;
-using Godot;
+﻿using Godot;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -26,6 +24,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			BackPlateToggleState = GetNode<Spatial>("BackPlateToggleState");
 			Connect("button_pressed", this, nameof(_on_TogglePressableButton_button_pressed));
 		}
+
+		internal void ApplyIsToggled(bool? isToggled)
+		{
+			if (isToggled == null) return;
+			IsToggled = (bool)isToggled;
+		}
+
 		private void _on_TogglePressableButton_button_pressed()
 		{
 			IsToggled = !IsToggled;
