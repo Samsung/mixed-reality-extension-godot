@@ -78,14 +78,31 @@ namespace MixedRealityExtension.Messaging.Payloads
 
 	/// <summary>
 	/// App => Engine
-	/// Instructs the engine to instantiate the Toolkit Buottn.
+	/// Instructs the engine to instantiate the Toolkit Button.
 	/// </summary>
 	public class CreateFromToolkitButton : CreateActor
 	{
 		/// <summary>
+		/// The main text of the button
+		/// </summary>
+		public string text;
+
+		/// <summary>
 		/// The main color of the button
 		/// </summary>
 		public ColorPatch Color;
+	}
+
+	/// <summary>
+	/// App => Engine
+	/// Instructs the engine to instantiate the Toolkit Toggle Button.
+	/// </summary>
+	public class CreateFromToolkitToggleButton : CreateFromToolkitButton
+	{
+		/// <summary>
+		/// Determines whether the Button is toggled or not.
+		/// </summary>
+		public Boolean IsToggled;
 	}
 
 	/// <summary>
