@@ -17,7 +17,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 	{
 		public static T GetPatchApplied<T>(this T _this, T value) where T : struct
 		{
-			
+
 			if (!_this.Equals(value))
 			{
 				_this = value;
@@ -51,7 +51,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 			_this.x = _this.x.GetPatchApplied(quaternion.X);
 			_this.y = _this.y.GetPatchApplied(quaternion.Y);
 			_this.z = _this.z.GetPatchApplied(quaternion.Z);
-			
+
 			return _this;
 		}
 
@@ -174,6 +174,21 @@ namespace MixedRealityExtension.Util.GodotHelper
 				var child = _this.GetChild(i) as T;
 				if (child != null)
 					yield return child;
+			}
+		}
+
+		public static IEnumerable<T> GetChildrenAll<T>(this Node _this) where T : class
+		{
+			if (_this is T t)
+			{
+				yield return t;
+			}
+			foreach (Node child in _this.GetChildren())
+			{
+				foreach (var node in GetChildrenAll<T>(child))
+				{
+					yield return node;
+				}
 			}
 		}
 
