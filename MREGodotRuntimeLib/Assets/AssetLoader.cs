@@ -40,6 +40,7 @@ namespace MixedRealityExtension.Assets
 		internal readonly static Dictionary<Type, PackedScene> PackedToolkitScene = new Dictionary<Type, PackedScene>()
 		{
 			{ typeof(PressableButtonGodot), ResourceLoader.Load<PackedScene>("res://Toolkit/PressableButtonGodot.tscn") },
+			{ typeof(TogglePressableButtonGodot), ResourceLoader.Load<PackedScene>("res://Toolkit/TogglePressableButtonGodot.tscn") },
 			{ typeof(PinchSlider), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSlider.tscn") },
 			{ typeof(PinchSliderThumb), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSliderThumb.tscn") }
 		};

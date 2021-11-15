@@ -29,9 +29,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		public PressableButtonGodot()
 		{
 			//set default
-			StartPushDistance = 0.032f;
-			MaxPushDistance = 0.008f;
-			PressDistance = 0.012f;
+			StartPushDistance = 0.016f;
+			MaxPushDistance = 0.004f;
+			PressDistance = 0.006f;
 			ReleaseDistanceDelta = 0.004f;
 			movingButtonVisualsNodePath = new NodePath("FrontPlate");
 			nearInteractionTouchableSurfaceNodePath = new NodePath("NearInteractionTouchable");
@@ -112,9 +112,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		internal void ApplyColor(ColorPatch color)
 		{
+			if (color == null) return;
 			MWColor MWColor = new MWColor();
 			BackPlateColor = BackPlateColor.GetPatchApplied(MWColor.ApplyPatch(color));
 			BackPlateMaterial.SetShaderParam("color", backPlateColor);
+		}
+
+		internal void ApplyText(string text)
+		{
+			if (text == null) return;
+			TextNode.Contents = text;
 		}
 
 		public void OnFocusEnter(MixedRealityFocusEventData eventData)

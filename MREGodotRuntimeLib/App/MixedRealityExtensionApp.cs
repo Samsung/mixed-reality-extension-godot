@@ -946,6 +946,32 @@ namespace MixedRealityExtension.App
 					actor.AddChild(button);
 					actor.PatchTouchable(true);
 					button.ApplyColor(payload.Color);
+					button.ApplyText(payload.text);
+				}
+			}
+			catch (Exception e)
+			{
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.PushError(e.ToString());
+			}
+		}
+
+		[CommandHandler(typeof(CreateFromToolkitToggleButton))]
+		private void OnCreateFromToolkitToggleButton(CreateFromToolkitToggleButton payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var actors = _assetLoader.CreateEmpty(payload.Actor?.ParentId);
+				ProcessCreatedActors(payload, actors, onCompleteCallback);
+
+				foreach (var actor in actors)
+				{
+					var button = AssetLoader.PackedToolkitScene[typeof(TogglePressableButtonGodot)].Instance<TogglePressableButtonGodot>();
+					actor.AddChild(button);
+					actor.PatchTouchable(true);
+					button.ApplyColor(payload.Color);
+					button.ApplyText(payload.text);
+					button.ApplyIsToggled(payload.IsToggled);
 				}
 			}
 			catch (Exception e)
