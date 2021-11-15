@@ -42,7 +42,8 @@ namespace MixedRealityExtension.Assets
 			{ typeof(PressableButtonGodot), ResourceLoader.Load<PackedScene>("res://Toolkit/PressableButtonGodot.tscn") },
 			{ typeof(TogglePressableButtonGodot), ResourceLoader.Load<PackedScene>("res://Toolkit/TogglePressableButtonGodot.tscn") },
 			{ typeof(PinchSlider), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSlider.tscn") },
-			{ typeof(PinchSliderThumb), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSliderThumb.tscn") }
+			{ typeof(PinchSliderThumb), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSliderThumb.tscn") },
+			{ typeof(ScrollingObjectCollection), ResourceLoader.Load<PackedScene>("res://Toolkit/ScrollingObjectCollection.tscn") }
 		};
 
 		//private readonly AsyncCoroutineHelper _asyncHelper;
