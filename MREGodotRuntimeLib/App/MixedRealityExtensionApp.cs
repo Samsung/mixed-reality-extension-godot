@@ -1048,6 +1048,35 @@ namespace MixedRealityExtension.App
 			}
 		}
 
+		[CommandHandler(typeof(CreateFromToolkitScrollingObjectCollection))]
+		private void OnCreateFromToolkitScrollingObjectCollection(CreateFromToolkitScrollingObjectCollection payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var actors = _assetLoader.CreateEmpty(payload.Actor?.ParentId);
+				ProcessCreatedActors(payload, actors, onCompleteCallback);
+
+				foreach (var actor in actors)
+				{
+					var scrollingObjectCollection = AssetLoader.PackedToolkitScene[typeof(ScrollingObjectCollection)].Instance<ScrollingObjectCollection>();
+					actor.AddChild(scrollingObjectCollection);
+					actor.PatchTouchable(true);
+					scrollingObjectCollection.ApplyPatch(payload);
+					foreach (var scrollContent in payload.ScrollContents)
+					{
+						var content = FindActor(scrollContent) as Spatial;
+						content.GetParent()?.RemoveChild(content);
+						scrollingObjectCollection.AddContent(content);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
+				GD.PushError(e.ToString());
+			}
+		}
+
 		private void ProcessCreatedActors(CreateActor originalMessage, IList<Actor> createdActors, Action onCompleteCallback, string guidSeed = null)
 		{
 			Guid guidGenSeed;
