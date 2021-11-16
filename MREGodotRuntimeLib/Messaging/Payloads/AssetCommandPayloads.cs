@@ -124,6 +124,21 @@ namespace MixedRealityExtension.Messaging.Payloads
 
 	/// <summary>
 	/// App => Engine
+	/// Instructs the engine to instantiate the Toolkit Scrolling Object Collection.
+	/// </summary>
+	public class CreateFromToolkitScrollingObjectCollection : CreateActor
+	{
+		public Guid[] ScrollContents;
+		public Microsoft.MixedReality.Toolkit.UI.ScrollingObjectCollection.ScrollDirectionType? ScrollDirectionType;
+		public int? CellsPerTier;
+		public int? TiersPerPage;
+		public float? CellWidth;
+		public float? CellHeight;
+		public float? CellDepth;
+	}
+
+	/// <summary>
+	/// App => Engine
 	/// Generate a new native asset with the included properties
 	/// </summary>
 	public class CreateAsset : NetworkCommandPayload
