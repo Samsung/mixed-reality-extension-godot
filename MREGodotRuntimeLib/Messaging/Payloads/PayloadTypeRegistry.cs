@@ -19,6 +19,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(CreateEmpty), "create-empty")]
 	[PayloadType(typeof(CreateFromLibrary), "create-from-library")]
 	[PayloadType(typeof(CreateFromPrefab), "create-from-prefab")]
+	[PayloadType(typeof(CreateFromToolkit), "create-from-toolkit")]
 	[PayloadType(typeof(CreateFromToolkitButton), "create-from-toolkit-button")]
 	[PayloadType(typeof(CreateFromToolkitToggleButton), "create-from-toolkit-toggle-button")]
 	[PayloadType(typeof(CreateFromToolkitPinchSlider), "create-from-toolkit-pinch-slider")]

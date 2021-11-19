@@ -1,4 +1,5 @@
 ﻿using Godot;
+using MixedRealityExtension.Patching.Types;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -34,6 +35,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void _on_TogglePressableButton_button_pressed()
 		{
 			IsToggled = !IsToggled;
+		}
+
+		public override void ApplyPatch(ToolkitPatch toolkitPatch)
+		{
+			if (toolkitPatch is ToggleButtonPatch patch)
+			{
+				ApplyText(patch.MainText);
+				ApplyColor(patch.Color);
+				ApplyIsToggled(patch.IsToggled);
+			}
 		}
 	}
 }
