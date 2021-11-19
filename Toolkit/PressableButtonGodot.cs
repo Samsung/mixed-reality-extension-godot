@@ -8,7 +8,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
-	public class PressableButtonGodot : PressableButton, IMixedRealityFocusHandler
+	public class PressableButtonGodot : PressableButton, IMixedRealityFocusHandler, IToolkit
 	{
 		[Export]
 		private string text = "";
@@ -132,6 +132,15 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		public void OnFocusExit(MixedRealityFocusEventData eventData)
 		{
 			HighlightPlateMaterial.SetShaderParam(HighlightArea.BorderColorString, Vector3.Zero);
+		}
+
+		public virtual void ApplyPatch(ToolkitPatch toolkitPatch)
+		{
+			if (toolkitPatch is ButtonPatch patch)
+			{
+				ApplyText(patch.MainText);
+				ApplyColor(patch.Color);
+			}
 		}
 	}
 }
