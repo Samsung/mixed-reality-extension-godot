@@ -949,6 +949,21 @@ namespace MixedRealityExtension.App
 			}
 		}
 
+		[CommandHandler(typeof(ToolkitUpdate))]
+		private void OnToolkitUpdate(ToolkitUpdate payload, Action onCompleteCallback)
+		{
+			try
+			{
+				var actor = FindActor(payload.ActorId) as Actor;
+				var toolkit = actor.GetChild<IToolkit>();
+				toolkit.ApplyPatch(payload.Toolkit);
+			}
+			catch (Exception e)
+			{
+				GD.PushError(e.ToString());
+			}
+		}
+
 		[CommandHandler(typeof(CreateFromToolkitButton))]
 		private void OnCreateFromToolkitButton(CreateFromToolkitButton payload, Action onCompleteCallback)
 		{
