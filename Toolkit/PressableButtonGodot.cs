@@ -8,7 +8,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
-	public class PressableButtonGodot : PressableButton, IMixedRealityFocusHandler, IToolkit
+	public class PressableButtonGodot : PressableButton, IToolkit, IMixedRealityFocusHandler
 	{
 		[Export]
 		private string text = "";
