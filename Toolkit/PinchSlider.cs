@@ -6,13 +6,14 @@ using System;
 using Godot;
 using Assets.Scripts.Tools;
 using MixedRealityExtension.Core;
+using MixedRealityExtension.Patching.Types;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
 	/// <summary>
 	/// A slider that can be moved by grabbing / pinching a slider thumb
 	/// </summary>
-	internal class PinchSlider : Spatial, IMixedRealityPointerHandler, IMixedRealityTouchHandler
+	internal class PinchSlider : Spatial, IToolkit, IMixedRealityPointerHandler, IMixedRealityTouchHandler
 	{
 		#region Public Properties
 		private Actor thumbActor = null;
@@ -32,6 +33,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				if (value != null)
 				{
 					thumbActor = value;
+					AddChild(thumbActor);
 				}
 			}
 		}
@@ -243,24 +245,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				InitializeStepDivisions();
 			}
 
-			if (thumbActor == null)
-			{
-				throw new Exception($"Slider thumb on Spatial {Name} is not specified. Did you forget to set it?");
-			}
-
 			this.RegisterHandler<IMixedRealityPointerHandler>();
 			this.RegisterHandler<IMixedRealityTouchHandler>();
 
-			thumbActor.GetParent<Node>().RemoveChild(thumbActor);
-			AddChild(thumbActor);
-			UpdateThumbActor();
-			InitializeSliderThumb();
-
 			trackMesh = GetNode<MeshInstance>("Mesh");
-			SnapToPosition = snapToPosition;
-			InitializeSliderThumb();
-
-			UpdateThumbActor();
+			//SnapToPosition = snapToPosition;
+			TouchCollisionShape.Disabled = false;
 			UpdateTrackMesh();
 
 			//OnValueUpdated.Invoke(new SliderEventData(sliderValue, sliderValue, null, this));
@@ -419,6 +409,18 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			SliderValue = clampedResult;
 		}
 
+		private void ApplyThumb(Guid thumbId)
+		{
+			var actor = GetParent<Actor>();
+			var thumb = actor.App.FindActor(thumbId) as Actor;
+			thumb.GetParent()?.RemoveChild(thumb);
+			ThumbActor = thumb;
+			thumb.ParentId = actor.Id;
+
+			UpdateThumbActor();
+			InitializeSliderThumb();
+			ThumbCollisionShape.Disabled = true;
+		}
 
 		#endregion
 
@@ -515,5 +517,15 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		}
 
 		#endregion IMixedRealityTouchHandler
+
+		#region IToolkit
+		public virtual void ApplyPatch(ToolkitPatch toolkitPatch)
+		{
+			if (toolkitPatch is PinchSliderPatch patch)
+			{
+				ApplyThumb(patch.ThumbId);
+			}
+		}
+		#endregion IToolkit
 	}
 }

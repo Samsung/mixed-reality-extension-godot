@@ -41,6 +41,14 @@ namespace MixedRealityExtension.Messaging.Payloads.Converters
 						toolkitPatch = new ToggleButtonPatch();
 						toolkitPatch.ToolkitType = typeof(TogglePressableButtonGodot);
 						break;
+					case "pinch-slider":
+						toolkitPatch = new PinchSliderPatch();
+						toolkitPatch.ToolkitType = typeof(PinchSlider);
+						break;
+					case "pinch-slider-thumb":
+						toolkitPatch = new PinchSliderThumbPatch();
+						toolkitPatch.ToolkitType = typeof(PinchSliderThumb);
+						break;
 					default:
 						MREAPI.Logger.LogError($"Failed to deserialize toolkit patch.  Invalid toolkit type <{toolkitType}>.");
 						break;
