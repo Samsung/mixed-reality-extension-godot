@@ -15,4 +15,17 @@ namespace MixedRealityExtension.Messaging.Payloads
 		public Guid ActorId { get; set; }
 		public ToolkitPatch Toolkit { get; set; }
 	}
+
+	/// <summary>
+	/// App => Engine
+	/// Payload for when the app wants to update an toolkit with a patch.
+	/// </summary>
+	public class ToolkitUpdate : NetworkCommandPayload
+	{
+		public Guid ActorId { get; set; }
+		/// <summary>
+		/// The toolkit patch to apply to the toolkit associated with the patch.
+		/// </summary>
+		public ToolkitPatch Toolkit { get; set; }
+	}
 }
