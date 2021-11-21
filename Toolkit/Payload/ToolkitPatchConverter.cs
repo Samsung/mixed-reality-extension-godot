@@ -49,6 +49,10 @@ namespace MixedRealityExtension.Messaging.Payloads.Converters
 						toolkitPatch = new PinchSliderThumbPatch();
 						toolkitPatch.ToolkitType = typeof(PinchSliderThumb);
 						break;
+					case "scrolling-object-collection":
+						toolkitPatch = new ScrollingObjectCollectionPatch();
+						toolkitPatch.ToolkitType = typeof(ScrollingObjectCollection);
+						break;
 					default:
 						MREAPI.Logger.LogError($"Failed to deserialize toolkit patch.  Invalid toolkit type <{toolkitType}>.");
 						break;

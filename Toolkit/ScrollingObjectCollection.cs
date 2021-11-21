@@ -15,6 +15,7 @@ using MixedRealityExtension.Core;
 using MixedRealityExtension.Messaging.Payloads;
 
 using MixedRealityExtension.Patching;
+using MixedRealityExtension.Patching.Types;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -22,7 +23,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
     /// A scrollable frame where content scroll is triggered by manual controller click and drag or according to pagination settings.
     //// </summary>
     ///<remarks>Executing also in edit mode to properly catch and mask any new content added to scroll container.</remarks>
-    public class ScrollingObjectCollection : Spatial,
+    public class ScrollingObjectCollection : Spatial, IToolkit,
             IMixedRealityPointerHandler,
             IMixedRealityTouchHandler
     {
@@ -1889,5 +1890,28 @@ namespace Microsoft.MixedReality.Toolkit.UI
             CellDepth = CellDepth.ApplyPatch(payload.CellDepth);
             ScrollDirection = ScrollDirection.ApplyPatch(payload.ScrollDirectionType);
         }
+
+        #region IToolkit
+        public void ApplyPatch(ToolkitPatch toolkitPatch)
+        {
+            if (toolkitPatch is ScrollingObjectCollectionPatch patch)
+            {
+                foreach (var scrollContent in patch.ScrollContents)
+                {
+                    var actor = GetParent<Actor>();
+                    var content = actor.App.FindActor(scrollContent) as Spatial;
+                    content.GetParent()?.RemoveChild(content);
+                    AddContent(content);
+                }
+                TiersPerPage = TiersPerPage.ApplyPatch(patch.TiersPerPage);
+                CellsPerTier = CellsPerTier.ApplyPatch(patch.CellsPerTier);
+                CellWidth = CellWidth.ApplyPatch(patch.CellWidth);
+                CellHeight = CellHeight.ApplyPatch(patch.CellHeight);
+                CellDepth = CellDepth.ApplyPatch(patch.CellDepth);
+                ScrollDirection = ScrollDirection.ApplyPatch(patch.ScrollDirectionType);
+            }
+        }
+
+        #endregion IToolkit
     }
 }
