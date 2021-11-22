@@ -1881,16 +1881,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         #endregion IMixedRealityTouchHandler implementation
 
-        internal void ApplyPatch(CreateFromToolkitScrollingObjectCollection payload)
-        {
-            TiersPerPage = TiersPerPage.ApplyPatch(payload.TiersPerPage);
-            CellsPerTier = CellsPerTier.ApplyPatch(payload.CellsPerTier);
-            CellWidth = CellWidth.ApplyPatch(payload.CellWidth);
-            CellHeight = CellHeight.ApplyPatch(payload.CellHeight);
-            CellDepth = CellDepth.ApplyPatch(payload.CellDepth);
-            ScrollDirection = ScrollDirection.ApplyPatch(payload.ScrollDirectionType);
-        }
-
         #region IToolkit
         public void ApplyPatch(ToolkitPatch toolkitPatch)
         {
