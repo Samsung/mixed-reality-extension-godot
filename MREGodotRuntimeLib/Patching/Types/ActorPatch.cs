@@ -68,6 +68,9 @@ namespace MixedRealityExtension.Patching.Types
 		public bool? Grabbable { get; set; }
 
 		[PatchProperty]
+		public ClippingPatch Clipping { get; set; }
+
+		[PatchProperty]
 		public List<ActorComponentType> Subscriptions { get; set; }
 
 		public ActorPatch()
