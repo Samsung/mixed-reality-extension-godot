@@ -62,8 +62,9 @@ namespace MixedRealityExtension.Core.Components
 			globalTransform.basis = globalTransform.basis.Scaled(Vector3Half);
 			foreach (var meshInstance in meshInstances)
 			{
-				if (meshInstance.IsVisibleInTree())
-					((ShaderMaterial)(meshInstance.MaterialOverride)).SetShaderParam("clipBoxInverseTransform", globalTransform.AffineInverse());
+				if (meshInstance.IsVisibleInTree()
+					&& meshInstance.MaterialOverride is ShaderMaterial shaderMaterial)
+					shaderMaterial.SetShaderParam("clipBoxInverseTransform", globalTransform.AffineInverse());
 			}
 		}
 
