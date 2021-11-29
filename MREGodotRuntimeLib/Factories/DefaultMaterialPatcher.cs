@@ -10,9 +10,10 @@ using MixedRealityExtension.Util.GodotHelper;
 using System;
 using System.Collections.Generic;
 using MWAssets = MixedRealityExtension.Assets;
-using Material = Godot.SpatialMaterial;
+using Material = Godot.ShaderMaterial;
 using MWMaterial = MixedRealityExtension.Assets.Material;
 using Texture = Godot.Texture;
+using Godot;
 
 namespace MixedRealityExtension.Factories
 {
@@ -27,29 +28,57 @@ namespace MixedRealityExtension.Factories
 		private MWVector3 _textureOffset = new MWVector3();
 		private MWVector3 _textureScale = new MWVector3();
 
+		private static string AlbedoColorProp = "albedo";
+		private static string EmissionColorProp = "emission";
+		private static string Uv1OffsetProp = "uv1_offset";
+		private static string Uv1ScaleProp = "uv1_scale";
+		private static string Uv2OffsetProp = "uv2_offset";
+		private static string Uv2ScaleProp = "uv2_scale";
+		private static string TextureAlbedoProp = "texture_albedo";
+		private static string TextureEmissionProp = "texture_emission";
+		private static string AlphaScissorThresholdProp = "alpha_scissor_threshold";
+
+		private static Shader OpaqueShader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Opaque.shader");
+		private static Shader BlendShader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Blend.shader");
+		private static Shader MaskShader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Mask.shader");
+
+
 		/// <inheritdoc />
 		public virtual void ApplyMaterialPatch(IMixedRealityExtensionApp app, Material material, MWMaterial patch)
 		{
+			switch (patch.AlphaMode)
+			{
+				case MWAssets.AlphaMode.Opaque:
+					material.Shader = OpaqueShader;
+					break;
+				case MWAssets.AlphaMode.Mask:
+					material.Shader = MaskShader;
+					break;
+				case MWAssets.AlphaMode.Blend:
+					material.Shader = BlendShader;
+					break;
+				// ignore default case, i.e. null
+			}
 			if (patch.Color != null)
 			{
-				_materialColor.FromGodotColor(material.AlbedoColor);
+				_materialColor.FromGodotColor((Color)material.GetShaderParam(AlbedoColorProp));
 				_materialColor.ApplyPatch(patch.Color);
-				material.AlbedoColor = _materialColor.ToColor();
+				material.SetShaderParam(AlbedoColorProp, _materialColor.ToColor());
 			}
 
 			if (patch.MainTextureOffset != null)
 			{
-				_textureOffset.FromGodotVector3(material.Uv1Offset);
+				_textureOffset.FromGodotVector3((Vector3)material.GetShaderParam(Uv1OffsetProp));
 				_textureOffset.ApplyPatch(patch.MainTextureOffset);
 				_textureOffset.Y *= -1;
-				material.Uv1Offset = _textureOffset.ToVector3();
+				material.SetShaderParam(Uv1OffsetProp, _textureOffset.ToVector3());
 			}
 
 			if (patch.MainTextureScale != null)
 			{
-				_textureScale.FromGodotVector3(material.Uv1Scale);
+				_textureScale.FromGodotVector3((Vector3)material.GetShaderParam(Uv1ScaleProp));
 				_textureScale.ApplyPatch(patch.MainTextureScale);
-				material.Uv1Scale = _textureScale.ToVector3();
+				material.SetShaderParam(Uv1ScaleProp, _textureScale.ToVector3());
 			}
 
 			if (patch.MainTextureId != null)
@@ -58,88 +87,66 @@ namespace MixedRealityExtension.Factories
 				mainTextureAssignments[material.GetInstanceId()] = textureId;
 				if (patch.MainTextureId == Guid.Empty)
 				{
-					material.AlbedoTexture = null;
+					material.SetShaderParam(TextureAlbedoProp, material.PropertyGetRevert(TextureAlbedoProp));
 				}
 				else
 				{
 					app.AssetManager.OnSet(textureId, tex =>
 					{
 						if (material == null || mainTextureAssignments[material.GetInstanceId()] != textureId) return;
-						material.AlbedoTexture = (Texture)tex.Asset;
+						material.SetShaderParam(TextureAlbedoProp, tex.Asset);
 					});
 				}
 			}
 
 			if (patch.EmissiveColor != null)
 			{
-				material.EmissionEnabled = true;
-				var color = material.Emission;
+				var color = (Color)material.GetShaderParam(EmissionColorProp);
 				color.r = patch.EmissiveColor.R ?? color.r;
 				color.g = patch.EmissiveColor.G ?? color.g;
 				color.b = patch.EmissiveColor.B ?? color.b;
 				color.a = patch.EmissiveColor.A ?? color.a;
-				material.Emission = color;
+				material.SetShaderParam(EmissionColorProp, color);
 			}
 
 			if (patch.EmissiveTextureOffset != null)
 			{
-				material.EmissionEnabled = true;
-				var offset = material.Uv2Offset;
+				var offset = (Vector3)material.GetShaderParam(Uv2OffsetProp);
 				offset.x = patch.EmissiveTextureOffset.X ?? offset.x;
 				offset.y = patch.EmissiveTextureOffset.Y ?? offset.y;
-				material.Uv2Offset = offset;
+				material.SetShaderParam(Uv2OffsetProp, offset);
 			}
 
 			if (patch.EmissiveTextureScale != null)
 			{
-				material.EmissionEnabled = true;
-				var scale = material.Uv2Scale;
+				var scale = (Vector3)material.GetShaderParam(Uv2ScaleProp);
 				scale.x = patch.EmissiveTextureScale.X ?? scale.x;
 				scale.y = patch.EmissiveTextureScale.Y ?? scale.y;
-				material.Uv2Scale = scale;
+				material.SetShaderParam(Uv2ScaleProp, scale);
 			}
 
 			if (patch.EmissiveTextureId != null)
 			{
-				material.EmissionEnabled = true;
 				var textureId = patch.EmissiveTextureId.Value;
 				emissiveTextureAssignments[material.GetInstanceId()] = textureId;
 				if (textureId == Guid.Empty)
 				{
-					material.EmissionTexture = null;
+					material.SetShaderParam(TextureEmissionProp, material.PropertyGetRevert(TextureEmissionProp));
 				}
 				else
 				{
 					app.AssetManager.OnSet(textureId, tex =>
 					{
 						if (material == null || emissiveTextureAssignments[material.GetInstanceId()] != textureId) return;
-						material.EmissionTexture = (Texture)tex.Asset;
+						material.SetShaderParam(TextureEmissionProp, tex.Asset);
 					});
 				}
 			}
 
 			if (patch.AlphaCutoff != null)
 			{
-				material.ParamsUseAlphaScissor = true;
-				material.ParamsAlphaScissorThreshold = patch.AlphaCutoff.Value;
+				material.SetShaderParam(AlphaScissorThresholdProp, patch.AlphaCutoff.Value);
 			}
-
-			switch (patch.AlphaMode)
-			{
-				case MWAssets.AlphaMode.Opaque:
-					material.FlagsTransparent = false;
-					break;
-				case MWAssets.AlphaMode.Mask:
-					material.ParamsUseAlphaScissor = true;
-					material.ParamsAlphaScissorThreshold = 1.0f;
-					break;
-				case MWAssets.AlphaMode.Blend:
-					material.FlagsTransparent = true;
-					material.ParamsUseAlphaScissor = false;
-					break;
-				// ignore default case, i.e. null
-			}
-
 		}
 
 		/// <inheritdoc />
@@ -147,17 +154,26 @@ namespace MixedRealityExtension.Factories
 		{
 			return new MWMaterial()
 			{
-				Color = new ColorPatch(material.AlbedoColor),
-				MainTextureId = app.AssetManager.GetByObject(material.AlbedoTexture)?.Id,
-				MainTextureOffset = new Vector3Patch(material.Uv1Offset),
-				MainTextureScale = new Vector3Patch(material.Uv1Scale)
+				Color = material.GetShaderParam(AlbedoColorProp) is Color albedoColor ? new ColorPatch(albedoColor) : null,
+				MainTextureId = material.GetShaderParam(TextureAlbedoProp) is Godot.Object textureAlbedo ? app.AssetManager.GetByObject(textureAlbedo)?.Id : null,
+				MainTextureOffset = material.GetShaderParam(Uv1OffsetProp) is Vector3 uv1Offset ? new Vector3Patch(uv1Offset) : null,
+				MainTextureScale = material.GetShaderParam(Uv1ScaleProp) is Vector3 uv1Scale ? new Vector3Patch(uv1Scale) : null,
+				EmissiveColor = material.GetShaderParam(EmissionColorProp) is Color emissionColor ? new ColorPatch(emissionColor): null,
+				EmissiveTextureId = material.GetShaderParam(TextureEmissionProp) is Godot.Object textureEmission ? app.AssetManager.GetByObject(textureEmission)?.Id : null,
+				EmissiveTextureOffset = material.GetShaderParam(Uv2OffsetProp) is Vector3 uv2Offset ? new Vector2Patch(ToVector2(uv2Offset)) : null,
+				EmissiveTextureScale = material.GetShaderParam(Uv2ScaleProp) is Vector3 uv2Scale ? new Vector2Patch(ToVector2(uv2Scale)) : null
 			};
 		}
 
 		/// <inheritdoc />
 		public virtual bool UsesTexture(IMixedRealityExtensionApp app, Material material, Texture texture)
 		{
-			return material.AlbedoTexture == texture;
+			return material.GetShaderParam(TextureAlbedoProp) == texture;
+		}
+
+		private static Vector2 ToVector2(Vector3 vec3)
+		{
+			return new Vector2(vec3.x, vec3.y);
 		}
 	}
 }
