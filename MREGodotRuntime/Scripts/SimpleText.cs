@@ -17,6 +17,7 @@ public class SimpleText : MeshInstance, IText
 	private float height;
 	private TextAnchorLocation anchor;
 	private TextJustify justify;
+	private static Shader TextShader = ResourceLoader.Load<Shader>("res://MREGodotRuntime/Shaders/MRESimpleTextShader.shader");
 
 	/// <inheritdoc />
 	public bool Enabled
@@ -146,12 +147,12 @@ public class SimpleText : MeshInstance, IText
 		var viewportTexture = textViewport.GetTexture();
 		viewportTexture.Flags |= (uint)Texture.FlagsEnum.Filter;
 
-		var textMeshMaterial = new SpatialMaterial()
+		var textMeshMaterial = new ShaderMaterial()
 		{
-			FlagsTransparent = true,
-			ParamsCullMode = SpatialMaterial.CullMode.Disabled,
-			AlbedoTexture = viewportTexture,
+			Shader = TextShader,
+
 		};
+		textMeshMaterial.SetShaderParam("texture_albedo", viewportTexture);
 
 		Mesh.SurfaceSetMaterial(0, textMeshMaterial);
 	}

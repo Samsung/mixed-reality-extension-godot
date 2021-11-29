@@ -89,7 +89,9 @@ public class MREComponent : Spatial
 
 	private static bool _apiInitialized = false;
 
-	private SpatialMaterial DefaultPrimMaterial = new SpatialMaterial();
+	private ShaderMaterial DefaultPrimMaterial = new ShaderMaterial() {
+		Shader = ResourceLoader.Load<Shader>("res://MREGodotRuntime/Shaders/MREDefaultShader_Opaque.shader")
+	};
 
 	private Dictionary<Guid, HostAppUser> hostAppUsers = new Dictionary<Guid, HostAppUser>();
 
@@ -301,7 +303,7 @@ public class MREComponent : Spatial
 			PlaceholderObject.PauseMode = PauseModeEnum.Process;
 		}
 	}
-	
+
 	public void UserJoin()
 	{
 		var hostAppUser = new HostAppUser(LocalPlayer.PlayerId, $"TestBed User: {LocalPlayer.PlayerId}")

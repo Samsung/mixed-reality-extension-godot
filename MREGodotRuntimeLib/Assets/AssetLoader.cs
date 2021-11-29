@@ -398,11 +398,11 @@ namespace MixedRealityExtension.Assets
 			_app.AssetManager.OnSet(def.Id, asset =>
 			{
 
-				if (def.Material != null && asset.Asset != null && asset.Asset is Godot.SpatialMaterial mat)
+				if (def.Material != null && asset.Asset != null && asset.Asset is Godot.ShaderMaterial mat)
 				{
 					// make sure material reference is write-safe
 					// Note: It's safe to assume existence because we're inside the OnSet callback
-					mat = _app.AssetManager.GetById(def.Id, writeSafe: true).Value.Asset as Godot.SpatialMaterial;
+					mat = _app.AssetManager.GetById(def.Id, writeSafe: true).Value.Asset as Godot.ShaderMaterial;
 
 					MREAPI.AppsAPI.MaterialPatcher.ApplyMaterialPatch(_app, mat, def.Material.Value);
 				}
@@ -627,7 +627,7 @@ namespace MixedRealityExtension.Assets
 					}
 				};
 			}
-			else if (unityAsset is Godot.SpatialMaterial mat)
+			else if (unityAsset is Godot.ShaderMaterial mat)
 			{
 				return new Asset()
 				{
