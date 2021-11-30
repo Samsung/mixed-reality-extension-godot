@@ -12,6 +12,7 @@ namespace MixedRealityExtension.Core.Components
 	{
 		private List<MeshInstance> meshInstances = new List<MeshInstance>();
 		private static Vector3 Vector3Half = Vector3.One * 0.5f;
+		public AABB Bounds =>new AABB(GlobalTransform.origin - GlobalTransform.basis.Scale / 2, GlobalTransform.basis.Scale);
 
 		internal void ApplyPatch(ClippingPatch patch)
 		{
@@ -20,14 +21,8 @@ namespace MixedRealityExtension.Core.Components
 			{
 				foreach (var clippingObjectId in patch.ClippingObjects)
 				{
-					Node targetActor = AttachedActor.App.FindActor(clippingObjectId) as Node;
-					MWGOTreeWalker.VisitTree(targetActor, node =>
-					{
-						if (node is MeshInstance meshInstance)
-						{
-							meshInstances.Add(meshInstance);
-						}
-					});
+					Spatial targetActor = AttachedActor.App.FindActor(clippingObjectId) as Spatial;
+					AddMeshInstance(targetActor);
 				}
 			}
 		}
@@ -81,6 +76,33 @@ namespace MixedRealityExtension.Core.Components
 				shaderMaterial.SetShaderParam("clipBoxInverseTransform", null);
 			}
 			meshInstances.Clear();
+		}
+
+		public void AddMeshInstance(Spatial root)
+		{
+			MWGOTreeWalker.VisitTree(root, node =>
+			{
+				if (node is MeshInstance meshInstance)
+				{
+					meshInstances.Add(meshInstance);
+				}
+			});
+		}
+
+		public void RemoveMeshInstance(Spatial root)
+		{
+			MWGOTreeWalker.VisitTree(root, node =>
+			{
+				if (node is MeshInstance meshInstance)
+				{
+					meshInstances.Remove(meshInstance);
+				}
+			});
+		}
+
+		public IEnumerable<MeshInstance> GetNodesCopy()
+		{
+			return new List<MeshInstance>(meshInstances);
 		}
 	}
 }

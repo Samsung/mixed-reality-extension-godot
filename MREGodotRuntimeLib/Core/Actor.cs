@@ -1693,7 +1693,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		private void PatchClipping(ClippingPatch clippingPatch)
+		public void PatchClipping(ClippingPatch clippingPatch)
 		{
 			if (clippingPatch != null)
 			{
