@@ -16,6 +16,7 @@ using MixedRealityExtension.Messaging.Payloads;
 
 using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
+using MixedRealityExtension.Core.Components;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -415,35 +416,28 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
         }
 
-        private ClippingBox clipBox;
+        private ClippingComponent clippingComponent;
 
         /// <summary>
         /// The ScrollingObjectCollection's ClippingBox.
         /// that is used for clipping items in and out of the list.
         /// </summary>
-        public ClippingBox ClipBox
+        internal ClippingComponent ClippingComponent
         {
             get
             {
-                if (clipBox == null)
+                if (clippingComponent == null)
                 {
-                    ClippingBox oldClippingBox = FindNode("Clipping Box", false) as ClippingBox;
+                    ClippingComponent oldClippingComponent = parentActor.GetChild<ClippingComponent>();
 
-                    if (oldClippingBox != null)
+                    if (oldClippingComponent != null)
                     {
-                        clipBox = oldClippingBox;
-                        GD.PushWarning(Name + " ScrollingObjectCollection found an existing Clipping object, using it for the list");
+                        clippingComponent = oldClippingComponent;
                     }
-                    else
-                    {
-                        clipBox = new ClippingBox() { Name = "Clipping Box" };
-                    }
-
-                    AddChild(clipBox);
-                    clipBox.Transform = Transform.Identity;
+                    clippingComponent.Transform = Transform.Identity;
                 }
 
-                return clipBox;
+                return clippingComponent;
             }
         }
 
@@ -488,6 +482,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         private Tool currentTool;
 
+        private Actor parentActor;
 
         #endregion scroll state variables
 
@@ -672,19 +667,19 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
                     // Apply the viewable area and column/row multiplier
                     // Use a dummy bounds of one to get the local scale to match;
-                    ClipBox.Scale = new Vector3(CellWidth * CellsPerTier, CellHeight * TiersPerPage, CellDepth);
+                    ClippingComponent.Scale = new Vector3(CellWidth * CellsPerTier, CellHeight * TiersPerPage, CellDepth);
 
                     break;
 
                 case ScrollDirectionType.LeftAndRight:
 
                     // Same as above for L <-> R
-                    ClipBox.Scale = new Vector3(CellWidth * TiersPerPage, CellHeight * CellsPerTier, CellDepth);
+                    ClippingComponent.Scale = new Vector3(CellWidth * TiersPerPage, CellHeight * CellsPerTier, CellDepth);
 
                     break;
             }
             // Apply new values
-            ClipBox.Transform = new Transform(ClipBox.Transform.basis, Vector3.Zero);
+            ClippingComponent.Transform = new Transform(ClippingComponent.Transform.basis, Vector3.Zero);
         }
 
         #endregion Setup methods
@@ -695,9 +690,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             this.RegisterHandler<IMixedRealityPointerHandler>();
             this.RegisterHandler<IMixedRealityTouchHandler>();
+            parentActor = GetParent<Actor>();
             ScrollingCollisionBoxShape = GetNode<CollisionShape>("CollisionShape").Shape as BoxShape;
             ScrollingTouchable = GetNode<NearInteractionTouchable>("NearInteractionTouchable");
-            UpdateContent();
         }
 
         public override void _Process(float delta)
@@ -1281,16 +1276,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         private bool DetectScrollRelease(Vector3 pointerPos)
         {
-            Vector3 scrollToPointerVector = pointerPos - ClipBox.GlobalTransform.origin;
+            Vector3 scrollToPointerVector = pointerPos - ClippingComponent.GlobalTransform.origin;
 
             // Projecting vector onto every clip box space coordinate and using clip box lossy scale as reference to dimensions to scroll view visible bounds
             // Using dot product to check if pointer is in front or behind the scroll view plane
-            bool isScrollRelease = scrollToPointerVector.Project(ClipBox.GlobalTransform.basis.y).Length() > ClipBox.GlobalTransform.basis.Scale.y / 2 + ReleaseThresholdTopBottom
-                                || scrollToPointerVector.Project(ClipBox.GlobalTransform.basis.x).Length() > ClipBox.GlobalTransform.basis.Scale.x / 2 + ReleaseThresholdLeftRight
+            bool isScrollRelease = scrollToPointerVector.Project(ClippingComponent.GlobalTransform.basis.y).Length() > ClippingComponent.GlobalTransform.basis.Scale.y / 2 + ReleaseThresholdTopBottom
+                                || scrollToPointerVector.Project(ClippingComponent.GlobalTransform.basis.x).Length() > ClippingComponent.GlobalTransform.basis.Scale.x / 2 + ReleaseThresholdLeftRight
 
                                 || (scrollToPointerVector.Dot(-GlobalTransform.basis.z) > 0 ?
-                                        scrollToPointerVector.Project(-ClipBox.GlobalTransform.basis.z).Length() > ClipBox.GlobalTransform.basis.Scale.z / 2 + ReleaseThresholdBack :
-                                        scrollToPointerVector.Project(-ClipBox.GlobalTransform.basis.z).Length() > ClipBox.GlobalTransform.basis.Scale.z / 2 + ReleaseThresholdFront);
+                                        scrollToPointerVector.Project(-ClippingComponent.GlobalTransform.basis.z).Length() > ClippingComponent.GlobalTransform.basis.Scale.z / 2 + ReleaseThresholdBack :
+                                        scrollToPointerVector.Project(-ClippingComponent.GlobalTransform.basis.z).Length() > ClippingComponent.GlobalTransform.basis.Scale.z / 2 + ReleaseThresholdFront);
             return isScrollRelease;
         }
 
@@ -1307,7 +1302,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             foreach (var meshInstance in meshInstances)
             {
-                ClipBox.AddMeshInstance(meshInstance);
+                ClippingComponent.AddMeshInstance(meshInstance);
             }
         }
 
@@ -1318,7 +1313,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             foreach (var meshInstance in meshInstances)
             {
-                ClipBox.RemoveMeshInstance(meshInstance);
+                ClippingComponent.RemoveMeshInstance(meshInstance);
             }
         }
 
@@ -1327,7 +1322,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         private void ClearClippingBox()
         {
-            ClipBox.ClearMeshInstances();
+            ClippingComponent.ClearMeshInstances();
         }
 
         /// <summary>
@@ -1354,10 +1349,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 return;
             }
 
-            AABB clippingThresholdAABB = ClipBox.Bounds;
+            AABB clippingThresholdAABB = ClippingComponent.Bounds;
             var contentMeshInstances = ScrollContainer.GetChildrenAll<MeshInstance>();
             clippedMeshInstances.Clear();
-            clippedMeshInstances.UnionWith(ClipBox.GetNodesCopy());
+            clippedMeshInstances.UnionWith(ClippingComponent.GetNodesCopy());
             clippedActors.Clear();
 
             // Remove all renderers from clipping primitive that are not part of scroll content
@@ -1429,7 +1424,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
             // Check collider visibility
             // Outer clipping bounds is used to ensure collider has minimum visibility to stay enabled
-            AABB outerClippingThresholdBounds = ClipBox.Bounds;
+            AABB outerClippingThresholdBounds = ClippingComponent.Bounds;
             outerClippingThresholdBounds.Size *= contentVisibilityThresholdRatio;
 
             var collisionShapes = ScrollContainer.GetChildrenAll<CollisionShape>();
@@ -1886,10 +1881,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             if (toolkitPatch is ScrollingObjectCollectionPatch patch)
             {
+                parentActor.PatchClipping(new ClippingPatch() {
+                    ClippingObjects = patch.ScrollContents
+                });
                 foreach (var scrollContent in patch.ScrollContents)
                 {
-                    var actor = GetParent<Actor>();
-                    var content = actor.App.FindActor(scrollContent) as Spatial;
+                    var content = parentActor.App.FindActor(scrollContent) as Spatial;
                     content.GetParent()?.RemoveChild(content);
                     AddContent(content);
                 }
@@ -1899,6 +1896,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 CellHeight = CellHeight.ApplyPatch(patch.CellHeight);
                 CellDepth = CellDepth.ApplyPatch(patch.CellDepth);
                 ScrollDirection = ScrollDirection.ApplyPatch(patch.ScrollDirectionType);
+                UpdateContent();
             }
         }
 
