@@ -8,6 +8,13 @@ code = "shader_type spatial;
 render_mode unshaded;
 
 uniform vec4 color: hint_color = vec4(0.2137f, 0.4254f, 0.9f, 1f);
+uniform mat4 clipBoxInverseTransform;
+
+float PointVsBox(vec3 worldPosition, mat4 boxInverseTransform)
+{
+   vec3 distance = abs(boxInverseTransform * vec4(worldPosition, 1.0)).xyz;
+   return 1.0 - step(1.0001, max(distance.x, max(distance.y, distance.z)));
+}
 
 float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius)
 {
@@ -23,12 +30,15 @@ void fragment()
 	float smmothedAlbedo = 1f - smoothstep(-edgeSoftness, edgeSoftness, abs(distance) - thickness);
 	ALBEDO = mix(color, vec4(0.42, 0.48f, 0.61f, smmothedAlbedo), smmothedAlbedo).xyz;
 	float smmothedAlpha = 1f - smoothstep(0f, edgeSoftness * 2f, distance);
-	ALPHA = mix(0.0, 1.0, smmothedAlpha);
+
+	vec3 global_vertex = (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	ALPHA = mix(0.0, 1.0, smmothedAlpha) * PointVsBox(global_vertex, clipBoxInverseTransform);
 }"
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
 shader_param/color = Color( 0.2137, 0.4254, 0.9, 1 )
+shader_param/clipBoxInverseTransform = null
 
 [sub_resource type="QuadMesh" id=3]
 
