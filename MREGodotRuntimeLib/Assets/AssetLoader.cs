@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Godot;
 using MWMaterial = MixedRealityExtension.Assets.Material;
 using MWTexture = MixedRealityExtension.Assets.Texture;
@@ -44,6 +45,28 @@ namespace MixedRealityExtension.Assets
 			{ typeof(PinchSlider), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSlider.tscn") },
 			{ typeof(PinchSliderThumb), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSliderThumb.tscn") },
 			{ typeof(ScrollingObjectCollection), ResourceLoader.Load<PackedScene>("res://Toolkit/ScrollingObjectCollection.tscn") }
+		};
+
+		private readonly static Dictionary<string, string> ShaderToSpatialProperties = new Dictionary<string, string>()
+		{
+			{"albedo", "albedo_color"},
+			{"specular", "metallic_specular"},
+			{"point_size", "params_point_size"},
+			{"alpha_scissor_threshold", "params_alpha_scissor_threshold"},
+			{"texture_albedo", "albedo_texture"},
+			{"texture_metallic", "metallic_texture"},
+			{"texture_roughness", "roughness_texture"},
+			{"texture_emission", "emission_texture"},
+			{"texture_normal", "normal_texture"},
+			{"texture_ambient_occlusion", "ao_texture"},
+		};
+
+		private readonly static Plane[] texture_mask = new Plane[] {
+			new Plane(1, 0, 0, 0),
+			new Plane(0, 1, 0, 0),
+			new Plane(0, 0, 1, 0),
+			new Plane(0, 0, 0, 1),
+			new Plane(0.3333333f, 0.3333333f, 0.3333333f, 0),
 		};
 
 		//private readonly AsyncCoroutineHelper _asyncHelper;
@@ -119,7 +142,7 @@ namespace MixedRealityExtension.Assets
 					MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(collisionLayer, collider);
 				}
 
-				if (go is Spatial)
+				if (go.GetType() == typeof(Spatial))
 				{
 					var newActor = Actor.Instantiate((Spatial)go);
 					actorList.Add(newActor);
@@ -350,15 +373,41 @@ namespace MixedRealityExtension.Assets
 					}
 				}
 
+				var materialRepace = new System.Collections.Generic.Dictionary<SpatialMaterial, ShaderMaterial>();
 				// load materials
 				if (gltfRoot.Materials != null)
 				{
 					for (var i = 0; i < gltfRoot.Materials.Count; i++)
 					{
 						var matdef = gltfRoot.Materials[i];
-						var material = await importer.LoadMaterialAsync(i);
-						material.ResourceName = matdef.Name ?? $"material:{i}";
-						assets.Add(material);
+						var material = await importer.LoadMaterialAsync(i) as SpatialMaterial;
+						string shaderCode =  await GetShaderCodeFromSpatialMaterial(material);
+						var newShaderMaterial = new ShaderMaterial()
+						{
+							Shader = new Shader() { Code = InsertClippingFunction(shaderCode) },
+							ResourceName = matdef.Name ?? $"material:{i}",
+						};
+
+						foreach (Godot.Collections.Dictionary param in VisualServer.ShaderGetParamList(newShaderMaterial.Shader.GetRid()))
+						{
+							string paramName = (string)param["name"];
+							if (ShaderToSpatialProperties.TryGetValue(paramName, out string SpatialParam))
+							{
+								newShaderMaterial.SetShaderParam(paramName, material.Get(SpatialParam));
+							}
+							else if (paramName.EndsWith("texture_channel"))
+							{
+								newShaderMaterial.SetShaderParam(paramName, texture_mask[(int)material.Get(paramName)]);
+							}
+							else
+							{
+								newShaderMaterial.SetShaderParam(paramName, material.Get(paramName));
+							}
+						}
+
+						materialRepace[material] = newShaderMaterial;
+
+						assets.Add(newShaderMaterial);
 					}
 				}
 
@@ -371,6 +420,36 @@ namespace MixedRealityExtension.Assets
 
 						Node rootObject = importer.LastLoadedScene;
 						rootObject.Name = gltfRoot.Scenes[i].Name ?? $"scene:{i}";
+						MWGOTreeWalker.VisitTree(rootObject, node =>
+						{
+							if (node is MeshInstance meshInstance)
+							{
+								if (meshInstance.MaterialOverride is SpatialMaterial spatialMaterial)
+									meshInstance.MaterialOverride = materialRepace[spatialMaterial];
+								else if (meshInstance.Mesh != null)
+								{
+									var materialCount = meshInstance.Mesh.GetSurfaceCount();
+									for (int i = 0; i < materialCount; i++)
+									{
+										var material = meshInstance.Mesh.SurfaceGetMaterial(i);
+										if (material is SpatialMaterial meshMaterial)
+										{
+											meshInstance.Mesh.SurfaceSetMaterial(i, materialRepace[meshMaterial]);
+										}
+									}
+								}
+								else
+								{
+									var materialCount = meshInstance.GetSurfaceMaterialCount();
+									for (int i = 0; i < materialCount; i++)
+									{
+										var material = meshInstance.GetSurfaceMaterial(i);
+										if (material is SpatialMaterial meshInstanceMaterial)
+											meshInstance.SetSurfaceMaterial(i, materialRepace[meshInstanceMaterial]);
+									}
+								}
+							}
+						});
 
 						var animation = rootObject.GetChild<Godot.AnimationPlayer>();
 						if (animation != null)
@@ -389,6 +468,47 @@ namespace MixedRealityExtension.Assets
 			}
 
 			return assets;
+		}
+
+		private async Task<string> GetShaderCodeFromSpatialMaterial(SpatialMaterial spatialMaterial)
+		{
+			var shaderRID = VisualServer.MaterialGetShader(spatialMaterial.GetRid());
+			string shaderCode = VisualServer.ShaderGetCode(shaderRID);
+			while (string.IsNullOrEmpty(shaderCode))
+			{
+				await _app.SceneRoot.ToSignal(_app.SceneRoot.GetTree().CreateTimer(0.0416f), "timeout");
+				shaderRID = VisualServer.MaterialGetShader(spatialMaterial.GetRid());
+				shaderCode = VisualServer.ShaderGetCode(shaderRID);
+			}
+			return shaderCode;
+		}
+
+		private string InsertClippingFunction(string shaderCode)
+		{
+			var origin = shaderCode;
+			string newCode;
+			if (origin.Contains("clipBoxInverseTransform"))
+				return origin;
+			var fragmentIndex = shaderCode.IndexOf("void fragment(");
+			newCode = origin.Substring(0, fragmentIndex - 1);
+			newCode += "\n" + "uniform mat4 clipBoxInverseTransform;\n" +
+								"float PointVsBox(vec3 worldPosition, mat4 boxInverseTransform)\n" +
+								"{\n" +
+								"   vec3 distance = abs(boxInverseTransform * vec4(worldPosition, 1.0)).xyz;\n" +
+								"   return 1.0 - step(1.0001, max(distance.x, max(distance.y, distance.z)));\n" +
+								"}\n";
+
+			var fragmentCode = origin.Substring(fragmentIndex);
+			var match = Regex.Match(fragmentCode, "(?<=\\{)[^}]*(?=\\})");
+			var restCode = fragmentCode.Substring(match.Index + match.Value.Length);
+			fragmentCode = fragmentCode.Substring(0, match.Index + match.Value.Length);
+			if (!fragmentCode.Contains("ALPHA"))
+				fragmentCode += "    ALPHA_SCISSOR=1.0;";
+			fragmentCode += "\n" +	"    vec3 gv = (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz;\n" +
+									"    ALPHA *= PointVsBox(gv, clipBoxInverseTransform);\n";
+			newCode += fragmentCode + restCode;
+
+			return newCode;
 		}
 
 		[CommandHandler(typeof(AssetUpdate))]
