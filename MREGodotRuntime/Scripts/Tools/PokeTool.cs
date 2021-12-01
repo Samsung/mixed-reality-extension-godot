@@ -94,8 +94,9 @@ namespace Assets.Scripts.Tools
 
 			ClosestProximityTouchable = touchable;
 
-			RayStartPoint = inputSource.PokePointer.GlobalTransform.origin + inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * TouchableDistance;
-			Vector3 to = -inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * 1.5f;
+			var touchableVector = inputSource.PokePointer.GlobalTransform.basis.z.Normalized() * TouchableDistance;
+			RayStartPoint = inputSource.PokePointer.GlobalTransform.origin + touchableVector;
+			Vector3 to = inputSource.PokePointer.GlobalTransform.origin - touchableVector;
 			var IntersectRayResult = spaceState.IntersectRay(RayStartPoint, to, collideWithAreas: true);
 			if (IntersectRayResult.Count > 0)
 			{
