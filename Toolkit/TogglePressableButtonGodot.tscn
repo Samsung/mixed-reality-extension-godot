@@ -45,7 +45,7 @@ shader_param/clipBoxInverseTransform = null
 [node name="PressableButtonGodot" instance=ExtResource( 1 )]
 script = ExtResource( 4 )
 
-[node name="BackPlateToggleState" type="MeshInstance" parent="." index="5"]
+[node name="BackPlateToggleState" type="MeshInstance" parent="." index="4"]
 transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 1, 0, 0, 0 )
 visible = false
 material_override = SubResource( 2 )

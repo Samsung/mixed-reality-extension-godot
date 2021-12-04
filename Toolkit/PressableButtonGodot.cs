@@ -5,6 +5,8 @@ using MixedRealityExtension.Core.Types;
 using MixedRealityExtension.Patching;
 using MixedRealityExtension.Util.GodotHelper;
 using Microsoft.MixedReality.Toolkit.Input;
+using MixedRealityExtension.Core;
+using MixedRealityExtension.PluginInterfaces;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -26,6 +28,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private ShaderMaterial HighlightPlateMaterial => (ShaderMaterial)HighlightPlate.MaterialOverride;
 		private SimpleText TextNode;
 
+		protected static readonly TouchablePatch TouchablePatch = new TouchablePatch()
+		{
+			Type = MixedRealityExtension.Messaging.Payloads.TouchableType.Surface,
+			Direction = MixedRealityExtension.Messaging.Payloads.TouchableDirection.Forward,
+			Bounds = new Vector2Patch(new Vector2(0.032f , 0.032f)),
+		};
+
 		public PressableButtonGodot()
 		{
 			//set default
@@ -34,7 +43,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			PressDistance = 0.006f;
 			ReleaseDistanceDelta = 0.004f;
 			movingButtonVisualsNodePath = new NodePath("FrontPlate");
-			nearInteractionTouchableSurfaceNodePath = new NodePath("NearInteractionTouchable");
 		}
 
 		public override void _Ready()
@@ -138,6 +146,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			if (toolkitPatch is ButtonPatch patch)
 			{
+				actor.PatchTouchable(TouchablePatch);
+				((TouchablePlane)touchableSurface).SetLocalCenter(new Vector3(0, 0, 0.016f));
 				ApplyText(patch.MainText);
 				ApplyColor(patch.Color);
 			}

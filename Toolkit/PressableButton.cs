@@ -5,6 +5,9 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Assets.Scripts.Tools;
 using System.Collections.Generic;
 using Godot;
+using MixedRealityExtension.Core;
+using MixedRealityExtension.PluginInterfaces;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -113,9 +116,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         public bool EnforceFrontPush { get => enforceFrontPush; private set => enforceFrontPush = value; }
 
-        [Export]
-        protected NodePath nearInteractionTouchableSurfaceNodePath;
-        private NearInteractionTouchableSurface nearInteractionTouchableSurface => GetNode<NearInteractionTouchableSurface>(nearInteractionTouchableSurfaceNodePath);
+        protected ITouchableSurface touchableSurface => actor.GetChild<ITouchableSurface>();
 
         [Signal]
         public delegate void touch_begin();
@@ -144,6 +145,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public float CurrentPushDistance { get => currentPushDistance; protected set => currentPushDistance = value; }
 
         private bool isTouching = false;
+
+        internal Actor actor;
 
         ///<summary>
         /// Represents the state of whether or not a finger is currently touching this button.
@@ -186,15 +189,15 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public float LocalToWorldScale => (WorldToLocalScale != 0) ? 1.0f / WorldToLocalScale : 0.0f;
 
         /// <summary>
-        /// The press direction of the button as defined by a NearInteractionTouchableSurface.
+        /// The press direction of the button as defined by a touchableSurface.
         /// </summary>
         private Vector3 WorldSpacePressDirection
         {
             get
             {
-                if (nearInteractionTouchableSurface != null)
+                if (touchableSurface != null)
                 {
-                    return nearInteractionTouchableSurface.node.GlobalTransform.basis.Orthonormalized().Xform(nearInteractionTouchableSurface.LocalPressDirection);
+                    return actor.GlobalTransform.basis.Orthonormalized().Xform(touchableSurface.LocalPressDirection);
                 }
 
                 return -GlobalTransform.basis.z;
@@ -202,16 +205,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
         }
 
         /// <summary>
-        /// The press direction of the button as defined by a NearInteractionTouchableSurface, in local space,
-        /// using Vector3.forward as an optional fallback when no NearInteractionTouchableSurface is defined.
+        /// The press direction of the button as defined by a touchableSurface, in local space,
+        /// using Vector3.forward as an optional fallback when no touchableSurface is defined.
         /// </summary>
         private Vector3 LocalSpacePressDirection
         {
             get
             {
-                if (nearInteractionTouchableSurface != null)
+                if (touchableSurface != null)
                 {
-                    return nearInteractionTouchableSurface.LocalPressDirection;
+                    return touchableSurface.LocalPressDirection;
                 }
 
                 return Vector3.Forward;
@@ -276,7 +279,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         public override void _EnterTree()
         {
-            nearInteractionTouchableSurface.OnValidate();
             currentPushDistance = startPushDistance;
         }
 
@@ -286,6 +288,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             hasStarted = true;
             this.RegisterHandler<IMixedRealityTouchHandler>();
+            actor = GetParent<Actor>();
 /*
             if (gameObject.layer == 2)
             {
@@ -390,29 +393,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
         }
 */
-        private bool HasPassedThroughStartPlane(TouchInputEventData eventData)
-        {
-            PokeTool poke = eventData.Tool as PokeTool;
-            if (poke != null && poke.CurrentTouchableObjectDown != null)
-            {
-                // Extrapolate to get previous position.
-                float previousDistance = GetDistanceAlongPushDirection(poke.PreviousPosition);
-                return previousDistance >= StartPushDistance;
-            }
-
-            return false;
-        }
 
         void OnTouchStarted(TouchInputEventData eventData)
         {
             if (touchPoints.ContainsKey(eventData.Tool))
-            {
-                return;
-            }
-
-            // Back-Press Detection:
-            // Accept touch only if controller pushed from the front.
-            if (enforceFrontPush && !HasPassedThroughStartPlane(eventData))
             {
                 return;
             }

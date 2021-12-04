@@ -36,6 +36,14 @@ namespace MixedRealityExtension.Util.GodotHelper
 			return _this;
 		}
 
+		public static Vector2 GetPatchApplied(this Vector2 _this, MWVector2 vector)
+		{
+			_this.x = _this.x.GetPatchApplied(vector.X);
+			_this.y = _this.y.GetPatchApplied(vector.Y);
+
+			return _this;
+		}
+
 		public static Vector3 GetPatchApplied(this Vector3 _this, MWVector3 vector)
 		{
 			_this.x = _this.x.GetPatchApplied(vector.X);

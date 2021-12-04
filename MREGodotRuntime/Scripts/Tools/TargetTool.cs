@@ -226,7 +226,7 @@ namespace Assets.Scripts.Tools
 				inputSource.RayCastMesh.Scale = new Vector3(1, 1, distance);
 				inputSource.RayCastMesh.Translation = new Vector3(0, 0, -distance / 2);
 
-				for (var node = (Spatial)RayIntersectionResult["collider"]; node != null; node = node.GetParent<Spatial>())
+				for (var node = (Spatial)RayIntersectionResult["collider"]; node != null; node = node.GetParent() as Spatial)
 				{
 					if (node is MixedRealityExtension.Core.Actor a)
 					{

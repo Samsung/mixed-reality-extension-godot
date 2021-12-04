@@ -101,6 +101,23 @@ namespace MixedRealityExtension.Messaging.Payloads
 		PeerAuthoritative
 	}
 
+	public enum TouchableType
+	{
+		None,
+		Surface,
+		Volume
+	}
+
+	public enum TouchableDirection
+	{
+		Forward,
+		Back,
+		Up,
+		Down,
+		Right,
+		Left,
+	}
+
 	/// <summary>
 	/// Payload that contains only traces.
 	/// </summary>
@@ -252,7 +269,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 	/// <summary>
 	/// Payload for when an action is performed for a behavior on an actor from engine to app.
 	/// </summary>
-	public class ActionPerformed : Payload 
+	public class ActionPerformed : Payload
 	{
 		/// <summary>
 		/// The id of the user performing the action.
