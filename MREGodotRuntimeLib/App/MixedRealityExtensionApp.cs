@@ -940,7 +940,6 @@ namespace MixedRealityExtension.App
 				var actor = FindActor(payload.ActorId) as Actor;
 				var toolkit = AssetLoader.PackedToolkitScene[payload.Toolkit.ToolkitType].Instance();
 				actor.AddChild(toolkit);
-				actor.PatchTouchable(true);
 				((IToolkit)toolkit).ApplyPatch(payload.Toolkit);
 			}
 			catch (Exception e)

@@ -17,6 +17,7 @@ using MixedRealityExtension.Messaging.Payloads;
 using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Core.Components;
+using MixedRealityExtension.PluginInterfaces;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -227,7 +228,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
         }
 
-        private float cellDepth = 0.25f;
+        private float cellDepth = 0.024f;
 
         /// <summary>
         /// Depth of cell used for masking out content renderers that are out of bounds.
@@ -385,7 +386,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// <summary>
         /// Scrolling interaction touchable used to catch touch events on empty spaces.
         /// </summary>
-        public NearInteractionTouchable ScrollingTouchable { get; private set; }
+        internal TouchablePlane ScrollingTouchable { get; private set; }
 
         // The empty Spatial that contains our nodes and be scrolled
         private Spatial scrollContainer;
@@ -692,7 +693,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
             this.RegisterHandler<IMixedRealityTouchHandler>();
             parentActor = GetParent<Actor>();
             ScrollingCollisionBoxShape = GetNode<CollisionShape>("CollisionShape").Shape as BoxShape;
-            ScrollingTouchable = GetNode<NearInteractionTouchable>("NearInteractionTouchable");
         }
 
         public override void _Process(float delta)
@@ -1833,11 +1833,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
             if (pokeTool == null)
                 return;
 
-            if (!HasPassedThroughFrontPlane(pokeTool))
-            {
-                return;
-            }
-
             currentTool = pokeTool;
 
             animateScrollerToken.Cancel();
@@ -1884,6 +1879,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 parentActor.PatchClipping(new ClippingPatch() {
                     ClippingObjects = patch.ScrollContents
                 });
+                parentActor.PatchTouchable(new TouchablePatch()
+                {
+                    Type = MixedRealityExtension.Messaging.Payloads.TouchableType.Surface,
+                    Direction = MixedRealityExtension.Messaging.Payloads.TouchableDirection.Forward,
+                });
+                ScrollingTouchable = parentActor.GetChild<TouchablePlane>();
                 foreach (var scrollContent in patch.ScrollContents)
                 {
                     var content = parentActor.App.FindActor(scrollContent) as Spatial;

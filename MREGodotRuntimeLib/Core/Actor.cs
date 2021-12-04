@@ -293,7 +293,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		internal bool Touchable { get; private set; }
+		internal ITouchableBase Touchable { get; private set; }
 
 		#endregion
 
@@ -411,6 +411,7 @@ namespace MixedRealityExtension.Core
 			PatchGrabbable(actorPatch.Grabbable);
 			PatchSubscriptions(actorPatch.Subscriptions);
 			PatchClipping(actorPatch.Clipping);
+			PatchTouchable(actorPatch.Touchable);
 		}
 
 		internal void ApplyCorrection(ActorCorrection actorCorrection)
@@ -1658,26 +1659,57 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		internal void PatchTouchable(bool? touchable)
+		internal void PatchTouchable(TouchablePatch touchablePatch)
 		{
-			if (touchable != null && touchable.Value != Touchable)
+			if (touchablePatch != null)
 			{
-				// Update existing behavior or add a basic target behavior if there isn't one already.
-				var behaviorComponent = GetActorComponent<BehaviorComponent>();
-				if (behaviorComponent == null)
+				if (touchablePatch.Type != TouchableType.None && Touchable == null)
 				{
-					behaviorComponent = GetOrCreateActorComponent<BehaviorComponent>();
-					var context = BehaviorContextFactory.CreateContext(BehaviorType.Button, this, new WeakReference<MixedRealityExtensionApp>(App));
-
-					if (context == null)
+					// Update existing behavior or add a basic target behavior if there isn't one already.
+					var behaviorComponent = GetActorComponent<BehaviorComponent>();
+					if (behaviorComponent == null)
 					{
-						GD.PushError("Failed to create a behavior context.  Touch will not work without one.");
-						return;
+						// NOTE: We need to have the default behavior on an actor be a button for now in the case we want the actor
+						// to be able to be touched on all controller types for host apps.  This will be a base Target behavior once we
+						// update host apps to handle button conflicts.
+						behaviorComponent = GetOrCreateActorComponent<BehaviorComponent>();
+						var context = BehaviorContextFactory.CreateContext(BehaviorType.Button, this, new WeakReference<MixedRealityExtensionApp>(App));
+
+						if (context == null)
+						{
+							GD.PushError("Failed to create a behavior context.  Touch will not work without one.");
+							return;
+						}
+
+						behaviorComponent.SetBehaviorContext(context);
 					}
 
-					behaviorComponent.SetBehaviorContext(context);
+					if (behaviorComponent.Context is TargetBehaviorContext targetContext)
+					{
+						ITouchableBase touchableBase = null;
+						switch (touchablePatch.Type)
+						{
+							case TouchableType.Surface:
+								var touchablePlane = new TouchablePlane(this) { Name = "TouchablePlane" };
+								touchablePlane.ApplyPatch(touchablePatch);
+								touchableBase = touchablePlane;
+								break;
+							case TouchableType.Volume:
+								//TODO: touchable volume
+								break;
+						}
+						((ITargetBehavior)behaviorComponent.Behavior).Touchable = touchableBase;
+						Touchable = touchableBase;
+					}
 				}
-				Touchable = touchable.Value;
+				else if (touchablePatch.Type == TouchableType.None && Touchable != null)
+				{
+					var behaviorComponent = GetActorComponent<BehaviorComponent>();
+					var oldTouchable = ((ITargetBehavior)behaviorComponent.Behavior).Touchable;
+					RemoveChild((Spatial)oldTouchable);
+					((ITargetBehavior)behaviorComponent.Behavior).Touchable = null;
+					Touchable = null;
+				}
 			}
 		}
 
@@ -2106,8 +2138,8 @@ namespace MixedRealityExtension.Core
 				behaviorComponent.SetBehaviorContext(context);
 
 				// We need to update the new behavior's grabbable flag from the actor so that it can be grabbed in the case we cleared the previous behavior.
-				if (context is ITargetBehavior)
-					((ITargetBehavior)context.Behavior).Grabbable = Grabbable;
+				((ITargetBehavior)context.Behavior).Grabbable = Grabbable;
+				((ITargetBehavior)context.Behavior).Touchable = Touchable;
 			}
 
 			onCompleteCallback?.Invoke();

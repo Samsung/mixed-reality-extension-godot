@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 using Assets.Scripts.Tools;
 using MixedRealityExtension.Behaviors.Contexts;
+using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.PluginInterfaces.Behaviors;
 using System;
 
@@ -14,6 +15,8 @@ namespace Assets.Scripts.Behaviors
 		public bool Grabbable { get; set; }
 
 		public bool IsGrabbed { get; set; }
+
+		public ITouchableBase Touchable { get; set; }
 
 		public TargetBehaviorContext Context => _context;
 

@@ -73,6 +73,9 @@ namespace MixedRealityExtension.Patching.Types
 		[PatchProperty]
 		public List<ActorComponentType> Subscriptions { get; set; }
 
+		[PatchProperty]
+		public TouchablePatch Touchable { get; set; }
+
 		public ActorPatch()
 		{
 		}

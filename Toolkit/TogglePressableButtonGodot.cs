@@ -41,6 +41,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			if (toolkitPatch is ToggleButtonPatch patch)
 			{
+				actor.PatchTouchable(TouchablePatch);
 				ApplyText(patch.MainText);
 				ApplyColor(patch.Color);
 				ApplyIsToggled(patch.IsToggled);
