@@ -28,12 +28,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private ShaderMaterial HighlightPlateMaterial => (ShaderMaterial)HighlightPlate.MaterialOverride;
 		private SimpleText TextNode;
 
-		protected static readonly TouchablePatch TouchablePatch = new TouchablePatch()
-		{
-			Type = MixedRealityExtension.Messaging.Payloads.TouchableType.Surface,
-			Direction = MixedRealityExtension.Messaging.Payloads.TouchableDirection.Forward,
-		};
-
 		public PressableButtonGodot()
 		{
 			//set default
@@ -145,7 +139,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			if (toolkitPatch is ButtonPatch patch)
 			{
-				actor.PatchTouchable(TouchablePatch);
 				((TouchablePlane)touchableSurface).SetLocalCenter(new Vector3(0, 0, 0.016f));
 				ApplyText(patch.MainText);
 				ApplyColor(patch.Color);
