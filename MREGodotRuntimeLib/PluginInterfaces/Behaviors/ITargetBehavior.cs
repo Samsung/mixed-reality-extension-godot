@@ -19,5 +19,10 @@ namespace MixedRealityExtension.PluginInterfaces.Behaviors
 		/// Whether the target behavior grab is active.
 		/// </summary>
 		bool IsGrabbed { get; set; }
+
+		/// <summary>
+		/// Touchable base of the target.
+		/// </summary>
+		ITouchableBase Touchable { get; set; }
 	}
 }
