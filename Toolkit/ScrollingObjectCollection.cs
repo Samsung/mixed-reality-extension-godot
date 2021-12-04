@@ -1869,14 +1869,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             if (toolkitPatch is ScrollingObjectCollectionPatch patch)
             {
-                parentActor.PatchClipping(new ClippingPatch() {
-                    ClippingObjects = patch.ScrollContents
-                });
-                parentActor.PatchTouchable(new TouchablePatch()
-                {
-                    Type = MixedRealityExtension.Messaging.Payloads.TouchableType.Surface,
-                    Direction = MixedRealityExtension.Messaging.Payloads.TouchableDirection.Forward,
-                });
                 ScrollingTouchable = parentActor.GetChild<TouchablePlane>();
                 foreach (var scrollContent in patch.ScrollContents)
                 {
