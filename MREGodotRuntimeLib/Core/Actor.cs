@@ -1659,7 +1659,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		internal void PatchTouchable(TouchablePatch touchablePatch)
+		private void PatchTouchable(TouchablePatch touchablePatch)
 		{
 			if (touchablePatch != null)
 			{
@@ -1725,7 +1725,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		public void PatchClipping(ClippingPatch clippingPatch)
+		private void PatchClipping(ClippingPatch clippingPatch)
 		{
 			if (clippingPatch != null)
 			{
