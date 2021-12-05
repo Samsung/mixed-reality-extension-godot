@@ -12,34 +12,33 @@ namespace Assets.Scripts.Tools
 {
 	public class TargetTool : Tool
 	{
-		private GrabTool _grabTool = new GrabTool();
 		private PokeTool pokeTool = new PokeTool();
-		private SphereTool sphereTool = new SphereTool();
+		private GrabTool grabTool = new GrabTool();
 		private TargetBehavior _currentTargetBehavior;
 
 		public bool IsNearObject;
 
 		public Spatial Target { get; private set; }
 
-		public bool TargetGrabbed => _grabTool.GrabActive;
+		public bool TargetGrabbed => grabTool.GrabActive;
 
 		protected Vector3 CurrentTargetPoint { get; private set; }
 
 		public TargetTool()
 		{
-			_grabTool.GrabStateChanged += OnGrabStateChanged;
+			grabTool.GrabStateChanged += OnGrabStateChanged;
 		}
 
 		public override void CleanUp()
 		{
-			_grabTool.GrabStateChanged -= OnGrabStateChanged;
+			grabTool.GrabStateChanged -= OnGrabStateChanged;
 		}
 
 		public override void OnToolHeld(InputSource inputSource)
 		{
 			base.OnToolHeld(inputSource);
 			pokeTool.OnToolHeld(inputSource);
-			sphereTool.OnToolHeld(inputSource);
+			grabTool.OnToolHeld(inputSource);
 
 			Vector3? hitPoint;
 			var newTarget = FindTarget(inputSource, out hitPoint);
@@ -77,8 +76,8 @@ namespace Assets.Scripts.Tools
 		{
 			if (_currentTargetBehavior?.Grabbable ?? false)
 			{
-				_grabTool.Update(inputSource, Target);
-				if (_grabTool.GrabActive)
+				grabTool.Update(inputSource);
+				if (grabTool.GrabActive)
 				{
 					// If a grab is active, nothing should change about the current target.
 					return;
@@ -86,7 +85,6 @@ namespace Assets.Scripts.Tools
 			}
 
 			pokeTool.Update(inputSource);
-			sphereTool.Update(inputSource);
 			Vector3? hitPoint;
 
 			Position = inputSource.Hand.GlobalTransform.origin;
@@ -207,7 +205,7 @@ namespace Assets.Scripts.Tools
 		private Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
-			Spatial nearTarget = inputSource.IsPinching ? sphereTool.FindTarget(inputSource, out hitPoint) : pokeTool.FindTarget(inputSource, out hitPoint);
+			Spatial nearTarget = inputSource.IsPinching ? grabTool.FindTarget(inputSource, out hitPoint) : pokeTool.FindTarget(inputSource, out hitPoint);
 			if (nearTarget != null)
 			{
 				IsNearObject = true;
@@ -273,11 +271,6 @@ namespace Assets.Scripts.Tools
 			transform.basis.z = transform.basis.y.Cross(transform.basis.x).Normalized();
 			transform.basis = transform.basis.Orthonormalized();
 			return transform;
-		}
-
-		void OnDestroy()
-		{
-			_grabTool.Dispose();
 		}
 	}
 }
