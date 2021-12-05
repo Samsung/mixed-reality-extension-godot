@@ -1,7 +1,6 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Toolkit/PinchSlider.cs" type="Script" id=1]
-[ext_resource path="res://Toolkit/NearInteractionGrabbable.cs" type="Script" id=2]
 [ext_resource path="res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Opaque.shader" type="Shader" id=3]
 
 [sub_resource type="ShaderMaterial" id=1]
@@ -39,6 +38,3 @@ material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="Mesh/Area"]
 shape = SubResource( 3 )
-
-[node name="NearInteractionGrabbable" type="Spatial" parent="."]
-script = ExtResource( 2 )

@@ -1,9 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-using Assets.Scripts.Behaviors;
-using Assets.Scripts.User;
 using System;
+using Assets.Scripts.User;
+using Assets.Scripts.Behaviors;
+using MixedRealityExtension.Util.GodotHelper;
 using Godot;
+using Godot.Collections;
+using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Assets.Scripts.Tools
 {
@@ -27,131 +28,154 @@ namespace Assets.Scripts.Tools
 		}
 	}
 
-	public class GrabTool: IDisposable
+	public class GrabTool : Tool
 	{
-		private Spatial _manipulator;
-		private Node _previousParent;
-		private Vector3 _manipulatorPosInToolSpace;
-		private Vector3 _manipulatorupInToolSpace;
-		private Vector3 _manipulatorLookAtPosInToolSpace;
-		private InputSource _currentInputSource;
+		readonly RID shape = PhysicsServer.ShapeCreate(PhysicsServer.ShapeType.Sphere);
+		readonly PhysicsShapeQueryParameters shapeQueryParameters;
+		PhysicsDirectSpaceState spaceState;
 
-		public bool GrabActive => CurrentGrabbedTarget != null && Godot.Object.IsInstanceValid(CurrentGrabbedTarget);
+		// Smoothing factor for query detection. If an object is detected in the query, the queried radius then becomes queryRadius * (1 + querySmoothingFactor) to reduce the sensitivity.
+		private float querySmoothingFactor = 0.4f;
+		private float queryRadius = 0.05f;
+		private bool currentGrabbable;
+		private Spatial currentGrabbableActor;
 
-		public Spatial CurrentGrabbedTarget { get; private set; }
+		// The distance between the grabbable target and the sphere tool.
+		private Vector3 grabbableOffset = Vector3.Zero;
 
+		public bool GrabActive { get; private set; } = false;
 		public EventHandler<GrabStateChangedArgs> GrabStateChanged { get; set; }
 
-		public void Update(InputSource inputSource, Spatial target)
+		public GrabTool()
 		{
-			if (target == null || !Godot.Object.IsInstanceValid(target))
+			shapeQueryParameters = new PhysicsShapeQueryParameters()
 			{
-				return;
+				CollideWithAreas = true,
+				CollideWithBodies = true,
+				ShapeRid = shape,
+				Margin = 0.04f
+			};
+		}
+
+		public Vector3 GetNearGraspPoint(InputSource inputSource)
+		{
+			//FIXME: the below code will work with MRTK_Hand.
+			var thumbTransform = inputSource.ThumbTip.GlobalTransform;
+			var indexTransform = inputSource.IndexTip.GlobalTransform;
+
+			return 0.5f * (thumbTransform.origin + indexTransform.origin);
+		}
+
+		internal Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		{
+			float radius;
+			hitPoint = GetNearGraspPoint(inputSource);
+
+			if (currentGrabbable)
+			{
+				radius = queryRadius * (1 + querySmoothingFactor);
+			}
+			else
+			{
+				radius = queryRadius;
+			}
+			currentGrabbable = false;
+
+			PhysicsServer.ShapeSetData(shape, radius);
+			shapeQueryParameters.Transform = new Transform(Basis.Identity, (Vector3)hitPoint);
+			spaceState = inputSource.GetWorld().DirectSpaceState;
+			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
+
+			foreach (Dictionary intersectResult in intersectShapes)
+			{
+				var collider = (Spatial)intersectResult["collider"];
+				Spatial actor = collider;
+
+				TargetBehavior behavior = null;
+				while (behavior == null)
+				{
+					actor = actor?.GetParent() as Spatial;
+					if (actor == null) break;
+					behavior = actor.GetChild<TargetBehavior>();
+				}
+				if (behavior == null || actor == null) return null;
+
+				if (behavior.Grabbable)
+				{
+					currentGrabbable = behavior.Grabbable;
+					currentGrabbableActor = actor;
+					return currentGrabbableActor;
+				}
 			}
 
-			if (Input.IsActionPressed("Fire2"))
+			currentGrabbableActor = null;
+			return null;
+		}
+
+		protected override void UpdateTool(InputSource inputSource)
+		{
+			if (currentGrabbableActor != null)
 			{
-				var grabBehavior = target.GetBehavior<TargetBehavior>();
-				if (grabBehavior != null)
+				if (inputSource.PinchChaged)
 				{
-					var mwUser = grabBehavior.GetMWUnityUser(inputSource.UserNode);
-					if (mwUser != null)
+					if (inputSource.IsPinching)
 					{
-						grabBehavior.Context.StartGrab(mwUser);
-						grabBehavior.IsGrabbed = true;
+						if (!GrabActive)
+						{
+							GrabActive = true;
+
+							var grabBehavior = currentGrabbableActor.GetBehavior<TargetBehavior>();
+							if (grabBehavior != null)
+							{
+								var mwUser = grabBehavior.GetMWUnityUser(inputSource.UserNode);
+								if (mwUser != null)
+								{
+									grabBehavior.Context.StartGrab(mwUser);
+									grabBehavior.IsGrabbed = true;
+								}
+							}
+
+							var nearGraspPoint = GetNearGraspPoint(inputSource);
+							var eventData = new MixedRealityPointerEventData(this, nearGraspPoint);
+							grabbableOffset = currentGrabbableActor.GlobalTransform.origin - nearGraspPoint;
+
+							currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDown), eventData);
+							GrabStateChanged?.Invoke(this, new GrabStateChangedArgs(GrabState.Released, GrabState.Grabbed, inputSource));
+						}
+					}
+					else
+					{
+						GrabActive = false;
+						var grabBehavior = currentGrabbableActor.GetBehavior<TargetBehavior>();
+						if (grabBehavior != null)
+						{
+							var mwUser = grabBehavior.GetMWUnityUser(inputSource.UserNode);
+							if (mwUser != null)
+							{
+								grabBehavior.Context.EndGrab(mwUser);
+								grabBehavior.IsGrabbed = false;
+							}
+						}
+
+						var eventData = new MixedRealityPointerEventData(this, GetNearGraspPoint(inputSource));
+						currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerUp), eventData);
+						GrabStateChanged?.Invoke(this, new GrabStateChangedArgs(GrabState.Grabbed, GrabState.Released, inputSource));
+
+						currentGrabbableActor = null;
+						grabbableOffset = Vector3.Zero;
 					}
 				}
-
-				StartGrab(inputSource, target);
-				GrabStateChanged?.Invoke(this, new GrabStateChangedArgs(GrabState.Released, GrabState.Grabbed, inputSource));
-			}
-			else if (Input.IsActionJustReleased("Fire2"))
-			{
-				var grabBehavior = target.GetBehavior<TargetBehavior>();
-				if (grabBehavior != null)
+				else if (GrabActive)
 				{
-					var mwUser = grabBehavior.GetMWUnityUser(inputSource.UserNode);
-					if (mwUser != null)
-					{
-						grabBehavior.Context.EndGrab(mwUser);
-						grabBehavior.IsGrabbed = false;
-					}
+					var nearGraspPoint = GetNearGraspPoint(inputSource);
+					var eventData = new MixedRealityPointerEventData(this, nearGraspPoint);
+					currentGrabbableActor.GlobalTransform = new Transform(currentGrabbableActor.GlobalTransform.basis, nearGraspPoint + grabbableOffset);
+					currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged), eventData);
 				}
 
-				EndGrab();
-				GrabStateChanged?.Invoke(this, new GrabStateChangedArgs(GrabState.Grabbed, GrabState.Released, inputSource));
-			}
-
-			if (GrabActive)
-			{
-				UpdatePosition();
-				UpdateRotation();
 			}
 		}
 
-		private void StartGrab(InputSource inputSource, Spatial target)
-		{
-			if (GrabActive ||target == null || !Godot.Object.IsInstanceValid(target))
-			{
-				return;
-			}
-
-			CurrentGrabbedTarget = target;
-			_currentInputSource = inputSource;
-
-			var targetTransform = CurrentGrabbedTarget.GlobalTransform;
-
-			_manipulator = new Spatial() { Name = "manipulator" };
-			inputSource.GetTree().Root.AddChild(_manipulator);
-			_manipulator.GlobalTransform = targetTransform;
-
-			_previousParent = CurrentGrabbedTarget.GetParent();
-			_previousParent.RemoveChild(CurrentGrabbedTarget);
-			_manipulator.AddChild(CurrentGrabbedTarget);
-			CurrentGrabbedTarget.GlobalTransform = targetTransform;
-
-			_manipulatorPosInToolSpace = _currentInputSource.ToLocal(_manipulator.GlobalTransform.origin);
-			_manipulatorupInToolSpace = _currentInputSource.ToLocal(_manipulator.GlobalTransform.basis.y);
-			_manipulatorLookAtPosInToolSpace = _currentInputSource.ToLocal(_manipulator.GlobalTransform.origin - _manipulator.GlobalTransform.basis.z);
-		}
-
-		private void EndGrab()
-		{
-			if (!GrabActive)
-			{
-				return;
-			}
-			var currentTargetGolbalTransform = CurrentGrabbedTarget.GlobalTransform;
-			_manipulator.RemoveChild(CurrentGrabbedTarget);
-			_previousParent.AddChild(CurrentGrabbedTarget);
-			CurrentGrabbedTarget.GlobalTransform = currentTargetGolbalTransform;
-			CurrentGrabbedTarget = null;
-
-			_manipulator.QueueFree();
-			_manipulator = null;
-		}
-
-		private void UpdatePosition()
-		{
-			Vector3 targetPosition = _currentInputSource.ToGlobal(_manipulatorPosInToolSpace);
-			_manipulator.GlobalTransform = new Transform(_manipulator.GlobalTransform.basis, targetPosition);
-		}
-
-		private void UpdateRotation()
-		{
-			Vector3 targetLookAtPos = _currentInputSource.ToGlobal(_manipulatorLookAtPosInToolSpace);
-			Vector3 targetUp = _currentInputSource.ToGlobal(_manipulatorupInToolSpace);
-			/*FIXME
-			_manipulator.transform.rotation = Quaternion.LookRotation(targetLookAtPos - _manipulator.transform.position, targetUp);
-			*/
-		}
-
-		public void Dispose()
-		{
-			if (_manipulator != null)
-			{
-				_manipulator.QueueFree();
-			}
-		}
+		public override void CleanUp() { }
 	}
 }
