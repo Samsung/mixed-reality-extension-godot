@@ -4,8 +4,6 @@
 using System;
 using System.Diagnostics;
 using Godot;
-using MixedRealityExtension.Core.Types;
-using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.Util.GodotHelper;
@@ -72,11 +70,6 @@ namespace MixedRealityExtension.Core
 		/// </summary>
 		public Vector3 LocalPressDirection => LocalForward;
 
-		/// <summary>
-		/// Bounds or size of the TouchablePlane
-		/// </summary>
-		public Vector2 Bounds { get; protected set; } = Vector2.One;
-
 		private Spatial ParentActor;
 
 		public TouchablePlane(Actor actor)
@@ -97,8 +90,6 @@ namespace MixedRealityExtension.Core
 
 			LocalForward = LocalForward.Normalized();
 			LocalUp = LocalUp.Normalized();
-
-			Bounds = new Vector2(Mathf.Max(Bounds.x, 0), Mathf.Max(Bounds.y, 0));
 		}
 
 		/// <summary>
@@ -132,14 +123,6 @@ namespace MixedRealityExtension.Core
 		}
 
 		/// <summary>
-		/// Set the size (bounds) of the TouchablePlane.
-		/// </summary>
-		public void SetBounds(Vector2 newBounds)
-		{
-			Bounds = newBounds;
-		}
-
-		/// <summary>
 		/// Adjust the bounds, local center and local forward to match a given box collider.  This method
 		/// also changes the size of the box collider attached to the actor.
 		/// Default Behavior:  if touchableCollider is null at runtime, the object's box collider will be used
@@ -150,12 +133,6 @@ namespace MixedRealityExtension.Core
 			CollisionShape collisionShape = collisionObject.GetChild<CollisionShape>();
 			if (collisionShape != null && collisionShape.Shape is BoxShape boxShape)
 			{
-				Vector2 adjustedSize = new Vector2(
-							Math.Abs(boxShape.Extents.Dot(LocalRight) * 2),
-							Math.Abs(boxShape.Extents.Dot(LocalUp) * 2));
-
-				SetBounds(adjustedSize);
-
 				// Set x and y center to match the newCollider but change the position of the
 				// z axis so the plane is always in front of the object
 				SetLocalCenter(collisionShape.Transform.origin + LocalForward * boxShape.Extents);
@@ -178,16 +155,6 @@ namespace MixedRealityExtension.Core
 				localPoint.Dot(LocalRight),
 				localPoint.Dot(LocalUp),
 				localPoint.Dot(LocalForward));
-
-			// touchables currently can only be touched within the bounds of the rectangle.
-			// We return infinity to ensure that any point outside the bounds does not get touched.
-			if (planeSpacePoint.x < -Bounds.x / 2 ||
-				planeSpacePoint.x > Bounds.x / 2 ||
-				planeSpacePoint.y < -Bounds.y / 2 ||
-				planeSpacePoint.y > Bounds.y / 2)
-			{
-				return float.PositiveInfinity;
-			}
 
 			// Scale back to 3D space
 			planeSpacePoint = ParentActor.GlobalTransform.basis.Scale * planeSpacePoint;
@@ -223,7 +190,6 @@ namespace MixedRealityExtension.Core
 			{
 				SetTouchableCollisionShape(collisionObject);
 			}
-			Bounds = Bounds.GetPatchApplied(new MWVector2(Bounds.x, Bounds.y).ApplyPatch(patch.Bounds));
 
 			ValidateProperties();
 		}
