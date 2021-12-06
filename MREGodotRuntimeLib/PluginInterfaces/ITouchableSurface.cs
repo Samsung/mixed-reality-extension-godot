@@ -16,10 +16,5 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// This is the direction that a user will press on this element.
 		/// </summary>
 		Vector3 LocalPressDirection { get; }
-
-		/// <summary>
-		/// Bounds specify where touchable interactions can occur.  They are local bounds on the plane specified by the LocalCenter and LocalPressDirection (as a normal).
-		/// </summary>
-		Vector2 Bounds { get; }
 	}
 }

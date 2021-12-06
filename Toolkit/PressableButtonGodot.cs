@@ -32,7 +32,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			Type = MixedRealityExtension.Messaging.Payloads.TouchableType.Surface,
 			Direction = MixedRealityExtension.Messaging.Payloads.TouchableDirection.Forward,
-			Bounds = new Vector2Patch(new Vector2(0.032f , 0.032f)),
 		};
 
 		public PressableButtonGodot()
