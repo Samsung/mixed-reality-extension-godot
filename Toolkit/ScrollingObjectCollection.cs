@@ -636,17 +636,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
             colliderPosition.x = ScrollingCollisionBoxShape.Extents.x / 2;
             colliderPosition.y = -ScrollingCollisionBoxShape.Extents.y / 2;
             colliderPosition.z = cellDepth / 2 + ScrollingColliderDepth;
-            //FIXME:
-            //ScrollingCollisionBoxShape.center = colliderPosition;
-
-            Vector2 size = new Vector2(
-                        Math.Abs(ScrollingCollisionBoxShape.Extents.Dot(ScrollingTouchable.LocalRight)),
-                        Math.Abs(ScrollingCollisionBoxShape.Extents.Dot(ScrollingTouchable.LocalUp)));
 
             Vector3 touchablePosition = colliderPosition;
             touchablePosition.z = -cellDepth / 2;
 
-            ScrollingTouchable.SetBounds(size);
             ScrollingTouchable.SetLocalCenter(touchablePosition);
         }
 
