@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using MWAssets = MixedRealityExtension.Assets;
 using Material = Godot.ShaderMaterial;
-using MWMaterial = MixedRealityExtension.Assets.Material;
 using Texture = Godot.Texture;
 using Godot;
 
@@ -44,7 +43,7 @@ namespace MixedRealityExtension.Factories
 
 
 		/// <inheritdoc />
-		public virtual void ApplyMaterialPatch(IMixedRealityExtensionApp app, Material material, MWMaterial patch)
+		public virtual void ApplyMaterialPatch(IMixedRealityExtensionApp app, Material material, MaterialPatch patch)
 		{
 			switch (patch.AlphaMode)
 			{
@@ -150,9 +149,9 @@ namespace MixedRealityExtension.Factories
 		}
 
 		/// <inheritdoc />
-		public virtual MWMaterial GeneratePatch(IMixedRealityExtensionApp app, Material material)
+		public virtual MaterialPatch GeneratePatch(IMixedRealityExtensionApp app, Material material)
 		{
-			return new MWMaterial()
+			return new MaterialPatch()
 			{
 				Color = material.GetShaderParam(AlbedoColorProp) is Color albedoColor ? new ColorPatch(albedoColor) : null,
 				MainTextureId = material.GetShaderParam(TextureAlbedoProp) is Godot.Object textureAlbedo ? app.AssetManager.GetByObject(textureAlbedo)?.Id : null,

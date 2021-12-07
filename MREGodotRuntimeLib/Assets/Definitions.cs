@@ -37,7 +37,7 @@ namespace MixedRealityExtension.Assets
 		/// <summary>
 		/// If this asset is a material, contains those properties
 		/// </summary>
-		public Material? Material;
+		public MaterialPatch Material;
 
 		/// <summary>
 		/// If this asset is a texture, contains those properties
@@ -116,61 +116,6 @@ namespace MixedRealityExtension.Assets
 		/// Blend with the background by the factor of alpha
 		/// </summary>
 		Blend
-	}
-	/// <summary>
-		 /// Contains material asset info
-		 /// </summary>
-	public struct Material
-	{
-		/// <summary>
-		/// The main color of the material
-		/// </summary>
-		public ColorPatch Color;
-
-		/// <summary>
-		/// The ID of the main texture asset
-		/// </summary>
-		public Guid? MainTextureId;
-
-		/// <summary>
-		/// Offset the texture by this amount as a fraction of the resolution
-		/// </summary>
-		public Vector3Patch MainTextureOffset;
-
-		/// <summary>
-		/// Scale the texture by this amount in each axis
-		/// </summary>
-		public Vector3Patch MainTextureScale;
-
-		/// <summary>
-		/// The lighting-independent color
-		/// </summary>
-		public ColorPatch EmissiveColor;
-
-		/// <summary>
-		/// The ID of the main texture asset
-		/// </summary>
-		public Guid? EmissiveTextureId;
-
-		/// <summary>
-		/// Offset the texture by this amount as a fraction of the resolution
-		/// </summary>
-		public Vector2Patch EmissiveTextureOffset;
-
-		/// <summary>
-		/// Scale the texture by this amount in each axis
-		/// </summary>
-		public Vector2Patch EmissiveTextureScale;
-
-		/// <summary>
-		/// How this material should treat the color/texture alpha channel
-		/// </summary>
-		public AlphaMode? AlphaMode;
-
-		/// <summary>
-		/// If AlphaMode is TransparentCutout, this is the transparency threshold
-		/// </summary>
-		public float? AlphaCutoff;
 	}
 
 	/// <summary>
