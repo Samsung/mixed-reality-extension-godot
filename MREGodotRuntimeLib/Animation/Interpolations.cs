@@ -54,6 +54,18 @@ namespace MixedRealityExtension.Animation
 						Mix.SetOrAdd("y", GodotMath.Lerp(A.ForceFloat("y"), B.ForceFloat("y"), easedT));
 					}
 				}
+				// Color3
+				else if (A.ContainsKey("r") && A.ContainsKey("g") && A.ContainsKey("b"))
+				{
+					Mix.SetOrAdd("r", GodotMath.Lerp(A.ForceFloat("r"), B.ForceFloat("r"), easedT));
+					Mix.SetOrAdd("g", GodotMath.Lerp(A.ForceFloat("g"), B.ForceFloat("g"), easedT));
+					Mix.SetOrAdd("b", GodotMath.Lerp(A.ForceFloat("b"), B.ForceFloat("b"), easedT));
+					// Color4
+					if (A.ContainsKey("a"))
+					{
+						Mix.SetOrAdd("a", GodotMath.Lerp(A.ForceFloat("a"), B.ForceFloat("a"), easedT));
+					}
+				}
 				// TODO: other compound types (color3, color4)
 			}
 			// simple types

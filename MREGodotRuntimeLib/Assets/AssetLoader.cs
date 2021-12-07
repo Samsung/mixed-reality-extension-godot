@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Godot;
-using MWMaterial = MixedRealityExtension.Assets.Material;
 using MWTexture = MixedRealityExtension.Assets.Texture;
 using MWMesh = MixedRealityExtension.Assets.Mesh;
 using MWSound = MixedRealityExtension.Assets.Sound;
@@ -524,7 +523,7 @@ namespace MixedRealityExtension.Assets
 					// Note: It's safe to assume existence because we're inside the OnSet callback
 					mat = _app.AssetManager.GetById(def.Id, writeSafe: true).Value.Asset as Godot.ShaderMaterial;
 
-					MREAPI.AppsAPI.MaterialPatcher.ApplyMaterialPatch(_app, mat, def.Material.Value);
+					MREAPI.AppsAPI.MaterialPatcher.ApplyMaterialPatch(_app, mat, def.Material);
 				}
 				else if (def.Texture != null && asset.Asset != null && asset.Asset is Godot.Texture tex)
 				{
