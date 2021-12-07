@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+using Godot;
+using MixedRealityExtension.API;
 using MixedRealityExtension.App;
+using MixedRealityExtension.Assets;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Messaging;
 using MixedRealityExtension.Messaging.Commands;
@@ -122,6 +125,11 @@ namespace MixedRealityExtension.Animation
 					var actorPatch = (ActorPatch)AnimOutputPatches.GetOrCreate(targetId, () => new ActorPatch(targetId));
 					actorPatch.WriteToPath(blend.Path, blend.CurrentValue, 0);
 				}
+				else if (blend.Path.AnimatibleType == "material")
+				{
+					var materialPatch = (MaterialPatch)AnimOutputPatches.GetOrCreate(targetId, () => new MaterialPatch(targetId));
+					materialPatch.WriteToPath(blend.Path, blend.CurrentValue, 0);
+				}
 
 				if (blend.FinalUpdate)
 				{
@@ -152,6 +160,26 @@ namespace MixedRealityExtension.Animation
 						if (SendUpdates.Contains(id))
 						{
 							App.Protocol.Send(new ActorUpdate() { Actor = actorPatch });
+						}
+					}
+				}
+				else if (patch is MaterialPatch materialPatch)
+				{
+					var shaderMaterial = App.AssetManager.GetById(id)?.Asset as ShaderMaterial;
+					if (materialPatch.IsEmpty())
+					{
+						AnimOutputPatches.Remove(id);
+					}
+					else if (shaderMaterial != null)
+					{
+						MREAPI.AppsAPI.MaterialPatcher.ApplyMaterialPatch(App, shaderMaterial, materialPatch);
+						if (SendUpdates.Contains(id))
+						{
+							App.Protocol.Send(new AssetUpdate() { Asset = new Asset()
+							{
+								Id = id,
+								Material = materialPatch
+							}});
 						}
 					}
 				}

@@ -11,14 +11,16 @@ namespace MixedRealityExtension.Animation
 		{
 			Value = 0,
 			Vector3,
-			Quaternion
+			Quaternion,
+			Color4
 		}
 
 		private readonly Dictionary<TokenPoolType, Stack<JToken>> TokenPool = new Dictionary<TokenPoolType, Stack<JToken>>(3)
 		{
 			{TokenPoolType.Value, new Stack<JToken>(5) },
 			{TokenPoolType.Vector3, new Stack<JToken>(5) },
-			{TokenPoolType.Quaternion, new Stack<JToken>(5) }
+			{TokenPoolType.Quaternion, new Stack<JToken>(5) },
+			{TokenPoolType.Color4, new Stack<JToken>(5) },
 		};
 
 		/// <summary>
@@ -51,6 +53,10 @@ namespace MixedRealityExtension.Animation
 				{
 					return TokenPoolType.Quaternion;
 				}
+				else if (Token.ContainsKey("r"))
+				{
+					return TokenPoolType.Color4;
+				}
 				else
 				{
 					return TokenPoolType.Vector3;
@@ -80,6 +86,14 @@ namespace MixedRealityExtension.Animation
 						{"x", new JValue(0) },
 						{"y", new JValue(0) },
 						{"z", new JValue(0) }
+					};
+				case TokenPoolType.Color4:
+					return new JObject()
+					{
+						{"r", new JValue(0) },
+						{"g", new JValue(0) },
+						{"b", new JValue(0) },
+						{"a", new JValue(0) }
 					};
 				case TokenPoolType.Value:
 					return new JValue(0);

@@ -3,7 +3,7 @@
 using MixedRealityExtension.App;
 using Texture = Godot.Texture;
 using Material = Godot.ShaderMaterial;
-using MWMaterial = MixedRealityExtension.Assets.Material;
+using MixedRealityExtension.Patching.Types;
 
 namespace MixedRealityExtension.PluginInterfaces
 {
@@ -18,7 +18,7 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// <param name="app">The app context of the material</param>
 		/// <param name="material">An instance of the default MRE material provided on load</param>
 		/// <param name="patch">The update from the app. Unmodified properties will be null.</param>
-		void ApplyMaterialPatch(IMixedRealityExtensionApp app, Material material, MWMaterial patch);
+		void ApplyMaterialPatch(IMixedRealityExtensionApp app, Material material, MaterialPatch patch);
 
 		/// <summary>
 		/// Generate an API patch from the Godot material's current state
@@ -26,7 +26,7 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// <param name="app">The app context of the material</param>
 		/// <param name="material">An instance of the default MRE material provided on load</param>
 		/// <returns>A full definition of the given material</returns>
-		MWMaterial GeneratePatch(IMixedRealityExtensionApp app, Material material);
+		MaterialPatch GeneratePatch(IMixedRealityExtensionApp app, Material material);
 
 		/// <summary>
 		/// Reports whether a particular Godot texture is in use by the given material
