@@ -9,7 +9,7 @@ namespace MixedRealityExtension.Patching.Types
 	/// <summary>
 	/// Contains material asset info
 	/// </summary>
-	public class MaterialPatch : Patchable<ActorPatch>
+	public class MaterialPatch : Patchable<MaterialPatch>
 	{
 		public Guid Id { get; set; }
 
@@ -93,7 +93,7 @@ namespace MixedRealityExtension.Patching.Types
 		{
 			if (depth == path.PathParts.Length)
 			{
-				// actors are not directly patchable, do nothing
+				// materials are not directly patchable, do nothing
 			}
 			else if (path.PathParts[depth] == "color")
 			{
