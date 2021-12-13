@@ -469,42 +469,39 @@ namespace MixedRealityExtension.Core
 					LocalTransform.ToLocalTransform(TransformNode);
 					if (generateAll || path.PathParts[2] == "position")
 					{
-						var localPos = TransformNode.Transform.origin;
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
 						{
-							output.Transform.Local.Position.X = localPos.x;
+							output.Transform.Local.Position.X = LocalTransform.Position.X;
 						}
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "y")
 						{
-							output.Transform.Local.Position.Y = localPos.y;
+							output.Transform.Local.Position.Y = LocalTransform.Position.Y;
 						}
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "z")
 						{
-							output.Transform.Local.Position.Z = -localPos.z;
+							output.Transform.Local.Position.Z = LocalTransform.Position.Z;
 						}
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
 					{
-						var localRot = new Quat(TransformNode.Rotation);
-						output.Transform.Local.Rotation.X = -localRot.x;
-						output.Transform.Local.Rotation.Y = -localRot.y;
-						output.Transform.Local.Rotation.Z = localRot.z;
-						output.Transform.Local.Rotation.W = localRot.w;
+						output.Transform.Local.Rotation.X = LocalTransform.Rotation.X;
+						output.Transform.Local.Rotation.Y = LocalTransform.Rotation.Y;
+						output.Transform.Local.Rotation.Z = LocalTransform.Rotation.Z;
+						output.Transform.Local.Rotation.W = LocalTransform.Rotation.W;
 					}
 					if (generateAll || path.PathParts[2] == "scale")
 					{
-						var localScale = TransformNode.Scale;
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "x")
 						{
-							output.Transform.Local.Scale.X = localScale.x;
+							output.Transform.Local.Scale.X = LocalTransform.Scale.X;
 						}
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "y")
 						{
-							output.Transform.Local.Scale.Y = localScale.y;
+							output.Transform.Local.Scale.Y = LocalTransform.Scale.Y;
 						}
 						if (generateAll || path.PathParts.Length == 3 || path.PathParts[3] == "z")
 						{
-							output.Transform.Local.Scale.Z = localScale.z;
+							output.Transform.Local.Scale.Z = LocalTransform.Scale.Z;
 						}
 					}
 				}
@@ -528,7 +525,6 @@ namespace MixedRealityExtension.Core
 					}
 					if (generateAll || path.PathParts[2] == "rotation")
 					{
-						var localRot = new Quat(TransformNode.Rotation);
 						output.Transform.App.Rotation.X = AppTransform.Rotation.X;
 						output.Transform.App.Rotation.Y = AppTransform.Rotation.Y;
 						output.Transform.App.Rotation.Z = AppTransform.Rotation.Z;
@@ -1408,7 +1404,7 @@ namespace MixedRealityExtension.Core
 					appRot.x = -transform.Rotation.X;
 					appRot.y = -transform.Rotation.Y;
 					appRot.z = transform.Rotation.Z;
-					newRot = new Quat(App.SceneRoot.GlobalTransform.basis) * appRot;
+					newRot = App.SceneRoot.GlobalTransform.basis.RotationQuat() * appRot;
 				}
 
 				// We do not pass in a value for the update period at this point.  We will be adding in lag
