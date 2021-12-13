@@ -9,7 +9,7 @@ using Godot;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class MREAttachmentComponent : Node
+	internal class MREAttachmentComponent : RemoteTransform
 	{
 		public Guid UserId { get; set; }
 
