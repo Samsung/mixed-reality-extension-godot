@@ -30,8 +30,8 @@ namespace MixedRealityExtension.Util.GodotHelper
 		public static MWQuaternion FromGodotQuaternion(this MWQuaternion _this, Quat other)
 		{
 			_this.W = other.w;
-			_this.X = -other.x;
-			_this.Y = -other.y;
+			_this.X = other.x;
+			_this.Y = other.y;
 			_this.Z = other.z;
 			return _this;
 		}
@@ -94,7 +94,9 @@ namespace MixedRealityExtension.Util.GodotHelper
 
 			_this.Position.FromGodotVector3(spatial.Transform.origin);
 			_this.Position.Z *= -1;
-			_this.Rotation.FromGodotQuaternion(new Quat(spatial.Rotation));
+			_this.Rotation.FromGodotQuaternion(spatial.Transform.basis.RotationQuat());
+			_this.Rotation.X *= -1;
+			_this.Rotation.Y *= -1;
 			_this.Scale.FromGodotVector3(spatial.Scale);
 		}
 
@@ -110,9 +112,15 @@ namespace MixedRealityExtension.Util.GodotHelper
 				_this.Rotation = new MWQuaternion();
 			}
 
-			_this.Position.FromGodotVector3(appRoot.ToLocal(transform.GlobalTransform.origin));
-			_this.Position.Z *= -1;
-			_this.Rotation.FromGodotQuaternion((appRoot.GlobalTransform.basis * transform.GlobalTransform.basis).Quat());
+			var globalTransform = appRoot.GlobalTransform.AffineInverse() * transform.GlobalTransform;
+			var globalOrigin = globalTransform.origin;
+			globalOrigin.z *= -1;
+			var globalRotation = globalTransform.basis.RotationQuat();
+			globalRotation.x *= -1;
+			globalRotation.y *= -1;
+
+			_this.Position.FromGodotVector3(globalOrigin);
+			_this.Rotation.FromGodotQuaternion(globalRotation);
 		}
 
 		public static MWVector3 ToLocalMWVector3(this MWVector3 _this, Vector3 point, Spatial objectRoot)
