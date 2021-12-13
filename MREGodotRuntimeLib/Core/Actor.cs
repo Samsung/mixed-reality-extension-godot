@@ -795,9 +795,6 @@ namespace MixedRealityExtension.Core
 					{
 						attachmentComponent.Actor = null;
 						attachmentComponent.QueueFree();
-
-						var parent = Parent != null ? (Parent as Actor) : App.SceneRoot;
-						parent.AddChild(this);
 					}
 				}
 			}
@@ -826,8 +823,10 @@ namespace MixedRealityExtension.Core
 						var attachmentComponent = attachPoint.AddNode(new MREAttachmentComponent());
 						attachmentComponent.Actor = this;
 						attachmentComponent.UserId = Attachment.UserId;
-						this.GetParent().RemoveChild(this);
-						attachPoint.AddChild(this);
+						attachmentComponent.Transform = this.Transform;
+						attachmentComponent.UpdateScale = false;
+						attachmentComponent.RemotePath = attachmentComponent.GetPathTo(this);
+
 						hostAppUser.BeforeAvatarDestroyed += UserInfo_BeforeAvatarDestroyed;
 						return true;
 					}
