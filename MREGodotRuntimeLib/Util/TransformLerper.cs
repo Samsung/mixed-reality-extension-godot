@@ -75,7 +75,7 @@ namespace MixedRealityExtension.Util
 			if (rotation.HasValue)
 			{
 				_targetRotation = rotation.Value;
-				_startRotation = new Quat(_spatial.GlobalTransform.basis);
+				_startRotation = _spatial.GlobalTransform.basis.RotationQuat();
 				_lerpingRotation = true;
 			}
 			else

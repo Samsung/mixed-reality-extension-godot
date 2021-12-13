@@ -120,23 +120,17 @@ namespace MixedRealityExtension.Patching
 
 		public static TransformPatch GenerateAppTransformPatch(MWTransform _old, Spatial _new, Spatial appRoot)
 		{
-			if (_old == null && _new != null)
-			{
-				return new TransformPatch()
-				{
-					Position = GeneratePatch(null, appRoot.ToLocal(_new.GlobalTransform.origin)),
-					Rotation = GeneratePatch(null, new Quat(appRoot.GlobalTransform.basis.Inverse() * _new.GlobalTransform.basis)),
-				};
-			}
-			else if (_new == null)
-			{
-				return null;
-			}
+			var globalTransform = appRoot.GlobalTransform.AffineInverse() * _new.GlobalTransform;
+			var globalOrigin = globalTransform.origin;
+			globalOrigin.z *= -1;
+			var globalRotation = globalTransform.basis.RotationQuat();
+			globalRotation.x *= -1;
+			globalRotation.y *= -1;
 
 			TransformPatch transform = new TransformPatch()
 			{
-				Position = GeneratePatch(_old.Position, appRoot.ToLocal(_new.GlobalTransform.origin)),
-				Rotation = GeneratePatch(_old.Rotation, new Quat(appRoot.GlobalTransform.basis.Inverse() * _new.GlobalTransform.basis)),
+				Position = GeneratePatch(_old?.Position, globalOrigin),
+				Rotation = GeneratePatch(_old?.Rotation, globalRotation),
 			};
 
 			return transform.IsPatched() ? transform : null;
@@ -144,24 +138,17 @@ namespace MixedRealityExtension.Patching
 
 		public static ScaledTransformPatch GenerateLocalTransformPatch(MWScaledTransform _old, Spatial _new)
 		{
-			if (_old == null && _new != null)
-			{
-				return new ScaledTransformPatch()
-				{
-					Position = GeneratePatch(null, _new.Transform.origin),
-					Rotation = GeneratePatch(null, new Quat(_new.Transform.basis)),
-					Scale = GeneratePatch(null, _new.Scale)
-				};
-			}
-			else if (_new == null)
-			{
-				return null;
-			}
+			var position = _new.Transform.origin;
+			position.z *= -1;
+			var rotation = _new.Transform.basis.RotationQuat();
+			rotation.x *= -1;
+			rotation.y *= -1;
+
 
 			ScaledTransformPatch transform = new ScaledTransformPatch()
 			{
-				Position = GeneratePatch(_old.Position, _new.Transform.origin),
-				Rotation = GeneratePatch(_old.Rotation, new Quat(_new.Transform.basis)),
+				Position = GeneratePatch(_old.Position, position),
+				Rotation = GeneratePatch(_old.Rotation, rotation),
 				Scale = GeneratePatch(_old.Scale, _new.Scale)
 			};
 
@@ -212,8 +199,8 @@ namespace MixedRealityExtension.Patching
 			var patch = new RigidBodyPatch()
 			{
 				// Do not include Position or Rotation in the patch.
-				
-				// we add velocities only if there is an explicit subscription for it, since it might cause significant bandwidth 
+
+				// we add velocities only if there is an explicit subscription for it, since it might cause significant bandwidth
 				Velocity = ((addVelocities) ?
 				  GeneratePatch(_old.Velocity, sceneRoot.ToLocal(_new.LinearVelocity)) : null),
 				AngularVelocity = ((addVelocities) ?
@@ -456,7 +443,7 @@ namespace MixedRealityExtension.Patching
 
 			var basis = new Basis(globalRotation);
 			basis.Scale = globalScale;
-			_this.Transform = new Transform(basis, globalPosition);
+			_this.GlobalTransform = new Transform(basis, globalPosition);
 		}
 	}
 }
