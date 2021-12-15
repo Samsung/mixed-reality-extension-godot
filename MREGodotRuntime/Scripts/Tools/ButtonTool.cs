@@ -4,13 +4,14 @@ using Assets.Scripts.Behaviors;
 using Assets.Scripts.User;
 using Godot;
 using Microsoft.MixedReality.Toolkit.Input;
-using MixedRealityExtension.Util.GodotHelper;
 
 namespace Assets.Scripts.Tools
 {
 	public class ButtonTool : TargetTool
 	{
 		private bool pressed;
+		private Vector3 startOffset;
+
 		protected override void UpdateTool(InputSource inputSource)
 		{
 			base.UpdateTool(inputSource);
@@ -28,6 +29,7 @@ namespace Assets.Scripts.Tools
 					var mwUser = buttonBehavior.GetMWUnityUser(inputSource.UserNode);
 					if (mwUser != null)
 					{
+						startOffset = inputSource.Hand.GlobalTransform.origin - CurrentTargetPoint;
 						buttonBehavior.Context.StartButton(mwUser, CurrentTargetPoint);
 						((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
 					}
@@ -111,6 +113,16 @@ namespace Assets.Scripts.Tools
 				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged),
 														new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
+		}
+
+		protected override Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		{
+			if (pressed)
+			{
+				hitPoint = inputSource.Hand.GlobalTransform.origin - startOffset;
+				return Target;
+			}
+			return base.FindTarget(inputSource, out hitPoint);
 		}
 	}
 }
