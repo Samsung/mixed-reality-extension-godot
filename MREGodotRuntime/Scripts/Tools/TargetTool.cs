@@ -220,9 +220,6 @@ namespace Assets.Scripts.Tools
 			if (RayIntersectionResult.Count > 0)
 			{
 				hitPoint = (Vector3)RayIntersectionResult["position"];
-				var distance = ((Vector3)hitPoint).DistanceTo(inputSource.Hand.GlobalTransform.origin);
-				inputSource.RayCastMesh.Scale = new Vector3(1, 1, distance);
-				inputSource.RayCastMesh.Translation = new Vector3(0, 0, -distance / 2);
 
 				for (var node = (Spatial)RayIntersectionResult["collider"]; node != null; node = node.GetParent() as Spatial)
 				{
@@ -231,6 +228,7 @@ namespace Assets.Scripts.Tools
 						if (node.GetChild<TargetBehavior>() != null)
 						{
 							var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
+							inputSource.HandRayHitPoint = (Vector3)hitPoint;
 							if (!inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = true;
 							var newTransform = LookAtHitPoint((Vector3)hitPoint, hitPointNormal, inputSource.CollisionPoint.GlobalTransform.basis.y);
 
@@ -250,8 +248,7 @@ namespace Assets.Scripts.Tools
 			}
 			else
 			{
-				inputSource.RayCastMesh.Scale = new Vector3(1, 1, 1.5f);
-				inputSource.RayCastMesh.Translation = new Vector3(0, 0, -0.75f);
+				inputSource.HandRayHitPoint = inputSource.Hand.GlobalTransform.origin - inputSource.Hand.GlobalTransform.basis.z.Normalized() * 1.5f;
 				if (inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = false;
 			}
 

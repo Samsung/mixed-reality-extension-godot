@@ -103,11 +103,15 @@ namespace Assets.Scripts.Tools
 					if (touchable == null || actor == null) return null;
 
 					CurrentPointerTarget = actor;
-					hitPoint = inputSource.PokePointer.GlobalTransform.origin;
+					hitPoint = rayEndPoint;
 					RayEndPoint = rayEndPoint;
 
-					if (ClosestProximityTouchable != null)
-						return CurrentPointerTarget;
+					if (CurrentTouchableObjectDown == null)
+					{
+						inputSource.HandRayHitPoint = (Vector3)hitPoint;
+					}
+
+					return CurrentPointerTarget;
 				}
 			}
 
@@ -160,7 +164,6 @@ namespace Assets.Scripts.Tools
 						if (mwUser != null)
 						{
 							buttonBehavior.Context.StartButton(mwUser, Position);
-							((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
 
 							var eventData = new TouchInputEventData(this, Position);
 							CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchStarted), eventData);
@@ -199,7 +202,10 @@ namespace Assets.Scripts.Tools
 		{
 			if (CurrentTouchableObjectDown != null)
 			{
-				var eventData = new TouchInputEventData(this, inputSource.PokePointer.GlobalTransform.origin);
+				var pokePointerOrigin = inputSource.PokePointer.GlobalTransform.origin;
+				var eventData = new TouchInputEventData(this, pokePointerOrigin);
+
+				inputSource.HandRayHitPoint = pokePointerOrigin;
 				CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchUpdated), eventData);
 			}
 		}
