@@ -3,7 +3,6 @@ using Assets.Scripts.User;
 using Assets.Scripts.Behaviors;
 using MixedRealityExtension.Util.GodotHelper;
 using Godot;
-using Godot.Collections;
 using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Assets.Scripts.Tools
@@ -40,7 +39,7 @@ namespace Assets.Scripts.Tools
 		private bool currentGrabbable;
 		private Spatial currentGrabbableActor;
 
-		// The distance between the grabbable target and the sphere tool.
+		// The distance between the grabbable target and the grab tool.
 		private Vector3 grabbableOffset = Vector3.Zero;
 
 		public bool GrabActive { get; private set; } = false;
@@ -60,10 +59,7 @@ namespace Assets.Scripts.Tools
 		public Vector3 GetNearGraspPoint(InputSource inputSource)
 		{
 			//FIXME: the below code will work with MRTK_Hand.
-			var thumbTransform = inputSource.ThumbTip.GlobalTransform;
-			var indexTransform = inputSource.IndexTip.GlobalTransform;
-
-			return 0.5f * (thumbTransform.origin + indexTransform.origin);
+			return inputSource.IndexTip.GlobalTransform.origin;
 		}
 
 		internal Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
@@ -86,17 +82,17 @@ namespace Assets.Scripts.Tools
 			spaceState = inputSource.GetWorld().DirectSpaceState;
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
-			foreach (Dictionary intersectResult in intersectShapes)
+			var intersections = spaceState.GetRestInfo(shapeQueryParameters);
+			if (intersections.Count != 0)
 			{
-				var collider = (Spatial)intersectResult["collider"];
-				Spatial actor = collider;
+				var collider = GD.InstanceFromId((ulong)(int)intersections["collider_id"]) as Spatial;
 
+				Spatial actor = collider;
 				TargetBehavior behavior = null;
-				while (behavior == null)
+				while (actor != null && behavior == null)
 				{
-					actor = actor?.GetParent() as Spatial;
-					if (actor == null) break;
-					behavior = actor.GetChild<TargetBehavior>();
+					actor = actor.GetParent() as Spatial;
+					behavior = actor?.GetChild<TargetBehavior>();
 				}
 				if (behavior == null || actor == null) return null;
 
@@ -104,6 +100,10 @@ namespace Assets.Scripts.Tools
 				{
 					currentGrabbable = behavior.Grabbable;
 					currentGrabbableActor = actor;
+
+					inputSource.HandRayHitPoint = (Vector3)intersections["point"];
+					inputSource.SetCursorNormal((Vector3)intersections["normal"]);
+					inputSource.SetHandRayColor(new Color(0.12f, 0.92f, 0.12f));
 					return currentGrabbableActor;
 				}
 			}
@@ -171,6 +171,8 @@ namespace Assets.Scripts.Tools
 					var eventData = new MixedRealityPointerEventData(this, nearGraspPoint);
 					currentGrabbableActor.GlobalTransform = new Transform(currentGrabbableActor.GlobalTransform.basis, nearGraspPoint + grabbableOffset);
 					currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged), eventData);
+
+					inputSource.HandRayHitPoint = inputSource.HandRayOrigin;
 				}
 
 			}
