@@ -216,6 +216,18 @@ namespace Assets.Scripts.User
 			((SpatialMaterial)cursor.MaterialOverride).AlbedoColor = color;
 		}
 
+		public void SetHandRayColor(Color color)
+		{
+			var gradient = new Gradient();
+			gradient.AddPoint(0.333f, new Color(1, 1, 1, 1));
+			gradient.AddPoint(0.667f, new Color(1, 1, 1, 1));
+			gradient.SetColor(0, new Color(1, 1, 1, 0));
+			gradient.SetColor(1, color);
+			gradient.SetColor(2, color);
+			gradient.SetColor(3, new Color(1, 1, 1, 0));
+			((GradientTexture)((SpatialMaterial)handRayLine.MaterialOverride).AlbedoTexture).Gradient = gradient;
+		}
+
 		private void UpdateHandRayLine()
 		{
 			var width = 1.6f;
