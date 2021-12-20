@@ -205,7 +205,9 @@ namespace Assets.Scripts.Tools
 		protected virtual Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
-			Spatial nearTarget = inputSource.IsPinching ? grabTool.FindTarget(inputSource, out hitPoint) : pokeTool.FindTarget(inputSource, out hitPoint);
+			Spatial nearTarget = grabTool.FindTarget(inputSource, out hitPoint);
+			if (!inputSource.IsPinching && nearTarget == null)
+				nearTarget = pokeTool.FindTarget(inputSource, out hitPoint);
 			if (nearTarget != null)
 			{
 				IsNearObject = true;

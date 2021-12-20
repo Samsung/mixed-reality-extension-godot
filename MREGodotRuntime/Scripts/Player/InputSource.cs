@@ -174,6 +174,10 @@ namespace Assets.Scripts.User
 				IsPinching = !isPinching;
 			}
 			_currentTool.Update(this);
+			// reset 'pinchChanged' if the pinching doesn't interact with any target.
+			if (_currentTool is TargetTool targetTool && targetTool.Target == null)
+				pinchChaged = false;
+
 			UpdateHandRayLine();
 			UpdateCursor();
 		}
@@ -190,12 +194,12 @@ namespace Assets.Scripts.User
 				if (Hand.Translation.z < handLocalOrigin)
 					Hand.Translation += Hand.Transform.basis.z * 0.0048f;
 			}
-			if (Input.IsActionJustPressed("Fire2"))
+			if (Input.IsActionJustPressed("Fire1"))
 			{
 				var animationPlayer = Hand.GetNode<AnimationPlayer>("AnimationPlayer");
 				animationPlayer?.Play("Pinch");
 			}
-			else if (Input.IsActionJustReleased("Fire2"))
+			else if (Input.IsActionJustReleased("Fire1"))
 			{
 				var animationPlayer = Hand.GetNode<AnimationPlayer>("AnimationPlayer");
 				animationPlayer?.PlayBackwards("Pinch");
