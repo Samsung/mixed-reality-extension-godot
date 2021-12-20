@@ -12,15 +12,22 @@ namespace Assets.Scripts.User
 		private Tool _currentTool;
 		private bool isPinching;
 		private bool pinchChaged;
+		private PhysicsDirectSpaceState spaceState;
+		private Spatial player;
+		private float handLocalOrigin;
+		private CSGTorus cursor;
+		private Vector3 cursorNormal;
+		private ImmediateGeometry handRayLine =  new ImmediateGeometry();
 
 		internal Spatial PokePointer;
-		public Node UserNode;
-
-		public CSGTorus CollisionPoint;
-
+		public Node UserNode { get; set; }
 		public Tool CurrentTool => _currentTool;
 
 		public Spatial Hand { get; private set; }
+
+		public Vector3 HandRayOrigin => Hand.GlobalTransform.origin;
+
+		public Vector3 HandRayHitPoint { get; set; }
 
 		public bool IsPinching
 		{
@@ -54,13 +61,6 @@ namespace Assets.Scripts.User
 		// Only target layers 0 (Default), 5 (UI), and 10 (Hologram).
 		// You still want to hit all layers, but only interact with these.
 		private const uint LayerMask = (1 << 0) | (1 << 5) | (1 << 10);
-		private PhysicsDirectSpaceState spaceState;
-		private Spatial player;
-		private float handLocalOrigin;
-
-		private ImmediateGeometry handRayLine =  new ImmediateGeometry();
-		internal Vector3 HandRayOrigin => Hand.GlobalTransform.origin;
-		internal Vector3 HandRayHitPoint { get; set; }
 
 		public override void _Ready()
 		{
@@ -109,18 +109,17 @@ namespace Assets.Scripts.User
 			};
 			Hand.AddChild(proximityVisibleLight);
 
-			CollisionPoint = new CSGTorus()
+			cursor = new CSGTorus()
 			{
 				InnerRadius = 0.02f,
 				OuterRadius = 0.01f,
 				Sides = 16,
 			};
-			CollisionPoint.Visible = false;
-			CollisionPoint.MaterialOverride = new SpatialMaterial()
+			cursor.MaterialOverride = new SpatialMaterial()
 			{
 				FlagsFixedSize = true
 			};
-			GetTree().Root.CallDeferred("add_child", CollisionPoint);
+			GetTree().Root.CallDeferred("add_child", cursor);
 
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
@@ -176,6 +175,7 @@ namespace Assets.Scripts.User
 			}
 			_currentTool.Update(this);
 			UpdateHandRayLine();
+			UpdateCursor();
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -200,6 +200,16 @@ namespace Assets.Scripts.User
 				var animationPlayer = Hand.GetNode<AnimationPlayer>("AnimationPlayer");
 				animationPlayer?.PlayBackwards("Pinch");
 			}
+		}
+
+		public void SetCursorNormal(Vector3 normal)
+		{
+			cursorNormal = normal;
+		}
+
+		public void SetCursorColor(Color color)
+		{
+			((SpatialMaterial)cursor.MaterialOverride).AlbedoColor = color;
 		}
 
 		private void UpdateHandRayLine()
@@ -244,6 +254,16 @@ namespace Assets.Scripts.User
 			handRayLine.AddVertex(v3);
 
 			handRayLine.End();
+		}
+
+		private void UpdateCursor()
+		{
+			var basis = Basis.Identity;
+			basis.y = cursorNormal;
+			basis.x = basis.z.Cross(basis.y);
+			basis = basis.Orthonormalized();
+
+			cursor.GlobalTransform = new Transform(basis, HandRayHitPoint);
 		}
 	}
 }

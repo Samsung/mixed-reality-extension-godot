@@ -31,7 +31,7 @@ namespace Assets.Scripts.Tools
 					{
 						startOffset = inputSource.Hand.GlobalTransform.origin - CurrentTargetPoint;
 						buttonBehavior.Context.StartButton(mwUser, CurrentTargetPoint);
-						((SpatialMaterial)inputSource.CollisionPoint.MaterialOverride).AlbedoColor = new Color(1, 0, 0);
+						inputSource.SetCursorColor(new Color(1, 0, 0));
 					}
 				}
 				pressed = true;
@@ -58,8 +58,7 @@ namespace Assets.Scripts.Tools
 			}
 			else
 			{
-				SpatialMaterial material = (SpatialMaterial)inputSource.CollisionPoint.MaterialOverride;
-				material.AlbedoColor = new Color(1, 1, 1);
+				inputSource.SetCursorColor(new Color(1, 1, 1));
 			}
 		}
 

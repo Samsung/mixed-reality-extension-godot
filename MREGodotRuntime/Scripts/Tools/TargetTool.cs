@@ -225,23 +225,12 @@ namespace Assets.Scripts.Tools
 				{
 					if (node is MixedRealityExtension.Core.Actor a)
 					{
+						var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
+						inputSource.HandRayHitPoint = (Vector3)hitPoint;
+						inputSource.SetCursorNormal(hitPointNormal);
 						if (node.GetChild<TargetBehavior>() != null)
 						{
-							var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
-							inputSource.HandRayHitPoint = (Vector3)hitPoint;
-							if (!inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = true;
-							var newTransform = LookAtHitPoint((Vector3)hitPoint, hitPointNormal, inputSource.CollisionPoint.GlobalTransform.basis.y);
-
-							if (inputSource.CollisionPoint.GlobalTransform.origin.DistanceSquaredTo((Vector3)hitPoint) > 0.0000001)
-							{
-								inputSource.CollisionPoint.GlobalTransform = newTransform;
-							}
-
 							return a;
-						}
-						else
-						{
-							if (inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = false;
 						}
 					}
 				}
@@ -249,25 +238,10 @@ namespace Assets.Scripts.Tools
 			else
 			{
 				inputSource.HandRayHitPoint = inputSource.Hand.GlobalTransform.origin - inputSource.Hand.GlobalTransform.basis.z.Normalized() * 1.5f;
-				if (inputSource.CollisionPoint.Visible) inputSource.CollisionPoint.Visible = false;
+				inputSource.SetCursorNormal(inputSource.GlobalTransform.basis.z);
 			}
 
 			return null;
-		}
-
-		private Transform LookAtHitPoint(Vector3 hitPoint, Vector3 hitPointNormal, Vector3 up)
-		{
-			Transform transform = new Transform(Basis.Identity, hitPoint);
-
-			//Y vector
-			transform.basis.y = hitPointNormal.Normalized();
-			transform.basis.z = -up;
-			transform.basis.x = transform.basis.z.Cross(transform.basis.y).Normalized();
-
-			//Recompute z = y cross X
-			transform.basis.z = transform.basis.y.Cross(transform.basis.x).Normalized();
-			transform.basis = transform.basis.Orthonormalized();
-			return transform;
 		}
 	}
 }

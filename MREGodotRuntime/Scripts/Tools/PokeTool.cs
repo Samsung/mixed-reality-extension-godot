@@ -24,6 +24,7 @@ namespace Assets.Scripts.Tools
 		private Vector3 RayStartPoint;
 		private Vector3 RayEndPoint;
 		private float previousClosestDistance = 0.0f;
+		private Vector3 hitPointNormal;
 
 		public PokeTool()
 		{
@@ -92,6 +93,7 @@ namespace Assets.Scripts.Tools
 				{
 					Vector3 rayEndPoint = (Vector3)IntersectRayResult["position"];
 					var collider = (Spatial)IntersectRayResult["collider"];
+					hitPointNormal = (Vector3)IntersectRayResult["normal"];
 					Spatial actor = collider;
 					ITouchableBase touchable = null;
 					while (touchable == null)
@@ -108,6 +110,7 @@ namespace Assets.Scripts.Tools
 
 					if (CurrentTouchableObjectDown == null)
 					{
+						inputSource.SetCursorNormal(hitPointNormal);
 						inputSource.HandRayHitPoint = (Vector3)hitPoint;
 					}
 
@@ -206,6 +209,7 @@ namespace Assets.Scripts.Tools
 				var eventData = new TouchInputEventData(this, pokePointerOrigin);
 
 				inputSource.HandRayHitPoint = pokePointerOrigin;
+				inputSource.SetCursorNormal(hitPointNormal);
 				CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchUpdated), eventData);
 			}
 		}
