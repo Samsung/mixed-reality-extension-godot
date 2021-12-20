@@ -16,12 +16,12 @@ namespace Assets.Scripts.Tools
 		{
 			base.UpdateTool(inputSource);
 
-			if (Target == null || !Godot.Object.IsInstanceValid(Target))
+			if (!Godot.Object.IsInstanceValid(Target) || IsNearObject || !inputSource.PinchChaged)
 			{
 				return;
 			}
 
-			if (Input.IsActionJustPressed("Fire1"))
+			if (inputSource.IsPinching)
 			{
 				var buttonBehavior = Target.GetBehavior<ButtonBehavior>();
 				if (buttonBehavior != null)
@@ -39,7 +39,7 @@ namespace Assets.Scripts.Tools
 				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDown),
 															new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
-			else if (Input.IsActionJustReleased("Fire1"))
+			else
 			{
 				var buttonBehavior = Target.GetBehavior<ButtonBehavior>();
 				if (buttonBehavior != null)
@@ -49,16 +49,13 @@ namespace Assets.Scripts.Tools
 					{
 						buttonBehavior.Context.EndButton(mwUser, CurrentTargetPoint);
 						buttonBehavior.Context.Click(mwUser, CurrentTargetPoint);
+						inputSource.SetCursorColor(new Color(1, 1, 1));
 					}
 				}
 				pressed = false;
 
 				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerUp),
 															new MixedRealityPointerEventData(this, CurrentTargetPoint));
-			}
-			else
-			{
-				inputSource.SetCursorColor(new Color(1, 1, 1));
 			}
 		}
 
