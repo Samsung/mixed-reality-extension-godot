@@ -1056,7 +1056,7 @@ namespace MixedRealityExtension.App
 
 				foreach (object node in actor.GetChildren())
 				{
-					if (node.GetType() == typeof(Spatial))
+					if (node.GetType() == typeof(Spatial) || node.GetType().Name == "Actor")
 						ProcessActors((Spatial)node, actor);
 				}
 			}
@@ -1064,20 +1064,19 @@ namespace MixedRealityExtension.App
 			void ProcessActors2(Spatial node3D)
 			{
 				var actor = node3D as Actor;
-				var animationPlayer = node3D.GetChild<Godot.AnimationPlayer>();
-				if (animationPlayer != null && createdActors.Contains(actor))
+				if (createdActors.Contains(actor))
 				{
-					var animTargets = node3D.GetChild<PrefabAnimationTargets>();
-					int animIndex = 0;
-					foreach (string animationString in animationPlayer.GetAnimationList())
+					foreach (var animationPlayer in node3D.GetChildren<Godot.AnimationPlayer>())
 					{
-						var anim = new NativeAnimation(AnimationManager, guids.Next(), animationPlayer, animationPlayer.GetAnimation(animationString));
-						anim.TargetIds = animTargets != null
-							? animTargets.GetTargets(node3D, animIndex++, addRootToTargets: true).Select(a => a.Id).ToList()
-							: new List<Guid>() { actor.Id };
+						foreach (string animationString in animationPlayer.GetAnimationList())
+						{
+							var godotAnim = animationPlayer.GetAnimation(animationString);
+							var anim = new NativeAnimation(AnimationManager, guids.Next(), animationPlayer, godotAnim);
 
-						AnimationManager.RegisterAnimation(anim);
-						createdAnims.Add(anim);
+							anim.TargetIds = new List<Guid>() { actor.Id };
+							AnimationManager.RegisterAnimation(anim);
+							createdAnims.Add(anim);
+						}
 					}
 				}
 			}
