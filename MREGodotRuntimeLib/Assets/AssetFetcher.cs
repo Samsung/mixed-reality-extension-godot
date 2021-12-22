@@ -96,38 +96,45 @@ namespace MixedRealityExtension.Assets
 				}
 
 				using (var scope = new AssetLoadThrottling.AssetLoadScope())
-				using (var www = new GodotWebRequest(uri, HTTPClient.Method.Get, handler))
+				using (var www = new GodotWebRequest(uri, HTTPClient.Method.Get))
 				{
 					if (!string.IsNullOrEmpty(ifNoneMatch))
 					{
 						www.SetRequestHeader("If-None-Match", ifNoneMatch);
 					}
 
-					Error error = www.SendWebRequest();
-					if (error != 0)
+					var stream = await www.LoadStreamAsync();
+
+					if (stream == null)
 					{
 						result.ReturnCode = -1;
-						result.FailureMessage = error.ToString();
+						result.FailureMessage = "Failed to load a web request stream.";
 					}
 					else
 					{
-						result.ReturnCode = www.GetResponseCode();
-						result.ETag = www.GetResponseHeader("ETag") ?? Constants.UnversionedAssetVersion;
+						using (stream)
+						{
+							if (stream.Length > 0)
+								handler.ParseData(stream);
 
-						if (result.ReturnCode >= 200 && result.ReturnCode <= 299)
-						{
-							if (typeof(T).IsAssignableFrom(typeof(AudioStream)))
+							result.ReturnCode = www.GetResponseCode();
+							result.ETag = www.GetResponseHeader("ETag") ?? Constants.UnversionedAssetVersion;
+
+							if (result.ReturnCode >= 200 && result.ReturnCode <= 299)
 							{
-								result.Asset = ((DownloadHandlerAudioStream)handler).AudioStream as T;
+								if (typeof(T).IsAssignableFrom(typeof(AudioStream)))
+								{
+									result.Asset = ((DownloadHandlerAudioStream)handler).AudioStream as T;
+								}
+								else if (typeof(T).IsAssignableFrom(typeof(Godot.Texture)))
+								{
+									result.Asset = ((DownloadHandlerTexture)handler).Texture as T;
+								}
 							}
-							else if (typeof(T).IsAssignableFrom(typeof(Godot.Texture)))
+							else
 							{
-								result.Asset = ((DownloadHandlerTexture)handler).Texture as T;
+								result.FailureMessage = $"[{result.ReturnCode}] {uri}";
 							}
-						}
-						else
-						{
-							result.FailureMessage = $"[{result.ReturnCode}] {uri}";
 						}
 					}
 				}
