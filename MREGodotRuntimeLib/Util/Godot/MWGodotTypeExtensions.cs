@@ -4,7 +4,6 @@ using MixedRealityExtension.API;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Types;
 using Godot;
-using GodotGLTF;
 
 using MRERigidBodyConstraints = MixedRealityExtension.Core.Interfaces.RigidBodyConstraints;
 
@@ -169,22 +168,6 @@ namespace MixedRealityExtension.Util.GodotHelper
 				b = _this.B,
 				a = _this.A
 			};
-		}
-
-		public static GLTFSceneImporter.ColliderType ToGLTFColliderType(this ColliderType _this)
-		{
-			switch (_this)
-			{
-				case ColliderType.Mesh:
-					return GLTFSceneImporter.ColliderType.MeshConvex;
-				case ColliderType.Sphere:
-					MREAPI.Logger.LogWarning("Sphere colliders are not supported in UnityGLTF yet.  Downgrading to a box collider.");
-					goto case ColliderType.Box;
-				case ColliderType.Box:
-					return GLTFSceneImporter.ColliderType.Box;
-				default:
-					return GLTFSceneImporter.ColliderType.None;
-			}
 		}
 
 		public static MRERigidBodyConstraints GetMRERigidBodyConstraints(this Godot.RigidBody rigidBody)
