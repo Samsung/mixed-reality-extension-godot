@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using Godot;
+using System.Threading.Tasks;
 
 namespace MixedRealityExtension.Util.GodotHelper
 {
@@ -10,18 +11,16 @@ namespace MixedRealityExtension.Util.GodotHelper
         Uri uri;
         Error err;
         HTTPClient.Method method;
-        DownloadHandler downloadHandler;
 
         private static Dictionary<string, HTTPClient> clientCache = new Dictionary<string, HTTPClient>();
 
         private List<string> headers = new List<string>();
         private Godot.Collections.Dictionary responseHeadersDictionary;
         private long responseCode;
-        public GodotWebRequest(Uri uri, HTTPClient.Method method = HTTPClient.Method.Get, DownloadHandler downloadHandler = null)
+        public GodotWebRequest(Uri uri, HTTPClient.Method method = HTTPClient.Method.Get)
         {
             this.uri = uri;
             this.method = method;
-            this.downloadHandler = downloadHandler;
         }
 
         public void SetRequestHeader(string name, string value)
@@ -39,7 +38,7 @@ namespace MixedRealityExtension.Util.GodotHelper
             return responseHeadersDictionary[key] as string;
         }
 
-        public Error SendWebRequest()
+        public async Task<MemoryStream> LoadStreamAsync()
         {
             if (!clientCache.TryGetValue(uri.Host, out HTTPClient client))
             {
@@ -48,7 +47,10 @@ namespace MixedRealityExtension.Util.GodotHelper
             }
             err = client.ConnectToHost(uri.Host, uri.Port);
             if (err != Error.Ok)
-                throw new InvalidOperationException($"Failed to connect to host: {uri}. Error: {err}.");
+            {
+                GD.PrintErr($"Failed to connect to host: {uri}. Error: {err}.");
+                return null;
+            }
 
             while (client.GetStatus() == HTTPClient.Status.Connecting || client.GetStatus() == HTTPClient.Status.Resolving)
             {
@@ -56,48 +58,64 @@ namespace MixedRealityExtension.Util.GodotHelper
                 OS.DelayMsec(10);
             }
             if (client.GetStatus() != HTTPClient.Status.Connected)
-                throw new InvalidOperationException($"Failed to connect to host: {uri}. Error: {err}.");
+            {
+                GD.PrintErr($"Failed to connect to host: {uri}. Error: {err}.");
+                return null;
+            }
 
             err = client.Request(method, uri.PathAndQuery, headers.ToArray());
             if (err != Error.Ok)
-                throw new InvalidOperationException($"Failed to Sends a request to the connected host: {uri}. Error: {err}.");
+            {
+                GD.PrintErr($"Failed to sends a request to the connected host: {uri}. Error: {err}.");
+                return null;
+            }
 
             while (client.GetStatus() == HTTPClient.Status.Requesting)
             {
                 client.Poll();
-                OS.DelayMsec(10);
+                if (OS.HasFeature("web"))
+                {
+                    // Synchronous HTTP requests are not supported on the web,
+                    // so wait for the next main loop iteration.
+                    await ToSignal(Engine.GetMainLoop(), "idle_frame");
+                }
+                else
+                {
+                    OS.DelayMsec(10);
+                }
             }
             if (client.GetStatus() != HTTPClient.Status.Body && client.GetStatus() != HTTPClient.Status.Connected)
-                throw new InvalidOperationException($"Failed to Sends a request to the connected host: {uri}. Error: {err}.");
+            {
+                GD.PrintErr($"Failed to sends a request to the connected host: {uri}. Error: {err}.");
+                return null;
+            }
 
+            MemoryStream stream = null;
             if (client.HasResponse())
             {
-                using (MemoryStream stream = new MemoryStream())
+                stream = new MemoryStream();
+
+                while (client.GetStatus() == HTTPClient.Status.Body)
                 {
-                    while (client.GetStatus() == HTTPClient.Status.Body)
+                    client.Poll();
+                    byte[] chunk = client.ReadResponseBodyChunk();
+                    if (chunk.Length == 0)
                     {
-                        client.Poll();
-                        byte[] chunk = client.ReadResponseBodyChunk();
-                        if (chunk.Length == 0)
-                        {
-                            OS.DelayMsec(10);
-                        }
-                        else
-                        {
-                            stream.Write(chunk, 0, chunk.Length);
-                        }
+                        OS.DelayMsec(10);
                     }
-                    stream.Position = 0;
-                    if (stream.Length > 0)
-                        downloadHandler.ParseData(stream);
+                    else
+                    {
+                        stream.Write(chunk, 0, chunk.Length);
+                    }
                 }
+                stream.Position = 0;
             }
 
             responseCode = client.GetResponseCode();
             responseHeadersDictionary = client.GetResponseHeadersAsDictionary();
             client.Close();
 
-            return err;
+            return stream;
         }
     }
 }
