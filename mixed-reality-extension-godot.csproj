@@ -4,14 +4,8 @@
     <RootNamespace>mixedrealityextensiongodot</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GLTFSerialization">
-      <HintPath>Libraries\GLTFSerialization.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Libraries\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="GodotGLTF">
-      <HintPath>Libraries\GodotGLTF.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

@@ -48,10 +48,10 @@ namespace MixedRealityExtension.Animation
 
 		public override float Time
 		{
-			get => animationPlayer.CurrentAnimationPosition;
+			get => animationPlayer.IsPlaying() ? animationPlayer.CurrentAnimationPosition : 0.0f;
 			protected set
 			{
-				animationPlayer.Seek(value);
+				animationPlayer.Seek(value, true);
 			}
 		}
 

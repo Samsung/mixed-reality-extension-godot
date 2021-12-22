@@ -50,7 +50,6 @@ namespace MixedRealityExtension.API
 			//IVideoPlayerFactory videoPlayerFactory = null,
 			// reasonable defaults provided
 			IPrimitiveFactory primitiveFactory = null,
-			IGLTFImporterFactory gltfImporterFactory = null,
 			IMaterialPatcher materialPatcher = null,
 			IMRELogger logger = null)
 		{
@@ -69,7 +68,6 @@ namespace MixedRealityExtension.API
 
 			// reasonable defaults provided
 			AppsAPI.PrimitiveFactory = primitiveFactory ?? new MWPrimitiveFactory();
-			AppsAPI.GLTFImporterFactory = gltfImporterFactory ?? new GLTFImporterFactory();
 			AppsAPI.MaterialPatcher = materialPatcher ?? new DefaultMaterialPatcher();
 
 #if ANDROID_DEBUG
@@ -122,8 +120,6 @@ namespace MixedRealityExtension.API
 		internal IPrimitiveFactory PrimitiveFactory { get; set; }
 
 		internal ILibraryResourceFactory LibraryResourceFactory { get; set; }
-
-		internal IGLTFImporterFactory GLTFImporterFactory { get; set; }
 
 		internal IMaterialPatcher MaterialPatcher { get; set; }
 
