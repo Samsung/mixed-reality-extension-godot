@@ -8,6 +8,100 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "",
+"class": "EditorSceneImporterGLTF",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/EditorSceneImporterGLTF.gdns"
+}, {
+"base": "",
+"class": "GLTFAccessor",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFAccessor.gdns"
+}, {
+"base": "",
+"class": "GLTFAnimation",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFAnimation.gdns"
+}, {
+"base": "",
+"class": "GLTFBufferView",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFBufferView.gdns"
+}, {
+"base": "",
+"class": "GLTFCamera",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFCamera.gdns"
+}, {
+"base": "",
+"class": "GLTFDocument",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFDocument.gdns"
+}, {
+"base": "",
+"class": "GLTFLight",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFLight.gdns"
+}, {
+"base": "",
+"class": "GLTFMesh",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFMesh.gdns"
+}, {
+"base": "",
+"class": "GLTFNode",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFNode.gdns"
+}, {
+"base": "",
+"class": "GLTFSkeleton",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFSkeleton.gdns"
+}, {
+"base": "",
+"class": "GLTFSkin",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFSkin.gdns"
+}, {
+"base": "",
+"class": "GLTFSpecGloss",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFSpecGloss.gdns"
+}, {
+"base": "",
+"class": "GLTFState",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFState.gdns"
+}, {
+"base": "",
+"class": "GLTFTexture",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/GLTFTexture.gdns"
+}, {
+"base": "",
+"class": "PackedSceneGLTF",
+"language": "NativeScript",
+"path": "res://addons/godot_gltf/PackedSceneGLTF.gdns"
+} ]
+_global_script_class_icons={
+"EditorSceneImporterGLTF": "",
+"GLTFAccessor": "",
+"GLTFAnimation": "",
+"GLTFBufferView": "",
+"GLTFCamera": "",
+"GLTFDocument": "",
+"GLTFLight": "",
+"GLTFMesh": "",
+"GLTFNode": "",
+"GLTFSkeleton": "",
+"GLTFSkin": "",
+"GLTFSpecGloss": "",
+"GLTFState": "",
+"GLTFTexture": "",
+"PackedSceneGLTF": ""
+}
+
 [application]
 
 config/name="mixed-reality-extension-godot"
