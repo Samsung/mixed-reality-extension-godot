@@ -1,7 +1,6 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://MREGodotRuntime/Scripts/SimpleText.cs" type="Script" id=1]
-[ext_resource path="res://Toolkit/HighlightArea.cs" type="Script" id=3]
 [ext_resource path="res://Toolkit/PressableButtonGodot.cs" type="Script" id=4]
 
 [sub_resource type="Shader" id=1]
@@ -11,8 +10,6 @@ render_mode cull_disabled, blend_add, ambient_light_disabled;
 uniform float thickness = 0.01;
 uniform float smoothness = 0.01;
 uniform vec3 border_color = vec3(0.42, 0.48, 0.61);
-uniform vec3 origin; // BackPlate Global origin
-uniform vec3 backward; // BackPlate backward
 uniform mat4 clipBoxInverseTransform;
 
 varying vec3 v;
@@ -36,8 +33,7 @@ void fragment() {
 	vec3 global_vertex = (CAMERA_MATRIX * vec4(VERTEX, 1.0)).xyz;
 
 	ALBEDO = border_color;
-	ALPHA = mix(step(0, dot(backward, global_vertex - origin)) * 0.7, 0, a)
-		* PointVsBox(global_vertex, clipBoxInverseTransform);
+	ALPHA *= mix(0.7, 0, a) * PointVsBox(global_vertex, clipBoxInverseTransform);
 	TRANSMISSION = texture(texture_transmission, UV).rgb;
 }"
 
@@ -46,8 +42,6 @@ shader = SubResource( 1 )
 shader_param/thickness = 0.01
 shader_param/smoothness = 0.01
 shader_param/border_color = Vector3( 0.42, 0.48, 0.61 )
-shader_param/origin = null
-shader_param/backward = null
 shader_param/clipBoxInverseTransform = null
 
 [sub_resource type="CubeMesh" id=3]
@@ -106,9 +100,6 @@ shader_param/clipBoxInverseTransform = null
 
 [sub_resource type="QuadMesh" id=6]
 
-[sub_resource type="BoxShape" id=7]
-extents = Vector3( 0.5, 0.5, 0.001 )
-
 [sub_resource type="BoxShape" id=8]
 extents = Vector3( 0.5, 0.5, 0.5 )
 
@@ -157,7 +148,7 @@ shader_param/clipBoxInverseTransform = null
 script = ExtResource( 4 )
 
 [node name="FrontPlate" type="MeshInstance" parent="."]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.032, 0, 0, 0 )
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.016, 0, 0, 0.008 )
 layers = 3
 material_override = SubResource( 2 )
 mesh = SubResource( 3 )
@@ -170,16 +161,8 @@ material_override = SubResource( 5 )
 mesh = SubResource( 6 )
 material/0 = null
 
-[node name="HighlightArea" type="Area" parent="FrontPlate/HighlightPlate"]
-collision_layer = 64
-collision_mask = 0
-script = ExtResource( 3 )
-
-[node name="CollisionShape" type="CollisionShape" parent="FrontPlate/HighlightPlate/HighlightArea"]
-shape = SubResource( 7 )
-
 [node name="TouchableArea" type="Area" parent="."]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.016, 0, 0, 0.0160871 )
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.016, 0, 0, 0.016 )
 collision_layer = 32
 collision_mask = 0
 
@@ -188,7 +171,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5 )
 shape = SubResource( 8 )
 
 [node name="BackPlate" type="MeshInstance" parent="."]
-transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.01, 0, 0, -0.001 )
+transform = Transform( 0.032, 0, 0, 0, 0.032, 0, 0, 0, 0.01, 0, 0, 0 )
 material_override = SubResource( 10 )
 mesh = SubResource( 11 )
 material/0 = null
