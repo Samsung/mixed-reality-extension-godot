@@ -6,6 +6,7 @@ using MixedRealityExtension.Core;
 using Microsoft.MixedReality.Toolkit.Input;
 using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.Util.GodotHelper;
+using System;
 
 namespace Assets.Scripts.Tools
 {
@@ -52,6 +53,7 @@ namespace Assets.Scripts.Tools
 			foreach (Dictionary intersectResult in intersectShapes)
 			{
 				var collider = (Spatial)intersectResult["collider"];
+				Vector3 normal;
 
 				Spatial actor = collider;
 				ITouchableBase touchable = null;
@@ -63,13 +65,14 @@ namespace Assets.Scripts.Tools
 				}
 				if (touchable == null || actor == null) continue;
 
-				float distance = touchable.DistanceToTouchable(inputSource.PokePointer.GlobalTransform.origin, out closestNormal);
+				float distance = touchable.DistanceToTouchable(inputSource.PokePointer.GlobalTransform.origin, out normal);
 
-				if (distance < closestDistance)
+				if (Math.Abs(distance) < closestDistance)
 				{
 					newClosestTouchable = touchable;
-					closestDistance = distance;
+					closestDistance = Math.Abs(distance);
 					previousClosestDistance = distance;
+					closestNormal = normal;
 				}
 			}
 
