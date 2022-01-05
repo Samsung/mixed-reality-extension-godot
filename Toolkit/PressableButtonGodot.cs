@@ -63,7 +63,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
 			TextNode.Scale = new Vector3(0.032f, 0.032f, 0.032f);
 
-			Connect("touch_end", this, nameof(_on_PressableButtonGodot_touch_end));
+			Connect(nameof(touch_ended), this, nameof(_on_PressableButtonGodot_touch_ended));
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -111,7 +111,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			}
 		}
 
-		private void _on_PressableButtonGodot_touch_end()
+		private void _on_PressableButtonGodot_touch_ended()
 		{
 			RevertProximityLight();
 		}
