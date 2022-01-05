@@ -18,6 +18,7 @@ using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Core.Components;
 using MixedRealityExtension.PluginInterfaces;
+using MixedRealityExtension.Behaviors.Actions;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -260,6 +261,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
         // Lerping time interval used for smoothing between positions during bouncing. Number was empirically defined.
         private const float BounceLerpInterval = 0.2f;
 
+
+        private MWAction _touchAction = new MWAction();
+        private MWAction _scrollAction = new MWAction();
+
         /// <summary>
         /// Event that is fired on the target object when the ScrollingObjectCollection deems event as a Click.
         /// </summary>
@@ -279,16 +284,22 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public delegate void touch_ended();
 
         /// <summary>
-        /// Event that is fired on the target object when the ScrollingObjectCollection is no longer in motion from velocity
-        /// </summary>
-        [Signal]
-        public delegate void momentum_ended();
-
-        /// <summary>
         /// Event that is fired on the target object when the ScrollingObjectCollection is starting motion with velocity.
         /// </summary>
         [Signal]
-        public delegate void momentum_started();
+        public delegate void scroll_started();
+
+        /// <summary>
+        /// Event that is fired on the target object when the ScrollingObjectCollection is no longer in motion from velocity
+        /// </summary>
+        [Signal]
+        public delegate void scroll_ended();
+
+        /// <summary>
+        /// Event that is fired on the target object when the ScrollingObjectCollection is scrolling.
+        /// </summary>
+        [Signal]
+        public delegate void scrolling();
 
         [Signal]
         private delegate void _Processed();
@@ -532,11 +543,11 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 {
                     if (value == VelocityState.None)
                     {
-                        EmitSignal(nameof(momentum_ended));
+                        EmitSignal(nameof(scroll_ended));
                     }
                     else if (currentVelocityState == VelocityState.None)
                     {
-                        EmitSignal(nameof(momentum_started));
+                        EmitSignal(nameof(scroll_started));
                     }
                     previousVelocityState = currentVelocityState;
                     currentVelocityState = value;
@@ -686,6 +697,14 @@ namespace Microsoft.MixedReality.Toolkit.UI
             this.RegisterHandler<IMixedRealityTouchHandler>();
             parentActor = GetParent<Actor>();
             ScrollingCollisionBoxShape = GetNode<CollisionShape>("CollisionShape").Shape as BoxShape;
+
+            ToolkitAction.RegisterAction(_touchAction, "touch", this);
+            ToolkitAction.RegisterAction(_scrollAction, "scroll", this);
+            Connect(nameof(touch_started), this, nameof(_on_ScrollingObjectCollection_touch_started));
+            Connect(nameof(touch_ended), this, nameof(_on_ScrollingObjectCollection_touch_ended));
+            Connect(nameof(scroll_started), this, nameof(_on_ScrollingObjectCollection_scroll_started));
+            Connect(nameof(scroll_ended), this, nameof(_on_ScrollingObjectCollection_scroll_ended));
+            Connect(nameof(scrolling), this, nameof(_on_ScrollingObjectCollection_scrolling));
         }
 
         public override void _Process(float delta)
@@ -1532,6 +1551,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
                     break;
             }
             ScrollContainer.Transform = new Transform(ScrollContainer.Transform.basis, newScrollPos);
+            if (CurrentVelocityState != VelocityState.None)
+                EmitSignal(nameof(scrolling));
         }
 
         /// <summary>
@@ -1539,7 +1560,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         private void ResetInteraction()
         {
-            EmitSignal(nameof(touch_ended));
+            if (IsTouched) EmitSignal(nameof(touch_ended));
 
             // Release the pointer
             currentTool = null;
@@ -1633,6 +1654,47 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
 
             throw new ArgumentException("Failed to find an actor parent.", nameof(meshInstance));
+        }
+
+        private void _on_ScrollingObjectCollection_touch_started()
+        {
+            var user = GetParent<Actor>().App.LocalUser;
+            if (user != null)
+            {
+                _touchAction.StartAction(user);
+            }
+        }
+
+        private void _on_ScrollingObjectCollection_touch_ended()
+        {
+            var user = GetParent<Actor>().App.LocalUser;
+            if (user != null)
+            {
+                _touchAction.StopAction(user);
+            }
+        }
+
+        private void _on_ScrollingObjectCollection_scroll_started()
+        {
+            var user = GetParent<Actor>().App.LocalUser;
+            if (user != null)
+            {
+                _scrollAction.StartAction(user);
+            }
+        }
+
+        private void _on_ScrollingObjectCollection_scroll_ended()
+        {
+            var user = GetParent<Actor>().App.LocalUser;
+            if (user != null)
+            {
+                _scrollAction.StopAction(user);
+            }
+        }
+
+        private void _on_ScrollingObjectCollection_scrolling()
+        {
+            _scrollAction.PerformActionUpdate();
         }
 
         #endregion private methods
@@ -1797,8 +1859,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 IsTouched = false;
                 IsEngaged = true;
                 IsDragging = false;
-
-                EmitSignal(nameof(touch_started));
             }
         }
 
