@@ -7,6 +7,7 @@ using Godot;
 using Assets.Scripts.Tools;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Patching.Types;
+using MixedRealityExtension.Behaviors.Actions;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -67,7 +68,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		/// <summary>
 		/// Used to control the slider on the track when snapToPosition is false
 		/// </summary>
-		public CollisionShape ThumbCollisionShape => thumbActor.GetNode<CollisionShape>("PinchSliderThumb/Mesh/Area/CollisionShape");
+		public CollisionShape ThumbCollisionShape => thumbActor.GetNode<CollisionShape>("PinchSliderThumb/Mesh/PinchSliderThumbArea/CollisionShape");
 
 		/// <summary>
 		/// Used to determine the position we snap the slider do when snapToPosition is true
@@ -84,7 +85,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				var oldSliderValue = sliderValue;
 				sliderValue = value;
 				UpdateUI();
-				//OnValueUpdated.Invoke(new SliderEventData(oldSliderValue, value, ActiveTool, this));
+				EmitSignal(nameof(value_changed));
 			}
 		}
 
@@ -175,10 +176,18 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		#endregion
 
 		#region Event Handlers
+
+		private MWAction<ActionData<float>> _valueChangedAction = new MWAction<ActionData<float>>();
+
+		[Signal]
+		public delegate void value_changed();
+
+		[Signal]
+		public delegate void interaction_started();
+
+		[Signal]
+		public delegate void interaction_ended();
 		/*
-		public SliderEvent OnValueUpdated = new SliderEvent();
-		public SliderEvent OnInteractionStarted = new SliderEvent();
-		public SliderEvent OnInteractionEnded = new SliderEvent();
 		public SliderEvent OnHoverEntered = new SliderEvent();
 		public SliderEvent OnHoverExited = new SliderEvent();
 		*/
@@ -247,13 +256,17 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 			this.RegisterHandler<IMixedRealityPointerHandler>();
 			this.RegisterHandler<IMixedRealityTouchHandler>();
+			ToolkitAction.RegisterAction(_valueChangedAction, "value_changed", this);
+			Connect(nameof(value_changed), this, nameof(_on_PinchSlider_value_changed));
+			Connect(nameof(interaction_started), this, nameof(_on_PinchSlider_interaction_started));
+			Connect(nameof(interaction_ended), this, nameof(_on_PinchSlider_interaction_ended));
 
 			trackMesh = GetNode<MeshInstance>("Mesh");
 			//SnapToPosition = snapToPosition;
 			TouchCollisionShape.Disabled = false;
 			UpdateTrackMesh();
 
-			//OnValueUpdated.Invoke(new SliderEventData(sliderValue, sliderValue, null, this));
+			EmitSignal(nameof(value_changed));
 		}
 
 		private void OnDisable()
@@ -267,6 +280,38 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void OnValidate()
 		{
 			CurrentSliderAxis = sliderAxis;
+		}
+
+		private void _on_PinchSlider_value_changed()
+		{
+			_valueChangedAction.PerformActionUpdate(new ActionData<float>()
+			{
+				value = sliderValue
+			});
+		}
+
+		private void _on_PinchSlider_interaction_started()
+		{
+			var user = GetParent<Actor>().App.LocalUser;
+			if (user != null)
+			{
+				_valueChangedAction.StartAction(user, new ActionData<float>()
+				{
+					value = sliderValue
+				});
+			}
+		}
+
+		private void _on_PinchSlider_interaction_ended()
+		{
+			var user = GetParent<Actor>().App.LocalUser;
+			if (user != null)
+			{
+				_valueChangedAction.StopAction(user, new ActionData<float>()
+				{
+					value = sliderValue
+				});
+			}
 		}
 
 		#endregion
@@ -371,7 +416,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		private void EndInteraction()
 		{
-			//OnInteractionEnded?.Invoke(new SliderEventData(sliderValue, sliderValue, ActiveTool, this));
+			EmitSignal(nameof(interaction_ended));
 			ActiveTool = null;
 		}
 
@@ -460,6 +505,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 					CalculateSliderValueBasedOnTouchPoint(eventData.InputData);
 				}
 				StartSliderValue = sliderValue;
+				EmitSignal(nameof(interaction_started));
 			}
 		}
 
@@ -493,7 +539,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			if (IsTouchable)
 			{
-				//OnInteractionStarted?.Invoke(new SliderEventData(sliderValue, sliderValue, ActiveTool, this));
+				EmitSignal(nameof(interaction_started));
 			}
 		}
 
