@@ -360,6 +360,9 @@ namespace MixedRealityExtension.Assets
 							await _app.SceneRoot.ToSignal(_app.SceneRoot.GetTree().CreateTimer(0.02f), "timeout");
 						}
 
+						var collider = GenerateColliderToMesh(mesh, colliderType);
+						mesh.SetMeta("collider", collider);
+
 						assets.Add(mesh);
 					}
 				}
@@ -441,6 +444,12 @@ namespace MixedRealityExtension.Assets
 				{
 					if (node is MeshInstance meshInstance)
 					{
+						if (meshInstance.Mesh.HasMeta("collider"))
+						{
+							var collider = meshInstance.Mesh.GetMeta("collider") as Area;
+							meshInstance.AddChild(collider);
+						}
+
 						if (meshInstance.MaterialOverride is SpatialMaterial spatialMaterial)
 							meshInstance.MaterialOverride = materialRepace[spatialMaterial];
 						else if (meshInstance.Mesh != null)
@@ -484,6 +493,34 @@ namespace MixedRealityExtension.Assets
 			}
 
 			return assets;
+		}
+
+		private Area GenerateColliderToMesh(ArrayMesh mesh, ColliderType colliderType)
+		{
+			Area area = null;
+			CollisionShape collisionShape = null;
+			if (colliderType == ColliderType.Box)
+			{
+				var aabb = mesh.GetAabb();
+				area = new Area() { Name = "Area" };
+				collisionShape = new CollisionShape();
+				collisionShape.Translation = (aabb.Position + aabb.End)/ 2;
+				collisionShape.Shape = new BoxShape() {
+					Extents = aabb.Size / 2,
+				};
+				area.AddChild(collisionShape);
+			}
+			else if (colliderType == ColliderType.Mesh)
+			{
+				area = new Area() { Name = "Area" };
+				var concavePolygonShape = new ConcavePolygonShape();
+				concavePolygonShape.Data = mesh.GetFaces();
+				collisionShape = new CollisionShape();
+				collisionShape.Shape = concavePolygonShape;
+				area.AddChild(collisionShape);
+			}
+
+			return area;
 		}
 
 		private async Task<string> GetShaderCodeFromSpatialMaterial(SpatialMaterial spatialMaterial)
