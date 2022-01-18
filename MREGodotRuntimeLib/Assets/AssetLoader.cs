@@ -646,7 +646,7 @@ namespace MixedRealityExtension.Assets
 				// this is a newly loaded texture, so we decide initial settings for the shared asset
 				if (result.ReturnCode == 200)
 				{
-					result.Asset.Flags = def.Texture.Value.Flags ?? (uint)Godot.Texture.FlagsEnum.Default;
+					result.Asset.Flags = def.Texture.Value.Flags ?? (uint)Godot.Texture.FlagsEnum.Default | (uint)Godot.Texture.FlagsEnum.AnisotropicFilter;
 				}
 
 				source.Version = result.ETag;
