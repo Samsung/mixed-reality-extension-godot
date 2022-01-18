@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix,depth_draw_opaque,cull_back,diffuse_burley,specular_schlick_ggx;
+render_mode blend_mix,depth_draw_alpha_prepass,cull_back,diffuse_burley,specular_schlick_ggx;
 uniform vec4 albedo : hint_color = vec4(1, 1, 1, 1);
 uniform sampler2D texture_albedo : hint_albedo;
 uniform float specular = 0.5;
