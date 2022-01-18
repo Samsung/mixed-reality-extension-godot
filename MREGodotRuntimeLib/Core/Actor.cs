@@ -1092,12 +1092,12 @@ namespace MixedRealityExtension.Core
 			else if (parentId.Value != ParentId)
 			{
 				// queue parent reassignment
-				ParentId = parentId.Value;
-				App.ProcessActorCommand(ParentId, new LocalCommand()
+				ParentId = newParent == null ? Guid.Empty : parentId.Value;
+				App.ProcessActorCommand(parentId.Value, new LocalCommand()
 				{
 					Command = () =>
 					{
-						var freshParent = App.FindActor(ParentId) as Actor;
+						var freshParent = App.FindActor(parentId.Value) as Actor;
 						if (this != null && freshParent != null && Parent != freshParent)
 						{
 							TransformNode.GetParent().RemoveChild(TransformNode);
