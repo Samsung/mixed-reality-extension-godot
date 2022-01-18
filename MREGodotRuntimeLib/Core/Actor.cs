@@ -893,6 +893,8 @@ namespace MixedRealityExtension.Core
 						_light = new DirectionalLight();
 						break;
 				}
+				_light.ShadowEnabled = true;
+				_light.ShadowBias = 0.01f;
 				AddChild(_light);
 				Light = new Light(_light);
 			}
