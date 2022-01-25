@@ -131,7 +131,7 @@ namespace MixedRealityExtension.Assets
 									result.Asset = ((DownloadHandlerTexture)handler).Texture as T;
 								}
 							}
-							else
+							else if (result.ReturnCode >= 400)
 							{
 								result.FailureMessage = $"[{result.ReturnCode}] {uri}";
 							}
