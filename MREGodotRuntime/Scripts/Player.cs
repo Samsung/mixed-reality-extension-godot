@@ -1,48 +1,123 @@
 using Godot;
 
-public class Player : KinematicBody
+public class Player : ARVROrigin
 {
-    private float speed = 4f;
-    private float cameraSpeed = 0.3f;
+    private float speed = 1f;
+    private float cameraSpeed = 0.0015f;
     private bool cameraMove = false;
-    private Camera camera;
     private Vector2 mouseDelta = new Vector2();
 
-    // Called when the node enters the scene tree for the first time.
+    [Export]
+    private NodePath viewport = null;
+    private bool ARVRInterfaceIsInitialized = false;
+    public Spatial Hand { get; private set;  }
+    public Spatial ThumbTip { get; private set; }
+    public Spatial IndexTip { get; private set; }
+
+    private bool InitializeOpenXR()
+    {
+        var ARVRInterface = ARVRServer.FindInterface("OpenXR");
+        if (ARVRInterface?.Initialize() == true)
+        {
+            GD.Print("OpenXR Interface initialized");
+
+            Viewport vp = null;
+            if (viewport != null)
+                vp = GetNode<Viewport>(viewport);
+            if (vp == null)
+                vp = GetViewport();
+
+            vp.Arvr = true;
+            //vp.Keep3dLinear = (bool)GetNode("Configuration").Call("keep_3d_linear");
+
+            Engine.IterationsPerSecond = 144;
+            ARVRInterfaceIsInitialized = ARVRInterface.InterfaceIsInitialized;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public override void _EnterTree()
+    {
+        InitializeOpenXR();
+        var openXRRightHand = GetNode<Spatial>("OpenXRRightHand");
+        var openXRLeftHand = GetNode<Spatial>("OpenXRLeftHand");
+        var rightHand = GetNode<Spatial>("RightHand");
+        if (ARVRInterfaceIsInitialized)
+        {
+            ThumbTip = openXRRightHand.FindNode("ThumbTip") as Spatial;
+            IndexTip = openXRRightHand.FindNode("IndexTip") as Spatial;
+            openXRRightHand.SetProcess(true);
+            openXRLeftHand.SetProcess(true);
+            openXRRightHand.Visible = true;
+            openXRLeftHand.Visible = true;
+
+            RemoveChild(rightHand);
+
+            Hand = openXRRightHand;
+        }
+        else
+        {
+            ThumbTip = rightHand.FindNode("ThumbTip") as Spatial;
+            IndexTip = rightHand.FindNode("IndexTip") as Spatial;
+            rightHand.SetProcess(true);
+            rightHand.Visible = true;
+
+            RemoveChild(openXRRightHand);
+            RemoveChild(openXRLeftHand);
+
+            Hand = rightHand;
+        }
+    }
+
     public override void _Ready()
     {
-        camera = GetNode<Camera>("MainCamera");
+        if (ARVRInterfaceIsInitialized)
+        {
+            var worldEnvironment = GetNode<WorldEnvironment>("../WorldEnvironment");
+            worldEnvironment.Environment.BackgroundMode = Godot.Environment.BGMode.Color;
+            worldEnvironment.Environment.BackgroundColor = new Color(0, 0, 0, 0);
+            GetTree().Root.TransparentBg = true;
+       }
     }
 
     public override void _PhysicsProcess(float delta)
     {
         if (!cameraMove) return;
-        camera.RotationDegrees = new Vector3(camera.RotationDegrees.x - mouseDelta.y * cameraSpeed,
-                                             camera.RotationDegrees.y - mouseDelta.x * cameraSpeed,
-                                             camera.RotationDegrees.z);
+        if (Input.IsKeyPressed((int)Godot.KeyList.Space))
+            ARVRServer.CenterOnHmd(ARVRServer.RotationMode.ResetButKeepTilt, true);
 
-        mouseDelta = new Vector2();
-        var velocity = Vector3.Zero;
-
-        //Transform = camera.Transform;
         if (Input.IsActionPressed("move_right"))
         {
-            velocity += camera.GlobalTransform.basis.x;
+            Translation += Transform.basis.x * delta * speed;
         }
-        if (Input.IsActionPressed("move_left"))
+        else if (Input.IsActionPressed("move_left"))
         {
-            velocity -= camera.GlobalTransform.basis.x;
+            Translation -= Transform.basis.x * delta * speed;
         }
         if (Input.IsActionPressed("move_back"))
         {
-            velocity += camera.GlobalTransform.basis.z;
+            Translation += Transform.basis.z * delta * speed;
         }
-        if (Input.IsActionPressed("move_forward"))
+        else if (Input.IsActionPressed("move_forward"))
         {
-            velocity -= camera.GlobalTransform.basis.z;
+            Translation -= Transform.basis.z * delta * speed;
         }
-        velocity = MoveAndSlide(velocity * speed);
 
+        if (Input.IsActionPressed("shift"))
+        {
+            Hand.Translate(new Vector3(mouseDelta.x * cameraSpeed, -mouseDelta.y * cameraSpeed, 0));
+        }
+        else
+        {
+            var newRotation = Rotation;
+            newRotation.x -= mouseDelta.y * cameraSpeed;
+            newRotation.y -= mouseDelta.x * cameraSpeed;
+            Rotation = newRotation;
+        }
+        mouseDelta = Vector2.Zero;
     }
 
     public override void _Input(InputEvent inputEvent)
@@ -60,10 +135,5 @@ public class Player : KinematicBody
         {
             cameraMove = false;
         }
-    }
-
-    private float Lerp(float firstFloat, float secondFloat, float by)
-    {
-        return firstFloat * (1 - by) + secondFloat * by;
     }
 }

@@ -13,7 +13,7 @@ namespace Assets.Scripts.User
 		private bool isPinching;
 		private bool pinchChaged;
 		private PhysicsDirectSpaceState spaceState;
-		private Spatial player;
+		private Player player;
 		private float handLocalOrigin;
 		private CSGTorus cursor;
 		private Vector3 cursorNormal;
@@ -64,12 +64,12 @@ namespace Assets.Scripts.User
 
 		public override void _Ready()
 		{
-			player = GetParent<Spatial>();
+			player = GetParent<Player>();
 			spaceState = GetWorld().DirectSpaceState;
 
-			Hand = GetNode<Spatial>("../MRTK_R_Hand");
-			ThumbTip = Hand.GetNode<Spatial>("R_Hand_MRTK_Rig2/Skeleton/Thumb_Tip");
-			IndexTip = Hand.GetNode<Spatial>("R_Hand_MRTK_Rig2/Skeleton/Pointer_Tip");
+			Hand = player.Hand;
+			ThumbTip = player.ThumbTip;
+			IndexTip = player.IndexTip;
 
 			var gradient = new Gradient();
 			gradient.AddPoint(0.333f, new Color(1, 1, 1, 1));

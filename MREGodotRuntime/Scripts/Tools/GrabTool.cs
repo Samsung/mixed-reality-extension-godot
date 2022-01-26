@@ -58,7 +58,6 @@ namespace Assets.Scripts.Tools
 
 		public Vector3 GetNearGraspPoint(InputSource inputSource)
 		{
-			//FIXME: the below code will work with MRTK_Hand.
 			return inputSource.IndexTip.GlobalTransform.origin;
 		}
 

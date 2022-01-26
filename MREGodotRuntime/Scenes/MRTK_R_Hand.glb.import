@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/MRTK_R_Hand.glb-ef2046d1ec76fed9ffba1698fffb6414.scn"
+path="res://.import/MRTK_R_Hand.glb-966c392b8d0265c3f6266e558f1775e7.scn"
 
 [deps]
 
-source_file="res://addons/godot-openxr/scenes/MRTK_R_Hand.glb"
-dest_files=[ "res://.import/MRTK_R_Hand.glb-ef2046d1ec76fed9ffba1698fffb6414.scn" ]
+source_file="res://MREGodotRuntime/Scenes/MRTK_R_Hand.glb"
+dest_files=[ "res://.import/MRTK_R_Hand.glb-966c392b8d0265c3f6266e558f1775e7.scn" ]
 
 [params]
 
