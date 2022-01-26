@@ -1,12 +1,10 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://addons/godot-openxr/scenes/center_ball_material.tres" type="Material" id=1]
 [ext_resource path="res://addons/godot-openxr/scenes/hand.gd" type="Script" id=2]
 [ext_resource path="res://addons/godot-openxr/scenes/right_hand_material.tres" type="Material" id=3]
 [ext_resource path="res://addons/godot-openxr/scenes/bone_material.tres" type="Material" id=4]
 [ext_resource path="res://addons/godot-openxr/OpenXRHand.gdns" type="Script" id=5]
-[ext_resource path="res://MREGodotRuntime/Scripts/ThumbTip.cs" type="Script" id=6]
-[ext_resource path="res://Hand_Right2.tscn" type="PackedScene" id=9]
 
 [sub_resource type="SphereMesh" id=1]
 material = ExtResource( 1 )
@@ -33,33 +31,29 @@ script = ExtResource( 5 )
 hand = 1
 
 [node name="Wrist" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.181, -0.151, 0.306 )
 mesh = SubResource( 1 )
 material/0 = null
 script = ExtResource( 2 )
 
 [node name="ThumbMetacarpal" type="MeshInstance" parent="Wrist"]
-transform = Transform( 0.951057, 0, -0.309017, 0, 1, 0, 0.309017, 0, 0.951057, -0.0692335, 0, -0.0460943 )
+transform = Transform( 0.951057, 0, -0.309017, 0, 1, 0, 0.309017, 0, 0.951057, 0.089108, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="ThumbProximal" type="MeshInstance" parent="Wrist/ThumbMetacarpal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0474696, 0, -0.0345762 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="ThumbDistal" type="MeshInstance" parent="Wrist/ThumbMetacarpal/ThumbProximal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0384386, 0, -0.0577736 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="ThumbTip" type="MeshInstance" parent="Wrist/ThumbMetacarpal/ThumbProximal/ThumbDistal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02109, 0, -0.0431474 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
-script = ExtResource( 6 )
-
-[node name="socket-right-thumb" type="Spatial" parent="Wrist/ThumbMetacarpal/ThumbProximal/ThumbDistal/ThumbTip"]
 
 [node name="ThumbDistal_Bone" type="MeshInstance" parent="Wrist/ThumbMetacarpal/ThumbProximal/ThumbDistal"]
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
@@ -77,30 +71,29 @@ mesh = SubResource( 3 )
 material/0 = null
 
 [node name="IndexMetacarpal" type="MeshInstance" parent="Wrist"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.048, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="IndexProximal" type="MeshInstance" parent="Wrist/IndexMetacarpal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1343, 0.0928948, -0.151383 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="IndexIntermediate" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0240938, 0.0320192, -0.0571905 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="IndexDistal" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0151026, 0.0261391, -0.05 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="IndexTip" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00697044, 0, -0.0469604 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
-
-[node name="socket-right-index" type="Spatial" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"]
 
 [node name="IndexDistal_Bone" type="MeshInstance" parent="Wrist/IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal"]
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
@@ -128,22 +121,22 @@ mesh = SubResource( 2 )
 material/0 = null
 
 [node name="MiddleProximal" type="MeshInstance" parent="Wrist/MiddleMetacarpal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.100951, 0.119041, -0.154681 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="MiddleIntermediate" type="MeshInstance" parent="Wrist/MiddleMetacarpal/MiddleProximal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00306593, 0.00874949, -0.0433938 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="MiddleDistal" type="MeshInstance" parent="Wrist/MiddleMetacarpal/MiddleProximal/MiddleIntermediate"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00656985, -0.0161706, -0.0348325 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="MiddleTip" type="MeshInstance" parent="Wrist/MiddleMetacarpal/MiddleProximal/MiddleIntermediate/MiddleDistal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0104998, -0.0186889, -0.0204506 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -168,26 +161,27 @@ mesh = SubResource( 3 )
 material/0 = null
 
 [node name="RingMetacarpal" type="MeshInstance" parent="Wrist"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.061, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="RingProximal" type="MeshInstance" parent="Wrist/RingMetacarpal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0397238, 0.11543, -0.15539 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="RingIntermediate" type="MeshInstance" parent="Wrist/RingMetacarpal/RingProximal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0111157, -0.0354076 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="RingDistal" type="MeshInstance" parent="Wrist/RingMetacarpal/RingProximal/RingIntermediate"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0130089, -0.0281114 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="RingTip" type="MeshInstance" parent="Wrist/RingMetacarpal/RingProximal/RingIntermediate/RingDistal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00567478, -0.0306309, -0.0188633 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -212,26 +206,27 @@ mesh = SubResource( 3 )
 material/0 = null
 
 [node name="LittleMetacarpal" type="MeshInstance" parent="Wrist"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.117382, 0, 1.98185e-05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="LittleProximal" type="MeshInstance" parent="Wrist/LittleMetacarpal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0139044, 0.095745, -0.15349 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="LittleIntermediate" type="MeshInstance" parent="Wrist/LittleMetacarpal/LittleProximal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00371878, 0, -0.0326386 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="LittleDistal" type="MeshInstance" parent="Wrist/LittleMetacarpal/LittleProximal/LittleIntermediate"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00497182, 0, -0.0246599 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
 [node name="LittleTip" type="MeshInstance" parent="Wrist/LittleMetacarpal/LittleProximal/LittleIntermediate/LittleDistal"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0228773, -0.015182 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -254,6 +249,3 @@ material/0 = null
 transform = Transform( 1, 0, 0, 0, -1.09278e-09, -1, 0, 0.025, -4.37114e-08, 0, 0, -0.025 )
 mesh = SubResource( 3 )
 material/0 = null
-
-[node name="Hand_Right2" parent="Wrist" instance=ExtResource( 9 )]
-transform = Transform( -4.40745e-09, -4.34886e-08, -1, -0.994904, 0.100831, 0, 0.100831, 0.994904, -4.37114e-08, -0.0608492, 0.0561047, -0.134 )
