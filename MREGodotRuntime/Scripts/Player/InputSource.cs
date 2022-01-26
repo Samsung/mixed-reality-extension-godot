@@ -62,6 +62,10 @@ namespace Assets.Scripts.User
 		// You still want to hit all layers, but only interact with these.
 		private const uint LayerMask = (1 << 0) | (1 << 5) | (1 << 10);
 
+		private MeshInstance colorCube;
+		private bool serverStarted = false;
+		private Vector3? planePosition = null;
+
 		public override void _Ready()
 		{
 			player = GetParent<Player>();
@@ -132,6 +136,9 @@ namespace Assets.Scripts.User
 				cursor.Visible = false;
 				handRayLine.Visible = false;
 			}
+
+			//for demo
+			colorCube = GetNode<MeshInstance>("ColorCube");
 		}
 
 		public void HoldTool(Type toolType)
@@ -155,6 +162,14 @@ namespace Assets.Scripts.User
 				_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 				_currentTool.OnToolHeld(this);
 			}
+		}
+
+		public Dictionary IntersectRay_Plane()
+		{
+			var forward = -GlobalTransform.basis.z.Normalized();
+			var from = GlobalTransform.origin;
+			var to = GlobalTransform.origin + forward * 40f;
+			return spaceState.IntersectRay(from, to, null, LayerMask, true, true);
 		}
 
 		public Dictionary IntersectRay()
@@ -187,6 +202,19 @@ namespace Assets.Scripts.User
 			if ((ThumbTip.GlobalTransform.origin.DistanceTo(IndexTip.GlobalTransform.origin) < 0.03f) ^ isPinching)
 			{
 				IsPinching = !isPinching;
+				if (IsPinching && !serverStarted && planePosition != null)
+				{
+					var MREServer = new LaunchMRE();
+					MREServer.GlobalTransform = new Transform(Basis.Identity, (Vector3)planePosition);
+					MREServer.UserNode = player.GetPath();
+					MREServer.SessionID = "testbed";
+					MREServer.AppID = "helloworld";
+					MREServer.EphemeralAppID = "helloworld-temp";
+					MREServer.MREURL = "ws://localhost:3901";
+					GetTree().Root.AddChild(MREServer);
+					serverStarted = true;
+					colorCube.Visible = false;
+				}
 			}
 			_currentTool.Update(this);
 			// reset 'pinchChanged' if the pinching doesn't interact with any target.
@@ -199,6 +227,21 @@ namespace Assets.Scripts.User
 
 		public override void _PhysicsProcess(float delta)
 		{
+			if (!serverStarted)
+			{
+				Dictionary ret = IntersectRay_Plane();
+				if (ret.Count > 0)
+				{
+					planePosition = (Vector3)ret["position"];
+					((SpatialMaterial)colorCube.MaterialOverride).AlbedoColor = new Color(77 / 255f, 204 / 255f, 77 / 255f);
+				}
+				else
+				{
+					planePosition = null;
+					((SpatialMaterial)colorCube.MaterialOverride).AlbedoColor = new Color(157 / 255f, 34 / 255f, 34 / 255f);
+				}
+
+			}
 			if (Input.IsActionPressed("hand_touch"))
 			{
 				if (Hand.Translation.z > handLocalOrigin - 0.05f)
