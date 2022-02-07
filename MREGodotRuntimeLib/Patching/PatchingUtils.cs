@@ -427,8 +427,8 @@ namespace MixedRealityExtension.Patching
 			if (patch.Position != null)
 			{
 				globalPosition = appRoot.ToLocal(_this.GlobalTransform.origin).GetPatchApplied(current.Position.ApplyPatch(patch.Position));
-				globalPosition = appRoot.ToGlobal(globalPosition);
 				globalPosition.z *= -1;
+				globalPosition = appRoot.ToGlobal(globalPosition);
 			}
 
 			if (patch.Rotation != null)
@@ -436,9 +436,9 @@ namespace MixedRealityExtension.Patching
 				var appRotation = appRoot.GlobalTransform.basis.RotationQuat();
 				var currAppRotation = appRotation.Inverse() * globalRotation;
 				var newAppRotation = currAppRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
+				newAppRotation.x *= -1;
+				newAppRotation.y *= -1;
 				globalRotation = appRotation * newAppRotation;
-				globalRotation.x *= -1;
-				globalRotation.y *= -1;
 			}
 
 			var basis = new Basis(globalRotation);
