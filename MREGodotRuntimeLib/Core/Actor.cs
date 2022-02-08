@@ -819,10 +819,8 @@ namespace MixedRealityExtension.Core
 						var attachmentComponent = attachPoint.AddNode(new MREAttachmentComponent());
 						attachmentComponent.Actor = this;
 						attachmentComponent.UserId = Attachment.UserId;
-						attachmentComponent.Transform = this.Transform;
-						attachmentComponent.UpdateScale = false;
-						attachmentComponent.RemotePath = attachmentComponent.GetPathTo(this);
 
+						attachmentComponent.Transform = this.Transform;
 						hostAppUser.BeforeAvatarDestroyed += UserInfo_BeforeAvatarDestroyed;
 						return true;
 					}
