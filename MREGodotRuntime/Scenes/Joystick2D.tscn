@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://MREGodotRuntime/joystick.png" type="Texture" id=1]
+[ext_resource path="res://MREGodotRuntime/Scripts/Joystick2D.cs" type="Script" id=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 125.0
+
+[node name="Joystick2D" type="TouchScreenButton"]
+position = Vector2( 32.905, 439.492 )
+normal = ExtResource( 1 )
+shape = SubResource( 1 )
+visibility_mode = 1
+script = ExtResource( 2 )

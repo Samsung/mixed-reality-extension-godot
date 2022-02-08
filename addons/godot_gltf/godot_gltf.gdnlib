@@ -10,6 +10,8 @@ reloadable=true
 Windows.64="res://addons/godot_gltf/bin/libgodot_gltf.dll"
 X11.64="res://addons/godot_gltf/bin/libgodot_gltf.so"
 Server.64="res://addons/godot_gltf/bin/libgodot_gltf.so"
+Android.armeabi-v7a="res://addons/godot_gltf/bin/libgodot_gltf.armv7a.so"
+Android.arm64-v8a="res://addons/godot_gltf/bin/libgodot_gltf.arm64v8a.so"
 
 [dependencies]
 
@@ -17,3 +19,5 @@ Windows.64=[  ]
 OSX.64=[  ]
 X11.64=[  ]
 Server.64=[  ]
+Android.armeabi-v7a=[  ]
+Android.arm64-v8a=[  ]
