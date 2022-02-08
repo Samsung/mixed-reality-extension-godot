@@ -9,10 +9,17 @@ using Godot;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class MREAttachmentComponent : RemoteTransform
+	internal class MREAttachmentComponent : Spatial
 	{
 		public Guid UserId { get; set; }
 
 		public Actor Actor { get; set; }
+
+		public override void _Process(float delta)
+		{
+			var scale = Actor.Scale;
+			Actor.GlobalTransform = GlobalTransform;
+			Actor.Scale = scale;
+		}
 	}
 }
