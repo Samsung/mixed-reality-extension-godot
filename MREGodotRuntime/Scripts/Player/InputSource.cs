@@ -125,6 +125,13 @@ namespace Assets.Scripts.User
 			_currentTool.OnToolHeld(this);
 
 			handLocalOrigin = Hand.Translation.z;
+
+			if (OS.GetName() == "Android")
+			{
+				Hand.Visible = false;
+				cursor.Visible = false;
+				handRayLine.Visible = false;
+			}
 		}
 
 		public void HoldTool(Type toolType)
@@ -155,6 +162,14 @@ namespace Assets.Scripts.User
 			var forward = -Hand.GlobalTransform.basis.z.Normalized();
 			var from = Hand.GlobalTransform.origin - forward * 0.05f;
 			var to = Hand.GlobalTransform.origin + forward * 1.5f;
+			if (OS.GetName() == "Android")
+			{
+				if (player.screenTouchPosition == Vector2.Zero)
+					return new Dictionary();
+				forward = ProjectRayNormal(player.screenTouchPosition);
+				from = ProjectRayOrigin(player.screenTouchPosition);
+				to = from + forward * 10000;
+			}
 			return spaceState.IntersectRay(from, to, null, LayerMask, true, true);
 		}
 
@@ -202,6 +217,11 @@ namespace Assets.Scripts.User
 			else if (Input.IsActionJustReleased("Fire1"))
 			{
 				var animationPlayer = Hand.GetNode<AnimationPlayer>("AnimationPlayer");
+				if (OS.GetName() == "Android")
+				{
+					animationPlayer.Stop(true);
+					animationPlayer.PlaybackSpeed = 0.2f;
+				}
 				animationPlayer?.PlayBackwards("Pinch");
 			}
 		}
