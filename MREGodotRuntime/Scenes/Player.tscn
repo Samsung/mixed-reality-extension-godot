@@ -6,6 +6,7 @@
 [ext_resource path="res://MREGodotRuntime/Scenes/MRTK_R_Hand.tscn" type="PackedScene" id=4]
 [ext_resource path="res://addons/godot-openxr/scenes/right_hand_nodes.tscn" type="PackedScene" id=5]
 [ext_resource path="res://addons/godot-openxr/scenes/left_hand_nodes.tscn" type="PackedScene" id=6]
+[ext_resource path="res://MREGodotRuntime/Scenes/Joystick2D.tscn" type="PackedScene" id=7]
 
 [sub_resource type="CapsuleShape" id=1]
 radius = 0.0563646
@@ -52,3 +53,5 @@ omni_range = 2.0
 [node name="RightHand" parent="." instance=ExtResource( 4 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0809927, -0.006109, -0.150688 )
 visible = false
+
+[node name="Joystick2D" parent="." instance=ExtResource( 7 )]

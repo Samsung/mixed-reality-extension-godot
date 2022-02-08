@@ -6,6 +6,9 @@ public class Player : ARVROrigin
     private float cameraSpeed = 0.0015f;
     private bool cameraMove = false;
     private Vector2 mouseDelta = new Vector2();
+    internal Vector2 screenTouchPosition;
+    private uint pressTime;
+    private Vector2 pressPosition;
 
     [Export]
     private NodePath viewport = null;
@@ -134,6 +137,28 @@ public class Player : ARVROrigin
         else if (Input.IsActionPressed("ui_cancel"))
         {
             cameraMove = false;
+        }
+        else if (inputEvent is InputEventScreenTouch screenTouch)
+        {
+            if (screenTouch.Pressed)
+            {
+                pressTime = OS.GetTicksMsec();
+                pressPosition = screenTouch.Position;
+            }
+            else
+            {
+                if (OS.GetTicksMsec() - pressTime < 110 &&
+                    pressPosition.DistanceSquaredTo(screenTouch.Position) < 200)
+                {
+                    screenTouchPosition = screenTouch.Position;
+                    Input.ActionPress("Fire1");
+                    Input.ActionRelease("Fire1");
+                }
+                else
+                {
+                    screenTouchPosition = Vector2.Zero;
+                }
+            }
         }
     }
 }
