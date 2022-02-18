@@ -17,7 +17,7 @@ namespace MixedRealityExtension.Messaging.Commands
 		{
 			public bool Invoked;
 			public string Location;
-			public DateTime CreationTime;
+			public uint CreationTime;
 		}
 
 		// Command handler methods mapped to MethodInfo by handler object type.
@@ -28,10 +28,10 @@ namespace MixedRealityExtension.Messaging.Commands
 		private readonly List<PendingCompletionCallback> _pendingCompletionCallbacks = new List<PendingCompletionCallback>();
 		// The next time to check the _pendingCompletionCallbacks queue for timed out commands.
 		// These commands may have a logic error and are not calling their supplied onCompleteCallback.
-		private DateTime _nextQueueCheckTime;
+		private uint _nextQueueCheckTime;
 
 		// The maximum amount of time to wait for an onCompleteCallback to be invoked.
-		private static readonly TimeSpan QueuedCompletionCallbackTimeout = TimeSpan.FromSeconds(60);
+		private static readonly uint QueuedCompletionCallbackTimeout = 60 * 1000;
 
 		public CommandManager(Dictionary<Type, ICommandHandlerContext> commandHandlers)
 		{
@@ -111,7 +111,7 @@ namespace MixedRealityExtension.Messaging.Commands
 			// Periodically check for timed out completion callback invocations.
 			if (_pendingCompletionCallbacks.Count > 0)
 			{
-				var currTime = DateTime.Now;
+				var currTime = Godot.OS.GetTicksMsec();
 				if (_nextQueueCheckTime <= currTime)
 				{
 					while (_pendingCompletionCallbacks.Count > 0)
@@ -136,7 +136,7 @@ namespace MixedRealityExtension.Messaging.Commands
 					// If there are still items in the list, schedule a time to check it again in the near future.
 					if (_pendingCompletionCallbacks.Count > 0)
 					{
-						_nextQueueCheckTime = currTime + TimeSpan.FromSeconds(5);
+						_nextQueueCheckTime = currTime + 5000;
 					}
 				}
 			}
@@ -152,14 +152,14 @@ namespace MixedRealityExtension.Messaging.Commands
 			// If the queue was previously empty then schedule a time to check it later.
 			if (_pendingCompletionCallbacks.Count == 0)
 			{
-				_nextQueueCheckTime = DateTime.Now + QueuedCompletionCallbackTimeout + TimeSpan.FromSeconds(1);
+				_nextQueueCheckTime = Godot.OS.GetTicksMsec() + QueuedCompletionCallbackTimeout + 1000;
 			}
 
 			var callback = new PendingCompletionCallback()
 			{
 				Invoked = false,
 				Location = location,
-				CreationTime = DateTime.Now
+				CreationTime = Godot.OS.GetTicksMsec()
 			};
 
 			_pendingCompletionCallbacks.Add(callback);
