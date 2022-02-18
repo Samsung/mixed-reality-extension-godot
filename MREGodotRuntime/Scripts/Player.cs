@@ -39,6 +39,30 @@ public class Player : ARVROrigin
         return false;
     }
 
+    private void tracker_added(string tracker_name, int type, int id)
+    {
+        if (type == (int)ARVRServer.TrackerType.Anchor)
+        {
+            var anchorScene = ResourceLoader.Load<PackedScene>("res://MREGodotRuntime/Scenes/Anchor.tscn");
+            var anchor = anchorScene.Instance<ARVRAnchor>();
+            anchor.AnchorId = id;
+            anchor.Name = "anchor_" + id;
+            AddChild(anchor);
+        }
+    }
+
+    private void tracker_removed(string tracker_name, int type, int id)
+    {
+        if (type == (int)ARVRServer.TrackerType.Anchor)
+        {
+            var anchor = GetNode<ARVRAnchor>("anchor_" + id);
+            if (anchor != null)
+            {
+                anchor.QueueFree();
+            }
+        }
+    }
+
     public override void _EnterTree()
     {
         InitializeOpenXR();
@@ -74,6 +98,29 @@ public class Player : ARVROrigin
 
     public override void _Ready()
     {
+        var GodotARCore = Engine.GetSingleton("GodotARCore");
+        if (GodotARCore != null)
+        {
+            GodotARCore.Call("ARCoreInitialize");
+
+            ARVRInterface arcore = ARVRServer.FindInterface("ARCore");
+            if (arcore == null)
+                GD.Print("Failed to start ARCore");
+
+            if (!arcore.Initialize())
+                GD.Print("Failed to Initialize ARCore");
+
+            ARVRServer.Singleton.Connect("tracker_added", this, nameof(tracker_added));
+            ARVRServer.Singleton.Connect("tracker_removed", this, nameof(tracker_removed));
+            GetViewport().Arvr = true;
+
+            GetNode<Camera>("MainCamera").Environment = new Environment()
+            {
+                BackgroundMode = Environment.BGMode.CameraFeed,
+                BackgroundCameraFeedId = arcore.GetCameraFeedId()
+            };
+        }
+
         if (ARVRInterfaceIsInitialized)
         {
             var worldEnvironment = GetNode<WorldEnvironment>("../WorldEnvironment");
