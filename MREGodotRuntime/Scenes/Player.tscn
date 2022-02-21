@@ -7,6 +7,7 @@
 [ext_resource path="res://addons/godot-openxr/scenes/right_hand_nodes.tscn" type="PackedScene" id=5]
 [ext_resource path="res://addons/godot-openxr/scenes/left_hand_nodes.tscn" type="PackedScene" id=6]
 [ext_resource path="res://MREGodotRuntime/Scenes/Joystick2D.tscn" type="PackedScene" id=7]
+[ext_resource path="res://addons/godot-openxr/scenes/SceneUnderstanding.tscn" type="PackedScene" id=8]
 
 [sub_resource type="SpatialMaterial" id=3]
 albedo_color = Color( 0.615686, 0.133333, 0.133333, 1 )
@@ -27,6 +28,9 @@ script = ExtResource( 1 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0 )
 current = true
 script = ExtResource( 3 )
+
+[node name="SceneUnderstanding" parent="MainCamera" instance=ExtResource( 8 )]
+"Mesh Color" = Color( 0.419608, 0.690196, 0.831373, 1 )
 
 [node name="ColorCube" type="MeshInstance" parent="MainCamera"]
 transform = Transform( 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, -0.852478 )
@@ -69,3 +73,4 @@ visible = false
 
 [node name="Joystick2D" parent="." instance=ExtResource( 7 )]
 visible = false
+
