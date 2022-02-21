@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://addons/godot-openxr/OpenXRConfig.gdns" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scripts/Player.cs" type="Script" id=2]
@@ -18,13 +18,13 @@ radius = 0.0563646
 height = 0.0459115
 
 [node name="Player" type="ARVROrigin"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.69584, 0 )
 script = ExtResource( 2 )
 
 [node name="Configuration" type="Node" parent="."]
 script = ExtResource( 1 )
 
 [node name="MainCamera" type="ARVRCamera" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0 )
 current = true
 script = ExtResource( 3 )
 
@@ -32,19 +32,21 @@ script = ExtResource( 3 )
 transform = Transform( 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, -0.852478 )
 material_override = SubResource( 3 )
 mesh = SubResource( 2 )
-material/0 = null
+
+[node name="socket-head" type="Spatial" parent="MainCamera"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
+
+[node name="OmniLight" type="OmniLight" parent="MainCamera"]
+omni_range = 4.5406
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
 shape = SubResource( 1 )
 disabled = true
 
-[node name="socket-head" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
-
 [node name="OpenXRLeftHand" parent="." instance=ExtResource( 6 )]
 pause_mode = 1
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.354911, -0.272587, -0.5 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.355, 1, -0.5 )
 visible = false
 
 [node name="OmniLight" type="OmniLight" parent="OpenXRLeftHand"]
@@ -53,7 +55,7 @@ omni_range = 2.0
 
 [node name="OpenXRRightHand" parent="." instance=ExtResource( 5 )]
 pause_mode = 1
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.287451, -0.271426, -0.500103 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.287, 1, -0.5 )
 visible = false
 hand = 0
 
@@ -62,7 +64,8 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.524409, 0.210365 )
 omni_range = 2.0
 
 [node name="RightHand" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0809927, -0.006109, -0.150688 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.081, 1.55, -0.151 )
 visible = false
 
 [node name="Joystick2D" parent="." instance=ExtResource( 7 )]
+visible = false

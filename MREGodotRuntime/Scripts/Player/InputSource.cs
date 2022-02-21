@@ -190,7 +190,7 @@ namespace Assets.Scripts.User
 
 		public override void _EnterTree()
 		{
-			UserNode = Owner;
+			UserNode = this;
 			if (UserNode == null)
 			{
 				throw new Exception("Input source must have a MWUnityUser assigned to it.");
@@ -206,7 +206,7 @@ namespace Assets.Scripts.User
 				{
 					var MREServer = new LaunchMRE();
 					MREServer.GlobalTransform = new Transform(Basis.Identity, (Vector3)planePosition);
-					MREServer.UserNode = player.GetPath();
+					MREServer.UserNode = this.GetPath();
 					MREServer.SessionID = "testbed";
 					MREServer.AppID = "helloworld";
 					MREServer.EphemeralAppID = "helloworld-temp";

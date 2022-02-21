@@ -10,17 +10,15 @@
 [node name="Spatial" type="Spatial"]
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.334629, 2.2771 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource( 3 )
 
 [node name="TestPlane" type="Area" parent="."]
-transform = Transform( 0.3, 0, 0, 0, 0.01, 0, 0, 0, 0.3, 0, 0, -0.827406 )
+transform = Transform( 0.3, 0, 0, 0, 0.01, 0, 0, 0, 0.3, 0, -0.180224, -1.56985 )
 
 [node name="CollisionShape" type="CollisionShape" parent="TestPlane"]
 shape = SubResource( 1 )
 
 [node name="MeshInstance" type="MeshInstance" parent="TestPlane"]
 mesh = SubResource( 2 )
-material/0 = null
