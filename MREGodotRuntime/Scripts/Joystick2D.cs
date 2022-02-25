@@ -40,7 +40,7 @@ public class Joystick2D : TouchScreenButton
     public override void _Process(float delta)
     {
         var d = playerDirection * speed;
-        player.Translation += player.Transform.basis.x * d.x;
-        player.Translation += player.Transform.basis.z * d.y;
+        player.MainCamera.Translation += player.MainCamera.Transform.basis.x * d.x;
+        player.MainCamera.Translation += player.MainCamera.Transform.basis.z * d.y;
     }
 }

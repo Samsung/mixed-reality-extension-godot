@@ -16,6 +16,7 @@ public class Player : ARVROrigin
     public Spatial Hand { get; private set;  }
     public Spatial ThumbTip { get; private set; }
     public Spatial IndexTip { get; private set; }
+    public Camera MainCamera { get; private set; }
 
     private bool InitializeOpenXR()
     {
@@ -23,6 +24,9 @@ public class Player : ARVROrigin
         if (ARVRInterface?.Initialize() == true)
         {
             GD.Print("OpenXR Interface initialized");
+
+            //default height 1.6m
+            MainCamera.Translation = Vector3.Up * 1.6f;
 
             Viewport vp = null;
             if (viewport != null)
@@ -44,10 +48,13 @@ public class Player : ARVROrigin
 
     public override void _EnterTree()
     {
-        InitializeOpenXR();
+        MainCamera = GetNode<Camera>("MainCamera");
         var openXRRightHand = GetNode<Spatial>("OpenXRRightHand");
         var openXRLeftHand = GetNode<Spatial>("OpenXRLeftHand");
-        var rightHand = GetNode<Spatial>("RightHand");
+        var rightHand = MainCamera.GetNode<Spatial>("RightHand");
+
+        InitializeOpenXR();
+
         if (ARVRInterfaceIsInitialized)
         {
             ThumbTip = openXRRightHand.FindNode("ThumbTip") as Spatial;
@@ -83,7 +90,7 @@ public class Player : ARVROrigin
             worldEnvironment.Environment.BackgroundMode = Godot.Environment.BGMode.Color;
             worldEnvironment.Environment.BackgroundColor = new Color(0, 0, 0, 0);
             GetTree().Root.TransparentBg = true;
-       }
+        }
     }
 
     public override void _PhysicsProcess(float delta)
@@ -94,19 +101,19 @@ public class Player : ARVROrigin
 
         if (Input.IsActionPressed("move_right"))
         {
-            Translation += Transform.basis.x * delta * speed;
+            MainCamera.Translation += MainCamera.Transform.basis.x * delta * speed;
         }
         else if (Input.IsActionPressed("move_left"))
         {
-            Translation -= Transform.basis.x * delta * speed;
+            MainCamera.Translation -= MainCamera.Transform.basis.x * delta * speed;
         }
         if (Input.IsActionPressed("move_back"))
         {
-            Translation += Transform.basis.z * delta * speed;
+            MainCamera.Translation += MainCamera.Transform.basis.z * delta * speed;
         }
         else if (Input.IsActionPressed("move_forward"))
         {
-            Translation -= Transform.basis.z * delta * speed;
+            MainCamera.Translation -= MainCamera.Transform.basis.z * delta * speed;
         }
 
         if (Input.IsActionPressed("shift"))
@@ -115,10 +122,10 @@ public class Player : ARVROrigin
         }
         else
         {
-            var newRotation = Rotation;
+            var newRotation = MainCamera.Rotation;
             newRotation.x -= mouseDelta.y * cameraSpeed;
             newRotation.y -= mouseDelta.x * cameraSpeed;
-            Rotation = newRotation;
+            MainCamera.Rotation = newRotation;
         }
         mouseDelta = Vector2.Zero;
     }
