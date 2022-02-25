@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://addons/godot-openxr/OpenXRConfig.gdns" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scripts/Player.cs" type="Script" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://addons/godot-openxr/scenes/right_hand_nodes.tscn" type="PackedScene" id=5]
 [ext_resource path="res://addons/godot-openxr/scenes/left_hand_nodes.tscn" type="PackedScene" id=6]
 [ext_resource path="res://MREGodotRuntime/Scenes/Joystick2D.tscn" type="PackedScene" id=7]
+[ext_resource path="res://default_env.tres" type="Environment" id=8]
 
 [sub_resource type="CapsuleShape" id=1]
 radius = 0.0563646
@@ -20,6 +21,7 @@ script = ExtResource( 2 )
 script = ExtResource( 1 )
 
 [node name="MainCamera" type="ARVRCamera" parent="."]
+environment = ExtResource( 8 )
 current = true
 script = ExtResource( 3 )
 

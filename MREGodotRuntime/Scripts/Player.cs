@@ -16,6 +16,7 @@ public class Player : ARVROrigin
     public Spatial Hand { get; private set;  }
     public Spatial ThumbTip { get; private set; }
     public Spatial IndexTip { get; private set; }
+    public Camera MainCamera { get; private set; }
 
     private bool InitializeOpenXR()
     {
@@ -44,6 +45,7 @@ public class Player : ARVROrigin
 
     public override void _EnterTree()
     {
+        MainCamera = GetNode<Camera>("MainCamera");
         InitializeOpenXR();
         var openXRRightHand = GetNode<Spatial>("OpenXRRightHand");
         var openXRLeftHand = GetNode<Spatial>("OpenXRLeftHand");
@@ -79,9 +81,7 @@ public class Player : ARVROrigin
     {
         if (ARVRInterfaceIsInitialized)
         {
-            var worldEnvironment = GetNode<WorldEnvironment>("../WorldEnvironment");
-            worldEnvironment.Environment.BackgroundMode = Godot.Environment.BGMode.Color;
-            worldEnvironment.Environment.BackgroundColor = new Color(0, 0, 0, 0);
+            MainCamera.Environment = ResourceLoader.Load<Environment>("res://MREGodotRuntime/arvr_env.tres");
             GetTree().Root.TransparentBg = true;
        }
     }
