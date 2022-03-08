@@ -113,7 +113,7 @@ namespace Assets.Scripts.Tools
 
 					if (CurrentTouchableObjectDown == null)
 					{
-						inputSource.SetCursorNormal(hitPointNormal);
+						inputSource.HitPointNormal = hitPointNormal;
 						inputSource.HandRayHitPoint = (Vector3)hitPoint;
 					}
 
@@ -212,7 +212,7 @@ namespace Assets.Scripts.Tools
 				var eventData = new TouchInputEventData(this, pokePointerOrigin);
 
 				inputSource.HandRayHitPoint = pokePointerOrigin;
-				inputSource.SetCursorNormal(hitPointNormal);
+				inputSource.HitPointNormal = hitPointNormal;
 				CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchUpdated), eventData);
 			}
 		}
