@@ -31,7 +31,7 @@ namespace Assets.Scripts.Tools
 					{
 						startOffset = inputSource.Hand.GlobalTransform.origin - CurrentTargetPoint;
 						buttonBehavior.Context.StartButton(mwUser, CurrentTargetPoint);
-						inputSource.SetCursorColor(new Color(1, 0, 0));
+						inputSource.Cursor.Color = new Color(1, 0, 0);
 					}
 				}
 				pressed = true;
@@ -49,7 +49,7 @@ namespace Assets.Scripts.Tools
 					{
 						buttonBehavior.Context.EndButton(mwUser, CurrentTargetPoint);
 						buttonBehavior.Context.Click(mwUser, CurrentTargetPoint);
-						inputSource.SetCursorColor(new Color(1, 1, 1));
+						inputSource.Cursor.Color = new Color(1, 1, 1);
 					}
 				}
 				pressed = false;

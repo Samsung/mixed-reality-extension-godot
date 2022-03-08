@@ -15,8 +15,7 @@ namespace Assets.Scripts.User
 		private PhysicsDirectSpaceState spaceState;
 		private Player player;
 		private float handLocalOrigin;
-		private CSGTorus cursor;
-		private Vector3 cursorNormal;
+		private Cursor cursor;
 		private ImmediateGeometry handRayLine =  new ImmediateGeometry();
 
 		internal Spatial PokePointer;
@@ -28,6 +27,25 @@ namespace Assets.Scripts.User
 		public Vector3 HandRayOrigin => Hand.GlobalTransform.origin;
 
 		public Vector3 HandRayHitPoint { get; set; }
+
+		public Vector3 HitPointNormal { get; set; }
+
+		public Cursor Cursor
+		{
+			get => cursor;
+			set
+			{
+				if (cursor == value)
+					return;
+
+				if (cursor != null)
+					cursor.QueueFree();
+
+				cursor = value;
+				if (cursor != null && IsInsideTree())
+					AddChild(cursor);
+			}
+		}
 
 		public bool IsPinching
 		{
@@ -109,17 +127,9 @@ namespace Assets.Scripts.User
 			};
 			Hand.AddChild(proximityVisibleLight);
 
-			cursor = new CSGTorus()
-			{
-				InnerRadius = 0.02f,
-				OuterRadius = 0.01f,
-				Sides = 16,
-			};
-			cursor.MaterialOverride = new SpatialMaterial()
-			{
-				FlagsFixedSize = true
-			};
-			GetTree().Root.CallDeferred("add_child", cursor);
+			var cursorScene = ResourceLoader.Load<PackedScene>("res://MREGodotRuntime/Scenes/RingCursor.tscn");
+			Cursor = cursorScene.Instance<Cursor>();
+			AddChild(Cursor);
 
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
@@ -129,7 +139,7 @@ namespace Assets.Scripts.User
 			if (OS.GetName() == "Android")
 			{
 				Hand.Visible = false;
-				cursor.Visible = false;
+				Cursor.Visible = false;
 				handRayLine.Visible = false;
 			}
 		}
@@ -194,7 +204,7 @@ namespace Assets.Scripts.User
 				pinchChaged = false;
 
 			UpdateHandRayLine();
-			UpdateCursor();
+			Cursor.SetCursorTransform(HandRayHitPoint, HitPointNormal);
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -224,16 +234,6 @@ namespace Assets.Scripts.User
 				}
 				animationPlayer?.PlayBackwards("Pinch");
 			}
-		}
-
-		public void SetCursorNormal(Vector3 normal)
-		{
-			cursorNormal = normal;
-		}
-
-		public void SetCursorColor(Color color)
-		{
-			((SpatialMaterial)cursor.MaterialOverride).AlbedoColor = color;
 		}
 
 		public void SetHandRayColor(Color color)
@@ -290,16 +290,6 @@ namespace Assets.Scripts.User
 			handRayLine.AddVertex(v3);
 
 			handRayLine.End();
-		}
-
-		private void UpdateCursor()
-		{
-			var basis = Basis.Identity;
-			basis.y = cursorNormal;
-			basis.x = basis.z.Cross(basis.y);
-			basis = basis.Orthonormalized();
-
-			cursor.GlobalTransform = new Transform(basis, HandRayHitPoint);
 		}
 	}
 }

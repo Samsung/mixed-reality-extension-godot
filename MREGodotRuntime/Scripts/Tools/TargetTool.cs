@@ -230,18 +230,21 @@ namespace Assets.Scripts.Tools
 					{
 						var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
 						inputSource.HandRayHitPoint = (Vector3)hitPoint;
-						inputSource.SetCursorNormal(hitPointNormal);
+						inputSource.HitPointNormal = hitPointNormal;
 						if (node.GetChild<TargetBehavior>() != null)
 						{
 							return a;
 						}
 					}
 				}
+
+				inputSource.HandRayHitPoint = inputSource.Hand.GlobalTransform.origin - inputSource.Hand.GlobalTransform.basis.z.Normalized() * 1.5f;
+				inputSource.HitPointNormal = inputSource.GlobalTransform.basis.z;
 			}
 			else
 			{
 				inputSource.HandRayHitPoint = inputSource.Hand.GlobalTransform.origin - inputSource.Hand.GlobalTransform.basis.z.Normalized() * 1.5f;
-				inputSource.SetCursorNormal(inputSource.GlobalTransform.basis.z);
+				inputSource.HitPointNormal = inputSource.GlobalTransform.basis.z;
 			}
 
 			return null;
