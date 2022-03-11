@@ -87,7 +87,7 @@ namespace Assets.Scripts.Tools
 			pokeTool.Update(inputSource);
 			Vector3? hitPoint;
 
-			Position = inputSource.Hand.GlobalTransform.origin;
+			Position = inputSource.GlobalTransform.origin;
 			var newTarget = FindTarget(inputSource, out hitPoint);
 			if ((Target == null || !Godot.Object.IsInstanceValid(Target)) && (newTarget == null || !Godot.Object.IsInstanceValid(newTarget)))
 			{
@@ -229,7 +229,7 @@ namespace Assets.Scripts.Tools
 					if (node is MixedRealityExtension.Core.Actor a)
 					{
 						var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
-						inputSource.HandRayHitPoint = (Vector3)hitPoint;
+						inputSource.HitPoint = (Vector3)hitPoint;
 						inputSource.HitPointNormal = hitPointNormal;
 						if (node.GetChild<TargetBehavior>() != null)
 						{
@@ -238,12 +238,12 @@ namespace Assets.Scripts.Tools
 					}
 				}
 
-				inputSource.HandRayHitPoint = inputSource.Hand.GlobalTransform.origin - inputSource.Hand.GlobalTransform.basis.z.Normalized() * 1.5f;
+				inputSource.HitPoint = inputSource.GlobalTransform.origin - inputSource.GlobalTransform.basis.z.Normalized() * 1.5f;
 				inputSource.HitPointNormal = inputSource.GlobalTransform.basis.z;
 			}
 			else
 			{
-				inputSource.HandRayHitPoint = inputSource.Hand.GlobalTransform.origin - inputSource.Hand.GlobalTransform.basis.z.Normalized() * 1.5f;
+				inputSource.HitPoint = inputSource.GlobalTransform.origin - inputSource.GlobalTransform.basis.z.Normalized() * 1.5f;
 				inputSource.HitPointNormal = inputSource.GlobalTransform.basis.z;
 			}
 
