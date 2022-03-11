@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://addons/godot-openxr/OpenXRConfig.gdns" type="Script" id=1]
 [ext_resource path="res://MREGodotRuntime/Scripts/Player.cs" type="Script" id=2]
@@ -6,7 +6,6 @@
 [ext_resource path="res://MREGodotRuntime/Scenes/MRTK_R_Hand.tscn" type="PackedScene" id=4]
 [ext_resource path="res://addons/godot-openxr/scenes/right_hand_nodes.tscn" type="PackedScene" id=5]
 [ext_resource path="res://addons/godot-openxr/scenes/left_hand_nodes.tscn" type="PackedScene" id=6]
-[ext_resource path="res://MREGodotRuntime/Scenes/Joystick2D.tscn" type="PackedScene" id=7]
 [ext_resource path="res://default_env.tres" type="Environment" id=8]
 
 [sub_resource type="CapsuleShape" id=1]
@@ -57,5 +56,3 @@ hand = 0
 [node name="OmniLight" type="OmniLight" parent="OpenXRRightHand"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.524409, 0.210365 )
 omni_range = 2.0
-
-[node name="Joystick2D" parent="." instance=ExtResource( 7 )]

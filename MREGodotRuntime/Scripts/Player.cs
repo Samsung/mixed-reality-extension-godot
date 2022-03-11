@@ -1,4 +1,14 @@
+using System;
 using Godot;
+using Assets.Scripts.Control;
+
+[Flags]
+public enum PositionControlType
+{
+    None = 0,
+    Keyboard = 1 << 0,
+    VirtualGamePad = 1 << 1,
+}
 
 public class Player : ARVROrigin
 {
@@ -12,11 +22,62 @@ public class Player : ARVROrigin
 
     [Export]
     private NodePath viewport = null;
+    private string gamepadScenePath = "res://MREGodotRuntime/Scenes/Joystick2D.tscn";
     private bool ARVRInterfaceIsInitialized = false;
+
+    [ExportEnum(typeof(PositionControlType))]
+    private int positionControl = (int)PositionControlType.Keyboard;
+
+    public PositionControlType PositionControl {
+        get => (PositionControlType)positionControl;
+        set
+        {
+            if (!IsInsideTree())
+                return;
+
+            positionControl = (int)value;
+
+            // clear exist IPositionControl
+            foreach (Node childNode in GetChildren())
+            {
+                if (childNode is IPositionControl)
+                {
+                    RemoveChild(childNode);
+                }
+            }
+
+            if (value.HasFlag(PositionControlType.Keyboard))
+            {
+                var keyboardControl = new KeyboardPositionControl(MainCamera);
+                AddChild(keyboardControl);
+            }
+
+            if (value.HasFlag(PositionControlType.VirtualGamePad))
+            {
+                var virtualGamePadControl = new VirtualGamepadPositionControl(MainCamera);
+                AddChild(virtualGamePadControl);
+            }
+        }
+    }
+
+    [Export(PropertyHint.File, "*.tscn")]
+    public string GamePadScenePath {
+        get => gamepadScenePath;
+        set {
+            if (gamepadScenePath == value)
+                return;
+            gamepadScenePath = value;
+            EmitSignal(nameof(gamepad_changed), value);
+        }
+    }
+
     public Spatial Hand { get; private set;  }
     public Spatial ThumbTip { get; private set; }
     public Spatial IndexTip { get; private set; }
     public Camera MainCamera { get; private set; }
+
+    [Signal]
+    public delegate void gamepad_changed(string scenePath);
 
     private bool InitializeOpenXR()
     {
@@ -86,34 +147,17 @@ public class Player : ARVROrigin
     {
         if (ARVRInterfaceIsInitialized)
         {
-            MainCamera.Environment = ResourceLoader.Load<Environment>("res://MREGodotRuntime/arvr_env.tres");
+            MainCamera.Environment = ResourceLoader.Load<Godot.Environment>("res://MREGodotRuntime/arvr_env.tres");
             GetTree().Root.TransparentBg = true;
         }
+
+        // update control property
+        PositionControl = (PositionControlType)positionControl;
     }
 
     public override void _PhysicsProcess(float delta)
     {
         if (!cameraMove) return;
-        if (Input.IsKeyPressed((int)Godot.KeyList.Space))
-            ARVRServer.CenterOnHmd(ARVRServer.RotationMode.ResetButKeepTilt, true);
-
-        if (Input.IsActionPressed("move_right"))
-        {
-            MainCamera.Translation += MainCamera.Transform.basis.x * delta * speed;
-        }
-        else if (Input.IsActionPressed("move_left"))
-        {
-            MainCamera.Translation -= MainCamera.Transform.basis.x * delta * speed;
-        }
-        if (Input.IsActionPressed("move_back"))
-        {
-            MainCamera.Translation += MainCamera.Transform.basis.z * delta * speed;
-        }
-        else if (Input.IsActionPressed("move_forward"))
-        {
-            MainCamera.Translation -= MainCamera.Transform.basis.z * delta * speed;
-        }
-
         if (Input.IsActionPressed("shift"))
         {
             Hand.Translate(new Vector3(mouseDelta.x * cameraSpeed, -mouseDelta.y * cameraSpeed, 0));
