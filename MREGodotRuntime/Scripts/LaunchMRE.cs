@@ -104,7 +104,7 @@ public class LaunchMRE : Spatial
 		MREComponent.AutoJoin = AutoJoin;
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
-		MREComponent.UserNode = GetNode(UserNode);
+		MREComponent.UserNode = GetNode(UserNode + "/MainCamera");
 		MREComponent.DialogFactory = GetNode<DialogFactory>("Player/DialogFactory");
 		AddChild(MREComponent);
 	}
