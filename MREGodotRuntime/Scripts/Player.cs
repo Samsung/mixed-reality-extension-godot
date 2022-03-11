@@ -22,6 +22,7 @@ public enum ControllerType
 {
     None = 0,
     Hand = 1 << 0,
+    Mouse = 1 << 1,
 }
 
 public class Player : ARVROrigin
@@ -118,6 +119,11 @@ public class Player : ARVROrigin
                 }
             }
 
+            if (value.HasFlag(ControllerType.Mouse))
+            {
+                var mouseControl = new MouseController(MainCamera);
+                AddChild(mouseControl);
+            }
             if (value.HasFlag(ControllerType.Hand))
             {
                 if (IsInsideTree())
