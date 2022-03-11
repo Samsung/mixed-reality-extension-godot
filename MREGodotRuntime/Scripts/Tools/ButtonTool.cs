@@ -29,7 +29,7 @@ namespace Assets.Scripts.Tools
 					var mwUser = buttonBehavior.GetMWUnityUser(inputSource.UserNode);
 					if (mwUser != null)
 					{
-						startOffset = inputSource.Hand.GlobalTransform.origin - CurrentTargetPoint;
+						startOffset = inputSource.GlobalTransform.origin - CurrentTargetPoint;
 						buttonBehavior.Context.StartButton(mwUser, CurrentTargetPoint);
 						inputSource.Cursor.Color = new Color(1, 0, 0);
 					}
@@ -115,7 +115,7 @@ namespace Assets.Scripts.Tools
 		{
 			if (pressed)
 			{
-				hitPoint = inputSource.Hand.GlobalTransform.origin - startOffset;
+				hitPoint = inputSource.GlobalTransform.origin - startOffset;
 				return Target;
 			}
 			return base.FindTarget(inputSource, out hitPoint);

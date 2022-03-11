@@ -17,26 +17,30 @@ public enum RotationControlType
     Mouse = 1 << 0,
 }
 
+[Flags]
+public enum ControllerType
+{
+    None = 0,
+    Hand = 1 << 0,
+}
+
 public class Player : ARVROrigin
 {
-    private float speed = 1f;
-    private float cameraSpeed = 0.0015f;
-    private bool cameraMove = false;
-    private Vector2 mouseDelta = new Vector2();
-    internal Vector2 screenTouchPosition;
-    private uint pressTime;
-    private Vector2 pressPosition;
-
     [Export]
     private NodePath viewport = null;
-    private string gamepadScenePath = "res://MREGodotRuntime/Scenes/Joystick2D.tscn";
-    private bool ARVRInterfaceIsInitialized = false;
+    private string cursorScenePath = MRERuntimeScenePath.DefaultCursor;
+    private string rayScenePath = MRERuntimeScenePath.DefaultRay;
+    private string gamepadScenePath = MRERuntimeScenePath.Joypad;
+    private bool openXRIsInitialized = false;
 
     [ExportEnum(typeof(PositionControlType))]
     private int positionControl = (int)PositionControlType.Keyboard;
 
     [ExportEnum(typeof(RotationControlType))]
     private int rotationControl = (int)RotationControlType.Mouse;
+
+    [ExportEnum(typeof(ControllerType))]
+    private int controller = (int)ControllerType.Hand;
 
     public PositionControlType PositionControl {
         get => (PositionControlType)positionControl;
@@ -96,6 +100,61 @@ public class Player : ARVROrigin
         }
     }
 
+    public ControllerType Controller {
+        get => (ControllerType)controller;
+        set
+        {
+            if (!IsInsideTree())
+                return;
+
+            controller = (int)value;
+
+            // clear exist Controller
+            foreach (Node childNode in GetChildren())
+            {
+                if (childNode is IController)
+                {
+                    RemoveChild(childNode);
+                }
+            }
+
+            if (value.HasFlag(ControllerType.Hand))
+            {
+                if (IsInsideTree())
+                {
+                    AddHandController();
+                }
+                else
+                {
+                    Connect("ready", this, nameof(_on_Player_ready));
+                }
+            }
+        }
+    }
+
+    [Export(PropertyHint.File, "*.tscn")]
+    public string CursorScenePath {
+        get => cursorScenePath;
+        set {
+            if (cursorScenePath == value)
+                return;
+            cursorScenePath = value;
+            EmitSignal(nameof(cursor_changed), value);
+        }
+    }
+
+    [Export(PropertyHint.File, "*.tscn")]
+    public string RayScenePath {
+        get => rayScenePath;
+        set {
+            if (rayScenePath == value)
+                return;
+            rayScenePath = value;
+            if (MainCamera != null)
+                EmitSignal(nameof(ray_changed), value, MainCamera);
+        }
+    }
+
     [Export(PropertyHint.File, "*.tscn")]
     public string GamePadScenePath {
         get => gamepadScenePath;
@@ -107,13 +166,38 @@ public class Player : ARVROrigin
         }
     }
 
-    public Spatial Hand { get; private set;  }
-    public Spatial ThumbTip { get; private set; }
-    public Spatial IndexTip { get; private set; }
     public Camera MainCamera { get; private set; }
 
     [Signal]
+    public delegate void cursor_changed(string scenePath);
+
+    [Signal]
+    public delegate void ray_changed(string scenePath);
+
+    [Signal]
     public delegate void gamepad_changed(string scenePath);
+
+    private void _on_Player_ready()
+    {
+        Disconnect("ready", this, nameof(_on_Player_ready));
+        AddHandController();
+    }
+
+    private void AddHandController()
+    {
+        if (openXRIsInitialized)
+        {
+            var rightHand = new HandController(MRERuntimeScenePath.OpenXRRightHand);
+            var leftHand = new HandController(MRERuntimeScenePath.OpenXRLeftHand);
+            AddChild(rightHand);
+            AddChild(leftHand);
+        }
+        else
+        {
+            var rightHand = new HandController(MRERuntimeScenePath.DefaultHand);
+            AddChild(rightHand);
+        }
+    }
 
     private bool InitializeOpenXR()
     {
@@ -135,7 +219,7 @@ public class Player : ARVROrigin
             //vp.Keep3dLinear = (bool)GetNode("Configuration").Call("keep_3d_linear");
 
             Engine.IterationsPerSecond = 144;
-            ARVRInterfaceIsInitialized = ARVRInterface.InterfaceIsInitialized;
+            openXRIsInitialized = ARVRInterface.InterfaceIsInitialized;
 
             return true;
         }
@@ -151,93 +235,13 @@ public class Player : ARVROrigin
         var rightHand = MainCamera.GetNode<Spatial>("RightHand");
 
         InitializeOpenXR();
-
-        if (ARVRInterfaceIsInitialized)
-        {
-            ThumbTip = openXRRightHand.FindNode("ThumbTip") as Spatial;
-            IndexTip = openXRRightHand.FindNode("IndexTip") as Spatial;
-            openXRRightHand.SetProcess(true);
-            openXRLeftHand.SetProcess(true);
-            openXRRightHand.Visible = true;
-            openXRLeftHand.Visible = true;
-
-            RemoveChild(rightHand);
-
-            Hand = openXRRightHand;
-        }
-        else
-        {
-            ThumbTip = rightHand.FindNode("ThumbTip") as Spatial;
-            IndexTip = rightHand.FindNode("IndexTip") as Spatial;
-            rightHand.SetProcess(true);
-            rightHand.Visible = true;
-
-            RemoveChild(openXRRightHand);
-            RemoveChild(openXRLeftHand);
-
-            Hand = rightHand;
-        }
     }
 
     public override void _Ready()
     {
-        if (ARVRInterfaceIsInitialized)
-        {
-            MainCamera.Environment = ResourceLoader.Load<Godot.Environment>("res://MREGodotRuntime/arvr_env.tres");
-            GetTree().Root.TransparentBg = true;
-        }
-
         // update control property
         PositionControl = (PositionControlType)positionControl;
         RotationControl = (RotationControlType)rotationControl;
-    }
-
-    public override void _PhysicsProcess(float delta)
-    {
-        if (!cameraMove) return;
-        if (Input.IsActionPressed("shift"))
-        {
-            Hand.Translate(new Vector3(mouseDelta.x * cameraSpeed, -mouseDelta.y * cameraSpeed, 0));
-        }
-        mouseDelta = Vector2.Zero;
-    }
-
-    public override void _Input(InputEvent inputEvent)
-    {
-        if (inputEvent is InputEventMouseMotion e)
-        {
-            mouseDelta = e.Relative;
-        }
-        else if (inputEvent is InputEventMouseButton eventMouseButton)
-        {
-            if (!cameraMove && eventMouseButton.Pressed)
-                cameraMove = true;
-        }
-        else if (Input.IsActionPressed("ui_cancel"))
-        {
-            cameraMove = false;
-        }
-        else if (inputEvent is InputEventScreenTouch screenTouch)
-        {
-            if (screenTouch.Pressed)
-            {
-                pressTime = OS.GetTicksMsec();
-                pressPosition = screenTouch.Position;
-            }
-            else
-            {
-                if (OS.GetTicksMsec() - pressTime < 110 &&
-                    pressPosition.DistanceSquaredTo(screenTouch.Position) < 200)
-                {
-                    screenTouchPosition = screenTouch.Position;
-                    Input.ActionPress("Fire1");
-                    Input.ActionRelease("Fire1");
-                }
-                else
-                {
-                    screenTouchPosition = Vector2.Zero;
-                }
-            }
-        }
+        Controller = (ControllerType)controller;
     }
 }

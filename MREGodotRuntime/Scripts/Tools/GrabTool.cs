@@ -58,7 +58,7 @@ namespace Assets.Scripts.Tools
 
 		public Vector3 GetNearGraspPoint(InputSource inputSource)
 		{
-			return inputSource.IndexTip.GlobalTransform.origin;
+			return inputSource.GlobalTransform.origin;
 		}
 
 		internal Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
@@ -100,7 +100,7 @@ namespace Assets.Scripts.Tools
 					currentGrabbable = behavior.Grabbable;
 					currentGrabbableActor = actor;
 
-					inputSource.HandRayHitPoint = (Vector3)intersections["point"];
+					inputSource.HitPoint = (Vector3)intersections["point"];
 					inputSource.HitPointNormal = (Vector3)intersections["normal"];
 					inputSource.Ray.Color = new Color(0.12f, 0.92f, 0.12f);
 					return currentGrabbableActor;
@@ -171,7 +171,7 @@ namespace Assets.Scripts.Tools
 					currentGrabbableActor.GlobalTransform = new Transform(currentGrabbableActor.GlobalTransform.basis, nearGraspPoint + grabbableOffset);
 					currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged), eventData);
 
-					inputSource.HandRayHitPoint = inputSource.HandRayOrigin;
+					inputSource.HitPoint = inputSource.GlobalTransform.origin;
 				}
 
 			}

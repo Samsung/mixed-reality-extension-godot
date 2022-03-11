@@ -42,14 +42,14 @@ namespace Assets.Scripts.Tools
 		internal Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			spaceState = inputSource.GetWorld().DirectSpaceState;
-			shapeQueryParameters.Transform = inputSource.PokePointer.GlobalTransform;
+			shapeQueryParameters.Transform = inputSource.GlobalTransform;
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
 			hitPoint = null;
 
 			ITouchableBase newClosestTouchable = null;
 			var closestDistance = float.PositiveInfinity;
-			Vector3 closestNormal = -inputSource.PokePointer.GlobalTransform.basis.z.Normalized();
+			Vector3 closestNormal = -inputSource.GlobalTransform.basis.z.Normalized();
 			foreach (Dictionary intersectResult in intersectShapes)
 			{
 				var collider = (Spatial)intersectResult["collider"];
@@ -65,7 +65,7 @@ namespace Assets.Scripts.Tools
 				}
 				if (touchable == null || actor == null) continue;
 
-				float distance = touchable.DistanceToTouchable(inputSource.PokePointer.GlobalTransform.origin, out normal);
+				float distance = touchable.DistanceToTouchable(inputSource.GlobalTransform.origin, out normal);
 
 				if (Math.Abs(distance) < closestDistance)
 				{
@@ -89,8 +89,8 @@ namespace Assets.Scripts.Tools
 			if (newClosestTouchable != null)
 			{
 				var touchableVector = closestNormal * TouchableDistance;
-				RayStartPoint = inputSource.PokePointer.GlobalTransform.origin + touchableVector;
-				Vector3 to = inputSource.PokePointer.GlobalTransform.origin - touchableVector;
+				RayStartPoint = inputSource.GlobalTransform.origin + touchableVector;
+				Vector3 to = inputSource.GlobalTransform.origin - touchableVector;
 				var IntersectRayResult = spaceState.IntersectRay(RayStartPoint, to, collideWithAreas: true);
 				if (IntersectRayResult.Count > 0)
 				{
@@ -114,7 +114,7 @@ namespace Assets.Scripts.Tools
 					if (CurrentTouchableObjectDown == null)
 					{
 						inputSource.HitPointNormal = hitPointNormal;
-						inputSource.HandRayHitPoint = (Vector3)hitPoint;
+						inputSource.HitPoint = (Vector3)hitPoint;
 					}
 
 					return CurrentPointerTarget;
@@ -126,7 +126,7 @@ namespace Assets.Scripts.Tools
 
 		protected override void UpdateTool(InputSource inputSource)
 		{
-			Position = inputSource.PokePointer.GlobalTransform.origin;
+			Position = inputSource.GlobalTransform.origin;
 			if (CurrentPointerTarget != null && ClosestProximityTouchable != null)
 			{
 				float distToTouchable = RayStartPoint.DistanceTo(RayEndPoint) - TouchableDistance;
@@ -150,7 +150,7 @@ namespace Assets.Scripts.Tools
 				}
 			}
 
-			PreviousPosition = inputSource.PokePointer.GlobalTransform.origin;
+			PreviousPosition = inputSource.GlobalTransform.origin;
 		}
 
 		public override void CleanUp() { }
@@ -208,10 +208,10 @@ namespace Assets.Scripts.Tools
 		{
 			if (CurrentTouchableObjectDown != null)
 			{
-				var pokePointerOrigin = inputSource.PokePointer.GlobalTransform.origin;
+				var pokePointerOrigin = inputSource.GlobalTransform.origin;
 				var eventData = new TouchInputEventData(this, pokePointerOrigin);
 
-				inputSource.HandRayHitPoint = pokePointerOrigin;
+				inputSource.HitPoint = pokePointerOrigin;
 				inputSource.HitPointNormal = hitPointNormal;
 				CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchUpdated), eventData);
 			}
