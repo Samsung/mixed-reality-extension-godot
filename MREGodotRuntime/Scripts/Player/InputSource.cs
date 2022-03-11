@@ -188,11 +188,7 @@ namespace Assets.Scripts.User
 
 		public override void _EnterTree()
 		{
-			UserNode = Owner;
-			if (UserNode == null)
-			{
-				throw new Exception("Input source must have a MWUnityUser assigned to it.");
-			}
+			UserNode = this;
 		}
 
 		public override void _Process(float delta)

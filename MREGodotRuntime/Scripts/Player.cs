@@ -25,6 +25,9 @@ public class Player : ARVROrigin
         {
             GD.Print("OpenXR Interface initialized");
 
+            //default height 1.6m
+            MainCamera.Translation = Vector3.Up * 1.6f;
+
             Viewport vp = null;
             if (viewport != null)
                 vp = GetNode<Viewport>(viewport);
@@ -46,10 +49,12 @@ public class Player : ARVROrigin
     public override void _EnterTree()
     {
         MainCamera = GetNode<Camera>("MainCamera");
-        InitializeOpenXR();
         var openXRRightHand = GetNode<Spatial>("OpenXRRightHand");
         var openXRLeftHand = GetNode<Spatial>("OpenXRLeftHand");
-        var rightHand = GetNode<Spatial>("RightHand");
+        var rightHand = MainCamera.GetNode<Spatial>("RightHand");
+
+        InitializeOpenXR();
+
         if (ARVRInterfaceIsInitialized)
         {
             ThumbTip = openXRRightHand.FindNode("ThumbTip") as Spatial;
@@ -83,7 +88,7 @@ public class Player : ARVROrigin
         {
             MainCamera.Environment = ResourceLoader.Load<Environment>("res://MREGodotRuntime/arvr_env.tres");
             GetTree().Root.TransparentBg = true;
-       }
+        }
     }
 
     public override void _PhysicsProcess(float delta)
@@ -94,19 +99,19 @@ public class Player : ARVROrigin
 
         if (Input.IsActionPressed("move_right"))
         {
-            Translation += Transform.basis.x * delta * speed;
+            MainCamera.Translation += MainCamera.Transform.basis.x * delta * speed;
         }
         else if (Input.IsActionPressed("move_left"))
         {
-            Translation -= Transform.basis.x * delta * speed;
+            MainCamera.Translation -= MainCamera.Transform.basis.x * delta * speed;
         }
         if (Input.IsActionPressed("move_back"))
         {
-            Translation += Transform.basis.z * delta * speed;
+            MainCamera.Translation += MainCamera.Transform.basis.z * delta * speed;
         }
         else if (Input.IsActionPressed("move_forward"))
         {
-            Translation -= Transform.basis.z * delta * speed;
+            MainCamera.Translation -= MainCamera.Transform.basis.z * delta * speed;
         }
 
         if (Input.IsActionPressed("shift"))
@@ -115,10 +120,10 @@ public class Player : ARVROrigin
         }
         else
         {
-            var newRotation = Rotation;
+            var newRotation = MainCamera.Rotation;
             newRotation.x -= mouseDelta.y * cameraSpeed;
             newRotation.y -= mouseDelta.x * cameraSpeed;
-            Rotation = newRotation;
+            MainCamera.Rotation = newRotation;
         }
         mouseDelta = Vector2.Zero;
     }

@@ -2,14 +2,15 @@ using Godot;
 
 public class Joystick2D : TouchScreenButton
 {
-    private Player player;
     private Vector2 playerDirection;
-    private float speed = 0.07f;
     private Vector2 joystickCenter;
+
+    public float Speed { get; set; } = 0.07f;
+
+    public Camera MainCamera { get; set; }
 
     public override void _Ready()
     {
-        player = GetParent<Player>();
         joystickCenter = Position + new Vector2(125, 125);
     }
 
@@ -39,8 +40,8 @@ public class Joystick2D : TouchScreenButton
 
     public override void _Process(float delta)
     {
-        var d = playerDirection * speed;
-        player.Translation += player.Transform.basis.x * d.x;
-        player.Translation += player.Transform.basis.z * d.y;
+        var d = playerDirection * Speed;
+        MainCamera.Translation += MainCamera.Transform.basis.x * d.x;
+        MainCamera.Translation += MainCamera.Transform.basis.z * d.y;
     }
 }

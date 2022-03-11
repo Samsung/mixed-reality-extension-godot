@@ -10,8 +10,8 @@
 [ext_resource path="res://default_env.tres" type="Environment" id=8]
 
 [sub_resource type="CapsuleShape" id=1]
-radius = 0.0563646
-height = 0.0459115
+radius = 0.08
+height = 0.04
 
 [node name="Player" type="ARVROrigin"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.69584, 0 )
@@ -25,13 +25,19 @@ environment = ExtResource( 8 )
 current = true
 script = ExtResource( 3 )
 
-[node name="CollisionShape" type="CollisionShape" parent="."]
+[node name="Area" type="Area" parent="MainCamera"]
+
+[node name="CollisionShape" type="CollisionShape" parent="MainCamera/Area"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
 shape = SubResource( 1 )
 disabled = true
 
-[node name="socket-head" type="Spatial" parent="."]
+[node name="socket-head" type="Spatial" parent="MainCamera"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
+
+[node name="RightHand" parent="MainCamera" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0809927, -0.006109, -0.150688 )
+visible = false
 
 [node name="OpenXRLeftHand" parent="." instance=ExtResource( 6 )]
 pause_mode = 1
@@ -51,9 +57,5 @@ hand = 0
 [node name="OmniLight" type="OmniLight" parent="OpenXRRightHand"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.524409, 0.210365 )
 omni_range = 2.0
-
-[node name="RightHand" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0809927, -0.006109, -0.150688 )
-visible = false
 
 [node name="Joystick2D" parent="." instance=ExtResource( 7 )]
