@@ -16,7 +16,7 @@ namespace Assets.Scripts.User
 		private Player player;
 		private float handLocalOrigin;
 		private Cursor cursor;
-		private ImmediateGeometry handRayLine =  new ImmediateGeometry();
+		private User.Ray ray;
 
 		internal Spatial PokePointer;
 		public Node UserNode { get; set; }
@@ -44,6 +44,23 @@ namespace Assets.Scripts.User
 				cursor = value;
 				if (cursor != null && IsInsideTree())
 					AddChild(cursor);
+			}
+		}
+
+		public User.Ray Ray
+		{
+			get => ray;
+			set
+			{
+				if (ray == value)
+					return;
+
+				if (ray != null)
+					ray.QueueFree();
+
+				ray = value;
+				if (ray != null && IsInsideTree())
+					GetTree().Root.CallDeferred("add_child", ray);
 			}
 		}
 
@@ -89,24 +106,6 @@ namespace Assets.Scripts.User
 			ThumbTip = player.ThumbTip;
 			IndexTip = player.IndexTip;
 
-			var gradient = new Gradient();
-			gradient.AddPoint(0.333f, new Color(1, 1, 1, 1));
-			gradient.AddPoint(0.667f, new Color(1, 1, 1, 1));
-			gradient.SetColor(0, new Color(1, 1, 1, 0));
-			gradient.SetColor(1, new Color(1, 1, 1, 1));
-			gradient.SetColor(2, new Color(1, 1, 1, 1));
-			gradient.SetColor(3, new Color(1, 1, 1, 0));
-
-			GetTree().Root.CallDeferred("add_child", handRayLine);
-
-			handRayLine.MaterialOverride = new SpatialMaterial() {
-				AlbedoTexture = new GradientTexture() {
-					Gradient = gradient
-				},
-				FlagsUnshaded = true,
-				FlagsTransparent = true
-			};
-
 			PokePointer = new Spatial();
 			Hand.AddChild(PokePointer);
 			var proximityLight = new OmniLight()
@@ -131,6 +130,10 @@ namespace Assets.Scripts.User
 			Cursor = cursorScene.Instance<Cursor>();
 			AddChild(Cursor);
 
+			var ray = ResourceLoader.Load<PackedScene>("res://MREGodotRuntime/Scenes/Ray.tscn");
+			Ray = ray.Instance<Ray>();
+			AddChild(Ray);
+
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
 
@@ -140,7 +143,7 @@ namespace Assets.Scripts.User
 			{
 				Hand.Visible = false;
 				Cursor.Visible = false;
-				handRayLine.Visible = false;
+				Ray.Visible = false;
 			}
 		}
 
@@ -203,8 +206,8 @@ namespace Assets.Scripts.User
 			if (_currentTool is TargetTool targetTool && targetTool.Target == null)
 				pinchChaged = false;
 
-			UpdateHandRayLine();
 			Cursor.SetCursorTransform(HandRayHitPoint, HitPointNormal);
+			Ray.DrawRay(GlobalTransform.origin, HandRayHitPoint);
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -234,62 +237,6 @@ namespace Assets.Scripts.User
 				}
 				animationPlayer?.PlayBackwards("Pinch");
 			}
-		}
-
-		public void SetHandRayColor(Color color)
-		{
-			var gradient = new Gradient();
-			gradient.AddPoint(0.333f, new Color(1, 1, 1, 1));
-			gradient.AddPoint(0.667f, new Color(1, 1, 1, 1));
-			gradient.SetColor(0, new Color(1, 1, 1, 0));
-			gradient.SetColor(1, color);
-			gradient.SetColor(2, color);
-			gradient.SetColor(3, new Color(1, 1, 1, 0));
-			((GradientTexture)((SpatialMaterial)handRayLine.MaterialOverride).AlbedoTexture).Gradient = gradient;
-		}
-
-		private void UpdateHandRayLine()
-		{
-			var width = 1.6f;
-			var startDepth = ToLocal(HandRayOrigin).Project(ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
-			var endDepth = ToLocal(HandRayHitPoint).Project(ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
-			var startPoint = UnprojectPosition(HandRayOrigin);
-			var endPoint = UnprojectPosition(HandRayHitPoint);
-			var normal = endPoint - startPoint;
-			normal = new Vector2(-normal.y, normal.x).Normalized();
-			// p# variable is a point in the 2D coordinate.
-			// v# variable is a vector in the 3D coordinate.
-			/* 	p4(v4)    p3(v3)
-					-----
-					|	|
-					|	|
-					|	|
-					-----
-				p1(v1)    p2(v2)
-			*/
-			var p1 = startPoint + normal * width;
-			var p2 = startPoint - normal * width;
-			var p3 = endPoint - normal * width;
-			var p4 = endPoint + normal * width;
-
-			var v1 = ProjectPosition(p1, startDepth);
-			var v2 = ProjectPosition(p2, startDepth);
-			var v3 = ProjectPosition(p3, endDepth);
-			var v4 = ProjectPosition(p4, endDepth);
-
-			handRayLine.Clear();
-			handRayLine.Begin(Mesh.PrimitiveType.TriangleStrip);
-
-			handRayLine.SetUv(new Vector2(0, 0));
-			handRayLine.AddVertex(v1);
-			handRayLine.SetUv(new Vector2(0, 1));
-			handRayLine.AddVertex(v2);
-			handRayLine.SetUv(new Vector2(1, 0));
-			handRayLine.AddVertex(v4);
-			handRayLine.SetUv(new Vector2(1, 1));
-			handRayLine.AddVertex(v3);
-
-			handRayLine.End();
 		}
 	}
 }
