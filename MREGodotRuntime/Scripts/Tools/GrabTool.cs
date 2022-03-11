@@ -102,7 +102,7 @@ namespace Assets.Scripts.Tools
 
 					inputSource.HandRayHitPoint = (Vector3)intersections["point"];
 					inputSource.HitPointNormal = (Vector3)intersections["normal"];
-					inputSource.SetHandRayColor(new Color(0.12f, 0.92f, 0.12f));
+					inputSource.Ray.Color = new Color(0.12f, 0.92f, 0.12f);
 					return currentGrabbableActor;
 				}
 			}
