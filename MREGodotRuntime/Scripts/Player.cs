@@ -10,6 +10,13 @@ public enum PositionControlType
     VirtualGamePad = 1 << 1,
 }
 
+[Flags]
+public enum RotationControlType
+{
+    None = 0,
+    Mouse = 1 << 0,
+}
+
 public class Player : ARVROrigin
 {
     private float speed = 1f;
@@ -27,6 +34,9 @@ public class Player : ARVROrigin
 
     [ExportEnum(typeof(PositionControlType))]
     private int positionControl = (int)PositionControlType.Keyboard;
+
+    [ExportEnum(typeof(RotationControlType))]
+    private int rotationControl = (int)RotationControlType.Mouse;
 
     public PositionControlType PositionControl {
         get => (PositionControlType)positionControl;
@@ -56,6 +66,32 @@ public class Player : ARVROrigin
             {
                 var virtualGamePadControl = new VirtualGamepadPositionControl(MainCamera);
                 AddChild(virtualGamePadControl);
+            }
+        }
+    }
+
+    public RotationControlType RotationControl {
+        get => (RotationControlType)rotationControl;
+        set
+        {
+            if (!IsInsideTree())
+                return;
+
+            rotationControl = (int)value;
+
+            // clear exist IRotationControl
+            foreach (Node childNode in GetChildren())
+            {
+                if (childNode is IRotationControl)
+                {
+                    RemoveChild(childNode);
+                }
+            }
+
+            if (value.HasFlag(RotationControlType.Mouse))
+            {
+                var mouseControl = new MouseRotationControl(MainCamera);
+                AddChild(mouseControl);
             }
         }
     }
@@ -153,6 +189,7 @@ public class Player : ARVROrigin
 
         // update control property
         PositionControl = (PositionControlType)positionControl;
+        RotationControl = (RotationControlType)rotationControl;
     }
 
     public override void _PhysicsProcess(float delta)
@@ -161,13 +198,6 @@ public class Player : ARVROrigin
         if (Input.IsActionPressed("shift"))
         {
             Hand.Translate(new Vector3(mouseDelta.x * cameraSpeed, -mouseDelta.y * cameraSpeed, 0));
-        }
-        else
-        {
-            var newRotation = MainCamera.Rotation;
-            newRotation.x -= mouseDelta.y * cameraSpeed;
-            newRotation.y -= mouseDelta.x * cameraSpeed;
-            MainCamera.Rotation = newRotation;
         }
         mouseDelta = Vector2.Zero;
     }
