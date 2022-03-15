@@ -90,7 +90,7 @@ public class MREComponent : Spatial
 	private static bool _apiInitialized = false;
 
 	private ShaderMaterial DefaultPrimMaterial = new ShaderMaterial() {
-		Shader = ResourceLoader.Load<Shader>("res://MREGodotRuntime/Shaders/MREDefaultShader_Opaque.shader")
+		Shader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Opaque.shader")
 	};
 
 	private Dictionary<Guid, HostAppUser> hostAppUsers = new Dictionary<Guid, HostAppUser>();
