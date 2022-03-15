@@ -12,9 +12,8 @@ public enum LaunchType
 [Tool]
 public class LaunchMRE : Spatial
 {
-	private Area CollisionArea;
-
 	private LaunchType launchType = LaunchType.OnStart;
+
 	[Export]
 	public LaunchType LaunchType
 	{
@@ -33,29 +32,30 @@ public class LaunchMRE : Spatial
 		if (!IsInsideTree())
 			return;
 
+		var area = FindNode("LaunchMREArea*", false);
 		switch (LaunchType)
 		{
 			case LaunchType.MouseButtonDown:
 			case LaunchType.TriggerVolume:
-				if (CollisionArea == null)
+				if (area == null)
 				{
-					CollisionArea = this.GetChild<Area>() ?? new Area();
-					AddChild(CollisionArea);
-					CollisionArea.Connect("input_event", this, nameof(OnInputEvent));
-					CollisionArea.Connect("body_entered", this, nameof(OnBodyEntered));
-					CollisionArea.Connect("body_exited", this, nameof(OnBodyExited));
-					CollisionArea.Owner = GetTree().EditedSceneRoot;
+					area = new Area() { Name = "LaunchMREArea" };
+					AddChild(area);
+					area.Owner = GetTree().EditedSceneRoot;
+					area.Connect("input_event", this, nameof(OnInputEvent));
+					area.Connect("body_entered", this, nameof(OnBodyEntered));
+					area.Connect("body_exited", this, nameof(OnBodyExited));
 
-					var CollisionShape = CollisionArea.GetChild<CollisionShape>() ?? new CollisionShape();
-					CollisionArea.AddChild(CollisionShape);
+					var CollisionShape = new CollisionShape();
+					area.AddChild(CollisionShape);
 					CollisionShape.Owner = GetTree().EditedSceneRoot;
 				}
 				break;
 			case LaunchType.OnStart:
-				if (CollisionArea != null)
+				if (area != null)
 				{
-					CollisionArea.QueueFree();
-					CollisionArea = null;
+					area.QueueFree();
+					area = null;
 				}
 				break;
 		}
@@ -124,10 +124,11 @@ public class LaunchMRE : Spatial
 		{
 			if (LaunchType == LaunchType.MouseButtonDown && MREComponent != null)
 			{
-				if (CollisionArea != null)
+				var area = FindNode("LaunchMREArea*", false);
+				if (area != null)
 				{
-					CollisionArea.QueueFree();
-					CollisionArea = null;
+					area.QueueFree();
+					area = null;
 				}
 				StartApp();
 			}
