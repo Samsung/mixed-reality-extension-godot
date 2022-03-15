@@ -11,7 +11,7 @@ namespace MixedRealityExtension.Util
 	// This is a quick hack, and does not generate valid UUIDs.
 	// To generate a deterministic sequence of values that are also valid
 	// UUIDs, we must emplement the "Name-based UUID" method described in
-	// RFC 4122 ง4.3 (http://www.ietf.org/rfc/rfc4122.txt).
+	// RFC 4122 ยง4.3 (http://www.ietf.org/rfc/rfc4122.txt).
 	internal class DeterministicGuids
 	{
 		private Guid seed;
