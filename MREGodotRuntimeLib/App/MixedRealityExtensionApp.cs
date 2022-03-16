@@ -844,7 +844,7 @@ namespace MixedRealityExtension.App
 					hasher.ComputeHash(encoder.GetBytes(hashString))
 				);
 
-				return UtilMethodsGodot.StringToGuid(hashedId);
+				return UtilMethods.StringToGuid(hashedId);
 			}
 		}
 
