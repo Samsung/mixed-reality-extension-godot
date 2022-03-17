@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using MixedRealityExtension.Util.GodotHelper;
 
 public enum LaunchType
 {
@@ -27,41 +25,7 @@ public class LaunchMRE : Spatial
 		}
 	}
 
-	void UpdateEditorSceneWithLaunchType()
-	{
-		if (!IsInsideTree())
-			return;
-
-		var area = FindNode("LaunchMREArea*", false);
-		switch (LaunchType)
-		{
-			case LaunchType.MouseButtonDown:
-			case LaunchType.TriggerVolume:
-				if (area == null)
-				{
-					area = new Area() { Name = "LaunchMREArea" };
-					AddChild(area);
-					area.Owner = GetTree().EditedSceneRoot;
-					area.Connect("input_event", this, nameof(OnInputEvent));
-					area.Connect("body_entered", this, nameof(OnBodyEntered));
-					area.Connect("body_exited", this, nameof(OnBodyExited));
-
-					var CollisionShape = new CollisionShape();
-					area.AddChild(CollisionShape);
-					CollisionShape.Owner = GetTree().EditedSceneRoot;
-				}
-				break;
-			case LaunchType.OnStart:
-				if (area != null)
-				{
-					area.QueueFree();
-					area = null;
-				}
-				break;
-		}
-	}
-
-	public MREComponent MREComponent;
+	public MREComponent MREComponent { get; set; } = new MREComponent();
 
 	[Export]
 	public bool StopAppOnExit = true;
@@ -90,11 +54,56 @@ public class LaunchMRE : Spatial
 	[Export]
 	public NodePath UserNode;
 
-	// Use this for initialization
-	public override void _Ready()
+	private void UpdateEditorSceneWithLaunchType()
 	{
-		UpdateEditorSceneWithLaunchType();
-		MREComponent = new MREComponent();
+		if (!IsInsideTree())
+			return;
+
+		var area = FindNode("LaunchArea*", false);
+		switch (LaunchType)
+		{
+			case LaunchType.MouseButtonDown:
+			case LaunchType.TriggerVolume:
+				if (area == null)
+				{
+					area = new Area() { Name = "LaunchArea" };
+					AddChild(area);
+					area.Owner = GetTree().EditedSceneRoot;
+
+					var CollisionShape = new CollisionShape();
+					area.AddChild(CollisionShape);
+					CollisionShape.Owner = GetTree().EditedSceneRoot;
+				}
+				break;
+			case LaunchType.OnStart:
+				if (area != null)
+				{
+					area.QueueFree();
+					area = null;
+				}
+				break;
+		}
+	}
+
+	private void InitializeLaunchArea()
+	{
+		var area = FindNode("LaunchArea*", false);
+		if (area != null)
+		{
+			if (launchType == LaunchType.MouseButtonDown)
+			{
+				area.Connect("input_event", this, nameof(OnInputEvent));
+			}
+			else if (launchType == LaunchType.TriggerVolume)
+			{
+				area.Connect("body_entered", this, nameof(OnBodyEntered));
+				area.Connect("body_exited", this, nameof(OnBodyExited));
+			}
+		}
+	}
+
+	private void InitializeMREComponent()
+	{
 		MREComponent.Name = "MREComponent";
 		MREComponent.MREURL = MREURL;
 		MREComponent.SessionID = SessionID;
@@ -107,32 +116,6 @@ public class LaunchMRE : Spatial
 		MREComponent.UserNode = GetNode(UserNode + "/MainCamera");
 		MREComponent.DialogFactory = GetNode<DialogFactory>("Player/DialogFactory");
 		AddChild(MREComponent);
-	}
-
-	// Update is called once per frame
-	public override void _Process(float delta)
-	{
-		if (!_running && LaunchType == LaunchType.OnStart)
-		{
-			StartApp();
-		}
-	}
-
-	public void OnInputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 clickPosition, Vector3 clickNormal, int shapeIdx)
-	{
-		if ((inputEvent is InputEventMouseButton e) && e.IsPressed())
-		{
-			if (LaunchType == LaunchType.MouseButtonDown && MREComponent != null)
-			{
-				var area = FindNode("LaunchMREArea*", false);
-				if (area != null)
-				{
-					area.QueueFree();
-					area = null;
-				}
-				StartApp();
-			}
-		}
 	}
 
 	private void StartApp()
@@ -149,9 +132,25 @@ public class LaunchMRE : Spatial
 		_running = false;
 	}
 
+	private void OnInputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 clickPosition, Vector3 clickNormal, int shapeIdx)
+	{
+		if ((inputEvent is InputEventMouseButton e) && e.IsPressed())
+		{
+			if (LaunchType == LaunchType.MouseButtonDown && MREComponent != null)
+			{
+				var area = FindNode("LaunchArea*", false);
+				if (area != null)
+				{
+					area.QueueFree();
+					area = null;
+				}
+				StartApp();
+			}
+		}
+	}
 	private void OnBodyEntered(Node other)
 	{
-		if (LaunchType == LaunchType.TriggerVolume && other.Name == "Player")
+		if (LaunchType == LaunchType.TriggerVolume && other.Name == "PlayerArea")
 		{
 			StartApp();
 		}
@@ -160,10 +159,24 @@ public class LaunchMRE : Spatial
 	{
 		if (StopAppOnExit)
 		{
-			if (LaunchType == LaunchType.TriggerVolume && other.Name == "Player")
+			if (LaunchType == LaunchType.TriggerVolume && other.Name == "PlayerArea")
 			{
 				StopApp();
 			}
+		}
+	}
+
+	public override void _Ready()
+	{
+		InitializeLaunchArea();
+		InitializeMREComponent();
+	}
+
+	public override void _Process(float delta)
+	{
+		if (!_running && LaunchType == LaunchType.OnStart)
+		{
+			StartApp();
 		}
 	}
 }
