@@ -96,8 +96,8 @@ public class LaunchMRE : Spatial
 			}
 			else if (launchType == LaunchType.TriggerVolume)
 			{
-				area.Connect("body_entered", this, nameof(OnBodyEntered));
-				area.Connect("body_exited", this, nameof(OnBodyExited));
+				area.Connect("area_entered", this, nameof(OnAreaEntered));
+				area.Connect("area_exited", this, nameof(OnAreaExited));
 			}
 		}
 	}
@@ -148,18 +148,18 @@ public class LaunchMRE : Spatial
 			}
 		}
 	}
-	private void OnBodyEntered(Node other)
+	private void OnAreaEntered(Node area)
 	{
-		if (LaunchType == LaunchType.TriggerVolume && other.Name == "PlayerArea")
+		if (LaunchType == LaunchType.TriggerVolume && area.Name == "PlayerArea")
 		{
 			StartApp();
 		}
 	}
-	private void OnBodyExited(Node other)
+	private void OnAreaExited(Node area)
 	{
 		if (StopAppOnExit)
 		{
-			if (LaunchType == LaunchType.TriggerVolume && other.Name == "PlayerArea")
+			if (LaunchType == LaunchType.TriggerVolume && area.Name == "PlayerArea")
 			{
 				StopApp();
 			}
