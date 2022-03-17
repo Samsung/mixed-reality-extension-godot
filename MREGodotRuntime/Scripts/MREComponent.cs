@@ -123,9 +123,6 @@ public class MREComponent : Spatial
 			_apiInitialized = true;
 		}
 
-		//FIXME temp
-		MREAPI.AppsAPI.PermissionManager = new MixedRealityExtension.Factories.SimplePermissionManager(GrantedPermissions);
-
 		MREApp = MREAPI.AppsAPI.CreateMixedRealityExtensionApp(this, EphemeralAppID, AppID);
 
 		if (SceneRoot == null)
