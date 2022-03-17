@@ -21,12 +21,11 @@ environment = ExtResource( 8 )
 current = true
 script = ExtResource( 3 )
 
-[node name="Area" type="Area" parent="MainCamera"]
+[node name="PlayerArea" type="Area" parent="MainCamera"]
 
-[node name="CollisionShape" type="CollisionShape" parent="MainCamera/Area"]
+[node name="CollisionShape" type="CollisionShape" parent="MainCamera/PlayerArea"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
 shape = SubResource( 1 )
-disabled = true
 
 [node name="socket-head" type="Spatial" parent="MainCamera"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197 )
