@@ -19,8 +19,6 @@ namespace MixedRealityExtension.Messaging.Payloads
 	[PayloadType(typeof(CreateEmpty), "create-empty")]
 	[PayloadType(typeof(CreateFromLibrary), "create-from-library")]
 	[PayloadType(typeof(CreateFromPrefab), "create-from-prefab")]
-	[PayloadType(typeof(CreateFromToolkit), "create-from-toolkit")]
-	[PayloadType(typeof(ToolkitUpdate), "toolkit-update")]
 	[PayloadType(typeof(CollisionEventRaised), "collision-event-raised")]
 	[PayloadType(typeof(DestroyActors), "destroy-actors")]
 	[PayloadType(typeof(DestroyAnimations), "destroy-animations")]
@@ -72,15 +70,7 @@ namespace MixedRealityExtension.Messaging.Payloads
 			_stringToPayloadMap = new Dictionary<string, Type>();
 			_payloadToStringMap = new Dictionary<Type, string>();
 
-			var payloadTypes = typeof(PayloadTypeRegistry)
-				.GetCustomAttributes(typeof(PayloadType), false)
-				.Select(attr => attr as PayloadType);
-
-			foreach (var payloadType in payloadTypes)
-			{
-				_stringToPayloadMap.Add(payloadType.NetworkType, payloadType.ClassType);
-				_payloadToStringMap.Add(payloadType.ClassType, payloadType.NetworkType);
-			}
+			RegisterPayloadType(typeof(PayloadTypeRegistry));
 		}
 
 		public static Payload CreatePayloadFromNetwork(string networkType)
@@ -97,6 +87,18 @@ namespace MixedRealityExtension.Messaging.Payloads
 		public static string GetNetworkType(Type payloadType)
 		{
 			return _payloadToStringMap[payloadType];
+		}
+
+		public static void RegisterPayloadType(Type type)
+		{
+			var payloadTypes = type.GetCustomAttributes(typeof(PayloadType), false)
+				.Select(attr => attr as PayloadType);
+
+			foreach (var payloadType in payloadTypes)
+			{
+				_stringToPayloadMap.Add(payloadType.NetworkType, payloadType.ClassType);
+				_payloadToStringMap.Add(payloadType.ClassType, payloadType.NetworkType);
+			}
 		}
 	}
 }

@@ -34,6 +34,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using Microsoft.MixedReality.Toolkit.Input;
 using MixedRealityExtension.Behaviors.Contexts;
+using MixedRealityExtension.Toolkit.Messaging.Payloads;
 
 namespace MixedRealityExtension.App
 {

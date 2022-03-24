@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 using System;
 using MixedRealityExtension.Patching.Types;
+using MixedRealityExtension.Messaging.Payloads;
 
-namespace MixedRealityExtension.Messaging.Payloads
+namespace MixedRealityExtension.Toolkit.Messaging.Payloads
 {
-
 	/// <summary>
 	/// Engine => App
 	/// Instructs the engine to instantiate the Toolkit.
