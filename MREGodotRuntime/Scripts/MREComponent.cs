@@ -11,6 +11,7 @@ using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.Factories;
 using MixedRealityExtension.RPC;
+using MixedRealityExtension.Toolkit.Messaging.Payloads;
 
 class TestLogMessage
 {
@@ -120,6 +121,8 @@ public class MREComponent : Spatial
 				//materialPatcher: new VertexMaterialPatcher(),
 				logger: new MRELogger()
 			);
+			//FIXME: I guess we need some kind of MRE Plugin structure.
+			MREAPI.AppsAPI.RegisterPayloadType(typeof(ToolkitPayloadTypeRegistry));
 			_apiInitialized = true;
 		}
 

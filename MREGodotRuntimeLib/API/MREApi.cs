@@ -127,6 +127,11 @@ namespace MixedRealityExtension.API
 
 		internal IPermissionManager PermissionManager { get; set; }
 
+		public void RegisterPayloadType(Type type)
+		{
+			MixedRealityExtension.Messaging.Payloads.PayloadTypeRegistry.RegisterPayloadType(type);
+		}
+
 		/// <summary>
 		/// Creates a new mixed reality extension app and adds it to the MRE runtime.
 		/// </summary>
