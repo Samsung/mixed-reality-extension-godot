@@ -3,13 +3,12 @@
 
 using Microsoft.MixedReality.Toolkit.UI;
 using MixedRealityExtension.API;
-using MixedRealityExtension.Core;
 using MixedRealityExtension.Patching.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace MixedRealityExtension.Messaging.Payloads.Converters
+namespace MixedRealityExtension.Toolkit.Payloads.Converters
 {
 	/// <summary>
 	/// Json converter for collision geometry serialization data.

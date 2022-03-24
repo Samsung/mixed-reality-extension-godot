@@ -3,7 +3,7 @@
 
 using MixedRealityExtension.Messaging.Payloads;
 
-namespace MixedRealityExtension.Toolkit.Messaging.Payloads
+namespace MixedRealityExtension.Toolkit.Payloads
 {
 	[PayloadType(typeof(CreateFromToolkit), "create-from-toolkit")]
 	[PayloadType(typeof(ToolkitUpdate), "toolkit-update")]
