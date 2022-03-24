@@ -11,7 +11,8 @@ using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.Factories;
 using MixedRealityExtension.RPC;
-using MixedRealityExtension.Toolkit.Messaging.Payloads;
+using MixedRealityExtension.Toolkit.Payloads;
+using MixedRealityExtension.Toolkit.Payloads.Converters;
 
 class TestLogMessage
 {
@@ -123,6 +124,7 @@ public class MREComponent : Spatial
 			);
 			//FIXME: I guess we need some kind of MRE Plugin structure.
 			MREAPI.AppsAPI.RegisterPayloadType(typeof(ToolkitPayloadTypeRegistry));
+			MREAPI.AppsAPI.RegisterJsonConverter(new ToolkitPatchConverter());
 			_apiInitialized = true;
 		}
 

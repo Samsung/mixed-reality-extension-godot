@@ -10,6 +10,7 @@ using Godot;
 
 using AppManager = MixedRealityExtension.Util.ObjectManager<MixedRealityExtension.App.IMixedRealityExtensionApp>;
 using MixedRealityExtension.Util.Logging;
+using Newtonsoft.Json;
 
 //FIXME
 namespace MixedRealityExtension.API
@@ -131,6 +132,12 @@ namespace MixedRealityExtension.API
 		{
 			MixedRealityExtension.Messaging.Payloads.PayloadTypeRegistry.RegisterPayloadType(type);
 		}
+
+		public void RegisterJsonConverter(JsonConverter jsonConverter)
+		{
+			MixedRealityExtension.Constants.SerializerSettings.Converters.Add(jsonConverter);
+		}
+
 
 		/// <summary>
 		/// Creates a new mixed reality extension app and adds it to the MRE runtime.
