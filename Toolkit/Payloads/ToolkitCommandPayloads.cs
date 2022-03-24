@@ -4,7 +4,7 @@ using System;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Messaging.Payloads;
 
-namespace MixedRealityExtension.Toolkit.Messaging.Payloads
+namespace MixedRealityExtension.Toolkit.Payloads
 {
 	/// <summary>
 	/// Engine => App
