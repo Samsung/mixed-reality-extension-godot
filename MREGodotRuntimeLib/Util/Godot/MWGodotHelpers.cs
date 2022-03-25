@@ -7,7 +7,7 @@ using Godot;
 
 namespace MixedRealityExtension.Util.GodotHelper
 {
-	internal static class MWGodotHelpers
+	public static class MWGodotHelpers
 	{
 		public static float LargestComponentValue(this MWVector3 _this)
 		{

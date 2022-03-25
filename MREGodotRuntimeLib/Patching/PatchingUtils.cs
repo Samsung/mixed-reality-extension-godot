@@ -441,7 +441,8 @@ namespace MixedRealityExtension.Patching
 			basis.Scale = globalScale;
 			_this.GlobalTransform = new Transform(basis, globalPosition);
 		}
-				public static T GetPatchApplied<T>(this T _this, T value) where T : struct
+
+		public static T GetPatchApplied<T>(this T _this, T value) where T : struct
 		{
 
 			if (!_this.Equals(value))
