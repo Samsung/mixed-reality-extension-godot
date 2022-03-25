@@ -1,17 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-using MixedRealityExtension.Core;
 using MixedRealityExtension.Core.Types;
 using MixedRealityExtension.Patching.Types;
-using MixedRealityExtension.Util;
 using Godot;
+using System;
 
 using MRECollisionDetectionMode = MixedRealityExtension.Core.Interfaces.CollisionDetectionMode;
-using MRERigidBodyConstraints = MixedRealityExtension.Core.Interfaces.RigidBodyConstraints;
-//using MRELight = MixedRealityExtension.Core.Light;
-//using UnityCollisionDetectionMode = UnityEngine.CollisionDetectionMode;
-//using UnityRigidBodyConstraints = UnityEngine.RigidbodyConstraints;
-using UnityLight = Godot.Light;
+using MRELightType = MixedRealityExtension.Core.Interfaces.LightType;
+using GodotLightType = Godot.VisualServer.LightType;
 using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Patching
@@ -444,6 +440,74 @@ namespace MixedRealityExtension.Patching
 			var basis = new Basis(globalRotation);
 			basis.Scale = globalScale;
 			_this.GlobalTransform = new Transform(basis, globalPosition);
+		}
+				public static T GetPatchApplied<T>(this T _this, T value) where T : struct
+		{
+
+			if (!_this.Equals(value))
+			{
+				_this = value;
+			}
+
+			return _this;
+		}
+
+		public static string GetPatchApplied(this string _this, string value)
+		{
+			if (!_this.Equals(value))
+			{
+				_this = value;
+			}
+
+			return _this;
+		}
+
+		public static Vector2 GetPatchApplied(this Vector2 _this, MWVector2 vector)
+		{
+			_this.x = _this.x.GetPatchApplied(vector.X);
+			_this.y = _this.y.GetPatchApplied(vector.Y);
+
+			return _this;
+		}
+
+		public static Vector3 GetPatchApplied(this Vector3 _this, MWVector3 vector)
+		{
+			_this.x = _this.x.GetPatchApplied(vector.X);
+			_this.y = _this.y.GetPatchApplied(vector.Y);
+			_this.z = _this.z.GetPatchApplied(vector.Z);
+
+			return _this;
+		}
+
+		public static Quat GetPatchApplied(this Quat _this, MWQuaternion quaternion)
+		{
+			_this.w = _this.w.GetPatchApplied(quaternion.W);
+			_this.x = _this.x.GetPatchApplied(quaternion.X);
+			_this.y = _this.y.GetPatchApplied(quaternion.Y);
+			_this.z = _this.z.GetPatchApplied(quaternion.Z);
+
+			return _this;
+		}
+
+		public static Color GetPatchApplied(this Color _this, MWColor color)
+		{
+			_this.r = _this.r.GetPatchApplied(color.R);
+			_this.g = _this.g.GetPatchApplied(color.G);
+			_this.b = _this.b.GetPatchApplied(color.B);
+			_this.a = _this.a.GetPatchApplied(color.A);
+
+			return _this;
+		}
+
+		public static GodotLightType GetPatchApplied(this VisualServer.LightType _this, MRELightType value)
+		{
+			var lightType = (GodotLightType)Enum.Parse(typeof(GodotLightType), value.ToString());
+			if (!_this.Equals(lightType))
+			{
+				_this = lightType;
+			}
+
+			return _this;
 		}
 	}
 }
