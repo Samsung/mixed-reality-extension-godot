@@ -24,7 +24,6 @@ using MWTexture = MixedRealityExtension.Assets.Texture;
 using MWMesh = MixedRealityExtension.Assets.Mesh;
 using MWSound = MixedRealityExtension.Assets.Sound;
 using MWVideoStream = MixedRealityExtension.Assets.VideoStream;
-using Microsoft.MixedReality.Toolkit.UI;
 
 namespace MixedRealityExtension.Assets
 {
@@ -35,15 +34,6 @@ namespace MixedRealityExtension.Assets
 		private readonly MixedRealityExtensionApp _app;
 
 		private readonly Node _owner;
-		internal readonly static Dictionary<Type, PackedScene> PackedToolkitScene = new Dictionary<Type, PackedScene>()
-		{
-			{ typeof(PressableButtonGodot), ResourceLoader.Load<PackedScene>("res://Toolkit/PressableButtonGodot.tscn") },
-			{ typeof(TogglePressableButtonGodot), ResourceLoader.Load<PackedScene>("res://Toolkit/TogglePressableButtonGodot.tscn") },
-			{ typeof(PinchSlider), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSlider.tscn") },
-			{ typeof(PinchSliderThumb), ResourceLoader.Load<PackedScene>("res://Toolkit/PinchSliderThumb.tscn") },
-			{ typeof(ScrollingObjectCollection), ResourceLoader.Load<PackedScene>("res://Toolkit/ScrollingObjectCollection.tscn") }
-		};
-
 		private readonly static Dictionary<string, string> ShaderToSpatialProperties = new Dictionary<string, string>()
 		{
 			{"albedo", "albedo_color"},

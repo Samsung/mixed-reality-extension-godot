@@ -13,6 +13,8 @@ using MixedRealityExtension.Factories;
 using MixedRealityExtension.RPC;
 using MixedRealityExtension.Toolkit.Payloads;
 using MixedRealityExtension.Toolkit.Payloads.Converters;
+using MixedRealityExtension.Toolkit;
+using MixedRealityExtension.Messaging.Commands;
 
 class TestLogMessage
 {
@@ -87,6 +89,7 @@ public class MREComponent : Spatial
 
 	public event AppEventHandler OnAppShutdown;
 
+	private MixedRealityExtensionToolkit toolkit;
 	private Guid _appId;
 
 	private static bool _apiInitialized = false;
@@ -129,6 +132,12 @@ public class MREComponent : Spatial
 		}
 
 		MREApp = MREAPI.AppsAPI.CreateMixedRealityExtensionApp(this, EphemeralAppID, AppID);
+		//FIXME: I guess we need some kind of MRE Plugin structure.
+		toolkit = new MixedRealityExtensionToolkit(MREApp);
+		MREApp.RegisterCommandHandlers(new Dictionary<Type, ICommandHandlerContext>()
+		{
+			{ typeof(MixedRealityExtensionToolkit), toolkit },
+		});
 
 		if (SceneRoot == null)
 		{

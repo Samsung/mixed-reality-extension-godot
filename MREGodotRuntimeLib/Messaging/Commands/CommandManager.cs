@@ -33,19 +33,9 @@ namespace MixedRealityExtension.Messaging.Commands
 		// The maximum amount of time to wait for an onCompleteCallback to be invoked.
 		private static readonly uint QueuedCompletionCallbackTimeout = 60 * 1000;
 
-		public CommandManager(Dictionary<Type, ICommandHandlerContext> commandHandlers)
+		public CommandManager(IDictionary<Type, ICommandHandlerContext> commandHandlers)
 		{
-			foreach (var commandHandlerPair in commandHandlers)
-			{
-				// Build table of handler to method info.
-				_methodHandlersByContextType.Add(commandHandlerPair.Key,
-					new Type[] { commandHandlerPair.Key }
-						.SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
-						.Where(m => m.GetCustomAttributes().OfType<CommandHandler>().Any())
-						.ToDictionary(m => m.GetCustomAttributes().OfType<CommandHandler>().First().CommandType));
-
-				_invocationTargets.Add(commandHandlerPair.Key, commandHandlerPair.Value);
-			}
+			RegisterCommandHandlers(commandHandlers);
 		}
 
 		public void ExecuteCommandPayload(ICommandPayload commandPayload, Action onCompleteCallback)
@@ -139,6 +129,21 @@ namespace MixedRealityExtension.Messaging.Commands
 						_nextQueueCheckTime = currTime + 5000;
 					}
 				}
+			}
+		}
+
+		internal void RegisterCommandHandlers(IDictionary<Type, ICommandHandlerContext> commandHandlers)
+		{
+			foreach (var commandHandlerPair in commandHandlers)
+			{
+				// Build table of handler to method info.
+				_methodHandlersByContextType.Add(commandHandlerPair.Key,
+					new Type[] { commandHandlerPair.Key }
+						.SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
+						.Where(m => m.GetCustomAttributes().OfType<CommandHandler>().Any())
+						.ToDictionary(m => m.GetCustomAttributes().OfType<CommandHandler>().First().CommandType));
+
+				_invocationTargets.Add(commandHandlerPair.Key, commandHandlerPair.Value);
 			}
 		}
 
