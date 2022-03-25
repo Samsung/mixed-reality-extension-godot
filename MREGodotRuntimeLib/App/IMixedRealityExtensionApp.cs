@@ -5,6 +5,7 @@ using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.IPC;
 using MixedRealityExtension.RPC;
 using MixedRealityExtension.PluginInterfaces;
+using MixedRealityExtension.Messaging.Commands;
 using System;
 using System.Collections.Generic;
 using Godot;
@@ -173,7 +174,7 @@ namespace MixedRealityExtension.App
 		/// <param name="user">The user to check interactability for.</param>
 		/// <returns>Whether the app is interactable for the given user.</returns>
 		bool IsInteractableForUser(IUser user);
-/*FIXME
+
 		/// <summary>
 		/// Find an actor with the given id or null if none exists.
 		/// </summary>
@@ -187,6 +188,9 @@ namespace MixedRealityExtension.App
 		/// <param name="actorId"></param>
 		void OnActorDestroyed(Guid actorId);
 
+		void RegisterCommandHandlers(IDictionary<Type, ICommandHandlerContext> commandHandlers);
+
+/*FIXME
 		/// <summary>
 		/// Declare pre-allocated game objects as MRE actors. Note: Since these actors are not created via an MRE message, the app has
 		/// no means to create them on clients that have not preallocated them. Thus cross-host compatibility will be reduced for these actors.

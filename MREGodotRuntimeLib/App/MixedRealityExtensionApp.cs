@@ -21,7 +21,6 @@ using MixedRealityExtension.RPC;
 using MixedRealityExtension.Util;
 using MixedRealityExtension.Util.Logging;
 using MixedRealityExtension.Util.GodotHelper;
-using Microsoft.MixedReality.Toolkit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +31,6 @@ using Regex = System.Text.RegularExpressions.Regex;
 using System.Text;
 using System.Security.Cryptography;
 using System.Threading;
-using Microsoft.MixedReality.Toolkit.Input;
-using MixedRealityExtension.Behaviors.Contexts;
-using MixedRealityExtension.Toolkit.Payloads;
 
 namespace MixedRealityExtension.App
 {
@@ -658,6 +654,11 @@ namespace MixedRealityExtension.App
 			AnimationManager.UpdateServerTimeOffset(currentServerTime);
 		}
 
+		public void RegisterCommandHandlers(IDictionary<Type, ICommandHandlerContext> commandHandlers)
+		{
+			_commandManager.RegisterCommandHandlers(commandHandlers);
+		}
+
 		#region Methods - Internal
 
 		internal void OnReceive(Message message)
@@ -930,37 +931,6 @@ namespace MixedRealityExtension.App
 			{
 				SendCreateActorResponse(payload, failureMessage: e.ToString(), onCompleteCallback: onCompleteCallback);
 				GD.Print(e);
-			}
-		}
-
-		[CommandHandler(typeof(CreateFromToolkit))]
-		private void OnCreateFromToolkit(CreateFromToolkit payload, Action onCompleteCallback)
-		{
-			try
-			{
-				var actor = FindActor(payload.ActorId) as Actor;
-				var toolkit = AssetLoader.PackedToolkitScene[payload.Toolkit.ToolkitType].Instance();
-				actor.AddChild(toolkit);
-				((IToolkit)toolkit).ApplyPatch(payload.Toolkit);
-			}
-			catch (Exception e)
-			{
-				GD.PushError(e.ToString());
-			}
-		}
-
-		[CommandHandler(typeof(ToolkitUpdate))]
-		private void OnToolkitUpdate(ToolkitUpdate payload, Action onCompleteCallback)
-		{
-			try
-			{
-				var actor = FindActor(payload.ActorId) as Actor;
-				var toolkit = actor.GetChild<IToolkit>();
-				toolkit.ApplyPatch(payload.Toolkit);
-			}
-			catch (Exception e)
-			{
-				GD.PushError(e.ToString());
 			}
 		}
 
