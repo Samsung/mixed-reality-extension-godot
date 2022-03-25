@@ -5,7 +5,7 @@ using System;
 namespace MixedRealityExtension.Messaging.Commands
 {
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	internal class CommandHandler : Attribute
+	public class CommandHandler : Attribute
 	{
 		public Type CommandType { get; }
 
