@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using Microsoft.MixedReality.Toolkit.Input;
-using Assets.Scripts.Tools;
 using System.Collections.Generic;
 using Godot;
 using MixedRealityExtension.Core;
@@ -117,7 +116,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         public bool EnforceFrontPush { get => enforceFrontPush; private set => enforceFrontPush = value; }
 
-        protected ITouchableSurface touchableSurface => actor.GetChild<ITouchableSurface>();
+        protected ITouchableSurface touchableSurface => Parent.GetChild<ITouchableSurface>();
 
         private MWAction _touchAction = new MWAction();
 
@@ -138,7 +137,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         // The maximum distance before the button is reset to its initial position when retracting.
         private const float MaxRetractDistanceBeforeReset = 0.0001f;
 
-        private Dictionary<Tool, Vector3> touchPoints = new Dictionary<Tool, Vector3>();
+        private Dictionary<Spatial, Vector3> touchPoints = new Dictionary<Spatial, Vector3>();
 
         private float currentPushDistance = 0.0f;
 
@@ -149,7 +148,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         private bool isTouching = false;
 
-        internal Actor actor;
+        protected Spatial Parent { get; set; }
 
         ///<summary>
         /// Represents the state of whether or not a finger is currently touching this button.
@@ -200,7 +199,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             {
                 if (touchableSurface != null)
                 {
-                    return actor.GlobalTransform.basis.Orthonormalized().Xform(touchableSurface.LocalPressDirection);
+                    return Parent.GlobalTransform.basis.Orthonormalized().Xform(touchableSurface.LocalPressDirection);
                 }
 
                 return -GlobalTransform.basis.z;
@@ -290,8 +289,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public override void _Ready()
         {
             hasStarted = true;
-            this.RegisterHandler<IMixedRealityTouchHandler>();
-            actor = GetParent<Actor>();
+            Parent = GetParent<Spatial>();
+            ((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, Parent);
+
 /*
             if (gameObject.layer == 2)
             {
@@ -401,35 +401,35 @@ namespace Microsoft.MixedReality.Toolkit.UI
         }
 */
 
-        void OnTouchStarted(TouchInputEventData eventData)
+        public void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
         {
-            if (touchPoints.ContainsKey(eventData.Tool))
+            if (touchPoints.ContainsKey(inputSource))
             {
                 return;
             }
 
-            touchPoints.Add(eventData.Tool, eventData.InputData);
+            touchPoints.Add(inputSource, point);
 
             IsTouching = true;
         }
 
-        void OnTouchUpdated(TouchInputEventData eventData)
+        public void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
         {
-            if (touchPoints.ContainsKey(eventData.Tool))
+            if (touchPoints.ContainsKey(inputSource))
             {
-                touchPoints[eventData.Tool] = eventData.InputData;
+                touchPoints[inputSource] = point;
             }
         }
 
-        void OnTouchCompleted(TouchInputEventData eventData)
+        public void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point)
         {
-            if (touchPoints.ContainsKey(eventData.Tool))
+            if (touchPoints.ContainsKey(inputSource))
             {
                 // When focus is lost, before removing controller, update the respective touch point to give a last chance for checking if pressed occurred
-                touchPoints[eventData.Tool] = eventData.InputData;
+                touchPoints[inputSource] = point;
                 UpdateTouch();
 
-                touchPoints.Remove(eventData.Tool);
+                touchPoints.Remove(inputSource);
 
                 IsTouching = (touchPoints.Count > 0);
             }

@@ -6,7 +6,6 @@ using MixedRealityExtension.Patching;
 using MixedRealityExtension.Util.GodotHelper;
 using Microsoft.MixedReality.Toolkit.Input;
 using MixedRealityExtension.Core;
-using MixedRealityExtension.PluginInterfaces;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -45,7 +44,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			initialLocalScale = movingButtonVisuals.Scale;
 
 			base._Ready();
-			this.RegisterHandler<IMixedRealityFocusHandler>();
+			((IMixedRealityFocusHandler)this).RegisterFocusEvent(this, Parent);
 
 			BackPlate = GetNode<MeshInstance>("BackPlate");
 			BackPlate.MaterialOverride = BackPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
@@ -130,12 +129,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			TextNode.Contents = text;
 		}
 
-		public void OnFocusEnter(MixedRealityFocusEventData eventData)
+		public void OnFocusEnter(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
 		{
 			HighlightPlateMaterial.SetShaderParam(HighlightBorderColorString, HighlightBorderColor);
 		}
 
-		public void OnFocusExit(MixedRealityFocusEventData eventData)
+		public void OnFocusExit(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
 		{
 			HighlightPlateMaterial.SetShaderParam(HighlightBorderColorString, Vector3.Zero);
 		}

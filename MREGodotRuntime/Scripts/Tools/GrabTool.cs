@@ -3,7 +3,6 @@ using Assets.Scripts.User;
 using Assets.Scripts.Behaviors;
 using MixedRealityExtension.Util.GodotHelper;
 using Godot;
-using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Assets.Scripts.Tools
 {
@@ -135,10 +134,11 @@ namespace Assets.Scripts.Tools
 							}
 
 							var nearGraspPoint = GetNearGraspPoint(inputSource);
-							var eventData = new MixedRealityPointerEventData(this, nearGraspPoint);
 							grabbableOffset = currentGrabbableActor.GlobalTransform.origin - nearGraspPoint;
 
-							currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDown), eventData);
+							if (currentGrabbableActor.HasUserSignal("pointer_down"))
+								currentGrabbableActor.EmitSignal("pointer_down", inputSource, inputSource.UserNode, nearGraspPoint);
+
 							GrabStateChanged?.Invoke(this, new GrabStateChangedArgs(GrabState.Released, GrabState.Grabbed, inputSource));
 						}
 					}
@@ -156,8 +156,9 @@ namespace Assets.Scripts.Tools
 							}
 						}
 
-						var eventData = new MixedRealityPointerEventData(this, GetNearGraspPoint(inputSource));
-						currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerUp), eventData);
+						if (currentGrabbableActor.HasUserSignal("pointer_up"))
+							currentGrabbableActor.EmitSignal("pointer_up", inputSource, inputSource.UserNode, GetNearGraspPoint(inputSource));
+
 						GrabStateChanged?.Invoke(this, new GrabStateChangedArgs(GrabState.Grabbed, GrabState.Released, inputSource));
 
 						currentGrabbableActor = null;
@@ -167,9 +168,10 @@ namespace Assets.Scripts.Tools
 				else if (GrabActive)
 				{
 					var nearGraspPoint = GetNearGraspPoint(inputSource);
-					var eventData = new MixedRealityPointerEventData(this, nearGraspPoint);
 					currentGrabbableActor.GlobalTransform = new Transform(currentGrabbableActor.GlobalTransform.basis, nearGraspPoint + grabbableOffset);
-					currentGrabbableActor.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged), eventData);
+
+					if (currentGrabbableActor.HasUserSignal("pointer_dragged"))
+						currentGrabbableActor.EmitSignal("pointer_dragged", inputSource, inputSource.UserNode, nearGraspPoint);
 
 					inputSource.HitPoint = inputSource.GlobalTransform.origin;
 				}
