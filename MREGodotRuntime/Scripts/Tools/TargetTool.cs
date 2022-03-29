@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 using Assets.Scripts.Behaviors;
 using Assets.Scripts.User;
-using System.Linq;
-using Godot;
 using MixedRealityExtension.Util.GodotHelper;
+using MixedRealityExtension.Core.Interfaces;
+
+using Godot;
 using Godot.Collections;
-using Microsoft.MixedReality.Toolkit.Input;
 
 namespace Assets.Scripts.Tools
 {
@@ -104,7 +104,7 @@ namespace Assets.Scripts.Tools
 
 				CurrentTargetPoint = hitPoint.Value;
 				_currentTargetBehavior.Context.UpdateTargetPoint(mwUser, CurrentTargetPoint);
-				OnTargetPointUpdated(CurrentTargetPoint);
+				OnTargetPointUpdated(inputSource, CurrentTargetPoint);
 				return;
 			}
 
@@ -165,16 +165,16 @@ namespace Assets.Scripts.Tools
 			{
 				_currentTargetBehavior.Context.EndTargeting(_currentTargetBehavior.GetMWUnityUser(inputSource.UserNode), oldTargetPoint);
 
-				oldTarget.HandleEvent<IMixedRealityFocusHandler>(nameof(IMixedRealityFocusHandler.OnFocusExit),
-																new MixedRealityFocusEventData(this, oldTarget, newTarget));
+				if (oldTarget.HasUserSignal("focus_exit"))
+					oldTarget.EmitSignal("focus_exit", inputSource, inputSource.UserNode, oldTarget, newTarget);
 			}
 
 			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget) && !IsNearObject)
 			{
 				newBehavior.Context.StartTargeting(newBehavior.GetMWUnityUser(inputSource.UserNode), newTargetPoint);
 
-				newTarget.HandleEvent<IMixedRealityFocusHandler>(nameof(IMixedRealityFocusHandler.OnFocusEnter),
-																new MixedRealityFocusEventData(this, oldTarget, newTarget));
+				if (newTarget.HasUserSignal("focus_enter"))
+					newTarget.EmitSignal("focus_enter", inputSource, inputSource.UserNode, oldTarget, newTarget);
 			}
 
 			CurrentTargetPoint = newTargetPoint;
@@ -182,7 +182,7 @@ namespace Assets.Scripts.Tools
 			_currentTargetBehavior = newBehavior;
 		}
 
-		protected virtual void OnTargetPointUpdated(Vector3 point)
+		protected virtual void OnTargetPointUpdated(InputSource inputSource, Vector3 point)
 		{
 
 		}

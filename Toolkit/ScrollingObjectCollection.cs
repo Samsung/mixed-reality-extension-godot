@@ -8,16 +8,13 @@ using System.Linq;
 using System.Diagnostics;
 using Godot;
 using MixedRealityExtension.Util.GodotHelper;
-using Assets.Scripts.Tools;
 using System.Threading.Tasks;
 using System.Threading;
 using MixedRealityExtension.Core;
-using MixedRealityExtension.Messaging.Payloads;
 
 using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Core.Components;
-using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.Behaviors.Actions;
 
 namespace Microsoft.MixedReality.Toolkit.UI
@@ -492,7 +489,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         // A list of content renderers that need to be removed from the clippingBox
         private List<MeshInstance> renderersToUnclip = new List<MeshInstance>();
 
-        private Tool currentTool;
+        private Spatial currentInputSource;
 
         private Actor parentActor;
 
@@ -693,9 +690,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         public override void _Ready()
         {
-            this.RegisterHandler<IMixedRealityPointerHandler>();
-            this.RegisterHandler<IMixedRealityTouchHandler>();
             parentActor = GetParent<Actor>();
+            ((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, parentActor);
+            ((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, parentActor);
             ScrollingCollisionBoxShape = GetNode<CollisionShape>("CollisionShape").Shape as BoxShape;
 
             ToolkitAction.RegisterAction(_touchAction, "touch", this);
@@ -923,19 +920,20 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             result = Vector3.Zero;
 
-            if (currentTool == null)
+            if (currentInputSource == null)
             {
                 return false;
             }
-            if (currentTool.GetType() == typeof(PokeTool))
+
+            if (IsTouched)
             {
-                result = currentTool.Position;
+                result = currentInputSource.GlobalTransform.origin;
                 return true;
             }
 
             var scrollVector = (ScrollDirection == ScrollDirectionType.UpAndDown) ? GlobalTransform.basis.y : GlobalTransform.basis.x;
 
-            result = GlobalTransform.origin + (currentTool.Position - GlobalTransform.origin).Project(scrollVector);
+            result = GlobalTransform.origin + (currentInputSource.GlobalTransform.origin - GlobalTransform.origin).Project(scrollVector);
             return true;
         }
 
@@ -1301,12 +1299,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
             return isScrollRelease;
         }
 
-        private bool HasPassedThroughFrontPlane(PokeTool pokeTool)
-        {
-            var p = ToLocal(pokeTool.PreviousPosition);
-            return p.z <= -FrontTouchDistance;
-        }
-
         /// <summary>
         /// Adds list of renderers to the ClippingBox
         /// </summary>
@@ -1563,7 +1555,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             if (IsTouched) EmitSignal(nameof(touch_ended));
 
             // Release the pointer
-            currentTool = null;
+            currentInputSource = null;
 
             // Clear our states
             IsTouched = false;
@@ -1806,9 +1798,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
         #region IMixedRealityPointerHandler implementation
 
         /// <inheritdoc/>
-        void OnPointerUp(MixedRealityPointerEventData eventData)
+        public void OnPointerUp(Spatial inputSource, Node userNode, Vector3 point)
         {
-            if (currentTool == null)
+            if (currentInputSource == null)
             {
                 return;
             }
@@ -1830,15 +1822,15 @@ namespace Microsoft.MixedReality.Toolkit.UI
         }
 
         /// <inheritdoc/>
-        void OnPointerDown(MixedRealityPointerEventData eventData)
+        public void OnPointerDown(Spatial inputSource, Node userNode, Vector3 point)
         {
             // Current pointer owns scroll interaction until scroll release happens. Ignoring any interaction with other pointers.
-            if (currentTool != null)
+            if (currentInputSource != null)
             {
                 return;
             }
 
-            currentTool = eventData.Tool;
+            currentInputSource = inputSource;
             //oldIsTargetPositionLockedOnFocusLock = currentPointer.IsTargetPositionLockedOnFocusLock;
 /*
             if (!(currentPointer is IMixedRealityNearPointer) && currentPointer.Controller.IsRotationAvailable)
@@ -1864,29 +1856,25 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         /// <inheritdoc/>
         /// Pointer Click handled during Update.
-        void OnPointerClicked(MixedRealityPointerEventData eventData) { }
+        public void OnPointerClicked(Spatial inputSource, Node userNode, Vector3 point) { }
 
         /// <inheritdoc/>
-        void OnPointerDragged(MixedRealityPointerEventData eventData) { }
+        public void OnPointerDragged(Spatial inputSource, Node userNode, Vector3 point) { }
 
         #endregion IMixedRealityPointerHandler implementation
 
         #region IMixedRealityTouchHandler implementation
 
         /// <inheritdoc/>
-        void OnTouchStarted(TouchInputEventData eventData)
+        public void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
         {
             // Current pointer owns scroll interaction until scroll release happens. Ignoring any interaction with other pointers.
-            if (currentTool != null)
+            if (currentInputSource != null)
             {
                 return;
             }
 
-            PokeTool pokeTool = eventData.Tool as PokeTool;
-            if (pokeTool == null)
-                return;
-
-            currentTool = pokeTool;
+            currentInputSource = inputSource;
 
             animateScrollerToken.Cancel();
             CurrentVelocityState = VelocityState.None;
@@ -1894,7 +1882,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
             if (!IsTouched && !IsEngaged)
             {
-                initialPointerPos = currentTool.Position;
+                initialPointerPos = currentInputSource.GlobalTransform.origin;
                 initialScrollerPos = ScrollContainer.Transform.origin;
 
                 IsTouched = true;
@@ -1906,12 +1894,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         /// <inheritdoc/>
         /// Touch release handled during Update.
-        void OnTouchCompleted(TouchInputEventData eventData) { }
+        public void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point) { }
 
         /// <inheritdoc/>
-        void OnTouchUpdated(TouchInputEventData eventData)
+        public void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
         {
-            if (currentTool == null)
+            if (currentInputSource == null)
             {
                 return;
             }

@@ -4,7 +4,6 @@
 using Microsoft.MixedReality.Toolkit.Input;
 using System;
 using Godot;
-using Assets.Scripts.Tools;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Behaviors.Actions;
@@ -224,7 +223,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		/// <summary>
 		/// Interface for handling tool being used in UX interaction.
 		/// </summary>
-		protected Tool ActiveTool { get; private set; }
+		protected Spatial ActiveInputSource { get; private set; }
 
 		#endregion
 
@@ -249,13 +248,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		#region Node Virtual Methods
 		public override void _Ready()
 		{
+			var parent = GetParent();
+
 			if (UseSliderStepDivisions)
 			{
 				InitializeStepDivisions();
 			}
 
-			this.RegisterHandler<IMixedRealityPointerHandler>();
-			this.RegisterHandler<IMixedRealityTouchHandler>();
 			ToolkitAction.RegisterAction(_valueChangedAction, "value_changed", this);
 			Connect(nameof(value_changed), this, nameof(_on_PinchSlider_value_changed));
 			Connect(nameof(interaction_started), this, nameof(_on_PinchSlider_interaction_started));
@@ -267,11 +266,14 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			UpdateTrackMesh();
 
 			EmitSignal(nameof(value_changed));
+
+			((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, parent);
+			((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, parent);
 		}
 
 		private void OnDisable()
 		{
-			if (ActiveTool != null)
+			if (ActiveInputSource != null)
 			{
 				EndInteraction();
 			}
@@ -417,7 +419,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void EndInteraction()
 		{
 			EmitSignal(nameof(interaction_ended));
-			ActiveTool = null;
+			ActiveInputSource = null;
 		}
 
 
@@ -485,35 +487,35 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		#region IMixedRealityPointerHandler
 
-		public void OnPointerUp(MixedRealityPointerEventData eventData)
+		public void OnPointerUp(Spatial inputSource, Node userNode, Vector3 point)
 		{
-			if (eventData.Tool == ActiveTool)
+			if (inputSource == ActiveInputSource)
 			{
 				EndInteraction();
 			}
 		}
 
-		public void OnPointerDown(MixedRealityPointerEventData eventData)
+		public void OnPointerDown(Spatial inputSource, Node userNode, Vector3 point)
 		{
-			if (ActiveTool == null)
+			if (ActiveInputSource == null)
 			{
-				ActiveTool = eventData.Tool;
-				StartPointerPosition = eventData.InputData;
+				ActiveInputSource = inputSource;
+				StartPointerPosition = point;
 
 				if (SnapToPosition)
 				{
-					CalculateSliderValueBasedOnTouchPoint(eventData.InputData);
+					CalculateSliderValueBasedOnTouchPoint(point);
 				}
 				StartSliderValue = sliderValue;
 				EmitSignal(nameof(interaction_started));
 			}
 		}
 
-		public virtual void OnPointerDragged(MixedRealityPointerEventData eventData)
+		public void OnPointerDragged(Spatial inputSource, Node userNode, Vector3 point)
 		{
-			if (eventData.Tool == ActiveTool)
+			if (inputSource == ActiveInputSource)
 			{
-				var delta = eventData.InputData - StartPointerPosition;
+				var delta = point - StartPointerPosition;
 				var handDelta = SliderTrackDirection.Normalized().Dot(delta);
 
 				if (UseSliderStepDivisions)
@@ -529,13 +531,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			}
 		}
 
-		public void OnPointerClicked(MixedRealityPointerEventData eventData) { }
+		public void OnPointerClicked(Spatial inputSource, Node userNode, Vector3 point) { }
 
 		#endregion
 
 
 		#region IMixedRealityTouchHandler
-		public void OnTouchStarted(TouchInputEventData eventData)
+		public void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (IsTouchable)
 			{
@@ -543,7 +545,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			}
 		}
 
-		public void OnTouchCompleted(TouchInputEventData eventData)
+		public void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (IsTouchable)
 			{
@@ -554,11 +556,11 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		/// <summary>b
 		/// When the collider is touched, use the touch point to Calculate the Slider value
 		/// </summary>
-		public void OnTouchUpdated(TouchInputEventData eventData)
+		public void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (IsTouchable)
 			{
-				CalculateSliderValueBasedOnTouchPoint(eventData.InputData);
+				CalculateSliderValueBasedOnTouchPoint(point);
 			}
 		}
 

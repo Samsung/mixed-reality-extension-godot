@@ -2,8 +2,6 @@ using Assets.Scripts.Behaviors;
 using Assets.Scripts.User;
 using Godot;
 using Godot.Collections;
-using MixedRealityExtension.Core;
-using Microsoft.MixedReality.Toolkit.Input;
 using MixedRealityExtension.PluginInterfaces;
 using MixedRealityExtension.Util.GodotHelper;
 using System;
@@ -171,8 +169,8 @@ namespace Assets.Scripts.Tools
 						{
 							buttonBehavior.Context.StartButton(mwUser, Position);
 
-							var eventData = new TouchInputEventData(this, Position);
-							CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchStarted), eventData);
+							if (CurrentTouchableObjectDown.HasUserSignal("touch_started"))
+								CurrentTouchableObjectDown.EmitSignal("touch_started", inputSource, inputSource.UserNode, Position);
 						}
 					}
 				}
@@ -196,8 +194,8 @@ namespace Assets.Scripts.Tools
 						buttonBehavior.Context.EndButton(mwUser, Position);
 						buttonBehavior.Context.Click(mwUser, Position);
 
-						var eventData = new TouchInputEventData(this, Position);
-						CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchCompleted), eventData);
+						if (CurrentTouchableObjectDown.HasUserSignal("touch_completed"))
+							CurrentTouchableObjectDown.EmitSignal("touch_completed", inputSource, inputSource.UserNode, Position);
 					}
 				}
 				CurrentTouchableObjectDown = null;
@@ -208,12 +206,19 @@ namespace Assets.Scripts.Tools
 		{
 			if (CurrentTouchableObjectDown != null)
 			{
-				var pokePointerOrigin = inputSource.GlobalTransform.origin;
-				var eventData = new TouchInputEventData(this, pokePointerOrigin);
+				var buttonBehavior = CurrentTouchableObjectDown.GetBehavior<ButtonBehavior>();
+				if (buttonBehavior != null)
+				{
+					var mwUser = buttonBehavior.GetMWUnityUser(inputSource.UserNode);
+					if (mwUser != null)
+					{
+						if (CurrentTouchableObjectDown.HasUserSignal("touch_updated"))
+							CurrentTouchableObjectDown.EmitSignal("touch_updated", inputSource, inputSource.UserNode, Position);
+					}
+				}
 
-				inputSource.HitPoint = pokePointerOrigin;
+				inputSource.HitPoint = inputSource.GlobalTransform.origin;
 				inputSource.HitPointNormal = hitPointNormal;
-				CurrentTouchableObjectDown.HandleEvent<IMixedRealityTouchHandler>(nameof(IMixedRealityTouchHandler.OnTouchUpdated), eventData);
 			}
 		}
 
