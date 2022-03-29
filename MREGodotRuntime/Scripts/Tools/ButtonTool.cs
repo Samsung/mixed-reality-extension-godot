@@ -3,7 +3,7 @@
 using Assets.Scripts.Behaviors;
 using Assets.Scripts.User;
 using Godot;
-using Microsoft.MixedReality.Toolkit.Input;
+using MixedRealityExtension.Core.Interfaces;
 
 namespace Assets.Scripts.Tools
 {
@@ -32,12 +32,12 @@ namespace Assets.Scripts.Tools
 						startOffset = inputSource.GlobalTransform.origin - CurrentTargetPoint;
 						buttonBehavior.Context.StartButton(mwUser, CurrentTargetPoint);
 						inputSource.Cursor.Color = new Color(1, 0, 0);
+
+						if (Target.HasUserSignal("pointer_down"))
+							Target.EmitSignal("pointer_down", inputSource, inputSource.UserNode, CurrentTargetPoint);
 					}
 				}
 				pressed = true;
-
-				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDown),
-															new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 			else
 			{
@@ -50,12 +50,12 @@ namespace Assets.Scripts.Tools
 						buttonBehavior.Context.EndButton(mwUser, CurrentTargetPoint);
 						buttonBehavior.Context.Click(mwUser, CurrentTargetPoint);
 						inputSource.Cursor.Color = new Color(1, 1, 1);
+
+						if (Target.HasUserSignal("pointer_up"))
+							Target.EmitSignal("pointer_up", inputSource, inputSource.UserNode, CurrentTargetPoint);
 					}
 				}
 				pressed = false;
-
-				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerUp),
-															new MixedRealityPointerEventData(this, CurrentTargetPoint));
 			}
 		}
 
@@ -102,12 +102,20 @@ namespace Assets.Scripts.Tools
 			}
 		}
 
-		protected override void OnTargetPointUpdated(Vector3 point)
+		protected override void OnTargetPointUpdated(InputSource inputSource, Vector3 point)
 		{
 			if (pressed)
 			{
-				Target.HandleEvent<IMixedRealityPointerHandler>(nameof(IMixedRealityPointerHandler.OnPointerDragged),
-														new MixedRealityPointerEventData(this, CurrentTargetPoint));
+				var buttonBehavior = Target.GetBehavior<ButtonBehavior>();
+				if (buttonBehavior != null)
+				{
+					var mwUser = buttonBehavior.GetMWUnityUser(inputSource.UserNode);
+					if (mwUser != null)
+					{
+						if (Target.HasUserSignal("pointer_dragged"))
+							Target.EmitSignal("pointer_dragged", inputSource, inputSource.UserNode, CurrentTargetPoint);
+					}
+				}
 			}
 		}
 
