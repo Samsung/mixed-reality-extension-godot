@@ -6,6 +6,9 @@ using MixedRealityExtension.Patching.Types;
 internal class PinchSliderThumb : Spatial, IToolkit, IMixedRealityPointerHandler
 {
     private PinchSlider slider;
+
+    public Node Parent { get; private set; }
+
     public void OnPointerUp(Spatial inputSource, Node userNode, Vector3 point)
     {
         slider.OnPointerUp(inputSource, userNode, point);
@@ -25,14 +28,13 @@ internal class PinchSliderThumb : Spatial, IToolkit, IMixedRealityPointerHandler
 
     public override void _Ready()
     {
-        var parent = GetParent();
-        ((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, parent);
+        Parent = GetParent();
+        ((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, Parent);
     }
 
     public override void _EnterTree()
     {
-        var actor = GetParent();
-        slider = actor.GetParent() as PinchSlider;
+        slider = Parent.GetParent() as PinchSlider;
     }
 
     public void ApplyPatch(ToolkitPatch toolkitPatch) {}
