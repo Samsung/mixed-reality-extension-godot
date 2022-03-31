@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Samsung Electronics Co., Ltd. All rights reserved.
 // Licensed under the MIT License.
 using MixedRealityExtension.App;
 using MixedRealityExtension.Behaviors.ActionData;
@@ -9,22 +9,19 @@ using System;
 
 namespace MixedRealityExtension.Behaviors.Actions
 {
-	internal sealed class BehaviorActionHandler : IActionHandler
+	public class ActionHandler : IActionHandler
 	{
-		private readonly BehaviorType _behaviorType;
-		private readonly WeakReference<MixedRealityExtensionApp> _appRef;
+		private readonly WeakReference<IMixedRealityExtensionApp> _appRef;
 
 		public string ActionName { get; }
 
 		public Guid AttachedActorId { get; }
 
-		internal BehaviorActionHandler(
-			BehaviorType behaviorType,
+		public ActionHandler(
 			string actionName,
-			WeakReference<MixedRealityExtensionApp> appRef,
+			WeakReference<IMixedRealityExtensionApp> appRef,
 			Guid attachedActorId)
 		{
-			_behaviorType = behaviorType;
 			_appRef = appRef;
 			ActionName = actionName;
 			AttachedActorId = attachedActorId;
@@ -41,7 +38,7 @@ namespace MixedRealityExtension.Behaviors.Actions
 			ActionState newState,
 			BaseActionData actionData)
 		{
-			MixedRealityExtensionApp app;
+			IMixedRealityExtensionApp app;
 			if (!_appRef.TryGetTarget(out app))
 			{
 				return;
@@ -56,13 +53,13 @@ namespace MixedRealityExtension.Behaviors.Actions
 			{
 				UserId = user.Id,
 				TargetId = AttachedActorId,
-				BehaviorType = _behaviorType,
 				ActionName = ActionName,
 				ActionState = newState,
 				ActionData = actionData
 			};
 
-			app.EventManager.QueueLateEvent(new BehaviorEvent(actionPerformed));
+			if (app is MixedRealityExtensionApp mreApp)
+				mreApp.EventManager.QueueLateEvent(new BehaviorEvent(actionPerformed));
 		}
 	}
 }
