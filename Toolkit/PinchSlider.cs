@@ -7,6 +7,7 @@ using Godot;
 using MixedRealityExtension.Core;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Behaviors.Actions;
+using MixedRealityExtension.Core.Interfaces;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -248,7 +249,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		#region Node Virtual Methods
 		public override void _Ready()
 		{
-			var parent = GetParent();
+			Parent = GetParent();
 
 			if (UseSliderStepDivisions)
 			{
@@ -267,8 +268,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 			EmitSignal(nameof(value_changed));
 
-			((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, parent);
-			((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, parent);
+			((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, Parent);
+			((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, Parent);
 		}
 
 		private void OnDisable()
@@ -458,7 +459,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		private void ApplyThumb(Guid thumbId)
 		{
-			var actor = GetParent<Actor>();
+			var actor = Parent as IActor;
 			var thumb = actor.App.FindActor(thumbId) as Actor;
 			thumb.GetParent()?.RemoveChild(thumb);
 			ThumbActor = thumb;
@@ -567,6 +568,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		#endregion IMixedRealityTouchHandler
 
 		#region IToolkit
+
+		public Node Parent { get; private set; }
+
 		public virtual void ApplyPatch(ToolkitPatch toolkitPatch)
 		{
 			if (toolkitPatch is PinchSliderPatch patch)

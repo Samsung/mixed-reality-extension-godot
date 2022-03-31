@@ -16,6 +16,7 @@ using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Core.Components;
 using MixedRealityExtension.Behaviors.Actions;
+using MixedRealityExtension.Core.Interfaces;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -437,7 +438,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             {
                 if (clippingComponent == null)
                 {
-                    ClippingComponent oldClippingComponent = parentActor.GetChild<ClippingComponent>();
+                    ClippingComponent oldClippingComponent = Parent.GetChild<ClippingComponent>();
 
                     if (oldClippingComponent != null)
                     {
@@ -490,8 +491,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         private List<MeshInstance> renderersToUnclip = new List<MeshInstance>();
 
         private Spatial currentInputSource;
-
-        private Actor parentActor;
 
         #endregion scroll state variables
 
@@ -690,9 +689,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         public override void _Ready()
         {
-            parentActor = GetParent<Actor>();
-            ((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, parentActor);
-            ((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, parentActor);
+            Parent = GetParent();
+            ((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, Parent);
+            ((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, Parent);
             ScrollingCollisionBoxShape = GetNode<CollisionShape>("CollisionShape").Shape as BoxShape;
 
             this.RegisterAction(_touchAction, "touch");
@@ -1913,14 +1912,18 @@ namespace Microsoft.MixedReality.Toolkit.UI
         #endregion IMixedRealityTouchHandler implementation
 
         #region IToolkit
+
+        public Node Parent { get; private set; }
+
         public void ApplyPatch(ToolkitPatch toolkitPatch)
         {
             if (toolkitPatch is ScrollingObjectCollectionPatch patch)
             {
-                ScrollingTouchable = parentActor.GetChild<TouchablePlane>();
+                ScrollingTouchable = Parent.GetChild<TouchablePlane>();
+                var actor = Parent as IActor;
                 foreach (var scrollContent in patch.ScrollContents)
                 {
-                    var content = parentActor.App.FindActor(scrollContent) as Spatial;
+                    var content = actor.App.FindActor(scrollContent) as Spatial;
                     content.GetParent()?.RemoveChild(content);
                     AddContent(content);
                 }
