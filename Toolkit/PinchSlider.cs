@@ -255,7 +255,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				InitializeStepDivisions();
 			}
 
-			ToolkitAction.RegisterAction(_valueChangedAction, "value_changed", this);
+			this.RegisterAction(_valueChangedAction, "value_changed");
 			Connect(nameof(value_changed), this, nameof(_on_PinchSlider_value_changed));
 			Connect(nameof(interaction_started), this, nameof(_on_PinchSlider_interaction_started));
 			Connect(nameof(interaction_ended), this, nameof(_on_PinchSlider_interaction_ended));
