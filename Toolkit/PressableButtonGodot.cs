@@ -19,6 +19,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		public Vector3 HighlightBorderColor { get; set; } = new Vector3(0.42f, 0.48f, 0.61f);
 
+		Node IToolkit.Parent => Parent;
+
 		public const string HighlightBorderColorString = "border_color";
 
 		private float pulseDelta = -0.6f;
