@@ -32,7 +32,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			base._Ready();
 			BackPlateToggleState = GetNode<Spatial>("BackPlateToggleState");
 
-			ToolkitAction.RegisterAction(_toggleChangedAction, "toggle_changed", this);
+			this.RegisterAction(_toggleChangedAction, "toggle_changed");
 			Connect(nameof(toggle_changed), this, nameof(_on_TogglePressableButtonGodot_toggle_changed));
 			Connect(nameof(button_pressed), this, nameof(_on_TogglePressableButtonGodot_button_pressed));
 		}

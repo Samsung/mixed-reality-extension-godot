@@ -303,7 +303,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             // Ensure everything is set to initial positions correctly.
             UpdateMovingVisualsPosition();
 
-            ToolkitAction.RegisterAction(_touchAction, "touch", this);
+            this.RegisterAction(_touchAction, "touch");
             Connect(nameof(touch_started), this, nameof(_on_PressableButton_touch_started));
             Connect(nameof(touch_ended), this, nameof(_on_PressableButton_touch_ended));
         }

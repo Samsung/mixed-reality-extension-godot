@@ -695,8 +695,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
             ((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, parentActor);
             ScrollingCollisionBoxShape = GetNode<CollisionShape>("CollisionShape").Shape as BoxShape;
 
-            ToolkitAction.RegisterAction(_touchAction, "touch", this);
-            ToolkitAction.RegisterAction(_scrollAction, "scroll", this);
+            this.RegisterAction(_touchAction, "touch");
+            this.RegisterAction(_scrollAction, "scroll");
             Connect(nameof(touch_started), this, nameof(_on_ScrollingObjectCollection_touch_started));
             Connect(nameof(touch_ended), this, nameof(_on_ScrollingObjectCollection_touch_ended));
             Connect(nameof(scroll_started), this, nameof(_on_ScrollingObjectCollection_scroll_started));
