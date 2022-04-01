@@ -85,6 +85,11 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				var oldSliderValue = sliderValue;
 				sliderValue = value;
 				UpdateUI();
+
+				_valueChangedAction.PerformActionUpdate(new ActionData<float>()
+				{
+					value = sliderValue
+				});
 				EmitSignal(nameof(value_changed));
 			}
 		}
@@ -173,6 +178,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			get { return SliderEndPosition - SliderStartPosition; }
 		}
 
+		private IUser currentUser;
+		public IUser CurrentUser
+		{
+			get => currentUser ?? (Parent as IActor).App.LocalUser;
+			set => currentUser = value;
+		}
+
 		#endregion
 
 		#region Event Handlers
@@ -257,15 +269,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			}
 
 			this.RegisterAction(_valueChangedAction, "value_changed");
-			Connect(nameof(value_changed), this, nameof(_on_PinchSlider_value_changed));
-			Connect(nameof(interaction_started), this, nameof(_on_PinchSlider_interaction_started));
-			Connect(nameof(interaction_ended), this, nameof(_on_PinchSlider_interaction_ended));
 
 			trackMesh = GetNode<MeshInstance>("Mesh");
 			//SnapToPosition = snapToPosition;
 			TouchCollisionShape.Disabled = false;
 			UpdateTrackMesh();
 
+			_valueChangedAction.PerformActionUpdate(new ActionData<float>()
+			{
+				value = sliderValue
+			});
 			EmitSignal(nameof(value_changed));
 
 			((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, Parent);
@@ -276,45 +289,13 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			if (ActiveInputSource != null)
 			{
-				EndInteraction();
+				OnInteractionEnded();
 			}
 		}
 
 		private void OnValidate()
 		{
 			CurrentSliderAxis = sliderAxis;
-		}
-
-		private void _on_PinchSlider_value_changed()
-		{
-			_valueChangedAction.PerformActionUpdate(new ActionData<float>()
-			{
-				value = sliderValue
-			});
-		}
-
-		private void _on_PinchSlider_interaction_started()
-		{
-			var user = GetParent<Actor>().App.LocalUser;
-			if (user != null)
-			{
-				_valueChangedAction.StartAction(user, new ActionData<float>()
-				{
-					value = sliderValue
-				});
-			}
-		}
-
-		private void _on_PinchSlider_interaction_ended()
-		{
-			var user = GetParent<Actor>().App.LocalUser;
-			if (user != null)
-			{
-				_valueChangedAction.StopAction(user, new ActionData<float>()
-				{
-					value = sliderValue
-				});
-			}
 		}
 
 		#endregion
@@ -417,13 +398,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			thumbActor.GlobalTransform = new Transform(thumbActor.GlobalTransform.basis, newSliderPos);
 		}
 
-		private void EndInteraction()
-		{
-			EmitSignal(nameof(interaction_ended));
-			ActiveInputSource = null;
-		}
-
-
 		private float SnapSliderToStepPositions(float value)
 		{
 			var stepCount = value / sliderStepVal;
@@ -488,15 +462,15 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		#region IMixedRealityPointerHandler
 
-		public void OnPointerUp(Spatial inputSource, Node userNode, Vector3 point)
+		public virtual void OnPointerUp(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (inputSource == ActiveInputSource)
 			{
-				EndInteraction();
+				OnInteractionEnded();
 			}
 		}
 
-		public void OnPointerDown(Spatial inputSource, Node userNode, Vector3 point)
+		public virtual void OnPointerDown(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (ActiveInputSource == null)
 			{
@@ -508,11 +482,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
 					CalculateSliderValueBasedOnTouchPoint(point);
 				}
 				StartSliderValue = sliderValue;
-				EmitSignal(nameof(interaction_started));
+
+				OnInteractionStarted(userNode);
 			}
 		}
 
-		public void OnPointerDragged(Spatial inputSource, Node userNode, Vector3 point)
+		public virtual void OnPointerDragged(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (inputSource == ActiveInputSource)
 			{
@@ -532,32 +507,32 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			}
 		}
 
-		public void OnPointerClicked(Spatial inputSource, Node userNode, Vector3 point) { }
+		public virtual void OnPointerClicked(Spatial inputSource, Node userNode, Vector3 point) { }
 
 		#endregion
 
 
 		#region IMixedRealityTouchHandler
-		public void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
+		public virtual void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (IsTouchable)
 			{
-				EmitSignal(nameof(interaction_started));
+				OnInteractionStarted(userNode);
 			}
 		}
 
-		public void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point)
+		public virtual void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (IsTouchable)
 			{
-				EndInteraction();
+				OnInteractionEnded();
 			}
 		}
 
-		/// <summary>b
+		/// <summary>
 		/// When the collider is touched, use the touch point to Calculate the Slider value
 		/// </summary>
-		public void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
+		public virtual void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
 		{
 			if (IsTouchable)
 			{
@@ -578,6 +553,29 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				ApplyThumb(patch.ThumbId);
 			}
 		}
+
+		public virtual void OnInteractionStarted(Node userNode)
+		{
+			CurrentUser = this.GetMREUser(userNode);
+
+			_valueChangedAction.StartAction(CurrentUser, new ActionData<float>()
+			{
+				value = sliderValue
+			});
+			EmitSignal(nameof(interaction_started));
+		}
+
+		public virtual void OnInteractionEnded()
+		{
+			_valueChangedAction.StopAction(CurrentUser, new ActionData<float>()
+			{
+				value = sliderValue
+			});
+			CurrentUser = null;
+			EmitSignal(nameof(interaction_ended));
+			ActiveInputSource = null;
+		}
+
 		#endregion IToolkit
 	}
 }

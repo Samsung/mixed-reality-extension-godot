@@ -3,9 +3,10 @@ using Godot;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Core.Types;
 using MixedRealityExtension.Patching;
-using MixedRealityExtension.Util.GodotHelper;
 using Microsoft.MixedReality.Toolkit.Input;
 using MixedRealityExtension.Core;
+using MixedRealityExtension.Behaviors.Actions;
+using MixedRealityExtension.Core.Interfaces;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -30,6 +31,14 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private ShaderMaterial HighlightPlateMaterial => (ShaderMaterial)HighlightPlate.MaterialOverride;
 		private SimpleText TextNode;
 		private Vector3 initialLocalScale;
+		private MWAction _touchAction = new MWAction();
+		private IUser currentUser;
+
+		public IUser CurrentUser
+		{
+			get => currentUser ?? (Parent as IActor).App.LocalUser;
+			set => currentUser = value;
+		}
 
 		public PressableButtonGodot()
 		{
@@ -46,6 +55,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			initialLocalScale = movingButtonVisuals.Scale;
 
 			base._Ready();
+			this.RegisterAction(_touchAction, "touch");
 			((IMixedRealityFocusHandler)this).RegisterFocusEvent(this, Parent);
 
 			BackPlate = GetNode<MeshInstance>("BackPlate");
@@ -63,8 +73,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			TextNode.Height = 0.2f;
 			TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
 			TextNode.Scale = new Vector3(0.032f, 0.032f, 0.032f);
-
-			Connect(nameof(touch_ended), this, nameof(_on_PressableButtonGodot_touch_ended));
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -112,11 +120,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			}
 		}
 
-		private void _on_PressableButtonGodot_touch_ended()
-		{
-			RevertProximityLight();
-		}
-
 		internal void ApplyColor(ColorPatch color)
 		{
 			if (color == null) return;
@@ -131,14 +134,45 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			TextNode.Contents = text;
 		}
 
-		public void OnFocusEnter(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
+		public virtual void OnFocusEnter(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
 		{
 			HighlightPlateMaterial.SetShaderParam(HighlightBorderColorString, HighlightBorderColor);
 		}
 
-		public void OnFocusExit(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
+		public virtual void OnFocusExit(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
 		{
 			HighlightPlateMaterial.SetShaderParam(HighlightBorderColorString, Vector3.Zero);
+		}
+
+		public override void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
+		{
+			base.OnTouchStarted(inputSource, userNode, point);
+			if (IsTouching)
+			{
+				OnInteractionStarted(userNode);
+				_touchAction.StartAction(CurrentUser);
+			}
+		}
+
+		public override void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point)
+		{
+			base.OnTouchCompleted(inputSource, userNode, point);
+			if (!IsTouching)
+			{
+				_touchAction.StopAction(CurrentUser);
+				OnInteractionEnded();
+			}
+			RevertProximityLight();
+		}
+
+		public virtual void OnInteractionStarted(Node userNode)
+		{
+			CurrentUser = this.GetMREUser(userNode);
+		}
+
+		public virtual void OnInteractionEnded()
+		{
+			CurrentUser = null;
 		}
 
 		public virtual void ApplyPatch(ToolkitPatch toolkitPatch)

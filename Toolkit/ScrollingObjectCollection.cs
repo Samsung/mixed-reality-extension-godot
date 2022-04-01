@@ -478,6 +478,14 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         public bool IsTouched { get; private set; } = false;
 
+        public IUser CurrentUser
+        {
+            get => currentUser ?? (Parent as IActor).App.LocalUser;
+            set => currentUser = value;
+        }
+
+        private IUser currentUser;
+
         // The position of the scollContainer before we do any updating to it
         private Vector3 initialScrollerPos;
 
@@ -539,10 +547,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 {
                     if (value == VelocityState.None)
                     {
+                        _scrollAction.StopAction(CurrentUser);
                         EmitSignal(nameof(scroll_ended));
                     }
                     else if (currentVelocityState == VelocityState.None)
                     {
+                        _scrollAction.StartAction(CurrentUser);
                         EmitSignal(nameof(scroll_started));
                     }
                     previousVelocityState = currentVelocityState;
@@ -696,11 +706,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
             this.RegisterAction(_touchAction, "touch");
             this.RegisterAction(_scrollAction, "scroll");
-            Connect(nameof(touch_started), this, nameof(_on_ScrollingObjectCollection_touch_started));
-            Connect(nameof(touch_ended), this, nameof(_on_ScrollingObjectCollection_touch_ended));
-            Connect(nameof(scroll_started), this, nameof(_on_ScrollingObjectCollection_scroll_started));
-            Connect(nameof(scroll_ended), this, nameof(_on_ScrollingObjectCollection_scroll_ended));
-            Connect(nameof(scrolling), this, nameof(_on_ScrollingObjectCollection_scrolling));
         }
 
         public override void _Process(float delta)
@@ -1543,7 +1548,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
             ScrollContainer.Transform = new Transform(ScrollContainer.Transform.basis, newScrollPos);
             if (CurrentVelocityState != VelocityState.None)
+            {
+                _scrollAction.PerformActionUpdate();
                 EmitSignal(nameof(scrolling));
+            }
         }
 
         /// <summary>
@@ -1551,10 +1559,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         private void ResetInteraction()
         {
-            if (IsTouched) EmitSignal(nameof(touch_ended));
+            if (IsTouched)
+            {
+                _touchAction.StopAction(CurrentUser);
+                EmitSignal(nameof(touch_ended));
+            }
 
             // Release the pointer
             currentInputSource = null;
+
+            OnInteractionEnded();
 
             // Clear our states
             IsTouched = false;
@@ -1645,47 +1659,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
 
             throw new ArgumentException("Failed to find an actor parent.", nameof(meshInstance));
-        }
-
-        private void _on_ScrollingObjectCollection_touch_started()
-        {
-            var user = GetParent<Actor>().App.LocalUser;
-            if (user != null)
-            {
-                _touchAction.StartAction(user);
-            }
-        }
-
-        private void _on_ScrollingObjectCollection_touch_ended()
-        {
-            var user = GetParent<Actor>().App.LocalUser;
-            if (user != null)
-            {
-                _touchAction.StopAction(user);
-            }
-        }
-
-        private void _on_ScrollingObjectCollection_scroll_started()
-        {
-            var user = GetParent<Actor>().App.LocalUser;
-            if (user != null)
-            {
-                _scrollAction.StartAction(user);
-            }
-        }
-
-        private void _on_ScrollingObjectCollection_scroll_ended()
-        {
-            var user = GetParent<Actor>().App.LocalUser;
-            if (user != null)
-            {
-                _scrollAction.StopAction(user);
-            }
-        }
-
-        private void _on_ScrollingObjectCollection_scrolling()
-        {
-            _scrollAction.PerformActionUpdate();
         }
 
         #endregion private methods
@@ -1797,7 +1770,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         #region IMixedRealityPointerHandler implementation
 
         /// <inheritdoc/>
-        public void OnPointerUp(Spatial inputSource, Node userNode, Vector3 point)
+        public virtual void OnPointerUp(Spatial inputSource, Node userNode, Vector3 point)
         {
             if (currentInputSource == null)
             {
@@ -1821,7 +1794,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         }
 
         /// <inheritdoc/>
-        public void OnPointerDown(Spatial inputSource, Node userNode, Vector3 point)
+        public virtual void OnPointerDown(Spatial inputSource, Node userNode, Vector3 point)
         {
             // Current pointer owns scroll interaction until scroll release happens. Ignoring any interaction with other pointers.
             if (currentInputSource != null)
@@ -1850,22 +1823,23 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 IsTouched = false;
                 IsEngaged = true;
                 IsDragging = false;
+                OnInteractionStarted(userNode);
             }
         }
 
         /// <inheritdoc/>
         /// Pointer Click handled during Update.
-        public void OnPointerClicked(Spatial inputSource, Node userNode, Vector3 point) { }
+        public virtual void OnPointerClicked(Spatial inputSource, Node userNode, Vector3 point) { }
 
         /// <inheritdoc/>
-        public void OnPointerDragged(Spatial inputSource, Node userNode, Vector3 point) { }
+        public virtual void OnPointerDragged(Spatial inputSource, Node userNode, Vector3 point) { }
 
         #endregion IMixedRealityPointerHandler implementation
 
         #region IMixedRealityTouchHandler implementation
 
         /// <inheritdoc/>
-        public void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
+        public virtual void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
         {
             // Current pointer owns scroll interaction until scroll release happens. Ignoring any interaction with other pointers.
             if (currentInputSource != null)
@@ -1887,16 +1861,20 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 IsTouched = true;
                 IsEngaged = true;
                 IsDragging = false;
+                OnInteractionStarted(userNode);
+
+                _touchAction.StartAction(CurrentUser);
+
                 EmitSignal(nameof(touch_started));
             }
         }
 
         /// <inheritdoc/>
         /// Touch release handled during Update.
-        public void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point) { }
+        public virtual void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point) { }
 
         /// <inheritdoc/>
-        public void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
+        public virtual void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
         {
             if (currentInputSource == null)
             {
@@ -1935,6 +1913,16 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 ScrollDirection = ScrollDirection.ApplyPatch(patch.ScrollDirectionType);
                 UpdateContent();
             }
+        }
+
+        public virtual void OnInteractionStarted(Node userNode)
+        {
+            CurrentUser = this.GetMREUser(userNode);
+        }
+
+        public virtual void OnInteractionEnded()
+        {
+            CurrentUser = null;
         }
 
         #endregion IToolkit
