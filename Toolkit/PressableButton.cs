@@ -118,8 +118,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
         protected ITouchableSurface touchableSurface => Parent.GetChild<ITouchableSurface>();
 
-        private MWAction _touchAction = new MWAction();
-
         [Signal]
         public delegate void touch_started();
 
@@ -302,10 +300,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
             // Ensure everything is set to initial positions correctly.
             UpdateMovingVisualsPosition();
-
-            this.RegisterAction(_touchAction, "touch");
-            Connect(nameof(touch_started), this, nameof(_on_PressableButton_touch_started));
-            Connect(nameof(touch_ended), this, nameof(_on_PressableButton_touch_ended));
         }
 
         public override void _ExitTree()
@@ -401,7 +395,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         }
 */
 
-        public void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
+        public virtual void OnTouchStarted(Spatial inputSource, Node userNode, Vector3 point)
         {
             if (touchPoints.ContainsKey(inputSource))
             {
@@ -413,7 +407,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             IsTouching = true;
         }
 
-        public void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
+        public virtual void OnTouchUpdated(Spatial inputSource, Node userNode, Vector3 point)
         {
             if (touchPoints.ContainsKey(inputSource))
             {
@@ -421,7 +415,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
         }
 
-        public void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point)
+        public virtual void OnTouchCompleted(Spatial inputSource, Node userNode, Vector3 point)
         {
             if (touchPoints.ContainsKey(inputSource))
             {
@@ -519,26 +513,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
                     IsPressing = false;
                     EmitSignal(nameof(button_released));
                 }
-            }
-        }
-
-        private void _on_PressableButton_touch_started()
-        {
-            var user = GetParent<Actor>().App.LocalUser;
-
-            if (user != null)
-            {
-                _touchAction.StartAction(user);
-            }
-        }
-
-        private void _on_PressableButton_touch_ended()
-        {
-            var user = GetParent<Actor>().App.LocalUser;
-
-            if (user != null)
-            {
-                _touchAction.StopAction(user);
             }
         }
 

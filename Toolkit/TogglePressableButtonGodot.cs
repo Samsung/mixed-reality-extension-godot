@@ -23,6 +23,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				isToggled = value;
 				BackPlateToggleState.Visible = isToggled;
 				EmitSignal(nameof(toggle_changed));
+				_toggleChangedAction.StartAction(CurrentUser, new ActionData<bool>()
+				{
+					value = isToggled
+				});
 			}
 		}
 
@@ -33,7 +37,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			BackPlateToggleState = GetNode<Spatial>("BackPlateToggleState");
 
 			this.RegisterAction(_toggleChangedAction, "toggle_changed");
-			Connect(nameof(toggle_changed), this, nameof(_on_TogglePressableButtonGodot_toggle_changed));
 			Connect(nameof(button_pressed), this, nameof(_on_TogglePressableButtonGodot_button_pressed));
 		}
 
@@ -46,18 +49,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void _on_TogglePressableButtonGodot_button_pressed()
 		{
 			IsToggled = !IsToggled;
-		}
-
-		private void _on_TogglePressableButtonGodot_toggle_changed()
-		{
-			var user = GetParent<Actor>().App.LocalUser;
-			if (user != null)
-			{
-				_toggleChangedAction.StartAction(user, new ActionData<bool>()
-				{
-					value = IsToggled
-				});
-			}
 		}
 
 		public override void ApplyPatch(ToolkitPatch toolkitPatch)
