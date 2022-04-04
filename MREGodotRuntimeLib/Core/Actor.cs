@@ -59,7 +59,7 @@ namespace MixedRealityExtension.Core
 		private GodotCollisionShape _collider;
 		private ColliderPatch _pendingColliderPatch;
 		private LookAtComponent _lookAt;
-		private ClippingComponent _clipping;
+		private ClippingBase _clipping;
 		class MediaInstance
 		{
 			public Guid MediaAssetId { get; }
@@ -1726,7 +1726,8 @@ namespace MixedRealityExtension.Core
 			{
 				if (_clipping == null)
 				{
-					_clipping = GetOrCreateActorComponent<ClippingComponent>();
+					_clipping = new ClippingBox();
+					AddChild(_clipping);
 				}
 				_clipping.ApplyPatch(clippingPatch);
 			}
