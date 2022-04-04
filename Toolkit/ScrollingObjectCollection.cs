@@ -17,6 +17,7 @@ using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Core.Components;
 using MixedRealityExtension.Behaviors.Actions;
 using MixedRealityExtension.Core.Interfaces;
+using MixedRealityExtension.PluginInterfaces;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -395,7 +396,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// <summary>
         /// Scrolling interaction touchable used to catch touch events on empty spaces.
         /// </summary>
-        internal TouchablePlane ScrollingTouchable { get; private set; }
+        internal ITouchableSurface ScrollingTouchable { get; private set; }
 
         // The empty Spatial that contains our nodes and be scrolled
         private Spatial scrollContainer;
@@ -649,15 +650,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
                 ScrollingCollisionBoxShape.Extents = new Vector3(CellWidth * TiersPerPage * 0.5f, CellHeight * CellsPerTier * 0.5f, ScrollingColliderDepth);
             }
 
-            Vector3 colliderPosition;
-            colliderPosition.x = ScrollingCollisionBoxShape.Extents.x / 2;
-            colliderPosition.y = -ScrollingCollisionBoxShape.Extents.y / 2;
-            colliderPosition.z = cellDepth / 2 + ScrollingColliderDepth;
-
-            Vector3 touchablePosition = colliderPosition;
-            touchablePosition.z = -cellDepth / 2;
-
-            ScrollingTouchable.SetLocalCenter(touchablePosition);
+            ScrollingTouchable.TouchableBoxShape = GetNode<CollisionShape>("CollisionShape");
         }
 
         /// <summary>
@@ -1897,7 +1890,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         {
             if (toolkitPatch is ScrollingObjectCollectionPatch patch)
             {
-                ScrollingTouchable = Parent.GetChild<TouchablePlane>();
+                ScrollingTouchable = Parent.GetChild<ITouchableSurface>();
                 var actor = Parent as IActor;
                 foreach (var scrollContent in patch.ScrollContents)
                 {

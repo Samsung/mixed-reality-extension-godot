@@ -70,6 +70,29 @@ namespace MixedRealityExtension.Core
 		/// </summary>
 		public Vector3 LocalPressDirection => LocalForward;
 
+		/// <inheritdoc/>
+		public CollisionShape TouchableBoxShape
+		{
+			get => touchableBoxShape;
+			set {
+				if (touchableBoxShape == value)
+					return;
+
+				if (value != null && value.Shape is BoxShape boxShape)
+				{
+					touchableBoxShape = value;
+					// Set x and y center to match the newCollider but change the position of the
+					// z axis so the plane is always in front of the object
+					SetLocalCenter(touchableBoxShape.Transform.origin + LocalForward * boxShape.Extents);
+				}
+				else
+				{
+					GD.PushWarning("TouchableBoxShape is not BoxShape, cannot set TouchableBoxShape.");
+				}
+			}
+		}
+
+		private CollisionShape touchableBoxShape;
 		private Spatial ParentActor;
 
 		public TouchablePlane(Actor actor)
@@ -122,27 +145,6 @@ namespace MixedRealityExtension.Core
 			LocalCenter = newLocalCenter;
 		}
 
-		/// <summary>
-		/// Adjust the bounds, local center and local forward to match a given box collider.  This method
-		/// also changes the size of the box collider attached to the actor.
-		/// Default Behavior:  if touchableCollider is null at runtime, the object's box collider will be used
-		/// to size and place the TouchablePlane in front of the actor
-		/// </summary>
-		public void SetTouchableCollisionShape(CollisionObject collisionObject)
-		{
-			CollisionShape collisionShape = collisionObject.GetChild<CollisionShape>();
-			if (collisionShape != null && collisionShape.Shape is BoxShape boxShape)
-			{
-				// Set x and y center to match the newCollider but change the position of the
-				// z axis so the plane is always in front of the object
-				SetLocalCenter(collisionShape.Transform.origin + LocalForward * boxShape.Extents);
-			}
-			else
-			{
-				GD.PushWarning("BoxCollider is null, cannot set bounds of TouchableComponent");
-			}
-		}
-
 		/// <inheritdoc />
 		public float DistanceToTouchable(Vector3 samplePoint, out Vector3 normal)
 		{
@@ -188,7 +190,7 @@ namespace MixedRealityExtension.Core
 			var collisionObject = ParentActor.GetChild<CollisionObject>();
 			if (collisionObject != null)
 			{
-				SetTouchableCollisionShape(collisionObject);
+				TouchableBoxShape = collisionObject.GetChild<CollisionShape>();
 			}
 
 			ValidateProperties();

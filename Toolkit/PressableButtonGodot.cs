@@ -179,7 +179,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			if (toolkitPatch is ButtonPatch patch)
 			{
-				((TouchablePlane)touchableSurface).SetLocalCenter(new Vector3(0, 0, 0.016f));
+				touchableSurface.TouchableBoxShape = GetNode<CollisionShape>("TouchableArea/CollisionShape");
 				ApplyText(patch.MainText);
 				ApplyColor(patch.Color);
 			}
