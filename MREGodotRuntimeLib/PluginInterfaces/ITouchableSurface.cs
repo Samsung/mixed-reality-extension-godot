@@ -16,5 +16,10 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// This is the direction that a user will press on this element.
 		/// </summary>
 		Vector3 LocalPressDirection { get; }
+
+		/// <summary>
+		/// local center and local forward are adjusted to match a this collision shape.
+		/// </summary>
+		CollisionShape TouchableBoxShape { get; set; }
 	}
 }
