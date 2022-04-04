@@ -3,15 +3,17 @@
 
 using System.Collections.Generic;
 using Godot;
+using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Util.GodotHelper;
 
-namespace MixedRealityExtension.Core.Components
+namespace MixedRealityExtension.Core
 {
-	internal class ClippingComponent : ActorComponentBase
+	public abstract class ClippingBase : Spatial
 	{
 		private List<MeshInstance> meshInstances = new List<MeshInstance>();
-		private static Vector3 Vector3Half = Vector3.One * 0.5f;
+		private IActor parent;
+
 		public AABB Bounds =>new AABB(GlobalTransform.origin - GlobalTransform.basis.Scale / 2, GlobalTransform.basis.Scale);
 
 		internal void ApplyPatch(ClippingPatch patch)
@@ -21,13 +23,13 @@ namespace MixedRealityExtension.Core.Components
 			{
 				foreach (var clippingObjectId in patch.ClippingObjects)
 				{
-					Spatial targetActor = AttachedActor.App.FindActor(clippingObjectId) as Spatial;
+					Spatial targetActor = parent.App.FindActor(clippingObjectId) as Spatial;
 					AddMeshInstance(targetActor);
 				}
 			}
 		}
 
-		private IEnumerable<ShaderMaterial> ShaderMaterials()
+		protected IEnumerable<ShaderMaterial> ShaderMaterials()
 		{
 			foreach (var meshInstance in meshInstances)
 			{
@@ -57,28 +59,17 @@ namespace MixedRealityExtension.Core.Components
 			}
 		}
 
-		public override void _Process(float delta)
+		public override void _Ready()
 		{
-			var globalTransform = GlobalTransform;
-			globalTransform.basis = globalTransform.basis.Scaled(Vector3Half);
-			var affineInverse = globalTransform.AffineInverse();
-			foreach (var shaderMaterial in ShaderMaterials())
-			{
-				shaderMaterial.SetShaderParam("clipBoxInverseTransform", affineInverse);
-			}
+			parent = GetParent() as IActor;
 		}
 
-		public void ClearMeshInstances()
+		public virtual void ClearMeshInstances()
 		{
-			foreach (var shaderMaterial in ShaderMaterials())
-			{
-				// clear inverse transform matrix
-				shaderMaterial.SetShaderParam("clipBoxInverseTransform", null);
-			}
 			meshInstances.Clear();
 		}
 
-		public void AddMeshInstance(Spatial root)
+		public virtual void AddMeshInstance(Spatial root)
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
@@ -89,7 +80,7 @@ namespace MixedRealityExtension.Core.Components
 			});
 		}
 
-		public void RemoveMeshInstance(Spatial root)
+		public virtual void RemoveMeshInstance(Spatial root)
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
