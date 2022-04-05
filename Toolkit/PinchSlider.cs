@@ -17,24 +17,24 @@ namespace Microsoft.MixedReality.Toolkit.UI
 	internal class PinchSlider : Spatial, IToolkit, IMixedRealityPointerHandler, IMixedRealityTouchHandler
 	{
 		#region Public Properties
-		private Actor thumbActor = null;
+		private IActor thumbActor = null;
 		/// <summary>
 		/// The Actor that contains the slider thumb
 		/// </summary>
-		public Actor ThumbActor
+		public Spatial Thumb
 		{
 			get
 			{
-				return thumbActor;
+				return (Spatial)thumbActor;
 			}
 			set
 			{
 				if (thumbActor == value) return;
-				if (thumbActor != null) RemoveChild(thumbActor);
+				if (thumbActor != null) RemoveChild((Spatial)thumbActor);
 				if (value != null)
 				{
-					thumbActor = value;
-					AddChild(thumbActor);
+					this.thumbActor = value as IActor;
+					AddChild((Spatial)thumbActor);
 				}
 			}
 		}
@@ -68,7 +68,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		/// <summary>
 		/// Used to control the slider on the track when snapToPosition is false
 		/// </summary>
-		public CollisionShape ThumbCollisionShape => thumbActor.GetNode<CollisionShape>("PinchSliderThumb/Mesh/PinchSliderThumbArea/CollisionShape");
+		public CollisionShape ThumbCollisionShape => Thumb.GetNode<CollisionShape>("PinchSliderThumb/Mesh/PinchSliderThumbArea/CollisionShape");
 
 		/// <summary>
 		/// Used to determine the position we snap the slider do when snapToPosition is true
@@ -303,9 +303,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		#region Private Methods
 		private void InitializeSliderThumb()
 		{
-			var startToThumb = thumbActor.GlobalTransform.origin - SliderStartPosition;
+			var startToThumb = Thumb.GlobalTransform.origin - SliderStartPosition;
 			var thumbProjectedOnTrack = SliderStartPosition + startToThumb.Project(SliderTrackDirection);
-			sliderThumbOffset = thumbActor.GlobalTransform.origin - thumbProjectedOnTrack;
+			sliderThumbOffset = Thumb.GlobalTransform.origin - thumbProjectedOnTrack;
 
 			UpdateUI();
 		}
@@ -344,9 +344,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		/// <summary>
 		/// Update orientation of thumb mesh based on slider axis orientation
 		/// </summary>
-		private void UpdateThumbActor()
+		private void UpdateThumb()
 		{
-			if (ThumbActor != null)
+			if (Thumb != null)
 			{
 				Transform newTransform = Transform.Identity;
 				switch (sliderAxis)
@@ -360,7 +360,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 						newTransform.basis = newTransform.basis.Rotated(Vector3.Right, Mathf.Pi / 2);
 						break;
 				}
-				ThumbActor.Transform = newTransform;
+				Thumb.Transform = newTransform;
 			}
 		}
 
@@ -371,7 +371,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		{
 			if (PreviousSliderAxis != sliderAxis)
 			{
-				UpdateThumbActor();
+				UpdateThumb();
 				UpdateTrackMesh();
 				PreviousSliderAxis = sliderAxis;
 			}
@@ -395,7 +395,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void UpdateUI()
 		{
 			var newSliderPos = SliderStartPosition + sliderThumbOffset + SliderTrackDirection * sliderValue;
-			thumbActor.GlobalTransform = new Transform(thumbActor.GlobalTransform.basis, newSliderPos);
+			Thumb.GlobalTransform = new Transform(Thumb.GlobalTransform.basis, newSliderPos);
 		}
 
 		private float SnapSliderToStepPositions(float value)
@@ -434,12 +434,11 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private void ApplyThumb(Guid thumbId)
 		{
 			var actor = Parent as IActor;
-			var thumb = actor.App.FindActor(thumbId) as Actor;
+			var thumb = actor.App.FindActor(thumbId) as Spatial;
 			thumb.GetParent()?.RemoveChild(thumb);
-			ThumbActor = thumb;
-			thumb.ParentId = actor.Id;
+			Thumb = thumb;
 
-			UpdateThumbActor();
+			UpdateThumb();
 			InitializeSliderThumb();
 			ThumbCollisionShape.Disabled = true;
 		}
