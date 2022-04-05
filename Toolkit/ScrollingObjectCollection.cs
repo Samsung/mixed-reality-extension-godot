@@ -458,7 +458,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
         private bool oldIsTargetPositionLockedOnFocusLock;
 
         private readonly HashSet<MeshInstance> clippedMeshInstances = new HashSet<MeshInstance>();
-        private readonly HashSet<Actor> clippedActors = new HashSet<Actor>();
+        private readonly HashSet<IActor> clippedActors = new HashSet<IActor>();
 
         #region scroll state variables
 
@@ -907,10 +907,11 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
             foreach (var actor in clippedActors)
             {
-                if (actor.PauseMode == PauseModeEnum.Stop)
+                var node = actor as Spatial;
+                if (node.PauseMode == PauseModeEnum.Stop)
                 {
-                    actor.PauseMode = PauseModeEnum.Inherit;
-                    actor.Visible = true;
+                    node.PauseMode = PauseModeEnum.Inherit;
+                    node.Visible = true;
                 }
             }
         }
@@ -1416,10 +1417,11 @@ namespace Microsoft.MixedReality.Toolkit.UI
                     if (DisableClippedActors)
                     {
                         var actor = GetActor(meshInstance);
-                        if (!clippedActors.Contains(actor) && actor.PauseMode != PauseModeEnum.Stop)
+                        var node = actor as Spatial;
+                        if (!clippedActors.Contains(actor) && node.PauseMode != PauseModeEnum.Stop)
                         {
-                            actor.PauseMode = PauseModeEnum.Stop;
-                            actor.Visible = false;
+                            node.PauseMode = PauseModeEnum.Stop;
+                            node.Visible = false;
                         }
                     }
                     if (DisableClippedRenderers)
@@ -1648,12 +1650,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
             }
         }
 
-        private Actor GetActor(MeshInstance meshInstance)
+        private IActor GetActor(MeshInstance meshInstance)
         {
             var parent = meshInstance.GetParent();
             while (parent != null)
             {
-                if (parent is Actor actor)
+                if (parent is IActor actor)
                     return actor;
                 parent = parent.GetParent();
             }
