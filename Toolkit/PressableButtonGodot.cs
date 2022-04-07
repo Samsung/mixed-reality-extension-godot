@@ -29,7 +29,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		private MeshInstance HighlightPlate;
 		private ShaderMaterial BackPlateMaterial => (ShaderMaterial)BackPlate.MaterialOverride;
 		private ShaderMaterial HighlightPlateMaterial => (ShaderMaterial)HighlightPlate.MaterialOverride;
-		private SimpleText TextNode;
+		private ToolkitText textNode;
 		private Vector3 initialLocalScale;
 		private MWAction _touchAction = new MWAction();
 		private IUser currentUser;
@@ -67,12 +67,10 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			HighlightPlate = movingButtonVisuals.GetNode<MeshInstance>("HighlightPlate");
 			HighlightPlate.MaterialOverride = HighlightPlate.MaterialOverride.Duplicate(true) as ShaderMaterial;
 
-			TextNode = GetNode<SimpleText>("Text");
-			TextNode.Contents = text;
-			TextNode.Anchor = MixedRealityExtension.Core.Interfaces.TextAnchorLocation.MiddleCenter;
-			TextNode.Height = 0.2f;
-			TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
-			TextNode.Scale = new Vector3(0.032f, 0.032f, 0.032f);
+			textNode = GetNode<ToolkitText>("ToolkitText");
+			textNode.Text = text;
+			textNode.Transform = new Transform(textNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
+			textNode.Scale = new Vector3(0.02f, 0.02f, 0.02f);
 		}
 
 		public override void _PhysicsProcess(float delta)
@@ -80,12 +78,12 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			if (IsTouching && IsPressing)
 			{
 				PulseProximityLight(delta);
-				TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(GlobalTransform.basis.z.Normalized() * 0.001f + GlobalTransform.origin));
+				textNode.Transform = new Transform(textNode.Transform.basis, ToLocal(GlobalTransform.basis.z.Normalized() * 0.001f + GlobalTransform.origin));
 			}
 			else
 			{
 				RevertProximityLight();
-				TextNode.Transform = new Transform(TextNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
+				textNode.Transform = new Transform(textNode.Transform.basis, ToLocal(HighlightPlate.GlobalTransform.origin) / 2);
 			}
 		}
 
@@ -131,7 +129,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 		internal void ApplyText(string text)
 		{
 			if (text == null) return;
-			TextNode.Contents = text;
+			textNode.Text = text;
 		}
 
 		public virtual void OnFocusEnter(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
