@@ -4,6 +4,10 @@
     <RootNamespace>mixedrealityextensiongodot</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="MREGodotRuntimeLibUnitTest\**" />
+    <EmbeddedResource Remove="MREGodotRuntimeLibUnitTest\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Libraries\Newtonsoft.Json.dll</HintPath>
     </Reference>
