@@ -2,7 +2,7 @@
 namespace Godot
 {
     //Dummy class
-    public class Ray
+    internal class Ray
     {
         public Vector3 origin;
 		public Vector3 direction;

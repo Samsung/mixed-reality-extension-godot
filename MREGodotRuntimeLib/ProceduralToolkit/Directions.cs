@@ -6,7 +6,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// Specifies directions along thee axes
 	/// </summary>
 	[Flags]
-	public enum Directions
+	internal enum Directions
 	{
 		None = 0,
 		Left = 1,
@@ -21,7 +21,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		All = Left | Right | Down | Up | Back | Forward
 	}
 
-	public static class DirectionsExtensions
+	internal static class DirectionsExtensions
 	{
 		public static bool HasFlag(this Directions directions, Directions flag)
 		{

@@ -5,12 +5,12 @@ using Godot;
 namespace MixedRealityExtension.ProceduralToolkit.Skeleton
 {
 	/// <summary>
-	/// A straight skeleton generator, computes a straight skeleton for the input polygon, reusable. 
+	/// A straight skeleton generator, computes a straight skeleton for the input polygon, reusable.
 	/// The generation algorithm is loosely based on the work of Tom Kelly
 	/// (2014) "Unwritten procedural modeling with the straight skeleton"
 	/// http://www.twak.co.uk/2014/02/unwritten-procedural-modeling-with.html
 	/// </summary>
-	public class StraightSkeletonGenerator
+	internal class StraightSkeletonGenerator
 	{
 		private readonly List<Plan> activePlans = new List<Plan>();
 		private readonly List<Plan> newPlans = new List<Plan>();

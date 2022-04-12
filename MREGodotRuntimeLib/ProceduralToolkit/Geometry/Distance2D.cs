@@ -5,7 +5,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Collection of distance calculation algorithms
 	/// </summary>
-	public static partial class Distance
+	internal static partial class Distance
 	{
 		#region Point-Line
 
@@ -216,7 +216,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			if (Mathf.Abs(denominator) < Geometry.Epsilon)
 			{
 				// Parallel
-				// Normalized direction gives more stable results 
+				// Normalized direction gives more stable results
 				float perpDotB = VectorE.PerpDot(segmentDirection.Normalized(), segmentAToOrigin);
 				if (Mathf.Abs(perpDotA) > Geometry.Epsilon || Mathf.Abs(perpDotB) > Geometry.Epsilon)
 				{
@@ -407,7 +407,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			Vector2 segmentDirection = segmentB - segmentA;
 			float denominator = VectorE.PerpDot(rayDirection, segmentDirection);
 			float perpDotA = VectorE.PerpDot(rayDirection, segmentAToOrigin);
-			// Normalized direction gives more stable results 
+			// Normalized direction gives more stable results
 			float perpDotB = VectorE.PerpDot(segmentDirection.Normalized(), segmentAToOrigin);
 
 			if (Mathf.Abs(denominator) < Geometry.Epsilon)
