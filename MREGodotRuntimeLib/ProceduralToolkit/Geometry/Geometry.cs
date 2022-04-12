@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Utility class for computational geometry algorithms
 	/// </summary>
-	public static class Geometry
+	internal static class Geometry
 	{
 		/// <summary>
 		/// A tiny floating point value used in comparisons

@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// Representation of a sphere
 	/// </summary>
 	[Serializable]
-	public struct Sphere : IEquatable<Sphere>, IFormattable
+	internal struct Sphere : IEquatable<Sphere>, IFormattable
 	{
 		public Vector3 center;
 		public float radius;

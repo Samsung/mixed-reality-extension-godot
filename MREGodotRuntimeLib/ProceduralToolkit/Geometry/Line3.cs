@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// Representation of a 3D line
 	/// </summary>
 	[Serializable]
-	public struct Line3 : IEquatable<Line3>, IFormattable
+	internal struct Line3 : IEquatable<Line3>, IFormattable
 	{
 		public Vector3 origin;
 		public Vector3 direction;

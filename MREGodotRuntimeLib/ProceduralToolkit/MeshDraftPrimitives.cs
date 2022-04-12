@@ -8,7 +8,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Helper class for procedural mesh generation
 	/// </summary>
-	public partial class MeshDraft
+	internal partial class MeshDraft
 	{
 		#region Platonic solids
 

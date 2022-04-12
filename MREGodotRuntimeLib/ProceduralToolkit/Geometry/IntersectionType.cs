@@ -1,6 +1,6 @@
 namespace MixedRealityExtension.ProceduralToolkit
 {
-	public enum IntersectionType : byte
+	internal enum IntersectionType : byte
 	{
 		None = 0,
 		Point,

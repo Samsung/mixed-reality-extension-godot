@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit.Skeleton
 	/// <summary>
 	/// Representation of the active plan during generation process
 	/// </summary>
-	public class Plan : IEnumerable<Plan.Vertex>
+	internal class Plan : IEnumerable<Plan.Vertex>
 	{
 		public int Count { get { return vertices.Count; } }
 		public Vertex First { get { return vertices[0]; } }

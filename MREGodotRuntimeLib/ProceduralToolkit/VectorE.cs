@@ -6,7 +6,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Vector extensions
 	/// </summary>
-	public static class VectorE
+	internal static class VectorE
 	{
 		#region Vector2
 
@@ -89,7 +89,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <param name="to">The angle extends round to this vector</param>
 		public static float SignedAngle(Vector2 from, Vector2 to)
 		{
-			
+
 			return Mathf.Rad2Deg(Mathf.Atan2(PerpDot(to, from), to.Dot(from)));
 		}
 

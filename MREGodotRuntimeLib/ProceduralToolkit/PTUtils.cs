@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Various useful methods and constants
 	/// </summary>
-	public static class PTUtils
+	internal static class PTUtils
 	{
 		/// <summary>
 		/// Lowercase letters from a to z
