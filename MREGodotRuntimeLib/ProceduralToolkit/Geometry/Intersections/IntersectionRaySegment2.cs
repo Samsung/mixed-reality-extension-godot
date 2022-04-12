@@ -2,7 +2,7 @@ using Godot;
 
 namespace MixedRealityExtension.ProceduralToolkit
 {
-	public struct IntersectionRaySegment2
+	internal struct IntersectionRaySegment2
 	{
 		public IntersectionType type;
 		public Vector2 pointA;

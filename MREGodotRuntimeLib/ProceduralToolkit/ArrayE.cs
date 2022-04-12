@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Array extensions
 	/// </summary>
-	public static class ArrayE
+	internal static class ArrayE
 	{
 		/// <summary>
 		/// Gets the next or the first node in the <see cref="LinkedList{T}"/>

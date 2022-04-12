@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// Representation of a 2D circle
 	/// </summary>
 	[Serializable]
-	public struct Circle2 : IEquatable<Circle2>, IFormattable
+	internal struct Circle2 : IEquatable<Circle2>, IFormattable
 	{
 		public Vector2 center;
 		public float radius;

@@ -7,7 +7,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// Representation of a 3D line segment
 	/// </summary>
 	[Serializable]
-	public struct Segment3 : IEquatable<Segment3>, IFormattable
+	internal struct Segment3 : IEquatable<Segment3>, IFormattable
 	{
 		public Vector3 a;
 		public Vector3 b;

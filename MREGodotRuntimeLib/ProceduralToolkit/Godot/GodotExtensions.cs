@@ -3,7 +3,7 @@ using Godot;
 
 namespace Godot
 {
-    public static class GodotExtensions
+    internal static class GodotExtensions
     {
         /// <summary>
         /// Returns the signed angle to the given vector, in radians.

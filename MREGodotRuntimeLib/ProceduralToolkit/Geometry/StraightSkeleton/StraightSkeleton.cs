@@ -6,7 +6,7 @@ namespace MixedRealityExtension.ProceduralToolkit.Skeleton
 	/// <summary>
 	/// A straight skeleton representation
 	/// </summary>
-	public class StraightSkeleton
+	internal class StraightSkeleton
 	{
 		public List<List<Vector2>> polygons = new List<List<Vector2>>();
 

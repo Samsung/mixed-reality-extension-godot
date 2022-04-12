@@ -5,7 +5,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Collection of distance calculation algorithms
 	/// </summary>
-	public static partial class Distance
+	internal static partial class Distance
 	{
 		#region Point-Line
 

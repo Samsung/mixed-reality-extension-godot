@@ -5,7 +5,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Collection of intersection algorithms
 	/// </summary>
-	public static partial class Intersect
+	internal static partial class Intersect
 	{
 		#region Point-Line
 

@@ -5,7 +5,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 	/// <summary>
 	/// Collection of closest point(s) algorithms
 	/// </summary>
-	public static partial class Closest
+	internal static partial class Closest
 	{
 		#region Point-Line
 
@@ -116,8 +116,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <summary>
 		/// Projects the point onto the segment
 		/// </summary>
-		/// <param name="projectedX">Normalized position of the projected point on the segment. 
-		/// Value of zero means that the projected point coincides with segment.a. 
+		/// <param name="projectedX">Normalized position of the projected point on the segment.
+		/// Value of zero means that the projected point coincides with segment.a.
 		/// Value of one means that the projected point coincides with segment.b.</param>
 		public static Vector2 PointSegment(Vector2 point, Segment2 segment, out float projectedX)
 		{
@@ -136,8 +136,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <summary>
 		/// Projects the point onto the segment
 		/// </summary>
-		/// <param name="projectedX">Normalized position of the projected point on the segment. 
-		/// Value of zero means that the projected point coincides with <paramref name="segmentA"/>. 
+		/// <param name="projectedX">Normalized position of the projected point on the segment.
+		/// Value of zero means that the projected point coincides with <paramref name="segmentA"/>.
 		/// Value of one means that the projected point coincides with <paramref name="segmentB"/>.</param>
 		public static Vector2 PointSegment(Vector2 point, Vector2 segmentA, Vector2 segmentB, out float projectedX)
 		{
@@ -323,7 +323,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			{
 				// Parallel
 				bool codirected = lineDirection.Dot(segmentDirection) > 0;
-				// Normalized direction gives more stable results 
+				// Normalized direction gives more stable results
 				float perpDotB = VectorE.PerpDot(segmentDirection.Normalized(), segmentAToOrigin);
 				if (Mathf.Abs(perpDotA) > Geometry.Epsilon || Mathf.Abs(perpDotB) > Geometry.Epsilon)
 				{
@@ -589,7 +589,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			Vector2 segmentAToOrigin = rayOrigin - segmentA;
 			float denominator = VectorE.PerpDot(rayDirection, segmentDirection);
 			float perpDotA = VectorE.PerpDot(rayDirection, segmentAToOrigin);
-			// Normalized direction gives more stable results 
+			// Normalized direction gives more stable results
 			float perpDotB = VectorE.PerpDot(segmentDirection.Normalized(), segmentAToOrigin);
 
 			if (Mathf.Abs(denominator) < Geometry.Epsilon)
