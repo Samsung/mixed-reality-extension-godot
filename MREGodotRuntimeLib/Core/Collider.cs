@@ -60,15 +60,14 @@ namespace MixedRealityExtension.Core
 
 	internal class Collider : Area, ICollider
 	{
-		//FIXME: need to change path
-		private static Resource Resource = ResourceLoader.Load("MREGodotRuntimeLib/Core/Collider.cs");
+		private static readonly Reference colliderScript = new Collider().GetScript();
 
 		public static Collider Instantiate(Area area)
 		{
 			var parent = area.GetParent();
 			ulong objId = area.GetInstanceId();
 
-			area.SetScript(Resource);
+			area.SetScript(colliderScript);
 			var newArea = GD.InstanceFromId(objId) as Collider;
 			newArea.SetProcess(true);
 			return newArea;
