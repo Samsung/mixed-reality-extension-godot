@@ -37,16 +37,14 @@ namespace MixedRealityExtension.Core
 	/// </summary>
 	internal sealed class Actor : MixedRealityExtensionObject, ICommandHandlerContext, IActor
 	{
-		//FIXME: need to change path
-		private static Resource Resource = ResourceLoader.Load("MREGodotRuntimeLib/Core/Actor.cs");
+		private static readonly Reference actorScript = new Actor().GetScript();
 
 		public static Actor Instantiate(Spatial node3D)
 		{
-			var parent = node3D.GetParent();
 			ulong objId = node3D.GetInstanceId();
 			var name = node3D.Name;
 
-			node3D.SetScript(Resource);
+			node3D.SetScript(actorScript);
 			var newNode = GD.InstanceFromId(objId) as Actor;
 			newNode.Name = name;
 			newNode.SetProcess(true);
