@@ -17,7 +17,7 @@ namespace MixedRealityExtension.Messaging.Commands
 		{
 			public bool Invoked;
 			public string Location;
-			public uint CreationTime;
+			public ulong CreationTime;
 		}
 
 		// Command handler methods mapped to MethodInfo by handler object type.
@@ -28,10 +28,10 @@ namespace MixedRealityExtension.Messaging.Commands
 		private readonly List<PendingCompletionCallback> _pendingCompletionCallbacks = new List<PendingCompletionCallback>();
 		// The next time to check the _pendingCompletionCallbacks queue for timed out commands.
 		// These commands may have a logic error and are not calling their supplied onCompleteCallback.
-		private uint _nextQueueCheckTime;
+		private ulong _nextQueueCheckTime;
 
 		// The maximum amount of time to wait for an onCompleteCallback to be invoked.
-		private static readonly uint QueuedCompletionCallbackTimeout = 60 * 1000;
+		private static readonly ulong QueuedCompletionCallbackTimeout = 60 * 1000;
 
 		public CommandManager(IDictionary<Type, ICommandHandlerContext> commandHandlers)
 		{
