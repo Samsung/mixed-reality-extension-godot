@@ -12,7 +12,6 @@ using AppManager = MixedRealityExtension.Util.ObjectManager<MixedRealityExtensio
 using MixedRealityExtension.Util.Logging;
 using Newtonsoft.Json;
 
-//FIXME
 namespace MixedRealityExtension.API
 {
 	/// <summary>

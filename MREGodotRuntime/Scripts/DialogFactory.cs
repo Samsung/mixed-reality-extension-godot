@@ -9,7 +9,6 @@ using Godot.Collections;
 
 public class DialogFactory : MeshInstance, IDialogFactory
 {
-	//[SerializeField] private UnityStandardAssets.Characters.FirstPerson.FirstPersonController controller;
 	[Export] private NodePath inputSource;
 	private Assets.Scripts.User.InputSource inputSourceNode;
 	private ConfirmationDialog label;

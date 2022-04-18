@@ -29,21 +29,6 @@ namespace MixedRealityExtension.Util.GodotHelper
 
 		private async void Run()
 		{
-			/* FIXME
-			if (_task != null)
-			{
-				while (_task.MoveNext())
-				{
-					Result = _task.Current;
-					yield return Result;
-				}
-			}
-			else
-			{
-				yield return null;
-			}
-			*/
-
 			await Task.Run(() => _then?.Invoke(Result));
 		}
 	}

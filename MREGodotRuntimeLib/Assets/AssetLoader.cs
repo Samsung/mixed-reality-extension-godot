@@ -728,7 +728,6 @@ namespace MixedRealityExtension.Assets
 			// verify creation and apply initial patch
 			if (unityAsset != null)
 			{
-				//unityAsset.Name = def.Name;
 				OnAssetUpdate(new AssetUpdate()
 				{
 					Asset = def

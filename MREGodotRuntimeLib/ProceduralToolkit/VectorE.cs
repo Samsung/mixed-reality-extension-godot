@@ -313,23 +313,5 @@ namespace MixedRealityExtension.ProceduralToolkit
 		}
 
 		#endregion Vector3
-
-		/* FIXME not support in godot
-		#region Vector4
-
-		/// <summary>
-		/// Calculates the linear parameter t that produces the interpolant value within the range [a, b].
-		/// </summary>
-		public static Vector4 InverseLerp(Vector4 a, Vector4 b, Vector4 value)
-		{
-			return new Vector4(
-				Mathf.InverseLerp(a.x, b.x, value.x),
-				Mathf.InverseLerp(a.y, b.y, value.y),
-				Mathf.InverseLerp(a.z, b.z, value.z),
-				Mathf.InverseLerp(a.w, b.w, value.w));
-		}
-
-		#endregion Vector4
-		*/
 	}
 }
