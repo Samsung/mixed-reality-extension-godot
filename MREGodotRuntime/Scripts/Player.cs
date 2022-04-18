@@ -236,9 +236,6 @@ public class Player : ARVROrigin
     public override void _EnterTree()
     {
         MainCamera = GetNode<Camera>("MainCamera");
-        var openXRRightHand = GetNode<Spatial>("OpenXRRightHand");
-        var openXRLeftHand = GetNode<Spatial>("OpenXRLeftHand");
-        var rightHand = MainCamera.GetNode<Spatial>("RightHand");
 
         InitializeOpenXR();
     }

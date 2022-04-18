@@ -234,34 +234,10 @@ namespace MixedRealityExtension.Core
 		{
 			get
 			{
-				/*FIXME
-				if (Renderer is SkinnedMeshRenderer skinned)
-				{
-					return skinned.sharedMesh;
-				}
-				else if (MeshFilter != null)
-				{
-					return MeshFilter.sharedMesh;
-				}
-				else
-				{
-					return null;
-				}
-				*/
 				return MeshInstance.Mesh;
 			}
 			set
 			{
-				/*FIXME
-				if (Renderer is SkinnedMeshRenderer skinned)
-				{
-					skinned.sharedMesh = value;
-				}
-				else
-				{
-					MeshFilter.sharedMesh = value;
-				}
-				*/
 				MeshInstance.Mesh = value;
 			}
 		}
@@ -841,8 +817,7 @@ namespace MixedRealityExtension.Core
 			// Detach from parent. This will preserve the world transform (changing the local transform).
 			// This is desired so that the actor doesn't change position, but we must restore the local
 			// transform when reattaching.
-			//FIXME
-			//DetachFromAttachPointParent();
+			DetachFromAttachPointParent();
 
 			IHostAppUser hostAppUser = App.FindUser(Attachment.UserId)?.HostAppUser;
 			if (hostAppUser != null)
@@ -1196,13 +1171,6 @@ namespace MixedRealityExtension.Core
 						meshInstance.MaterialOverride = (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate();
 						forceUpdateRenderer = true;
 					}
-					/*FIXME
-					// guarantee mesh filter (unless it has a skinned mesh renderer)
-					if (renderer is MeshRenderer && meshFilter == null)
-					{
-						meshFilter = gameObject.AddComponent<MeshFilter>();
-					}
-					*/
 
 					// look up and assign mesh
 					var updatedMeshId = MeshId;
@@ -1910,63 +1878,7 @@ namespace MixedRealityExtension.Core
 		{
 			ExecuteRigidBodyCommands(payload, onCompleteCallback);
 		}
-/*FIXME
-		[CommandHandler(typeof(CreateAnimation))]
-		private void OnCreateAnimation(CreateAnimation payload, Action onCompleteCallback)
-		{
-			var animComponent = GetOrCreateActorComponent<AnimationComponent>();
-			animComponent.CreateAnimation(payload.AnimationName, payload.Keyframes, payload.Events, payload.WrapMode, payload.InitialState,
-				isInternal: false,
-				managed: payload.AnimationId.HasValue,
-				onCreatedCallback: () =>
-				{
-					if (payload.AnimationId.HasValue)
-					{
-						var unityAnim = GetComponent<UnityEngine.Animation>();
-						var unityState = unityAnim[payload.AnimationName];
-						var nativeAnim = new NativeAnimation(
-							App.AnimationManager,
-							payload.AnimationId.Value,
-							unityAnim,
-							unityState);
-						nativeAnim.TargetIds = new List<Guid>() { Id };
-						App.AnimationManager.RegisterAnimation(nativeAnim);
 
-						Trace trace = new Trace()
-						{
-							Severity = TraceSeverity.Info,
-							Message = $"Successfully created animation named {nativeAnim.Name}"
-						};
-
-						App.Protocol.Send(
-							new ObjectSpawned()
-							{
-								Result = new OperationResult()
-								{
-									ResultCode = OperationResultCode.Success,
-									Message = trace.Message
-								},
-								Traces = new List<Trace>() { trace },
-								Animations = new AnimationPatch[] { nativeAnim.GeneratePatch() }
-							},
-							payload.MessageId
-						);
-					}
-					onCompleteCallback?.Invoke();
-				}
-			);
-		}
-
-		[Obsolete]
-		[CommandHandler(typeof(SetAnimationState))]
-		private void OnSetAnimationState(SetAnimationState payload, Action onCompleteCallback)
-		{
-			var actor = (Actor)App.FindActor(payload.ActorId);
-			actor.GetOrCreateActorComponent<AnimationComponent>()
-				.SetAnimationState(payload.AnimationName, payload.State.Time, payload.State.Speed, payload.State.Enabled);
-			onCompleteCallback?.Invoke();
-		}
-*/
 		[CommandHandler(typeof(SetMediaState))]
 		private void OnSetMediaState(SetMediaState payload, Action onCompleteCallback)
 		{

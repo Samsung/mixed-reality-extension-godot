@@ -183,12 +183,6 @@ public class MREComponent : Spatial
 
 	public override void _Process(float delta)
 	{
-		/* FIXME
-		if (Input.GetButtonUp("Jump"))
-		{
-			MREApp?.RPC.SendRPC("button-up", "space", false);
-		}
-		*/
 		MREApp?.Update();
 	}
 

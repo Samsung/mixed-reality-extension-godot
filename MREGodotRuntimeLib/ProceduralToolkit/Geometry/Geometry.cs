@@ -421,32 +421,6 @@ namespace MixedRealityExtension.ProceduralToolkit
 			return Mathf.Sin(Mathf.Deg2Rad(angle)/2);
 		}
 
-		/*FIXME not support in godot.
-		/// <summary>
-		/// Calculates a bounding rect for a set of vertices.
-		/// </summary>
-		public static Rect GetRect(IList<Vector2> vertices)
-		{
-			Vector2 min = vertices[0];
-			Vector2 max = vertices[0];
-			for (var i = 1; i < vertices.Count; i++)
-			{
-				var vertex = vertices[i];
-				min = Vector2.Min(min, vertex);
-				max = Vector2.Max(max, vertex);
-			}
-			return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
-		}
-
-		/// <summary>
-		/// Calculates a circumradius for a rectangle.
-		/// </summary>
-		public static float GetCircumradius(Rect rect)
-		{
-			return GetCircumradius(rect.width, rect.height);
-		}
-		*/
-
 		/// <summary>
 		/// Calculates a circumradius for a rectangle.
 		/// </summary>
