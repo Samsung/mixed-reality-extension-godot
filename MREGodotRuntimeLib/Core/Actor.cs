@@ -819,9 +819,9 @@ namespace MixedRealityExtension.Core
 						var attachmentComponent = attachPoint.AddNode(new MREAttachmentComponent());
 						attachmentComponent.Actor = this;
 						attachmentComponent.UserId = Attachment.UserId;
-
 						attachmentComponent.Transform = this.Transform;
 						hostAppUser.BeforeAvatarDestroyed += UserInfo_BeforeAvatarDestroyed;
+						Connect("tree_exited", this, nameof(ActorTreeExited), new Godot.Collections.Array() { attachmentComponent });
 						return true;
 					}
 				}
@@ -833,6 +833,12 @@ namespace MixedRealityExtension.Core
 
 			return false;
 		}
+
+		private void ActorTreeExited(Spatial attachmentComponent)
+		{
+			attachmentComponent.QueueFree();
+		}
+
 		private void UserInfo_BeforeAvatarDestroyed()
 		{
 			// Remember the original local transform.
