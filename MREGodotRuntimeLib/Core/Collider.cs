@@ -10,13 +10,10 @@ using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Util.GodotHelper;
 using System;
-using System.Linq;
 using Godot;
 
 using MREContactPoint = MixedRealityExtension.Core.Collision.ContactPoint;
 
-using GodotCollisionObject = Godot.CollisionObject;
-//using UnityCollision = UnityEngine.Collision;
 
 namespace MixedRealityExtension.Core
 {

@@ -88,14 +88,6 @@ namespace MixedRealityExtension.Assets
 			{
 				CacheRootGO = SerializedCacheRoot;
 			}
-			//FIXME
-			//Application.lowMemory += CleanUnusedResources;
-		}
-
-		protected virtual void OnDestroy()
-		{
-			//FIXME
-			//Application.lowMemory -= CleanUnusedResources;
 		}
 
 		///<inheritdoc/>
@@ -248,7 +240,7 @@ namespace MixedRealityExtension.Assets
 				{
 					WaitTime = CleanInterval,
 				};
-				
+
 				await ToSignal(CleanTimer, "timeout");
 				CleanUnusedResources();
 				CleanTimer = null;

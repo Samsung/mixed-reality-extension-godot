@@ -41,7 +41,7 @@ namespace MixedRealityExtension.Core.Components
 					|| animationData.Enabled == animationPlayer.PlaybackActive
 				)
 					continue;
-				
+
 				animationData.Enabled = animationPlayer.PlaybackActive;
 
 				// Let the app know this animation (or interpolation) changed state.
@@ -115,34 +115,8 @@ namespace MixedRealityExtension.Core.Components
 					AddFloatPatch(type, String.Format("{0}:z", propertyName), time, value?.Z);
 				}
 
-				void AddQuaternionPatch(Type type, string propertyName, float time, QuaternionPatch value)
-				{
-					AddFloatPatch(type, String.Format("{0}:x", propertyName), time, value?.X);
-					AddFloatPatch(type, String.Format("{0}:y", propertyName), time, value?.Y);
-					AddFloatPatch(type, String.Format("{0}:z", propertyName), time, value?.Z);
-					AddFloatPatch(type, String.Format("{0}:w", propertyName), time, value?.W);
-				}
-
 				void AddTransformPatch(float time, ScaledTransformPatch value)
 				{
-					// Work around a Unity bug/feature where all position components must be specified
-					// in the keyframe or the missing fields get set to zero.
-					Vector3Patch position = value?.Position;
-					if (position != null && position.IsPatched())
-					{
-						if (!position.X.HasValue) { position.X = Transform.origin.x; }
-						if (!position.Y.HasValue) { position.Y = Transform.origin.y; }
-						if (!position.Z.HasValue) { position.Z = Transform.origin.z; }
-					}
-					// Work around a Unity bug/feature where all scale components must be specified
-					// in the keyframe or the missing fields get set to one.
-					Vector3Patch scale = value?.Scale;
-					if (scale != null && scale.IsPatched())
-					{
-						if (!scale.X.HasValue) { scale.X = Scale.x; }
-						if (!scale.Y.HasValue) { scale.Y = Scale.y; }
-						if (!scale.Z.HasValue) { scale.Z = Scale.z; }
-					}
 					AddVector3Patch(typeof(Transform), "..:translation", time, value?.Position);
 					var ratation = value?.Rotation;
 					var quat = new Quat(ratation.X.Value, ratation.Y.Value, ratation.Z.Value, ratation.W.Value);
