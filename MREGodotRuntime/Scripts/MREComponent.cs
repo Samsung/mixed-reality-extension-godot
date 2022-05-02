@@ -235,20 +235,6 @@ public class MREComponent : Spatial
 	{
 		GD.Print($"User joined with host id: {user.HostAppUser.HostUserId} and mre user id: {user.Id}");
 		hostAppUsers[user.Id] = (HostAppUser)user.HostAppUser;
-
-		if (hostAppUsers.Count == 1)
-		{
-			var drawingRPC = new RPCInterface(MREApp);
-			MREApp.RPCChannels.SetChannelHandler(user.Id.ToString(), drawingRPC);
-			drawingRPC.OnReceive("drawing:drawing-start", new RPCHandler<Guid, Guid>((userId, actorId) =>
-			{
-				var actor = ((MixedRealityExtensionApp)MREApp).FindActor(actorId) as Actor;
-				if (actor == null) return;
-				var origin = actor.GlobalTransform.origin;
-				origin.z *= -1;
-				drawingRPC.SendRPC(user.Id.ToString(), "drawing:drawing-start", user.Id.ToString(), userId, origin);
-			}));
-		}
 	}
 
 	private void MRE_OnUserLeft(IUser user, bool isLocalUser)
