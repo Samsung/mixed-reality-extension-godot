@@ -8,6 +8,7 @@ using MixedRealityExtension.Core;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Behaviors.Actions;
 using MixedRealityExtension.Core.Interfaces;
+using MixedRealityExtension.Util.GodotHelper;
 
 namespace Microsoft.MixedReality.Toolkit.UI
 {
@@ -271,6 +272,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			this.RegisterAction(_valueChangedAction, "value_changed");
 
 			trackMesh = GetNode<MeshInstance>("Mesh");
+			trackMesh.Mesh.SurfaceSetMaterial(0, new ShaderMaterial() {
+				Shader = ShaderFactory.OpaqueShader
+			});
 			//SnapToPosition = snapToPosition;
 			TouchCollisionShape.Disabled = false;
 			UpdateTrackMesh();
