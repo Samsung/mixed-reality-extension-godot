@@ -226,15 +226,12 @@ namespace Assets.Scripts.Tools
 
 				for (var node = (Spatial)RayIntersectionResult["collider"]; node != null; node = node.GetParent() as Spatial)
 				{
-					if (node is MixedRealityExtension.Core.Actor a)
+					var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
+					inputSource.HitPoint = (Vector3)hitPoint;
+					inputSource.HitPointNormal = hitPointNormal;
+					if (node.GetChild<TargetBehavior>() != null)
 					{
-						var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
-						inputSource.HitPoint = (Vector3)hitPoint;
-						inputSource.HitPointNormal = hitPointNormal;
-						if (node.GetChild<TargetBehavior>() != null)
-						{
-							return a;
-						}
+						return node;
 					}
 				}
 
