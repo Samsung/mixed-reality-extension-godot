@@ -37,24 +37,19 @@ namespace MixedRealityExtension.Factories
 		private static string TextureEmissionProp = "texture_emission";
 		private static string AlphaScissorThresholdProp = "alpha_scissor_threshold";
 
-		private static Shader OpaqueShader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Opaque.shader");
-		private static Shader BlendShader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Blend.shader");
-		private static Shader MaskShader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Mask.shader");
-
-
 		/// <inheritdoc />
 		public virtual void ApplyMaterialPatch(IMixedRealityExtensionApp app, Material material, MaterialPatch patch)
 		{
 			switch (patch.AlphaMode)
 			{
 				case MWAssets.AlphaMode.Opaque:
-					material.Shader = OpaqueShader;
+					material.Shader = ShaderFactory.OpaqueShader;
 					break;
 				case MWAssets.AlphaMode.Mask:
-					material.Shader = MaskShader;
+					material.Shader = ShaderFactory.MaskShader;
 					break;
 				case MWAssets.AlphaMode.Blend:
-					material.Shader = BlendShader;
+					material.Shader = ShaderFactory.BlendShader;
 					break;
 				// ignore default case, i.e. null
 			}

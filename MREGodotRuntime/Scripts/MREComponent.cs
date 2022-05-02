@@ -15,6 +15,7 @@ using MixedRealityExtension.Toolkit.Payloads;
 using MixedRealityExtension.Toolkit.Payloads.Converters;
 using MixedRealityExtension.Toolkit;
 using MixedRealityExtension.Messaging.Commands;
+using MixedRealityExtension.Util.GodotHelper;
 
 class TestLogMessage
 {
@@ -95,7 +96,7 @@ public class MREComponent : Spatial
 	private static bool _apiInitialized = false;
 
 	private ShaderMaterial DefaultPrimMaterial = new ShaderMaterial() {
-		Shader = ResourceLoader.Load<Shader>("res://MREGodotRuntimeLib/Shaders/MREDefaultShader_Opaque.shader")
+		Shader = ShaderFactory.OpaqueShader
 	};
 
 	private Dictionary<Guid, HostAppUser> hostAppUsers = new Dictionary<Guid, HostAppUser>();

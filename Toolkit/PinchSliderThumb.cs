@@ -3,6 +3,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.Patching.Types;
+using MixedRealityExtension.Util.GodotHelper;
 
 internal class PinchSliderThumb : Spatial, IToolkit, IMixedRealityPointerHandler
 {
@@ -36,6 +37,9 @@ internal class PinchSliderThumb : Spatial, IToolkit, IMixedRealityPointerHandler
     public override void _Ready()
     {
         ((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, Parent);
+        GetNode<MeshInstance>("Mesh").Mesh.SurfaceSetMaterial(0, new ShaderMaterial() {
+            Shader = ShaderFactory.OpaqueShader
+        });
     }
 
     public override void _EnterTree()
