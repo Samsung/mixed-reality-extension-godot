@@ -4,8 +4,8 @@
     <RootNamespace>mixedrealityextensiongodot</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="MREGodotRuntimeLibUnitTest\**" />
-    <EmbeddedResource Remove="MREGodotRuntimeLibUnitTest\**" />
+    <Compile Remove="MREGodotRuntimeLibUnitTests\**" />
+    <EmbeddedResource Remove="MREGodotRuntimeLibUnitTests\**" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
