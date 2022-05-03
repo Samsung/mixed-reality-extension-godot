@@ -32,3 +32,5 @@ transform = Transform( -6.55671e-10, 0.015, 0, -0.015, -6.55671e-10, 0, 0, 0, 0.
 
 [node name="CollisionShape" type="CollisionShape" parent="Mesh/PinchSliderThumbArea"]
 shape = SubResource( 2 )
+
+[node name="Tween" type="Tween" parent="."]

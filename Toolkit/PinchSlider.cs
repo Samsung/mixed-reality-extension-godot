@@ -3,8 +3,8 @@
 
 using Microsoft.MixedReality.Toolkit.Input;
 using System;
+using System.Linq;
 using Godot;
-using MixedRealityExtension.Core;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Behaviors.Actions;
 using MixedRealityExtension.Core.Interfaces;
@@ -15,7 +15,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 	/// <summary>
 	/// A slider that can be moved by grabbing / pinching a slider thumb
 	/// </summary>
-	internal class PinchSlider : Spatial, IToolkit, IMixedRealityPointerHandler, IMixedRealityTouchHandler
+	internal class PinchSlider : Spatial, IToolkit, IMixedRealityPointerHandler, IMixedRealityTouchHandler, IMixedRealityFocusHandler
 	{
 		#region Public Properties
 		private IActor thumbActor = null;
@@ -287,6 +287,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 			((IMixedRealityTouchHandler)this).RegisterTouchEvent(this, Parent);
 			((IMixedRealityPointerHandler)this).RegisterPointerEvent(this, Parent);
+			((IMixedRealityFocusHandler)this).RegisterFocusEvent(this, Parent);
 		}
 
 		private void OnDisable()
@@ -545,6 +546,22 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
 		#endregion IMixedRealityTouchHandler
 
+		#region IMixedRealityFocusHandler
+
+		/// <inheritdoc/>
+		public void OnFocusEnter(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
+		{
+			Thumb.GetNode<PinchSliderThumb>("PinchSliderThumb").OnFocused();
+		}
+
+		/// <inheritdoc/>
+		public void OnFocusExit(Spatial inputSource, Node userNode, Spatial oldTarget, Spatial newTarget)
+		{
+			Thumb.GetNode<PinchSliderThumb>("PinchSliderThumb").OnUnfocused();
+		}
+
+		#endregion IMixedRealityFocusHandler
+
 		#region IToolkit
 
 		public Node Parent { get; private set; }
@@ -565,6 +582,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
 			{
 				value = sliderValue
 			});
+
+			Thumb.GetNode<PinchSliderThumb>("PinchSliderThumb").OnInteractionStarted(userNode);
 			EmitSignal(nameof(interaction_started));
 		}
 
@@ -575,6 +594,7 @@ namespace Microsoft.MixedReality.Toolkit.UI
 				value = sliderValue
 			});
 			CurrentUser = null;
+			Thumb.GetNode<PinchSliderThumb>("PinchSliderThumb").OnInteractionEnded();
 			EmitSignal(nameof(interaction_ended));
 			ActiveInputSource = null;
 		}
