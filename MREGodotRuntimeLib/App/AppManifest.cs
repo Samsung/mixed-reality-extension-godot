@@ -51,6 +51,11 @@ namespace MixedRealityExtension.Core
 		/// </summary>
 		public Permissions[] OptionalPermissions;
 
+		/// <summary>
+		/// A list of plugins required for this MRE to run.
+		/// </summary>
+		public string[] Plugins;
+
 		internal static async Task<AppManifest> DownloadManifest(Uri manifestUri)
 		{
 			var webClient = new HttpClient();
