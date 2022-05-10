@@ -1,0 +1,54 @@
+{
+  "runtimeTarget": {
+    "name": ".NETStandard,Version=v2.1/",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETStandard,Version=v2.1": {},
+    ".NETStandard,Version=v2.1/": {
+      "ToolkitMREPlugin/1.0.0": {
+        "dependencies": {
+          "mixed-reality-extension-godot": "1.0.0.0",
+          "Newtonsoft.Json": "12.0.0.0"
+        },
+        "runtime": {
+          "ToolkitMREPlugin.dll": {}
+        }
+      },
+      "mixed-reality-extension-godot/1.0.0.0": {
+        "runtime": {
+          "mixed-reality-extension-godot.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Newtonsoft.Json/12.0.0.0": {
+        "runtime": {
+          "Newtonsoft.Json.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.1.22924"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ToolkitMREPlugin/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "mixed-reality-extension-godot/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Newtonsoft.Json/12.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
