@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 using System;
+using System.Reflection;
+using System.Collections.Generic;
 
 using MixedRealityExtension.App;
 using MixedRealityExtension.Factories;
@@ -11,6 +13,8 @@ using Godot;
 using AppManager = MixedRealityExtension.Util.ObjectManager<MixedRealityExtension.App.IMixedRealityExtensionApp>;
 using MixedRealityExtension.Util.Logging;
 using Newtonsoft.Json;
+using MixedRealityExtension.Messaging.Commands;
+using System.IO;
 
 namespace MixedRealityExtension.API
 {
@@ -127,6 +131,14 @@ namespace MixedRealityExtension.API
 
 		internal IPermissionManager PermissionManager { get; set; }
 
+		private string GetMREPluginPath(string pluginName)
+		{
+			if (OS.HasFeature("editor"))
+				return System.IO.Path.Join(ProjectSettings.GlobalizePath("res://addons/"), pluginName);
+			else
+				return OS.GetExecutablePath().GetBaseDir();
+		}
+
 		public void RegisterPayloadType(Type type)
 		{
 			MixedRealityExtension.Messaging.Payloads.PayloadTypeRegistry.RegisterPayloadType(type);
@@ -137,6 +149,43 @@ namespace MixedRealityExtension.API
 			MixedRealityExtension.Constants.SerializerSettings.Converters.Add(jsonConverter);
 		}
 
+		public void LoadMREPlugin(IMixedRealityExtensionApp app, string pluginName)
+		{
+			if (app == null)
+				throw new ArgumentNullException(nameof(app));
+			if (string.IsNullOrWhiteSpace(pluginName))
+				throw new ArgumentNullException(nameof(pluginName));
+
+			var pluginPath = GetMREPluginPath(pluginName);
+			var dllPath = System.IO.Path.Join(pluginPath, $"{pluginName}.dll");
+			var pckPath = System.IO.Path.Join(pluginPath, $"{pluginName}.pck");
+			if (!System.IO.File.Exists(dllPath))
+				throw new FileNotFoundException($"plugin not found", nameof(dllPath));
+
+			var dll = Assembly.LoadFile(dllPath);
+
+			if (System.IO.File.Exists(pckPath) && !ProjectSettings.LoadResourcePack(pckPath))
+			{
+				GD.PushError($"{pckPath} not found.");
+				return;
+			}
+
+			foreach (var type in dll.GetTypes())
+			{
+				if (typeof(JsonConverter).IsAssignableFrom(type))
+					RegisterJsonConverter((JsonConverter)Activator.CreateInstance(type));
+				else if (type.Name.EndsWith("TypeRegistry"))
+					RegisterPayloadType(type);
+				else if (typeof(ICommandHandlerContext).IsAssignableFrom(type))
+				{
+					var commandHandler = (ICommandHandlerContext)Activator.CreateInstance(type, new object[] { app });
+					app.RegisterCommandHandlers(new Dictionary<Type, ICommandHandlerContext>()
+					{
+						{ type, commandHandler },
+					});
+				}
+			}
+		}
 
 		/// <summary>
 		/// Creates a new mixed reality extension app and adds it to the MRE runtime.
