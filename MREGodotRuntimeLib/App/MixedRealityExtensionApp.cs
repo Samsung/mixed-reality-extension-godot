@@ -267,8 +267,11 @@ namespace MixedRealityExtension.App
 			var wantedFlags = manifest.OptionalPermissions?.ToFlags() ?? Permissions.None;
 
 			// load plugins
-			foreach (var plugin in manifest.Plugins)
-				MREAPI.AppsAPI.LoadMREPlugin(this, plugin);
+			if (manifest.Plugins != null)
+			{
+				foreach (var plugin in manifest.Plugins)
+					MREAPI.AppsAPI.LoadMREPlugin(this, plugin);
+			}
 
 			// set up cancel source
 			if (permissionRequestCancelSource != null)
