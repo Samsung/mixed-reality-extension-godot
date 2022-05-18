@@ -416,16 +416,17 @@ namespace MixedRealityExtension.Assets
 				assets.Add(gltfRoot);
 
 				// load prefabs
-				var root_nodes = gltfState.Get("root_nodes") as Godot.Collections.Array;
-				if (root_nodes?.Count != 0)
+				var nodes = gltfState.Get("nodes") as Godot.Collections.Array;
+				if (nodes?.Count != 0)
 				{
-					for (var i = 0; i < root_nodes.Count; i++)
+					for (var i = 0; i < nodes.Count; i++)
 					{
-						int root_node = (int)root_nodes[i];
-						Node rootObject = gltfState.Call("get_scene_node", root_node) as Node;
-						rootObject.Name ??= $"scene:{i}";
-
-						assets.Add(rootObject);
+						Node sceneNode = gltfState.Call("get_scene_node", i) as Node;
+						if (sceneNode != null)
+						{
+							sceneNode.Name ??= $"scene:{i}";
+							assets.Add(sceneNode);
+						}
 					}
 				}
 
