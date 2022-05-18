@@ -128,12 +128,29 @@ namespace MixedRealityExtension.Assets
 					|| go.GetType() == typeof(Skeleton)
 					|| go.GetType() == typeof(BoneAttachment))
 				{
+					DuplicateResources(go);
+
 					var newActor = Actor.Instantiate((Spatial)go);
 					actorList.Add(newActor);
 				}
 			});
 
 			return actorList;
+		}
+
+		private void DuplicateResources(Godot.Object o)
+		{
+			foreach (Godot.Collections.Dictionary p in o.GetPropertyList())
+			{
+				var propertyName = (string)p["name"];
+				if (o.Get(propertyName) is Resource resource)
+				{
+					var newResource = resource.Duplicate();
+					o.Set(propertyName, newResource);
+
+					DuplicateResources(newResource);
+				}
+			}
 		}
 
 		[CommandHandler(typeof(LoadAssets))]
