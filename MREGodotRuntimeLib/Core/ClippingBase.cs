@@ -11,10 +11,10 @@ namespace MixedRealityExtension.Core
 {
 	public abstract class ClippingBase : Spatial
 	{
-		private List<MeshInstance> meshInstances = new List<MeshInstance>();
+		private List<Spatial> meshInstances = new List<Spatial>();
 		private IActor parent;
 
-		public AABB Bounds =>new AABB(GlobalTransform.origin - GlobalTransform.basis.Scale / 2, GlobalTransform.basis.Scale);
+		public AABB Bounds => new AABB(GlobalTransform.origin - GlobalTransform.basis.Scale / 2, GlobalTransform.basis.Scale);
 
 		internal void ApplyPatch(ClippingPatch patch)
 		{
@@ -34,24 +34,24 @@ namespace MixedRealityExtension.Core
 			foreach (var meshInstance in meshInstances)
 			{
 				if (!meshInstance.IsVisibleInTree()) continue;
-				if (meshInstance.MaterialOverride is ShaderMaterial shaderMaterial)
+				if (meshInstance.Get("material_override") is ShaderMaterial shaderMaterial)
 					yield return shaderMaterial;
-				else if (meshInstance.Mesh != null)
+				else if (meshInstance.Get("mesh") is Mesh mesh)
 				{
-					var materialCount = meshInstance.Mesh.GetSurfaceCount();
+					var materialCount = mesh.GetSurfaceCount();
 					for (int i = 0; i < materialCount; i++)
 					{
-						var material = meshInstance.Mesh.SurfaceGetMaterial(i);
+						var material = mesh.SurfaceGetMaterial(i);
 						if (material is ShaderMaterial meshMaterial)
 							yield return meshMaterial;
 					}
 				}
 				else
 				{
-					var materialCount = meshInstance.GetSurfaceMaterialCount();
+					var materialCount = (int)meshInstance.Call("get_surface_material_count");
 					for (int i = 0; i < materialCount; i++)
 					{
-						var material = meshInstance.GetSurfaceMaterial(i);
+						var material = meshInstance.Call("get_surface_material", i);
 						if (material is ShaderMaterial meshInstanceMaterial)
 							yield return meshInstanceMaterial;
 					}
@@ -73,9 +73,9 @@ namespace MixedRealityExtension.Core
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
-				if (node is MeshInstance meshInstance)
+				if (node is MeshInstance || node.IsClass("MeshInstance"))
 				{
-					meshInstances.Add(meshInstance);
+					meshInstances.Add((Spatial)node);
 				}
 			});
 		}
@@ -84,16 +84,16 @@ namespace MixedRealityExtension.Core
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
-				if (node is MeshInstance meshInstance)
+				if (node is MeshInstance || node.IsClass("MeshInstance"))
 				{
-					meshInstances.Remove(meshInstance);
+					meshInstances.Remove((Spatial)node);
 				}
 			});
 		}
 
-		public IEnumerable<MeshInstance> GetNodesCopy()
+		public IEnumerable<Spatial> GetNodesCopy()
 		{
-			return new List<MeshInstance>(meshInstances);
+			return new List<Spatial>(meshInstances);
 		}
 	}
 }
