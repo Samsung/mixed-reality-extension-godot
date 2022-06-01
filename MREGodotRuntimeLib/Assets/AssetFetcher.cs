@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 using MixedRealityExtension.API;
 using System;
-using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
@@ -96,14 +95,17 @@ namespace MixedRealityExtension.Assets
 				}
 
 				using (var scope = new AssetLoadThrottling.AssetLoadScope())
-				using (var www = new GodotWebRequest(uri, HTTPClient.Method.Get))
+				using (var loader = new GodotWebRequest(uri.AbsoluteUri))
 				{
 					if (!string.IsNullOrEmpty(ifNoneMatch))
 					{
-						www.SetRequestHeader("If-None-Match", ifNoneMatch);
+						loader.BeforeRequestCallback += (msg) =>
+						{
+							msg.Headers.Add("If-None-Match", ifNoneMatch);
+						};
 					}
 
-					var stream = await www.LoadStreamAsync();
+					var stream = await loader.LoadStreamAsync(System.IO.Path.GetFileName(uri.LocalPath));
 
 					if (stream == null)
 					{
@@ -117,8 +119,8 @@ namespace MixedRealityExtension.Assets
 							if (stream.Length > 0)
 								handler.ParseData(stream);
 
-							result.ReturnCode = www.GetResponseCode();
-							result.ETag = www.GetResponseHeader("ETag") ?? Constants.UnversionedAssetVersion;
+							result.ReturnCode = (long)loader.LastResponse.StatusCode;
+							result.ETag = loader.LastResponse.Headers.ETag.Tag ?? Constants.UnversionedAssetVersion;
 
 							if (result.ReturnCode >= 200 && result.ReturnCode <= 299)
 							{

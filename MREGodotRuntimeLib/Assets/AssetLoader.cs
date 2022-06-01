@@ -212,22 +212,30 @@ namespace MixedRealityExtension.Assets
 
 			// Wait asynchronously until the load throttler lets us through.
 			using (var scope = await AssetLoadThrottling.AcquireLoadScope())
-			using (var www = new GodotWebRequest(source.ParsedUri, HTTPClient.Method.Get))
+			using (var loader = new GodotWebRequest(source.ParsedUri.AbsoluteUri))
 			{
+				// set up loader
 				if (cachedVersion != Constants.UnversionedAssetVersion && !string.IsNullOrEmpty(cachedVersion))
 				{
-					www.SetRequestHeader("If-None-Match", cachedVersion);
+					loader.BeforeRequestCallback += (msg) =>
+					{
+						if (msg.RequestUri == source.ParsedUri)
+						{
+							msg.Headers.Add("If-None-Match", cachedVersion);
+						}
+					};
 				}
 
 				// download root gltf file, check for cache hit
 				try
 				{
-					stream = await www.LoadStreamAsync();
-					source.Version = www.GetResponseHeader("ETag") ?? Constants.UnversionedAssetVersion;
+					stream = await loader.LoadStreamAsync(System.IO.Path.GetFileName(source.ParsedUri.LocalPath));
+					source.Version = loader.LastResponse.Headers.ETag?.Tag ?? Constants.UnversionedAssetVersion;
 				}
 				catch (HttpRequestException)
 				{
-					if (www.GetHashCode() == 304)
+					if (loader.LastResponse != null
+						&& loader.LastResponse.StatusCode == System.Net.HttpStatusCode.NotModified)
 					{
 						source.Version = cachedVersion;
 					}
