@@ -3,7 +3,7 @@
 [ext_resource path="res://addons/godot_gltf/godot_gltf.gdnlib" type="GDNativeLibrary" id=1]
 
 [resource]
-class_name = "GLTFAccessor"
+class_name = "GLTFBufferView_"
 library = ExtResource( 1 )
-resource_name = "GLTFAccessor"
-script_class_name = "GLTFAccessor"
+resource_name = "GLTFBufferView_"
+script_class_name = "GLTFBufferView_"

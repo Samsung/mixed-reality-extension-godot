@@ -12,94 +12,94 @@ _global_script_classes=[ {
 "base": "",
 "class": "EditorSceneImporterGLTF",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/EditorSceneImporterGLTF.gdns"
+"path": "res://addons/godot_gltf/EditorSceneImporterGLTF_.gdns"
 }, {
 "base": "",
-"class": "GLTFAccessor",
+"class": "GLTFAccessor_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFAccessor.gdns"
+"path": "res://addons/godot_gltf/GLTFAccessor_.gdns"
 }, {
 "base": "",
-"class": "GLTFAnimation",
+"class": "GLTFAnimation_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFAnimation.gdns"
+"path": "res://addons/godot_gltf/GLTFAnimation_.gdns"
 }, {
 "base": "",
-"class": "GLTFBufferView",
+"class": "GLTFBufferView_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFBufferView.gdns"
+"path": "res://addons/godot_gltf/GLTFBufferView_.gdns"
 }, {
 "base": "",
-"class": "GLTFCamera",
+"class": "GLTFCamera_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFCamera.gdns"
+"path": "res://addons/godot_gltf/GLTFCamera_.gdns"
 }, {
 "base": "",
-"class": "GLTFDocument",
+"class": "GLTFDocument_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFDocument.gdns"
+"path": "res://addons/godot_gltf/GLTFDocument_.gdns"
 }, {
 "base": "",
-"class": "GLTFLight",
+"class": "GLTFLight_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFLight.gdns"
+"path": "res://addons/godot_gltf/GLTFLight_.gdns"
 }, {
 "base": "",
-"class": "GLTFMesh",
+"class": "GLTFMesh_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFMesh.gdns"
+"path": "res://addons/godot_gltf/GLTFMesh_.gdns"
 }, {
 "base": "",
-"class": "GLTFNode",
+"class": "GLTFNode_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFNode.gdns"
+"path": "res://addons/godot_gltf/GLTFNode_.gdns"
 }, {
 "base": "",
-"class": "GLTFSkeleton",
+"class": "GLTFSkeleton_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFSkeleton.gdns"
+"path": "res://addons/godot_gltf/GLTFSkeleton_.gdns"
 }, {
 "base": "",
-"class": "GLTFSkin",
+"class": "GLTFSkin_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFSkin.gdns"
+"path": "res://addons/godot_gltf/GLTFSkin_.gdns"
 }, {
 "base": "",
-"class": "GLTFSpecGloss",
+"class": "GLTFSpecGloss_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFSpecGloss.gdns"
+"path": "res://addons/godot_gltf/GLTFSpecGloss_.gdns"
 }, {
 "base": "",
-"class": "GLTFState",
+"class": "GLTFState_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFState.gdns"
+"path": "res://addons/godot_gltf/GLTFState_.gdns"
 }, {
 "base": "",
-"class": "GLTFTexture",
+"class": "GLTFTexture_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/GLTFTexture.gdns"
+"path": "res://addons/godot_gltf/GLTFTexture_.gdns"
 }, {
 "base": "",
-"class": "PackedSceneGLTF",
+"class": "PackedSceneGLTF_",
 "language": "NativeScript",
-"path": "res://addons/godot_gltf/PackedSceneGLTF.gdns"
+"path": "res://addons/godot_gltf/PackedSceneGLTF_.gdns"
 } ]
 _global_script_class_icons={
 "EditorSceneImporterGLTF": "",
-"GLTFAccessor": "",
-"GLTFAnimation": "",
-"GLTFBufferView": "",
-"GLTFCamera": "",
-"GLTFDocument": "",
-"GLTFLight": "",
-"GLTFMesh": "",
-"GLTFNode": "",
-"GLTFSkeleton": "",
-"GLTFSkin": "",
-"GLTFSpecGloss": "",
-"GLTFState": "",
-"GLTFTexture": "",
-"PackedSceneGLTF": ""
+"GLTFAccessor_": "",
+"GLTFAnimation_": "",
+"GLTFBufferView_": "",
+"GLTFCamera_": "",
+"GLTFDocument_": "",
+"GLTFLight_": "",
+"GLTFMesh_": "",
+"GLTFNode_": "",
+"GLTFSkeleton_": "",
+"GLTFSkin_": "",
+"GLTFSpecGloss_": "",
+"GLTFState_": "",
+"GLTFTexture_": "",
+"PackedSceneGLTF_": ""
 }
 
 [application]
@@ -129,22 +129,22 @@ singletons=[ "res://addons/godot-openxr/godot_openxr.gdnlib" ]
 
 move_left={
 "deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":65,"unicode":0,"echo":false,"script":null)
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":65,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 move_right={
 "deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":68,"unicode":0,"echo":false,"script":null)
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":68,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 move_forward={
 "deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":87,"unicode":0,"echo":false,"script":null)
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":87,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 move_back={
 "deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":83,"unicode":0,"echo":false,"script":null)
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":83,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 Fire1={
@@ -159,12 +159,12 @@ Fire2={
 }
 shift={
 "deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777237,"unicode":0,"echo":false,"script":null)
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777237,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 hand_touch={
 "deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":67,"unicode":0,"echo":false,"script":null)
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":67,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 

@@ -3,7 +3,7 @@
 [ext_resource path="res://addons/godot_gltf/godot_gltf.gdnlib" type="GDNativeLibrary" id=1]
 
 [resource]
-class_name = "GLTFNode"
+class_name = "GLTFLight_"
 library = ExtResource( 1 )
-resource_name = "GLTFNode"
-script_class_name = "GLTFNode"
+resource_name = "GLTFLight_"
+script_class_name = "GLTFLight_"
