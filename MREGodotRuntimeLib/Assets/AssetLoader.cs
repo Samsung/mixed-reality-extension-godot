@@ -325,8 +325,8 @@ namespace MixedRealityExtension.Assets
 
 			// pre-parse glTF document so we can get a scene count
 			// run this on a threadpool thread so that the Godot main thread is not blocked
-			var gltf = GD.Load<NativeScript>("res://addons/godot_gltf/PackedSceneGLTF.gdns").New() as Godot.Object;
-			var gltfState = GD.Load<NativeScript>("res://addons/godot_gltf/GLTFState.gdns").New() as Godot.Object;
+			var gltf = GD.Load<NativeScript>("res://addons/godot_gltf/PackedSceneGLTF_.gdns").New() as Godot.Object;
+			var gltfState = GD.Load<NativeScript>("res://addons/godot_gltf/GLTFState_.gdns").New() as Godot.Object;
 			Spatial gltfRoot = null;
 			try
 			{
@@ -464,6 +464,7 @@ namespace MixedRealityExtension.Assets
 						{
 							var collider = meshInstance.Mesh.GetMeta("collider") as Area;
 							meshInstance.AddChild(collider);
+							meshInstance.Mesh.RemoveMeta("collider");
 						}
 
 						if (meshInstance.MaterialOverride is SpatialMaterial spatialMaterial)

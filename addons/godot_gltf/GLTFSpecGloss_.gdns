@@ -3,7 +3,7 @@
 [ext_resource path="res://addons/godot_gltf/godot_gltf.gdnlib" type="GDNativeLibrary" id=1]
 
 [resource]
-class_name = "GLTFSpecGloss"
+class_name = "GLTFSpecGloss_"
 library = ExtResource( 1 )
-resource_name = "GLTFSpecGloss"
-script_class_name = "GLTFSpecGloss"
+resource_name = "GLTFSpecGloss_"
+script_class_name = "GLTFSpecGloss_"

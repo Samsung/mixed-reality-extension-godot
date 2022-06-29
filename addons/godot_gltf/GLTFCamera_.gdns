@@ -3,7 +3,7 @@
 [ext_resource path="res://addons/godot_gltf/godot_gltf.gdnlib" type="GDNativeLibrary" id=1]
 
 [resource]
-class_name = "GLTFSkeleton"
+class_name = "GLTFCamera_"
 library = ExtResource( 1 )
-resource_name = "GLTFSkeleton"
-script_class_name = "GLTFSkeleton"
+resource_name = "GLTFCamera_"
+script_class_name = "GLTFCamera_"

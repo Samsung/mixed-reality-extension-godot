@@ -3,7 +3,7 @@
 [ext_resource path="res://addons/godot_gltf/godot_gltf.gdnlib" type="GDNativeLibrary" id=1]
 
 [resource]
-class_name = "GLTFSkin"
+class_name = "PackedSceneGLTF_"
 library = ExtResource( 1 )
-resource_name = "GLTFSkin"
-script_class_name = "GLTFSkin"
+resource_name = "PackedSceneGLTF_"
+script_class_name = "PackedSceneGLTF_"
