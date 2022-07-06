@@ -26,6 +26,11 @@ namespace MixedRealityExtension.Animation
 			{"transform/app/position/y", TokenPoolType.Value },
 			{"transform/app/position/z", TokenPoolType.Value },
 			{"transform/app/rotation", TokenPoolType.Quaternion },
+			{"color", TokenPoolType.Color4 },
+			{"color/r", TokenPoolType.Value },
+			{"color/g", TokenPoolType.Value },
+			{"color/b", TokenPoolType.Value },
+			{"color/a", TokenPoolType.Value },
 		};
 
 		private static Regex PathRegex = new Regex("^(?<type>actor|animation|material):(?<placeholder>[^/]+)/(?<path>.+)$");
