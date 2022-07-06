@@ -98,6 +98,10 @@ namespace MixedRealityExtension.Core
 				}
 				return meshInstance;
 			}
+			set
+			{
+				meshInstance = value;
+			}
 		}
 
 		/// <summary>

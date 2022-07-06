@@ -115,6 +115,19 @@ namespace MixedRealityExtension.Assets
 
 			// note: actor properties are set in App#ProcessCreatedActors
 			var actorList = new List<Actor>();
+
+			// if prefab only has one mesh, make it mesh instance of root actor.
+			if (prefab.GetChildCount() == 1
+				&& prefab.GetChild(0).IsClass("MeshInstance")
+				&& prefab.GetChild(0).GetChildCount() == 0)
+			{
+				MeshInstance meshInstance = prefab.GetChild(0) as MeshInstance;
+				var newActor = Actor.Instantiate((Spatial)prefab);
+				newActor.MeshInstance = meshInstance;
+				actorList.Add(newActor);
+				return actorList;
+			}
+
 			MWGOTreeWalker.VisitTree(prefab, go =>
 			{
 				var collider = go.GetChild<Area>();
@@ -123,15 +136,34 @@ namespace MixedRealityExtension.Assets
 					MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(collisionLayer, collider);
 				}
 
-				if (go.GetType() == typeof(Spatial)
-					|| go.GetType() == typeof(MeshInstance)
-					|| go.GetType() == typeof(Skeleton)
-					|| go.GetType() == typeof(BoneAttachment))
+				if (go.GetType() == typeof(Spatial))
 				{
-					DuplicateResources(go);
-
+					var meshInstance = go.GetChild<MeshInstance>();
+					DuplicateResources(meshInstance);
 					var newActor = Actor.Instantiate((Spatial)go);
+					newActor.MeshInstance = meshInstance;
 					actorList.Add(newActor);
+				}
+				else if (go.GetType() == typeof(MeshInstance))
+				{
+					var m = (MeshInstance)go;
+					Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
+					Actor actor = Actor.Instantiate(newGO);
+					var parent = m.GetParent();
+
+					actor.GlobalTransform = m.GlobalTransform;
+					parent.RemoveChild(m);
+					m.Transform = Transform.Identity;
+					actor.AddChild(m);
+					actor.MeshInstance = m;
+					foreach (Node child in m.GetChildren())
+					{
+						m.RemoveChild(child);
+						actor.AddChild(child);
+					}
+
+					parent.AddChild(actor);
+					actorList.Add(actor);
 				}
 			});
 
