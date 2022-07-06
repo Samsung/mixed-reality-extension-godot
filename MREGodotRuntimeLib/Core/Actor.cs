@@ -204,7 +204,7 @@ namespace MixedRealityExtension.Core
 					{
 						if (this == null || MeshInstance == null || _materialId != updatedMaterialId) return;
 
-						MeshInstance.MaterialOverride = (Material)(sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial.Duplicate());
+						MeshInstance.SetSurfaceMaterial(0, (Material)(sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial.Duplicate()));
 
 						// keep this material up to date
 						if (!ListeningForMaterialChanges)
@@ -216,7 +216,7 @@ namespace MixedRealityExtension.Core
 				}
 				else
 				{
-					MeshInstance.MaterialOverride = (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate();
+					MeshInstance.SetSurfaceMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
 					if (ListeningForMaterialChanges)
 					{
 						App.AssetManager.AssetReferenceChanged -= CheckMaterialReferenceChanged;
@@ -1172,7 +1172,7 @@ namespace MixedRealityExtension.Core
 					{
 						meshInstance = new MeshInstance();
 						Node3D.AddChild(meshInstance);
-						meshInstance.MaterialOverride = (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate();
+						meshInstance.SetSurfaceMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
 						forceUpdateRenderer = true;
 					}
 
@@ -1245,7 +1245,7 @@ namespace MixedRealityExtension.Core
 		{
 			if (this != null && MaterialId == id && MeshInstance != null)
 			{
-				MeshInstance.MaterialOverride = (Material)App.AssetManager.GetById(id).Value.Asset;
+				MeshInstance.SetSurfaceMaterial(0, (Material)App.AssetManager.GetById(id).Value.Asset);
 			}
 		}
 

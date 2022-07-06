@@ -1013,9 +1013,9 @@ namespace MixedRealityExtension.App
 				if (actor.MeshInstance != null)
 				{
 					// only overwrite material if there's something in the cache, i.e. not a random library material
-					if (actor.MeshInstance.MaterialOverride != null)
 					{
-						var matId = AssetManager.GetByObject(actor.MeshInstance.MaterialOverride)?.Id;
+						var material = actor.MeshInstance.GetSurfaceMaterial(0);
+						var matId = AssetManager.GetByObject(material)?.Id;
 						if (matId.HasValue)
 						{
 							actor.MaterialId = matId.Value;
