@@ -467,9 +467,7 @@ namespace MixedRealityExtension.Assets
 							meshInstance.Mesh.RemoveMeta("collider");
 						}
 
-						if (meshInstance.MaterialOverride is SpatialMaterial spatialMaterial)
-							meshInstance.MaterialOverride = materialRepace[spatialMaterial];
-						else if (meshInstance.Mesh != null)
+						if (meshInstance.Mesh != null)
 						{
 							var materialCount = meshInstance.Mesh.GetSurfaceCount();
 
@@ -487,18 +485,8 @@ namespace MixedRealityExtension.Assets
 								var material = meshInstance.Mesh.SurfaceGetMaterial(i);
 								if (material is SpatialMaterial meshMaterial)
 								{
-									meshInstance.Mesh.SurfaceSetMaterial(i, materialRepace[meshMaterial]);
+									meshInstance.SetSurfaceMaterial(i, materialRepace[meshMaterial]);
 								}
-							}
-						}
-						else
-						{
-							var materialCount = meshInstance.GetSurfaceMaterialCount();
-							for (int i = 0; i < materialCount; i++)
-							{
-								var material = meshInstance.GetSurfaceMaterial(i);
-								if (material is SpatialMaterial meshInstanceMaterial)
-									meshInstance.SetSurfaceMaterial(i, materialRepace[meshInstanceMaterial]);
 							}
 						}
 					}
