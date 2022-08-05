@@ -799,7 +799,7 @@ namespace MixedRealityExtension.Core
 						attachmentComponent.UserId = Attachment.UserId;
 						attachmentComponent.Transform = this.Transform;
 						hostAppUser.BeforeAvatarDestroyed += UserInfo_BeforeAvatarDestroyed;
-						Connect("tree_exited", this, nameof(ActorTreeExited), new Godot.Collections.Array() { attachmentComponent });
+						Connect("tree_exited", new Callable(this, nameof(ActorTreeExited)), new Godot.Collections.Array() { attachmentComponent });
 						return true;
 					}
 				}

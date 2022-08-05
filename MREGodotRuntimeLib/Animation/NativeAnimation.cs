@@ -146,7 +146,7 @@ namespace MixedRealityExtension.Animation
 
 			public override void _Ready()
 			{
-				Animation.animationPlayer.Connect("animation_finished", this, nameof(AnimationEndReached));
+				Animation.animationPlayer.Connect("animation_finished", new Callable(this, nameof(AnimationEndReached)));
 			}
 
 			private void AnimationEndReached(string animationString)

@@ -92,12 +92,12 @@ public partial class LaunchMRE : Node3D
 		{
 			if (launchType == LaunchType.MouseButtonDown)
 			{
-				area.Connect("input_event", this, nameof(OnInputEvent));
+				area.Connect("input_event", new Callable(this, nameof(OnInputEvent)));
 			}
 			else if (launchType == LaunchType.TriggerVolume)
 			{
-				area.Connect("area_entered", this, nameof(OnAreaEntered));
-				area.Connect("area_exited", this, nameof(OnAreaExited));
+				area.Connect("area_entered", new Callable(this, nameof(OnAreaEntered)));
+				area.Connect("area_exited", new Callable(this, nameof(OnAreaExited)));
 			}
 		}
 	}

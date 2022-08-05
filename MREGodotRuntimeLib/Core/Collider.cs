@@ -188,18 +188,18 @@ namespace MixedRealityExtension.Core
 							rigid.ContactMonitor = true;
 							rigid.ContactsReported = 32;
 							if (sub == ColliderEventType.CollisionEnter)
-								rigid.Connect("body_shape_entered", this, nameof(OnBodyShapeEnter));
+								rigid.Connect("body_shape_entered", new Callable(this, nameof(OnBodyShapeEnter)));
 							else if (sub == ColliderEventType.CollisionExit)
-								rigid.Connect("body_shape_exited", this, nameof(OnBodyShapeExit));
+								rigid.Connect("body_shape_exited", new Callable(this, nameof(OnBodyShapeExit)));
 						}
 					}
 					else if (sub == ColliderEventType.TriggerEnter)
 					{
-						Connect("area_entered", this, nameof(OnAreaEnter));
+						Connect("area_entered", new Callable(this, nameof(OnAreaEnter)));
 					}
 					else if (sub == ColliderEventType.TriggerExit)
 					{
-						Connect("area_exited", this, nameof(OnAreaExit));
+						Connect("area_exited", new Callable(this, nameof(OnAreaExit)));
 					}
 				}
 			}

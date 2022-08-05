@@ -45,8 +45,8 @@ namespace Assets.Scripts.Control
             };
             parent.AddChild(InputSource);
 
-            player.Connect(nameof(Player.cursor_changed), this, nameof(_on_BaseController_cursor_changed));
-            player.Connect(nameof(Player.ray_changed), this, nameof(_on_BaseController_ray_changed));
+            player.Connect(nameof(Player.cursor_changed), new Callable(this, nameof(_on_BaseController_cursor_changed)));
+            player.Connect(nameof(Player.ray_changed), new Callable(this, nameof(_on_BaseController_ray_changed)));
         }
 
         protected virtual void _on_BaseController_cursor_changed(string cursorPath)

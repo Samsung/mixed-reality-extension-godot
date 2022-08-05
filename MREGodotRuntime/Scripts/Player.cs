@@ -33,6 +33,7 @@ public partial class Player : XROrigin3D
     private string rayScenePath = MRERuntimeScenePath.DefaultRay;
     private string gamepadScenePath = MRERuntimeScenePath.Joypad;
     private bool openXRIsInitialized = false;
+    private Callable readyCallable;
 
     [ExportEnum(typeof(PositionControlType))]
     private int positionControl = (int)PositionControlType.Keyboard;
@@ -132,7 +133,7 @@ public partial class Player : XROrigin3D
                 }
                 else
                 {
-                    Connect("ready", this, nameof(_on_Player_ready));
+                    Connect("ready", readyCallable);
                 }
             }
         }
@@ -185,7 +186,7 @@ public partial class Player : XROrigin3D
 
     private void _on_Player_ready()
     {
-        Disconnect("ready", this, nameof(_on_Player_ready));
+        Disconnect("ready", readyCallable);
         AddHandController();
     }
 
@@ -242,6 +243,7 @@ public partial class Player : XROrigin3D
 
     public override void _Ready()
     {
+        readyCallable = new Callable(this, nameof(_on_Player_ready));
         // update control property
         PositionControl = (PositionControlType)positionControl;
         RotationControl = (RotationControlType)rotationControl;
