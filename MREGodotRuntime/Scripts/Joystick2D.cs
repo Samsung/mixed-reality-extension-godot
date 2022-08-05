@@ -1,6 +1,6 @@
 using Godot;
 
-public class Joystick2D : TouchScreenButton
+public partial class Joystick2D : TouchScreenButton
 {
     private Vector2 playerDirection;
     private Vector2 joystickCenter;

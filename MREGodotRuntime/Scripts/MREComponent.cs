@@ -38,7 +38,7 @@ public class MRELogger : IMRELogger
 	}
 }
 
-public class MREComponent : Spatial
+public partial class MREComponent : Spatial
 {
 	public delegate void AppEventHandler(MREComponent app);
 

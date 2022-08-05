@@ -9,7 +9,7 @@ using Godot;
 
 namespace Assets.Scripts.Behaviors
 {
-	public abstract class BehaviorBase : Node, IBehavior
+	public abstract partial class BehaviorBase : Node, IBehavior
 	{
 		public IActor Actor { get; set; }
 

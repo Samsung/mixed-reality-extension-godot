@@ -7,7 +7,7 @@ using Godot.Collections;
 
 namespace Assets.Scripts.User
 {
-	public class InputSource : Camera
+	public partial class InputSource : Camera
 	{
 		private Tool _currentTool;
 		private bool isPinching;

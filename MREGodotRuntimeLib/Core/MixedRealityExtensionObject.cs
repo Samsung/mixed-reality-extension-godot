@@ -10,7 +10,7 @@ using Godot;
 
 namespace MixedRealityExtension.Core
 {
-	internal abstract class MixedRealityExtensionObject : Spatial, IMixedRealityExtensionObject
+	internal abstract partial class MixedRealityExtensionObject : Spatial, IMixedRealityExtensionObject
 	{
 		/// <inheritdoc />
 		public Guid Id { get; private set; }
@@ -48,7 +48,7 @@ namespace MixedRealityExtension.Core
 
 		protected virtual void OnAwake()
 		{
-			
+
 		}
 
 		protected virtual void OnDestroyed()

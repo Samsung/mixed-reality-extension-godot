@@ -3,7 +3,7 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    public class HandController : BaseController
+    public partial class HandController : BaseController
     {
         private bool isPinching;
         private bool pinchChanged;

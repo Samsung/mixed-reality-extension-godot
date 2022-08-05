@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class MRENode : LaunchMRE
+public partial class MRENode : LaunchMRE
 {
-    
+
 }

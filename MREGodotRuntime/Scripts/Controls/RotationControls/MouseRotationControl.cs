@@ -2,7 +2,7 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    internal class MouseRotationControl : Spatial, IRotationControl
+    internal partial class MouseRotationControl : Spatial, IRotationControl
     {
         private bool cameraMove = false;
         private Vector2 mouseDelta = new Vector2();

@@ -2,7 +2,7 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    internal class KeyboardPositionControl : Spatial, IPositionControl
+    internal partial class KeyboardPositionControl : Spatial, IPositionControl
     {
         public float Speed { get; set; } = 1f;
         private Camera mainCamera;

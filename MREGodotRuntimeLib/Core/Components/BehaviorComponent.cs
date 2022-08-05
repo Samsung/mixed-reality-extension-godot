@@ -6,7 +6,7 @@ using MixedRealityExtension.PluginInterfaces.Behaviors;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class BehaviorComponent : ActorComponentBase
+	internal partial class BehaviorComponent : ActorComponentBase
 	{
 		private BehaviorContextBase _behaviorContext;
 

@@ -16,7 +16,7 @@ using GodotAnimation = Godot.Animation;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class AnimationComponent : ActorComponentBase
+	internal partial class AnimationComponent : ActorComponentBase
 	{
 		private class AnimationData
 		{

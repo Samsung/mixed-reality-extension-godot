@@ -6,7 +6,7 @@ using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class ActorComponentBase : Spatial
+	internal partial class ActorComponentBase : Spatial
 	{
 		internal Actor AttachedActor { get; set; }
 

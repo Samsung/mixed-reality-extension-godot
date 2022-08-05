@@ -4,7 +4,7 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    internal class MouseController : BaseController
+    internal partial class MouseController : BaseController
     {
         private Camera mainCamera;
 

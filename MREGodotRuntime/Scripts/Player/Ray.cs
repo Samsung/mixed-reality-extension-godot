@@ -2,7 +2,7 @@ using Godot;
 
 namespace Assets.Scripts.User
 {
-    public class Ray : ImmediateGeometry
+    public class partial Ray : ImmediateGeometry
     {
         internal Camera Camera { get; set; }
 

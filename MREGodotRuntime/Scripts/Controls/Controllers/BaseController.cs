@@ -4,7 +4,7 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    public abstract class BaseController : Spatial, IController
+    public abstract partial class BaseController : Spatial, IController
     {
         public InputSource InputSource { get; protected set; }
 

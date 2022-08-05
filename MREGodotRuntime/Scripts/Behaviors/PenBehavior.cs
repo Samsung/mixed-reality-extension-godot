@@ -7,7 +7,7 @@ using MixedRealityExtension.PluginInterfaces.Behaviors;
 
 namespace Assets.Scripts.Behaviors
 {
-	public class PenBehavior : TargetBehavior, IPenBehavior
+	public partial class PenBehavior : TargetBehavior, IPenBehavior
 	{
 		public new PenBehaviorContext Context => _context as PenBehaviorContext;
 

@@ -25,7 +25,7 @@ public enum ControllerType
     Mouse = 1 << 1,
 }
 
-public class Player : ARVROrigin
+public partial class Player : ARVROrigin
 {
     [Export]
     private NodePath viewport = null;

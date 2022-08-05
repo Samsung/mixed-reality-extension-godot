@@ -8,7 +8,7 @@ public enum LaunchType
 }
 
 [Tool]
-public class LaunchMRE : Spatial
+public partial class LaunchMRE : Spatial
 {
 	private LaunchType launchType = LaunchType.OnStart;
 

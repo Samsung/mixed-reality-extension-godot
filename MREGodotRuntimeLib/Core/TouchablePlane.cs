@@ -11,7 +11,7 @@ using MixedRealityExtension.Messaging.Payloads;
 
 namespace MixedRealityExtension.Core
 {
-	internal class TouchablePlane : Spatial, ITouchableSurface
+	internal partial class TouchablePlane : Spatial, ITouchableSurface
 	{
 		/// <inheritdoc />
 		public float DebounceThreshold { get; set; } = 0.01f;

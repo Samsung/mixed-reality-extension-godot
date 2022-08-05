@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace MixedRealityExtension.Core
 {
-	internal class User : MixedRealityExtensionObject, IUser
+	internal partial class User : MixedRealityExtensionObject, IUser
 	{
 		private IList<MixedRealityExtensionApp> _joinedApps = new List<MixedRealityExtensionApp>();
 

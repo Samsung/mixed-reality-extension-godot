@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class ThumbTip : MeshInstance
+public partial class ThumbTip : MeshInstance
 {
     Spatial indexTip;
     public override void _Ready()

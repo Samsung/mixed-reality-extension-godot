@@ -9,7 +9,7 @@ using Godot;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class MREAttachmentComponent : Spatial
+	internal partial class MREAttachmentComponent : Spatial
 	{
 		public Guid UserId { get; set; }
 

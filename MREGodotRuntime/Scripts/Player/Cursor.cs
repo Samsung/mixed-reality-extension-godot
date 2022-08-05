@@ -2,7 +2,7 @@ using Godot;
 
 namespace Assets.Scripts.User
 {
-    public class Cursor : Spatial
+    public partial class Cursor : Spatial
     {
         public GeometryInstance Mesh { get; set; }
 

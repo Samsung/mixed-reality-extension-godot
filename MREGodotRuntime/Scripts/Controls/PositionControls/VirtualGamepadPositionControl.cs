@@ -2,7 +2,7 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    public class VirtualGamepadPositionControl : Spatial, IPositionControl
+    public partial class VirtualGamepadPositionControl : Spatial, IPositionControl
     {
         private Joystick2D gamepad;
         private Camera mainCamera;

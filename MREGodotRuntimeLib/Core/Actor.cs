@@ -35,7 +35,7 @@ namespace MixedRealityExtension.Core
 	/// <summary>
 	/// Class that represents an actor in a mixed reality extension app.
 	/// </summary>
-	internal sealed class Actor : MixedRealityExtensionObject, ICommandHandlerContext, IActor
+	internal sealed partial class Actor : MixedRealityExtensionObject, ICommandHandlerContext, IActor
 	{
 		private static readonly Reference actorScript = new Actor().GetScript();
 

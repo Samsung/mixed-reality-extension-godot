@@ -2,7 +2,7 @@
 using Godot;
 
 [Tool]
-public class MRENodePlugin : EditorPlugin
+public partial class MRENodePlugin : EditorPlugin
 {
     public override void _EnterTree()
     {

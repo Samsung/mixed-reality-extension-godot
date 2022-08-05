@@ -11,7 +11,7 @@ namespace MixedRealityExtension.Core.Components
 	/// <summary>
 	/// Unity Behaviour to face toward a given target object
 	/// </summary>
-	internal class LookAtComponent : ActorComponentBase
+	internal partial class LookAtComponent : ActorComponentBase
 	{
 		private Spatial _targetObject;
 		private LookAtMode _lookAtMode;

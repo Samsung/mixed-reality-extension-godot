@@ -9,7 +9,7 @@ using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Core
 {
-	public abstract class ClippingBase : Spatial
+	public abstract partial class ClippingBase : Spatial
 	{
 		private List<Spatial> meshInstances = new List<Spatial>();
 		private IActor parent;

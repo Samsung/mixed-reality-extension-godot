@@ -58,7 +58,7 @@ namespace MixedRealityExtension.Core
 		Mesh
 	}
 
-	internal class Collider : Area, ICollider
+	internal partial class Collider : Area, ICollider
 	{
 		private static readonly Reference colliderScript = new Collider().GetScript();
 

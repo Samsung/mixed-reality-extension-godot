@@ -6,7 +6,7 @@ using MixedRealityExtension.Patching.Types;
 using System.Collections.Generic;
 using Godot;
 
-public class SimpleText : MeshInstance, IText
+public partial class SimpleText : MeshInstance, IText
 {
 	private readonly QuadMesh textMesh;
 	private readonly RichTextLabel label;

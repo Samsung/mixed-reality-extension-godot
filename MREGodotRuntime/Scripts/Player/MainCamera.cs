@@ -1,6 +1,6 @@
 using Godot;
 
-public class MainCamera : ARVRCamera
+public partial class MainCamera : ARVRCamera
 {
     public override void _Ready()
     {
