@@ -98,10 +98,10 @@ namespace MixedRealityExtension.Core
 				if (Size != null)
 				{
 					Vector3 newSize;
-					newSize.x = Size.X / 2;
-					newSize.y = Size.Y / 2;
-					newSize.z = Size.Z / 2;
-					boxShape.Extents = newSize * 0.999998f;
+					newSize.x = Size.X;
+					newSize.y = Size.Y;
+					newSize.z = Size.Z;
+					boxShape.Size = newSize * 0.999998f;
 				}
 			}
 		}

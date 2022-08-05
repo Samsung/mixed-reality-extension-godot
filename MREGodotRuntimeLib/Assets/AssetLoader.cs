@@ -546,7 +546,7 @@ namespace MixedRealityExtension.Assets
 				collisionShape = new CollisionShape3D();
 				collisionShape.Position = (aabb.Position + aabb.End)/ 2;
 				collisionShape.Shape = new BoxShape3D() {
-					Extents = aabb.Size / 2,
+					Size = aabb.Size,
 				};
 				area.AddChild(collisionShape);
 			}

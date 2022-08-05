@@ -231,7 +231,7 @@ namespace MixedRealityExtension.Core
 			{
 				colliderGeo = new BoxColliderGeometry()
 				{
-					Size = (boxCollider.Extents * 0.999998f).CreateMWVector3(),
+					Size = (boxCollider.Size * 0.999998f).CreateMWVector3(),
 					Center = _collider.Transform.origin.CreateMWVector3()
 				};
 			}
