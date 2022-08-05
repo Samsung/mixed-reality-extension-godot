@@ -22,8 +22,8 @@ using System.Linq;
 using Godot;
 
 using GodotLight = Godot.Light;
-using GodotRigidBody = Godot.RigidBody;
-using GodotCollisionShape = Godot.CollisionShape;
+using GodotRigidDynamicBody3D = Godot.RigidDynamicBody3D;
+using GodotCollisionShape3D = Godot.CollisionShape3D;
 using MixedRealityExtension.PluginInterfaces.Behaviors;
 using MixedRealityExtension.Util;
 //using IVideoPlayer = MixedRealityExtension.PluginInterfaces.IVideoPlayer;
@@ -39,7 +39,7 @@ namespace MixedRealityExtension.Core
 	{
 		private static readonly Reference actorScript = new Actor().GetScript();
 
-		public static Actor Instantiate(Spatial node3D)
+		public static Actor Instantiate(Node3D node3D)
 		{
 			ulong objId = node3D.GetInstanceId();
 			var name = node3D.Name;
@@ -51,10 +51,10 @@ namespace MixedRealityExtension.Core
 
 			return newNode;
 		}
-		private Spatial TransformNode => (Spatial)_rigidbody ?? this;
-		private GodotRigidBody _rigidbody;
+		private Node3D TransformNode => (Node3D)_rigidbody ?? this;
+		private GodotRigidDynamicBody3D _rigidbody;
 		private GodotLight _light;
-		private GodotCollisionShape _collider;
+		private GodotCollisionShape3D _collider;
 		private ColliderPatch _pendingColliderPatch;
 		private LookAtComponent _lookAt;
 		private ClippingBase _clipping;
@@ -86,15 +86,15 @@ namespace MixedRealityExtension.Core
 
 		private ActorTransformPatch _rbTransformPatch;
 
-		private MeshInstance meshInstance = null;
+		private MeshInstance3D meshInstance = null;
 
-		internal MeshInstance MeshInstance
+		internal MeshInstance3D MeshInstance3D
 		{
 			get
 			{
 				if (meshInstance == null)
 				{
-					meshInstance = Node3D.GetChild<MeshInstance>();
+					meshInstance = Node3D.GetChild<MeshInstance3D>();
 				}
 				return meshInstance;
 			}
@@ -176,7 +176,7 @@ namespace MixedRealityExtension.Core
 
 		internal Guid ParentId { get; set; } = Guid.Empty;
 
-		internal RigidBody RigidBody { get; private set; }
+		internal RigidBody RigidDynamicBody3D { get; private set; }
 
 		internal Light Light { get; private set; }
 
@@ -206,9 +206,9 @@ namespace MixedRealityExtension.Core
 					var updatedMaterialId = _materialId;
 					App.AssetManager.OnSet(_materialId, sharedMat =>
 					{
-						if (this == null || MeshInstance == null || _materialId != updatedMaterialId) return;
+						if (this == null || MeshInstance3D == null || _materialId != updatedMaterialId) return;
 
-						MeshInstance.SetSurfaceMaterial(0, (Material)(sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial.Duplicate()));
+						MeshInstance3D.SetSurfaceMaterial(0, (Material)(sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial.Duplicate()));
 
 						// keep this material up to date
 						if (!ListeningForMaterialChanges)
@@ -220,7 +220,7 @@ namespace MixedRealityExtension.Core
 				}
 				else
 				{
-					MeshInstance.SetSurfaceMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
+					MeshInstance3D.SetSurfaceMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
 					if (ListeningForMaterialChanges)
 					{
 						App.AssetManager.AssetReferenceChanged -= CheckMaterialReferenceChanged;
@@ -236,11 +236,11 @@ namespace MixedRealityExtension.Core
 		{
 			get
 			{
-				return MeshInstance.Mesh;
+				return MeshInstance3D.Mesh;
 			}
 			set
 			{
-				MeshInstance.Mesh = value;
+				MeshInstance3D.Mesh = value;
 			}
 		}
 
@@ -322,7 +322,7 @@ namespace MixedRealityExtension.Core
 					actorPatch.ParentId = ParentId;
 				}
 
-				if (!App.UsePhysicsBridge || RigidBody == null)
+				if (!App.UsePhysicsBridge || RigidDynamicBody3D == null)
 				{
 					if (ShouldSync(subscriptions, ActorComponentType.Transform))
 					{
@@ -334,7 +334,7 @@ namespace MixedRealityExtension.Core
 				{
 					// we should include the velocities either when the old sync model is used
 					// OR when there is an explicit subscription to it.
-					GenerateRigidBodyPatch(actorPatch,
+					GenerateRigidDynamicBody3DPatch(actorPatch,
 						(!App.UsePhysicsBridge || subscriptions.HasFlag(ActorComponentType.RigidbodyVelocity)));
 				}
 
@@ -381,7 +381,7 @@ namespace MixedRealityExtension.Core
 			PatchAppearance(actorPatch.Appearance);
 			PatchTransform(actorPatch.Transform);
 			PatchLight(actorPatch.Light);
-			PatchRigidBody(actorPatch.RigidBody);
+			PatchRigidDynamicBody3D(actorPatch.RigidDynamicBody3D);
 			PatchCollider(actorPatch.Collider);
 			PatchText(actorPatch.Text);
 			PatchAttachment(actorPatch.Attachment);
@@ -407,7 +407,7 @@ namespace MixedRealityExtension.Core
 			ApplyCorrection(actorCorrection);
 		}
 
-		internal void ExecuteRigidBodyCommands(RigidBodyCommands commandPayload, Action onCompleteCallback)
+		internal void ExecuteRigidDynamicBody3DCommands(RigidBodyCommands commandPayload, Action onCompleteCallback)
 		{
 			foreach (var command in commandPayload.CommandPayloads.OfType<ICommandPayload>())
 			{
@@ -513,12 +513,12 @@ namespace MixedRealityExtension.Core
 
 			if (generateAll)
 			{
-				var rigidBody = PatchingUtilMethods.GeneratePatch(RigidBody, (GodotRigidBody)null,
+				var rigidBody = PatchingUtilMethods.GeneratePatch(RigidDynamicBody3D, (GodotRigidDynamicBody3D)null,
 					App.SceneRoot, !App.UsePhysicsBridge);
 
 				ColliderPatch collider = null;
-				var area = Node3D.GetChild<Area>();
-				_collider = area?.GetChild<GodotCollisionShape>();
+				var area = Node3D.GetChild<Area3D>();
+				_collider = area?.GetChild<GodotCollisionShape3D>();
 				if (_collider != null)
 				{
 					if (Collider == null)
@@ -531,7 +531,7 @@ namespace MixedRealityExtension.Core
 
 				output.ParentId = ParentId;
 				output.Name = Name;
-				output.RigidBody = rigidBody;
+				output.RigidDynamicBody3D = rigidBody;
 				output.Collider = collider;
 				output.Appearance = new AppearancePatch()
 				{
@@ -544,13 +544,13 @@ namespace MixedRealityExtension.Core
 			return output;
 		}
 /*
-		internal OperationResult EnableRigidBody(RigidBodyPatch rigidBodyPatch)
+		internal OperationResult EnableRigidDynamicBody3D(RigidDynamicBody3DPatch rigidBodyPatch)
 		{
-			if (AddRigidBody() != null)
+			if (AddRigidDynamicBody3D() != null)
 			{
 				if (rigidBodyPatch != null)
 				{
-					PatchRigidBody(rigidBodyPatch);
+					PatchRigidDynamicBody3D(rigidBodyPatch);
 				}
 
 				return new OperationResult()
@@ -632,7 +632,7 @@ namespace MixedRealityExtension.Core
 
 			//if ((flags & SubscriptionType.Rigidbody) != SubscriptionType.None)
 			//{
-			//    actorPatch.Transform = this.RigidBody.AsPatch();
+			//    actorPatch.Transform = this.RigidDynamicBody3D.AsPatch();
 			//}
 
 			if (actorPatch.IsPatched())
@@ -647,7 +647,7 @@ namespace MixedRealityExtension.Core
 
 		protected override void OnStart()
 		{
-			_rigidbody = this.GetChild<GodotRigidBody>();
+			_rigidbody = this.GetChild<GodotRigidDynamicBody3D>();
 			_light = this.GetChild<GodotLight>();
 		}
 
@@ -674,9 +674,9 @@ namespace MixedRealityExtension.Core
 */
 			if (App.UsePhysicsBridge)
 			{
-				if (RigidBody != null)
+				if (RigidDynamicBody3D != null)
 				{
-					App.PhysicsBridge.removeRigidBody(Id);
+					App.PhysicsBridge.removeRigidDynamicBody3D(Id);
 				}
 			}
 
@@ -721,8 +721,8 @@ namespace MixedRealityExtension.Core
 					return;
 				}
 
-				RigidBody = RigidBody ?? new RigidBody(_rigidbody, App.SceneRoot);
-				RigidBody.Update();
+				RigidDynamicBody3D = RigidDynamicBody3D ?? new RigidBody(_rigidbody, App.SceneRoot);
+				RigidDynamicBody3D.Update();
 				// TODO: Send this update if actor is set to "high-frequency" updates
 				//Actor.SynchronizeApp();
 			}
@@ -812,7 +812,7 @@ namespace MixedRealityExtension.Core
 			return false;
 		}
 
-		private void ActorTreeExited(Spatial attachmentComponent)
+		private void ActorTreeExited(Node3D attachmentComponent)
 		{
 			attachmentComponent.QueueFree();
 		}
@@ -864,14 +864,14 @@ namespace MixedRealityExtension.Core
 				switch (lightType)
 				{
 					case LightType.Spot:
-						_light = new SpotLight();
+						_light = new SpotLight3D();
 						_light.RotateX(-90);
 						break;
 					case LightType.Point:
-						_light = new OmniLight();
+						_light = new OmniLight3D();
 						break;
 					case LightType.Directional:
-						_light = new DirectionalLight();
+						_light = new DirectionalLight3D();
 						break;
 				}
 				_light.ShadowEnabled = true;
@@ -882,7 +882,7 @@ namespace MixedRealityExtension.Core
 			return Light;
 		}
 
-		void OnRigidBodyGrabbed(object sender, ActionStateChangedArgs args)
+		void OnRigidDynamicBody3DGrabbed(object sender, ActionStateChangedArgs args)
 		{
 			if (App.UsePhysicsBridge)
 			{
@@ -891,9 +891,9 @@ namespace MixedRealityExtension.Core
 					if (_isExclusiveToUser)
 					{
 						// if rigid body is exclusive to user, manage rigid body directly
-						if (args.NewState == ActionState.Started || RigidBody.IsKinematic)
+						if (args.NewState == ActionState.Started || RigidDynamicBody3D.IsKinematic)
 						{
-							_rigidbody.Mode = GodotRigidBody.ModeEnum.Kinematic;
+							_rigidbody.Mode = GodotRigidDynamicBody3D.ModeEnum.Kinematic;
 						}
 					}
 					else
@@ -907,19 +907,19 @@ namespace MixedRealityExtension.Core
 						else
 						{
 							// on end of grab, return to original value
-							App.PhysicsBridge.setKeyframed(Id, RigidBody.IsKinematic);
+							App.PhysicsBridge.setKeyframed(Id, RigidDynamicBody3D.IsKinematic);
 						}
 					}
 				}
 			}
 		}
 
-		private RigidBody AddRigidBody()
+		private RigidBody AddRigidDynamicBody3D()
 		{
 			if (_rigidbody == null)
 			{
 				var parent = GetParent();
-				_rigidbody = new GodotRigidBody()
+				_rigidbody = new GodotRigidDynamicBody3D()
 				{
 					PhysicsMaterialOverride = new PhysicsMaterial(),
 					GlobalTransform = GlobalTransform
@@ -928,9 +928,9 @@ namespace MixedRealityExtension.Core
 				parent.AddChild(_rigidbody);
 				parent.RemoveChild(this);
 				_rigidbody.AddChild(this);
-				this.Transform = Transform.Identity;
+				this.Transform = Transform3D.Identity;
 
-				RigidBody = new RigidBody(_rigidbody, App.SceneRoot);
+				RigidDynamicBody3D = new RigidBody(_rigidbody, App.SceneRoot);
 
 				if (App.UsePhysicsBridge)
 				{
@@ -938,7 +938,7 @@ namespace MixedRealityExtension.Core
 					// Otherwise, do it once source is provided.
 					if (Owner.HasValue && !_isExclusiveToUser)
 					{
-						App.PhysicsBridge.addRigidBody(Id, _rigidbody, Owner.Value, RigidBody.IsKinematic);
+						App.PhysicsBridge.addRigidBody(Id, _rigidbody, Owner.Value, RigidDynamicBody3D.IsKinematic);
 					}
 				}
 
@@ -948,11 +948,11 @@ namespace MixedRealityExtension.Core
 					var targetBehavior = (ITargetBehavior)targetContext.Behavior;
 					if (targetBehavior.Grabbable)
 					{
-						targetContext.GrabAction.ActionStateChanged += OnRigidBodyGrabbed;
+						targetContext.GrabAction.ActionStateChanged += OnRigidDynamicBody3DGrabbed;
 					}
 				}
 			}
-			return RigidBody;
+			return RigidDynamicBody3D;
 		}
 
 		/// <summary>
@@ -991,34 +991,34 @@ namespace MixedRealityExtension.Core
 				}
 			}
 
-			GodotCollisionShape godotCollisionShape = null;
+			GodotCollisionShape3D godotCollisionShape3D = null;
 
 			switch (colliderType)
 			{
 				case ColliderType.Box:
-					var boxCollider = new CollisionShape() { Shape = new BoxShape() };
+					var boxCollider = new CollisionShape3D() { Shape = new BoxShape3D() };
 					colliderGeometry.Patch(App, boxCollider);
-					godotCollisionShape = boxCollider;
+					godotCollisionShape3D = boxCollider;
 					break;
 				case ColliderType.Sphere:
-					var sphereCollider =  new CollisionShape() { Shape = new SphereShape() };
+					var sphereCollider =  new CollisionShape3D() { Shape = new SphereShape3D() };
 					colliderGeometry.Patch(App, sphereCollider);
-					godotCollisionShape = sphereCollider;
+					godotCollisionShape3D = sphereCollider;
 					break;
 				case ColliderType.Capsule:
-					var capsuleCollider =  new CollisionShape() { Shape = new CapsuleShape() };
+					var capsuleCollider =  new CollisionShape3D() { Shape = new CapsuleShape3D() };
 					colliderGeometry.Patch(App, capsuleCollider);
-					godotCollisionShape = capsuleCollider;
+					godotCollisionShape3D = capsuleCollider;
 					break;
 				case ColliderType.Cylinder:
-					var cylinderCollider =  new CollisionShape() { Shape = new CylinderShape() };
+					var cylinderCollider =  new CollisionShape3D() { Shape = new CylinderShape3D() };
 					colliderGeometry.Patch(App, cylinderCollider);
-					godotCollisionShape = cylinderCollider;
+					godotCollisionShape3D = cylinderCollider;
 					break;
 				case ColliderType.Mesh:
-					var meshCollider = new CollisionShape() { Shape = new ConcavePolygonShape() };
+					var meshCollider = new CollisionShape3D() { Shape = new ConcavePolygonShape3D() };
 					colliderGeometry.Patch(App, meshCollider);
-					godotCollisionShape = meshCollider;
+					godotCollisionShape3D = meshCollider;
 					break;
 				default:
 					App.Logger.LogWarning("Cannot add the given collider type to the actor " +
@@ -1026,7 +1026,7 @@ namespace MixedRealityExtension.Core
 					break;
 			}
 
-			_collider = godotCollisionShape;
+			_collider = godotCollisionShape3D;
 
 			// update bounciness and frictions
 			if (_rigidbody != null)
@@ -1117,19 +1117,19 @@ namespace MixedRealityExtension.Core
 			{
 				if (ownerOrNull.HasValue)
 				{
-					if (RigidBody != null)
+					if (RigidDynamicBody3D != null)
 					{
 						if (!_isExclusiveToUser)
 						{
 							if (Owner.HasValue) // test the old value
 							{
 								// if body is already registered to physics bridge, just set the new owner
-								App.PhysicsBridge.setRigidBodyOwnership(Id, ownerOrNull.Value, RigidBody.IsKinematic);
+								App.PhysicsBridge.setRigidDynamicBody3DOwnership(Id, ownerOrNull.Value, RigidDynamicBody3D.IsKinematic);
 							}
 							else
 							{
 								// if this is first time owner is set, add body to physics bridge
-								App.PhysicsBridge.addRigidBody(Id, _rigidbody, ownerOrNull.Value, RigidBody.IsKinematic);
+								App.PhysicsBridge.addRigidBody(Id, _rigidbody, ownerOrNull.Value, RigidDynamicBody3D.IsKinematic);
 							}
 
 							Owner = ownerOrNull;
@@ -1174,7 +1174,7 @@ namespace MixedRealityExtension.Core
 					// guarantee meshInstance
 					if (meshInstance == null || !Godot.Object.IsInstanceValid(meshInstance))
 					{
-						meshInstance = new MeshInstance();
+						meshInstance = new MeshInstance3D();
 						Node3D.AddChild(meshInstance);
 						meshInstance.SetSurfaceMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
 						forceUpdateRenderer = true;
@@ -1204,8 +1204,8 @@ namespace MixedRealityExtension.Core
 				// clean up unused components
 				else
 				{
-					if (MeshInstance != null)
-						MeshInstance.QueueFree();
+					if (MeshInstance3D != null)
+						MeshInstance3D.QueueFree();
 					if (Collider != null && Collider.Shape == ColliderType.Auto)
 					{
 						_collider.Free();
@@ -1247,9 +1247,9 @@ namespace MixedRealityExtension.Core
 		/// <param name="id"></param>
 		private void CheckMaterialReferenceChanged(Guid id)
 		{
-			if (this != null && MaterialId == id && MeshInstance != null)
+			if (this != null && MaterialId == id && MeshInstance3D != null)
 			{
-				MeshInstance.SetSurfaceMaterial(0, (Material)App.AssetManager.GetById(id).Value.Asset);
+				MeshInstance3D.SetSurfaceMaterial(0, (Material)App.AssetManager.GetById(id).Value.Asset);
 			}
 		}
 
@@ -1257,7 +1257,7 @@ namespace MixedRealityExtension.Core
 		{
 			if (transformPatch != null)
 			{
-				if (RigidBody == null)
+				if (RigidDynamicBody3D == null)
 				{
 					// Apply local first.
 					if (transformPatch.Local != null)
@@ -1278,13 +1278,13 @@ namespace MixedRealityExtension.Core
 					// others will get update through PhysicsBridge.
 					if (!App.UsePhysicsBridge || IsSimulatedByLocalUser)
 					{
-						PatchTransformWithRigidBody(transformPatch);
+						PatchTransformWithRigidDynamicBody3D(transformPatch);
 					}
 				}
 			}
 		}
 
-		private void PatchTransformWithRigidBody(ActorTransformPatch transformPatch)
+		private void PatchTransformWithRigidDynamicBody3D(ActorTransformPatch transformPatch)
 		{
 			if (_rigidbody == null)
 			{
@@ -1294,7 +1294,7 @@ namespace MixedRealityExtension.Core
 			RigidBody.RigidBodyTransformUpdate transformUpdate = new RigidBody.RigidBodyTransformUpdate();
 			if (transformPatch.Local != null)
 			{
-				var parent = TransformNode.GetParent() as Spatial;
+				var parent = TransformNode.GetParent() as Node3D;
 				// In case of rigid body:
 				// - Apply scale directly.
 				_rigidbody.Scale = _rigidbody.Scale.GetPatchApplied(LocalTransform.Scale.ApplyPatch(transformPatch.Local.Scale));
@@ -1342,7 +1342,7 @@ namespace MixedRealityExtension.Core
 			}
 
 			// Queue update to happen in the fixed update
-			RigidBody.SynchronizeEngine(transformUpdate);
+			RigidDynamicBody3D.SynchronizeEngine(transformUpdate);
 		}
 
 		private void CorrectAppTransform(MWTransform transform)
@@ -1352,7 +1352,7 @@ namespace MixedRealityExtension.Core
 				return;
 			}
 
-			if (RigidBody == null)
+			if (RigidDynamicBody3D == null)
 			{
 				// We need to lerp at the transform level with the transform lerper.
 				if (_transformLerper == null)
@@ -1362,7 +1362,7 @@ namespace MixedRealityExtension.Core
 
 				// Convert the app relative transform for the correction to world position relative to our app root.
 				Vector3? newPos = null;
-				Quat? newRot = null;
+				Quaternion? newRot = null;
 
 				if (transform.Position != null)
 				{
@@ -1375,7 +1375,7 @@ namespace MixedRealityExtension.Core
 
 				if (transform.Rotation != null)
 				{
-					Quat appRot;
+					Quaternion appRot;
 					appRot.w = transform.Rotation.W;
 					appRot.x = -transform.Rotation.X;
 					appRot.y = -transform.Rotation.Y;
@@ -1430,7 +1430,7 @@ namespace MixedRealityExtension.Core
 						_rbTransformPatch.App.Rotation = null;
 					}
 
-					PatchTransformWithRigidBody(_rbTransformPatch);
+					PatchTransformWithRigidDynamicBody3D(_rbTransformPatch);
 				}
 			}
 		}
@@ -1447,7 +1447,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		private void PatchRigidBody(RigidBodyPatch rigidBodyPatch)
+		private void PatchRigidDynamicBody3D(RigidBodyPatch rigidBodyPatch)
 		{
 			if (rigidBodyPatch != null)
 			{
@@ -1455,20 +1455,20 @@ namespace MixedRealityExtension.Core
 
 				bool wasKinematic;
 
-				if (RigidBody == null)
+				if (RigidDynamicBody3D == null)
 				{
-					AddRigidBody();
+					AddRigidDynamicBody3D();
 
-					wasKinematic = RigidBody.IsKinematic;
+					wasKinematic = RigidDynamicBody3D.IsKinematic;
 
-					RigidBody.ApplyPatch(rigidBodyPatch, patchVelocities);
+					RigidDynamicBody3D.ApplyPatch(rigidBodyPatch, patchVelocities);
 				}
 				else
 				{
-					wasKinematic = RigidBody.IsKinematic;
+					wasKinematic = RigidDynamicBody3D.IsKinematic;
 
 					// Queue update to happen in the fixed update
-					RigidBody.SynchronizeEngine(rigidBodyPatch, patchVelocities);
+					RigidDynamicBody3D.SynchronizeEngine(rigidBodyPatch, patchVelocities);
 				}
 
 				if (App.UsePhysicsBridge)
@@ -1601,7 +1601,7 @@ namespace MixedRealityExtension.Core
 
 				if (behaviorComponent.Context is TargetBehaviorContext targetContext)
 				{
-					if (RigidBody != null)
+					if (RigidDynamicBody3D != null)
 					{
 						// for rigid body we need callbacks for the physics bridge
 						var targetBehavior = (ITargetBehavior)targetContext.Behavior;
@@ -1612,11 +1612,11 @@ namespace MixedRealityExtension.Core
 						{
 							if (grabbable.Value)
 							{
-								targetContext.GrabAction.ActionStateChanged += OnRigidBodyGrabbed;
+								targetContext.GrabAction.ActionStateChanged += OnRigidDynamicBody3DGrabbed;
 							}
 							else
 							{
-								targetContext.GrabAction.ActionStateChanged -= OnRigidBodyGrabbed;
+								targetContext.GrabAction.ActionStateChanged -= OnRigidDynamicBody3DGrabbed;
 							}
 						}
 					}
@@ -1677,7 +1677,7 @@ namespace MixedRealityExtension.Core
 				{
 					var behaviorComponent = GetActorComponent<BehaviorComponent>();
 					var oldTouchable = ((ITargetBehavior)behaviorComponent.Behavior).Touchable;
-					RemoveChild((Spatial)oldTouchable);
+					RemoveChild((Node3D)oldTouchable);
 					((ITargetBehavior)behaviorComponent.Behavior).Touchable = null;
 					Touchable = null;
 				}
@@ -1723,20 +1723,20 @@ namespace MixedRealityExtension.Core
 			actorPatch.Transform = transformPatch.IsPatched() ? transformPatch : null;
 		}
 
-		private void GenerateRigidBodyPatch(ActorPatch actorPatch, bool addVelocities)
+		private void GenerateRigidDynamicBody3DPatch(ActorPatch actorPatch, bool addVelocities)
 		{
-			if (_rigidbody != null && RigidBody != null)
+			if (_rigidbody != null && RigidDynamicBody3D != null)
 			{
-				// convert to a RigidBody and build a patch from the old one to this one.
-				var rigidBodyPatch = PatchingUtilMethods.GeneratePatch(RigidBody, _rigidbody,
+				// convert to a RigidDynamicBody3D and build a patch from the old one to this one.
+				var rigidBodyPatch = PatchingUtilMethods.GeneratePatch(RigidDynamicBody3D, _rigidbody,
 					App.SceneRoot, addVelocities);
 
 				if (rigidBodyPatch != null && rigidBodyPatch.IsPatched())
 				{
-					actorPatch.RigidBody = rigidBodyPatch;
+					actorPatch.RigidDynamicBody3D = rigidBodyPatch;
 				}
 
-				RigidBody.Update(_rigidbody);
+				RigidDynamicBody3D.Update(_rigidbody);
 			}
 		}
 
@@ -1755,17 +1755,17 @@ namespace MixedRealityExtension.Core
 			if (behaviorComponent != null && behaviorComponent.Context is TargetBehaviorContext targetContext)
 			{
 				var targetBehavior = (ITargetBehavior)targetContext.Behavior;
-				if (RigidBody != null && Grabbable)
+				if (RigidDynamicBody3D != null && Grabbable)
 				{
-					targetContext.GrabAction.ActionStateChanged -= OnRigidBodyGrabbed;
+					targetContext.GrabAction.ActionStateChanged -= OnRigidDynamicBody3DGrabbed;
 				}
 			}
 
 			if (App.UsePhysicsBridge)
 			{
-				if (RigidBody != null)
+				if (RigidDynamicBody3D != null)
 				{
-					App.PhysicsBridge.removeRigidBody(Id);
+					App.PhysicsBridge.removeRigidDynamicBody3D(Id);
 				}
 			}
 
@@ -1792,7 +1792,7 @@ namespace MixedRealityExtension.Core
 
 			// If the actor has a rigid body then always sync the transform and the rigid body.
 			// but not the velocities (due to bandwidth), sync only when there is an explicit subscription for the velocities
-			if (RigidBody != null)
+			if (RigidDynamicBody3D != null)
 			{
 				subscriptions |= ActorComponentType.Transform;
 				subscriptions |= ActorComponentType.Rigidbody;
@@ -1812,10 +1812,10 @@ namespace MixedRealityExtension.Core
 			{
 				return
 					((App.OperatingModel == OperatingModel.ServerAuthoritative) ||
-					(RigidBody == null &&
+					(RigidDynamicBody3D == null &&
 						((App.IsAuthoritativePeer ||
 						inOwnedAttachmentHierarchy) && !IsGrabbed)) ||
-					(RigidBody != null &&
+					(RigidDynamicBody3D != null &&
 						IsSimulatedByLocalUser));
 			}
 
@@ -1841,12 +1841,12 @@ namespace MixedRealityExtension.Core
 			// Override the previous rules if this actor is grabbed by the local user or is in an attachment
 			// hierarchy owned by the local user.
 			if (App.OperatingModel == OperatingModel.ServerAuthoritative ||
-				(RigidBody == null &&
+				(RigidDynamicBody3D == null &&
 					(App.IsAuthoritativePeer ||
 					IsGrabbed ||
 					_grabbedLastSync ||
 					inOwnedAttachmentHierarchy)) ||
-				(RigidBody != null &&
+				(RigidDynamicBody3D != null &&
 					(IsSimulatedByLocalUser || IsGrabbed ||
 					_grabbedLastSync )))
 			{
@@ -1882,9 +1882,9 @@ namespace MixedRealityExtension.Core
 		}
 
 		[CommandHandler(typeof(RigidBodyCommands))]
-		private void OnRigidBodyCommands(RigidBodyCommands payload, Action onCompleteCallback)
+		private void OnRigidDynamicBody3DCommands(RigidBodyCommands payload, Action onCompleteCallback)
 		{
-			ExecuteRigidBodyCommands(payload, onCompleteCallback);
+			ExecuteRigidDynamicBody3DCommands(payload, onCompleteCallback);
 		}
 
 		[CommandHandler(typeof(SetMediaState))]
@@ -2068,14 +2068,14 @@ namespace MixedRealityExtension.Core
 		[CommandHandler(typeof(RBMovePosition))]
 		private void OnRBMovePosition(RBMovePosition payload, Action onCompleteCallback)
 		{
-			RigidBody?.RigidBodyMovePosition(new MWVector3().ApplyPatch(payload.Position));
+			RigidDynamicBody3D?.RigidDynamicBody3DMovePosition(new MWVector3().ApplyPatch(payload.Position));
 			onCompleteCallback?.Invoke();
 		}
 
 		[CommandHandler(typeof(RBMoveRotation))]
 		private void OnRBMoveRotation(RBMoveRotation payload, Action onCompleteCallback)
 		{
-			RigidBody?.RigidBodyMoveRotation(new MWQuaternion().ApplyPatch(payload.Rotation));
+			RigidDynamicBody3D?.RigidDynamicBody3DMoveRotation(new MWQuaternion().ApplyPatch(payload.Rotation));
 			onCompleteCallback?.Invoke();
 		}
 */
@@ -2086,7 +2086,7 @@ namespace MixedRealityExtension.Core
 			if (isOwner)
 			{
 				payload.Force.Z *= -1;
-				RigidBody?.RigidBodyAddForce(new MWVector3().ApplyPatch(payload.Force));
+				RigidDynamicBody3D?.RigidDynamicBody3DAddForce(new MWVector3().ApplyPatch(payload.Force));
 			}
 
 			onCompleteCallback?.Invoke();
@@ -2097,7 +2097,7 @@ namespace MixedRealityExtension.Core
 		{
 			var force = new MWVector3().ApplyPatch(payload.Force);
 			var position = new MWVector3().ApplyPatch(payload.Position);
-			RigidBody?.RigidBodyAddForceAtPosition(force, position);
+			RigidDynamicBody3D?.RigidDynamicBody3DAddForceAtPosition(force, position);
 			onCompleteCallback?.Invoke();
 		}
 
@@ -2106,7 +2106,7 @@ namespace MixedRealityExtension.Core
 		{
 			payload.Torque.X *= -1;
 			payload.Torque.Y *= -1;
-			RigidBody?.RigidBodyAddTorque(new MWVector3().ApplyPatch(payload.Torque));
+			RigidDynamicBody3D?.RigidDynamicBody3DAddTorque(new MWVector3().ApplyPatch(payload.Torque));
 			onCompleteCallback?.Invoke();
 		}
 
@@ -2115,7 +2115,7 @@ namespace MixedRealityExtension.Core
 		{
 			payload.RelativeTorque.X *= -1;
 			payload.RelativeTorque.Y *= -1;
-			RigidBody?.RigidBodyAddRelativeTorque(new MWVector3().ApplyPatch(payload.RelativeTorque));
+			RigidDynamicBody3D?.RigidDynamicBody3DAddRelativeTorque(new MWVector3().ApplyPatch(payload.RelativeTorque));
 			onCompleteCallback?.Invoke();
 		}
 

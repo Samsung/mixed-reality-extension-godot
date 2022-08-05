@@ -38,7 +38,7 @@ public class MRELogger : IMRELogger
 	}
 }
 
-public partial class MREComponent : Spatial
+public partial class MREComponent : Node3D
 {
 	public delegate void AppEventHandler(MREComponent app);
 
@@ -66,7 +66,7 @@ public partial class MREComponent : Spatial
 	//[SerializeField]
 	internal Permissions GrantedPermissions;
 
-	public Spatial SceneRoot;
+	public Node3D SceneRoot;
 
 	public Node PlaceholderObject;
 

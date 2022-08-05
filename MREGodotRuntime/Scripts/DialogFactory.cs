@@ -7,14 +7,14 @@ using MixedRealityExtension.PluginInterfaces;
 using System;
 using Godot.Collections;
 
-public class DialogFactory : MeshInstance, IDialogFactory
+public class DialogFactory : MeshInstance3D, IDialogFactory
 {
 	[Export] private NodePath inputSource;
 	private Assets.Scripts.User.InputSource inputSourceNode;
 	private ConfirmationDialog label;
 	private TextEdit input;
 	private Viewport viewport;
-	private CollisionShape collisionShape;
+	private CollisionShape3D collisionShape;
 
 	private class DialogQueueEntry
 	{
@@ -42,10 +42,10 @@ public class DialogFactory : MeshInstance, IDialogFactory
 		label.Connect("confirmed", this, nameof(OnOk));
 		label.Connect("popup_hide", this, nameof(OnPopupHide));
 
-		var area = new Area();
-		collisionShape = new CollisionShape();
+		var area = new Area3D();
+		collisionShape = new CollisionShape3D();
 		collisionShape.Disabled = true;
-		collisionShape.Shape = new BoxShape()
+		collisionShape.Shape = new BoxShape3D()
 		{
 			Extents = new Vector3(0.5f, 0.5f, 0.001f),
 		};
@@ -104,7 +104,7 @@ public class DialogFactory : MeshInstance, IDialogFactory
 		label.Connect("resized", this, nameof(onResized));
 		label.Popup_();
 
-		GlobalTransform = new Transform(inputSourceNode.GlobalTransform.basis, inputSourceNode.ToGlobal(new Vector3(0, 0, -0.5f)));
+		GlobalTransform = new Transform3D(inputSourceNode.GlobalTransform.basis, inputSourceNode.ToGlobal(new Vector3(0, 0, -0.5f)));
 		Visible = true;
 	}
 

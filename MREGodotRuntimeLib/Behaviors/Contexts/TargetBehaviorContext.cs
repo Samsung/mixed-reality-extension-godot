@@ -29,7 +29,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromGodotVector3(targetPoint, Behavior.Actor.Node3D as Spatial, app.SceneRoot)
+					PointData.CreateFromGodotVector3(targetPoint, Behavior.Actor.Node3D as Node3D, app.SceneRoot)
 				}
 			};
 
@@ -48,7 +48,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 			{
 				targetedPoints = new PointData[1]
 				{
-					PointData.CreateFromGodotVector3(targetPoint, Behavior.Actor.Node3D as Spatial, app.SceneRoot)
+					PointData.CreateFromGodotVector3(targetPoint, Behavior.Actor.Node3D as Node3D, app.SceneRoot)
 				}
 			};
 
@@ -73,9 +73,9 @@ namespace MixedRealityExtension.Behaviors.Contexts
 
 		internal TargetBehaviorContext()
 		{
-			
+
 		}
-		
+
 		internal override void SynchronizeBehavior()
 		{
 			base.SynchronizeBehavior();
@@ -92,7 +92,7 @@ namespace MixedRealityExtension.Behaviors.Contexts
 				{
 					targetedPoints = _currentTargetPoints.Select((point) =>
 					{
-						return PointData.CreateFromGodotVector3(point, Behavior.Actor.Node3D as Spatial, app.SceneRoot);
+						return PointData.CreateFromGodotVector3(point, Behavior.Actor.Node3D as Node3D, app.SceneRoot);
 					}).ToArray()
 				});
 

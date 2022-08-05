@@ -1,12 +1,12 @@
 using Godot;
 using System;
 
-public partial class ThumbTip : MeshInstance
+public partial class ThumbTip : MeshInstance3D
 {
-    Spatial indexTip;
+    Node3D indexTip;
     public override void _Ready()
     {
-        indexTip = ((Spatial)GetNode("../../../../IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"));
+        indexTip = ((Node3D)GetNode("../../../../IndexMetacarpal/IndexProximal/IndexIntermediate/IndexDistal/IndexTip"));
     }
 
     public override void _Input(InputEvent ev)
@@ -17,7 +17,7 @@ public partial class ThumbTip : MeshInstance
         }
         else if (Input.IsActionJustReleased("Fire2"))
         {
-            Transform = new Transform(Transform.basis, new Vector3(0, 0, -0.05f));
+            Transform = new Transform3D(Transform.basis, new Vector3(0, 0, -0.05f));
         }
     }
 }

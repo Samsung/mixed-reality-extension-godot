@@ -18,7 +18,7 @@ namespace Assets.Scripts.Tools
 
 		public bool IsNearObject;
 
-		public Spatial Target { get; private set; }
+		public Node3D Target { get; private set; }
 
 		public bool TargetGrabbed => grabTool.GrabActive;
 
@@ -149,9 +149,9 @@ namespace Assets.Scripts.Tools
 		}
 
 		protected virtual void OnTargetChanged(
-			Spatial oldTarget,
+			Node3D oldTarget,
 			Vector3 oldTargetPoint,
-			Spatial newTarget,
+			Node3D newTarget,
 			Vector3 newTargetPoint,
 			TargetBehavior newBehavior,
 			InputSource inputSource)
@@ -202,10 +202,10 @@ namespace Assets.Scripts.Tools
 			OnGrabStateChanged(args.OldGrabState, args.NewGrabState, args.InputSource);
 		}
 
-		protected virtual Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		protected virtual Node3D FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			hitPoint = null;
-			Spatial nearTarget = grabTool.FindTarget(inputSource, out hitPoint);
+			Node3D nearTarget = grabTool.FindTarget(inputSource, out hitPoint);
 			if (!inputSource.IsPinching && nearTarget == null)
 				nearTarget = pokeTool.FindTarget(inputSource, out hitPoint);
 			if (nearTarget != null)
@@ -224,7 +224,7 @@ namespace Assets.Scripts.Tools
 			{
 				hitPoint = (Vector3)RayIntersectionResult["position"];
 
-				for (var node = (Spatial)RayIntersectionResult["collider"]; node != null; node = node.GetParent() as Spatial)
+				for (var node = (Node3D)RayIntersectionResult["collider"]; node != null; node = node.GetParent() as Node3D)
 				{
 					var hitPointNormal = (Vector3)RayIntersectionResult["normal"];
 					inputSource.HitPoint = (Vector3)hitPoint;

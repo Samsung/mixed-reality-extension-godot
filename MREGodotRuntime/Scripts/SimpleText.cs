@@ -6,7 +6,7 @@ using MixedRealityExtension.Patching.Types;
 using System.Collections.Generic;
 using Godot;
 
-public partial class SimpleText : MeshInstance, IText
+public partial class SimpleText : MeshInstance3D, IText
 {
 	private readonly QuadMesh textMesh;
 	private readonly RichTextLabel label;
@@ -185,7 +185,7 @@ public partial class SimpleText : MeshInstance, IText
 		Font = FontFamily.SansSerif;
 	}
 
-	public SimpleText(Spatial parent) : this()
+	public SimpleText(Node3D parent) : this()
 	{
 		parent?.CallDeferred("add_child", this);
 	}

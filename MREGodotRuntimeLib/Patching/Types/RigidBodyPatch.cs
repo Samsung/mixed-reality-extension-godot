@@ -103,13 +103,13 @@ namespace MixedRealityExtension.Patching.Types
 		public RigidBodyPatch()
 		{ }
 
-		internal RigidBodyPatch(RigidBody rigidbody, Spatial sceneRoot)
+		internal RigidBodyPatch(RigidDynamicBody3D rigidbody, Node3D sceneRoot)
 		{
 			// Do not include Position or Rotation in the patch.
 			Velocity = new Vector3Patch(sceneRoot.ToLocal(rigidbody.LinearVelocity));
 			AngularVelocity = new Vector3Patch(sceneRoot.ToLocal(rigidbody.AngularVelocity));
 			Mass = rigidbody.Mass;
-			DetectCollisions = !rigidbody.GetChild<CollisionShape>().Disabled;
+			DetectCollisions = !rigidbody.GetChild<CollisionShape3D>().Disabled;
 			CollisionDetectionMode = rigidbody.ContinuousCd switch
 			{
 				true => MRECollisionDetectionMode.Continuous,

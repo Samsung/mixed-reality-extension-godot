@@ -11,7 +11,7 @@ using MixedRealityExtension.Messaging.Payloads;
 
 namespace MixedRealityExtension.Core
 {
-	internal partial class TouchablePlane : Spatial, ITouchableSurface
+	internal partial class TouchablePlane : Node3D, ITouchableSurface
 	{
 		/// <inheritdoc />
 		public float DebounceThreshold { get; set; } = 0.01f;
@@ -71,29 +71,29 @@ namespace MixedRealityExtension.Core
 		public Vector3 LocalPressDirection => LocalForward;
 
 		/// <inheritdoc/>
-		public CollisionShape TouchableBoxShape
+		public CollisionShape3D TouchableBoxShape
 		{
 			get => touchableBoxShape;
 			set {
 				if (touchableBoxShape == value)
 					return;
 
-				if (value != null && value.Shape is BoxShape boxShape)
+				if (value != null && value.Shape is BoxShape3D boxShape)
 				{
 					touchableBoxShape = value;
 					// Set x and y center to match the newCollider but change the position of the
 					// z axis so the plane is always in front of the object
-					SetLocalCenter(touchableBoxShape.Transform.origin + LocalForward * boxShape.Extents);
+					SetLocalCenter(touchableBoxShape.Transform.origin + LocalForward * boxShape.Size / 2);
 				}
 				else
 				{
-					GD.PushWarning("TouchableBoxShape is not BoxShape, cannot set TouchableBoxShape.");
+					GD.PushWarning("TouchableBoxShape is not BoxShape3D, cannot set TouchableBoxShape.");
 				}
 			}
 		}
 
-		private CollisionShape touchableBoxShape;
-		private Spatial ParentActor;
+		private CollisionShape3D touchableBoxShape;
+		private Node3D ParentActor;
 
 		public TouchablePlane(Actor actor)
 		{
@@ -187,10 +187,10 @@ namespace MixedRealityExtension.Core
 					break;
 			}
 
-			var collisionObject = ParentActor.GetChild<CollisionObject>();
+			var collisionObject = ParentActor.GetChild<CollisionObject3D>();
 			if (collisionObject != null)
 			{
-				TouchableBoxShape = collisionObject.GetChild<CollisionShape>();
+				TouchableBoxShape = collisionObject.GetChild<CollisionShape3D>();
 			}
 
 			ValidateProperties();

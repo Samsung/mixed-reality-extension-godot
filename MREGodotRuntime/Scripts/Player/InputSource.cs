@@ -7,12 +7,12 @@ using Godot.Collections;
 
 namespace Assets.Scripts.User
 {
-	public partial class InputSource : Camera
+	public partial class InputSource : Camera3D
 	{
 		private Tool _currentTool;
 		private bool isPinching;
 		private bool pinchChaged;
-		private PhysicsDirectSpaceState spaceState;
+		private PhysicsDirectSpaceState3D spaceState;
 		private Cursor cursor;
 		private User.Ray ray;
 

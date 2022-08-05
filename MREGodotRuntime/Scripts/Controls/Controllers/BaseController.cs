@@ -4,7 +4,7 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    public abstract partial class BaseController : Spatial, IController
+    public abstract partial class BaseController : Node3D, IController
     {
         public InputSource InputSource { get; protected set; }
 
@@ -15,11 +15,11 @@ namespace Assets.Scripts.Control
             return cursor;
         }
 
-        protected virtual User.Ray LoadRay(string scenePath, Camera mainCamera)
+        protected virtual User.Ray LoadRay(string scenePath, Camera3D mainCamera)
         {
             var rayScene = ResourceLoader.Load<PackedScene>(scenePath);
-            var ray = rayScene.Instance<User.Ray>();
-            ray.Camera = mainCamera;
+            var ray = rayScene.Instantiate<User.Ray>();
+            ray.Camera3D = mainCamera;
             return ray;
         }
 
@@ -35,7 +35,7 @@ namespace Assets.Scripts.Control
 
             if (!string.IsNullOrEmpty(rayScene))
             {
-                ray = LoadRay(rayScene, (Camera)userNode);
+                ray = LoadRay(rayScene, (Camera3D)userNode);
             }
 
             InputSource = new InputSource(userNode)
@@ -58,7 +58,7 @@ namespace Assets.Scripts.Control
             }
         }
 
-        protected virtual void _on_BaseController_ray_changed(string RayPath, Camera camera)
+        protected virtual void _on_BaseController_ray_changed(string RayPath, Camera3D camera)
         {
             if (camera == null)
             {

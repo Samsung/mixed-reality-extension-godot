@@ -8,7 +8,7 @@ using MixedRealityExtension.Util.GodotHelper;
 using System;
 using Godot;
 
-using GodotCollisionShape = Godot.CollisionShape;
+using GodotCollisionShape = Godot.CollisionShape3D;
 
 namespace MixedRealityExtension.Core
 {
@@ -45,7 +45,7 @@ namespace MixedRealityExtension.Core
 
 		internal override void Patch(MixedRealityExtensionApp app, GodotCollisionShape collider)
 		{
-			if (collider.Shape is SphereShape sphereCollider)
+			if (collider.Shape is SphereShape3D sphereCollider)
 			{
 				if (Center != null)
 				{
@@ -53,7 +53,7 @@ namespace MixedRealityExtension.Core
 					newCenter.x = Center.X;
 					newCenter.y = Center.Y;
 					newCenter.z = Center.Z;
-					collider.Transform = new Transform(Basis.Identity, newCenter);
+					collider.Transform = new Transform3D(Basis.Identity, newCenter);
 				}
 
 				if (Radius != null)
@@ -84,7 +84,7 @@ namespace MixedRealityExtension.Core
 
 		internal override void Patch(MixedRealityExtensionApp app, GodotCollisionShape collider)
 		{
-			if (collider.Shape is BoxShape boxShape)
+			if (collider.Shape is BoxShape3D boxShape)
 			{
 				if (Center != null)
 				{
@@ -92,7 +92,7 @@ namespace MixedRealityExtension.Core
 					newCenter.x = Center.X;
 					newCenter.y = Center.Y;
 					newCenter.z = Center.Z;
-					collider.Transform = new Transform(Basis.Identity, newCenter);
+					collider.Transform = new Transform3D(Basis.Identity, newCenter);
 				}
 
 				if (Size != null)
@@ -122,13 +122,13 @@ namespace MixedRealityExtension.Core
 
 		internal override void Patch(MixedRealityExtensionApp app, GodotCollisionShape collider)
 		{
-			if (collider.Shape is ConcavePolygonShape concavePolygonShape)
+			if (collider.Shape is ConcavePolygonShape3D concavePolygonShape)
 			{
 				Patch(app, concavePolygonShape);
 			}
 		}
 
-		private void Patch(MixedRealityExtensionApp app, ConcavePolygonShape concavePolygonShape)
+		private void Patch(MixedRealityExtensionApp app, ConcavePolygonShape3D concavePolygonShape)
 		{
 			var tempId = MeshId;
 			app.AssetManager.OnSet(MeshId, asset =>
@@ -164,7 +164,7 @@ namespace MixedRealityExtension.Core
 
 		internal override void Patch(MixedRealityExtensionApp app, GodotCollisionShape collider)
 		{
-			if (collider.Shape is CylinderShape cylinderShape)
+			if (collider.Shape is CylinderShape3D cylinderShape)
 			{
 				Vector3 newCenter = Vector3.Zero;
 				Basis basis = Basis.Identity;
@@ -206,7 +206,7 @@ namespace MixedRealityExtension.Core
 						basis = basis.Rotated(Vector3.Right, Mathf.Pi / 2);
 					}
 				}
-				collider.Transform = new Transform(basis, newCenter);
+				collider.Transform = new Transform3D(basis, newCenter);
 			}
 		}
 	}
@@ -257,7 +257,7 @@ namespace MixedRealityExtension.Core
 
 		internal override void Patch(MixedRealityExtensionApp app, GodotCollisionShape collider)
 		{
-			if (collider.Shape is CapsuleShape capsuleShape)
+			if (collider.Shape is CapsuleShape3D capsuleShape)
 			{
 				Vector3 newCenter = Vector3.Zero;
 				Basis basis = Basis.Identity;
@@ -283,7 +283,7 @@ namespace MixedRealityExtension.Core
 						basis = basis.Rotated(Vector3.Right, Mathf.Pi / 2);
 					}
 				}
-				collider.Transform = new Transform(basis, newCenter);
+				collider.Transform = new Transform3D(basis, newCenter);
 			}
 		}
 	}

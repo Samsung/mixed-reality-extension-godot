@@ -7,7 +7,7 @@ public partial class Joystick2D : TouchScreenButton
 
     public float Speed { get; set; } = 0.07f;
 
-    public Camera MainCamera { get; set; }
+    public Camera3D MainCamera { get; set; }
 
     public override void _Ready()
     {
@@ -41,7 +41,7 @@ public partial class Joystick2D : TouchScreenButton
     public override void _Process(float delta)
     {
         var d = playerDirection * Speed;
-        MainCamera.Translation += MainCamera.Transform.basis.x * d.x;
-        MainCamera.Translation += MainCamera.Transform.basis.z * d.y;
+        MainCamera.Position += MainCamera.Transform.basis.x * d.x;
+        MainCamera.Position += MainCamera.Transform.basis.z * d.y;
     }
 }

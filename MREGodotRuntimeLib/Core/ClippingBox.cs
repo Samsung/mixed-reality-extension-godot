@@ -20,9 +20,9 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		public override void ClearMeshInstances()
+		public override void ClearMeshInstance3Ds()
 		{
-			base.ClearMeshInstances();
+			base.ClearMeshInstance3Ds();
 			foreach (var shaderMaterial in ShaderMaterials())
 			{
 				// clear inverse transform matrix

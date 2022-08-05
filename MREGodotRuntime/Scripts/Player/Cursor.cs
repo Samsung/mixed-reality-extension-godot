@@ -2,13 +2,13 @@ using Godot;
 
 namespace Assets.Scripts.User
 {
-    public partial class Cursor : Spatial
+    public partial class Cursor : Node3D
     {
-        public GeometryInstance Mesh { get; set; }
+        public GeometryInstance3D Mesh { get; set; }
 
         public Color Color {
-            get => ((SpatialMaterial)Mesh.MaterialOverride).AlbedoColor;
-            set => ((SpatialMaterial)Mesh.MaterialOverride).AlbedoColor = value;
+            get => ((StandardMaterial3D)Mesh.MaterialOverride).AlbedoColor;
+            set => ((StandardMaterial3D)Mesh.MaterialOverride).AlbedoColor = value;
         }
 
         public void SetCursorTransform(Vector3 hitPoint, Vector3 hitPointNormal)
@@ -18,12 +18,12 @@ namespace Assets.Scripts.User
             basis.x = basis.z.Cross(basis.y);
             basis = basis.Orthonormalized();
 
-            GlobalTransform = new Transform(basis, hitPoint);
+            GlobalTransform = new Transform3D(basis, hitPoint);
         }
 
         public override void _Ready()
         {
-            Mesh = GetNode<GeometryInstance>("Mesh");
+            Mesh = GetNode<GeometryInstance3D>("Mesh");
         }
     }
 }

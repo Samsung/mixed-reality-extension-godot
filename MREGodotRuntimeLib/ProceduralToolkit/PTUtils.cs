@@ -137,7 +137,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				vector.z.ToString(format, formatProvider));
 		}
 
-		public static string ToString(this Quat quaternion, string format, IFormatProvider formatProvider)
+		public static string ToString(this Quaternion quaternion, string format, IFormatProvider formatProvider)
 		{
 			return string.Format("({0}, {1}, {2}, {3})", quaternion.x.ToString(format, formatProvider), quaternion.y.ToString(format, formatProvider),
 				quaternion.z.ToString(format, formatProvider), quaternion.w.ToString(format, formatProvider));

@@ -9,7 +9,7 @@ using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Util.GodotHelper;
 using Godot;
 using MRELightType = MixedRealityExtension.Core.Interfaces.LightType;
-using GodotLight = Godot.Light;
+using GodotLight = Godot.Light3D;
 
 namespace MixedRealityExtension.Core
 {
@@ -28,11 +28,11 @@ namespace MixedRealityExtension.Core
 			get {
 				switch (_light)
 				{
-					case SpotLight _:
+					case SpotLight3D _:
 						return MRELightType.Spot;
-					case OmniLight _:
+					case OmniLight3D _:
 						return MRELightType.Point;
-					case DirectionalLight _:
+					case DirectionalLight3D _:
 						return MRELightType.Directional;
 				}
 				return MRELightType.Spot;
@@ -47,11 +47,11 @@ namespace MixedRealityExtension.Core
 			get {
 				switch (_light)
 				{
-					case SpotLight spotLight:
+					case SpotLight3D spotLight:
 						return spotLight.SpotRange;
-					case OmniLight omniLight:
+					case OmniLight3D omniLight:
 						return omniLight.OmniRange;
-					case DirectionalLight _:
+					case DirectionalLight3D _:
 						return float.MaxValue;
 				}
 				return 0;
@@ -64,15 +64,15 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public float SpotAngle {
 			get {
-				if (!(_light is SpotLight))
+				if (!(_light is SpotLight3D))
 					return 0;
 				switch (_light)
 				{
-					case SpotLight spotLight:
+					case SpotLight3D spotLight:
 						return spotLight.SpotRange;
-					case OmniLight omniLight:
+					case OmniLight3D omniLight:
 						return omniLight.OmniRange;
-					case DirectionalLight _:
+					case DirectionalLight3D _:
 						return float.MaxValue;
 				}
 				return 0;
@@ -94,13 +94,13 @@ namespace MixedRealityExtension.Core
 			_light.Visible = _light.Visible.GetPatchApplied(Enabled.ApplyPatch(patch.Enabled));
 			_light.LightColor = _light.LightColor.GetPatchApplied(Color.ApplyPatch(patch.Color));
 			_light.LightEnergy = _light.LightEnergy.GetPatchApplied(Intensity.ApplyPatch(patch.Intensity));
-			if (_light is SpotLight spotLight)
+			if (_light is SpotLight3D spotLight)
 			{
 				if (patch.SpotAngle.HasValue)
 					spotLight.SpotAngle = Mathf.Rad2Deg(patch.SpotAngle.Value);
 				spotLight.SpotRange = spotLight.SpotRange.GetPatchApplied(Range.ApplyPatch(patch.Range));
 			}
-			else if (_light is OmniLight omniLight)
+			else if (_light is OmniLight3D omniLight)
 			{
 				omniLight.OmniRange = omniLight.OmniRange.GetPatchApplied(Range.ApplyPatch(patch.Range));
 			}

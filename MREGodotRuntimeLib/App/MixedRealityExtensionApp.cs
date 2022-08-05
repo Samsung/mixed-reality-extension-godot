@@ -142,7 +142,7 @@ namespace MixedRealityExtension.App
 		public Uri ServerAssetUri { get; private set; }
 
 		/// <inheritdoc />
-		public Spatial SceneRoot { get; set; }
+		public Node3D SceneRoot { get; set; }
 
 		/// <inheritdoc />
 		public IUser LocalUser { get; private set; }
@@ -819,11 +819,11 @@ namespace MixedRealityExtension.App
 			}
 		}
 
-		private Spatial[] GetDistinctTreeRoots(Spatial[] gos)
+		private Node3D[] GetDistinctTreeRoots(Node3D[] gos)
 		{
 			// identify game objects whose ancestors are not also flagged to be actors
 			var goIds = new HashSet<ulong>(gos.Select(go => go.GetInstanceId()));
-			var rootGos = new List<Spatial>(gos.Length);
+			var rootGos = new List<Node3D>(gos.Length);
 			foreach (var go in gos)
 			{
 				if (!ancestorInList(go))
@@ -834,11 +834,11 @@ namespace MixedRealityExtension.App
 
 			return rootGos.ToArray();
 
-			bool ancestorInList(Spatial go)
+			bool ancestorInList(Node3D go)
 			{
 				return go != null && go.GetParent() != null && (
 					goIds.Contains(go.GetParent().GetInstanceId()) ||
-					ancestorInList(go.GetParent() as Spatial));
+					ancestorInList(go.GetParent() as Node3D));
 			}
 		}
 
@@ -978,7 +978,7 @@ namespace MixedRealityExtension.App
 				return;
 			}
 
-			var secondPassXfrms = new List<Spatial>(2);
+			var secondPassXfrms = new List<Node3D>(2);
 			foreach (var root in rootActors)
 			{
 				ProcessActors(root.Node3D, root.GetParent() as Actor);
@@ -998,7 +998,7 @@ namespace MixedRealityExtension.App
 			_actorManager.UponStable(
 				() => SendCreateActorResponse(originalMessage, actors: createdActors, anims: createdAnims, onCompleteCallback: onCompleteCallback));
 
-			void ProcessActors(Spatial node3D, Actor parent)
+			void ProcessActors(Node3D node3D, Actor parent)
 			{
 				// Generate actors for all node3D, even if the loader didn't. Only loader-generated
 				// actors are returned to the app though. We do this so library objects get enabled/disabled
@@ -1010,11 +1010,11 @@ namespace MixedRealityExtension.App
 
 				actor.ParentId = parent?.Id ?? actor.ParentId;
 
-				if (actor.MeshInstance != null)
+				if (actor.MeshInstance3D != null)
 				{
 					// only overwrite material if there's something in the cache, i.e. not a random library material
 					{
-						var material = actor.MeshInstance.GetSurfaceMaterial(0);
+						var material = actor.MeshInstance3D.GetSurfaceMaterial(0);
 						var matId = AssetManager.GetByObject(material)?.Id;
 						if (matId.HasValue)
 						{
@@ -1034,12 +1034,12 @@ namespace MixedRealityExtension.App
 
 				foreach (object node in actor.GetChildren())
 				{
-					if (node.GetType() == typeof(Spatial) || node.GetType().Name == "Actor")
-						ProcessActors((Spatial)node, actor);
+					if (node.GetType() == typeof(Node3D) || node.GetType().Name == "Actor")
+						ProcessActors((Node3D)node, actor);
 				}
 			}
 
-			void ProcessActors2(Spatial node3D)
+			void ProcessActors2(Node3D node3D)
 			{
 				var actor = node3D as Actor;
 				if (createdActors.Contains(actor))

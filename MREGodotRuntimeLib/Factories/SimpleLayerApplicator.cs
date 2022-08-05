@@ -36,7 +36,7 @@ namespace MixedRealityExtension.Factories
 		}
 
 		/// <inheritdoc />
-		public virtual void ApplyLayerToCollider(CollisionLayer? layer, Area area)
+		public virtual void ApplyLayerToCollider(CollisionLayer? layer, Area3D area)
 		{
 			if (!layer.HasValue) return;
 
@@ -64,7 +64,7 @@ namespace MixedRealityExtension.Factories
 		}
 
 		/// <inheritdoc />
-		public virtual void ApplyLayerToCollider(CollisionLayer? layer, PhysicsBody physicsBody)
+		public virtual void ApplyLayerToCollider(CollisionLayer? layer, PhysicsBody3D physicsBody)
 		{
 			if (!layer.HasValue) return;
 
@@ -92,7 +92,7 @@ namespace MixedRealityExtension.Factories
 		}
 
 		/// <inheritdoc />
-		public virtual CollisionLayer DetermineLayerOfCollider(Area area)
+		public virtual CollisionLayer DetermineLayerOfCollider(Area3D area)
 		{
 			if (area.CollisionLayer == navigationLayer)
 			{

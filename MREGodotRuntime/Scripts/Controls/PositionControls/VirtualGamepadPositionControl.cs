@@ -2,14 +2,14 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    public partial class VirtualGamepadPositionControl : Spatial, IPositionControl
+    public partial class VirtualGamepadPositionControl : Node3D, IPositionControl
     {
         private Joystick2D gamepad;
-        private Camera mainCamera;
+        private Camera3D mainCamera;
 
         public float Speed { get; set; } = 0.07f;
 
-        public VirtualGamepadPositionControl(Camera camera)
+        public VirtualGamepadPositionControl(Camera3D camera)
         {
             mainCamera = camera;
         }
@@ -29,7 +29,7 @@ namespace Assets.Scripts.Control
         private Joystick2D LoadGamepad(string scenePath)
         {
             var gamepadScene = ResourceLoader.Load<PackedScene>(scenePath);
-            var gamepad = gamepadScene.Instance<Joystick2D>();
+            var gamepad = gamepadScene.Instantiate<Joystick2D>();
             gamepad.MainCamera = mainCamera;
             gamepad.Speed = Speed;
             return gamepad;

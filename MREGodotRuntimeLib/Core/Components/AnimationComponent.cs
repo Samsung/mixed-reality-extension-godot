@@ -117,12 +117,12 @@ namespace MixedRealityExtension.Core.Components
 
 				void AddTransformPatch(float time, ScaledTransformPatch value)
 				{
-					AddVector3Patch(typeof(Transform), "..:translation", time, value?.Position);
+					AddVector3Patch(typeof(Transform3D), "..:translation", time, value?.Position);
 					var ratation = value?.Rotation;
-					var quat = new Quat(ratation.X.Value, ratation.Y.Value, ratation.Z.Value, ratation.W.Value);
+					var quat = new Quaternion(ratation.X.Value, ratation.Y.Value, ratation.Z.Value, ratation.W.Value);
 					var vector3 = quat.GetEuler();
-					AddVector3Patch(typeof(Transform), "..:rotation_degrees", time, new Vector3Patch(vector3));
-					AddVector3Patch(typeof(Transform), "..:scale", time, value?.Scale);
+					AddVector3Patch(typeof(Transform3D), "..:rotation_degrees", time, new Vector3Patch(vector3));
+					AddVector3Patch(typeof(Transform3D), "..:scale", time, value?.Scale);
 				}
 
 				void AddActorPatch(float time, ActorPatch value)
@@ -211,7 +211,7 @@ namespace MixedRealityExtension.Core.Components
 				// If quaternion is incomplete, fall back to the identity.
 				if (!hasAllComponents)
 				{
-					finalTransform.Rotation = new QuaternionPatch(Quat.Identity);
+					finalTransform.Rotation = new QuaternionPatch(Quaternion.Identity);
 					break;
 				}
 
@@ -224,7 +224,7 @@ namespace MixedRealityExtension.Core.Components
 				if (lengthSquared == 0)
 				{
 					// If the quaternion is length zero, fall back to the identity.
-					finalTransform.Rotation = new QuaternionPatch(Quat.Identity);
+					finalTransform.Rotation = new QuaternionPatch(Quaternion.Identity);
 					break;
 				}
 				else if (lengthSquared != 1.0f)
@@ -287,14 +287,14 @@ namespace MixedRealityExtension.Core.Components
 				return false;
 			}
 
-			bool SlerpQuaternion(out Quat dest, Quat start, QuaternionPatch end, float t)
+			bool SlerpQuaternion(out Quaternion dest, Quaternion start, QuaternionPatch end, float t)
 			{
 				if (end != null)
 				{
-					dest = start.Slerp(new Quat(end.X.Value, end.Y.Value, end.Z.Value, end.W.Value), t);
+					dest = start.Slerp(new Quaternion(end.X.Value, end.Y.Value, end.Z.Value, end.W.Value), t);
 					return true;
 				}
-				dest = Quat.Identity;
+				dest = Quaternion.Identity;
 				return false;
 			}
 
@@ -334,8 +334,8 @@ namespace MixedRealityExtension.Core.Components
 
 			void BuildKeyframeRotation(MWAnimationKeyframe keyframe, float t)
 			{
-				Quat value;
-				if (SlerpQuaternion(out value, new Quat(Rotation), finalTransform.Rotation, t))
+				Quaternion value;
+				if (SlerpQuaternion(out value, new Quaternion(Rotation), finalTransform.Rotation, t))
 				{
 					keyframe.Value.Transform.Local.Rotation = new QuaternionPatch(value);
 				}

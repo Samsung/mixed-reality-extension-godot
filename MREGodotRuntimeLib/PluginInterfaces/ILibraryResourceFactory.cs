@@ -16,8 +16,8 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// Instantiate a host-defined actor by resource ID. Will throw an ArgumentException if the resourceId is not recognized.
 		/// </summary>
 		/// <param name="resourceId">A string that uniquely identifies a library resource to the host app</param>
-		/// <param name="parent">The Spatial to attach the library object to</param>
+		/// <param name="parent">The Node3D to attach the library object to</param>
 		/// <returns>An async task that will resolve with the spawned GameObject</returns>
-		Task<Spatial> CreateFromLibrary(string resourceId, Spatial parent);
+		Task<Node3D> CreateFromLibrary(string resourceId, Node3D parent);
 	}
 }

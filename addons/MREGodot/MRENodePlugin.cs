@@ -8,13 +8,13 @@ public partial class MRENodePlugin : EditorPlugin
     {
         var script = GD.Load<Script>("MREGodotRuntime/Scripts/LaunchMRE.cs");
         var texture = GD.Load<Texture>("addons/MREGodot/icon.svg");
-        AddCustomType("MRENode", "Spatial", script, texture);
+        AddCustomType("MRENode", "Node3D", script, texture);
 
         var textScript = GD.Load<Script>("MREGodotRuntime/Scripts/SimpleText.cs");
-        AddCustomType("SimpleText", "MeshInstance", textScript, null);
+        AddCustomType("SimpleText", "MeshInstance3D", textScript, null);
 
         var buttonScript = GD.Load<Script>("Toolkit/PressableButton.cs");
-        AddCustomType("PressableButton", "Spatial", buttonScript, null);
+        AddCustomType("PressableButton", "Node3D", buttonScript, null);
 
         var buttonGodotScript = GD.Load<Script>("Toolkit/PressableButtonGodot.cs");
         AddCustomType("PressableButtonGodot", "PressableButton", buttonScript, null);

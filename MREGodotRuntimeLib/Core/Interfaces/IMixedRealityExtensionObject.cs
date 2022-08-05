@@ -29,6 +29,6 @@ namespace MixedRealityExtension.Core.Interfaces
 		/// <summary>
 		/// The node that the actor is associated with.
 		/// </summary>
-		Spatial Node3D { get; }
+		Node3D Node3D { get; }
 	}
 }

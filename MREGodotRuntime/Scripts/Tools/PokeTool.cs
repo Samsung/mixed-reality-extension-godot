@@ -10,16 +10,16 @@ namespace Assets.Scripts.Tools
 {
 	public class PokeTool : Tool
 	{
-		RID shape = PhysicsServer.ShapeCreate(PhysicsServer.ShapeType.Sphere);
-		PhysicsDirectSpaceState spaceState;
-		PhysicsShapeQueryParameters shapeQueryParameters;
+		RID shape = PhysicsServer3D.ShapeCreate(PhysicsServer3D.ShapeType.Sphere);
+		PhysicsDirectSpaceState3D spaceState;
+		PhysicsShapeQueryParameters3D shapeQueryParameters;
 
 		public ITouchableBase ClosestProximityTouchable { get; private set; }
 		public float TouchableDistance { get; } = 0.2f;
-		public Spatial CurrentTouchableObjectDown { get; private set; }
+		public Node3D CurrentTouchableObjectDown { get; private set; }
 		public Vector3 PreviousPosition { get; private set; } = Vector3.Zero;
 
-		private Spatial CurrentPointerTarget;
+		private Node3D CurrentPointerTarget;
 		private Vector3 RayStartPoint;
 		private Vector3 RayEndPoint;
 		private float previousClosestDistance = 0.0f;
@@ -27,8 +27,8 @@ namespace Assets.Scripts.Tools
 
 		public PokeTool()
 		{
-			PhysicsServer.ShapeSetData(shape, TouchableDistance);
-			shapeQueryParameters = new PhysicsShapeQueryParameters()
+			PhysicsServer3D.ShapeSetData(shape, TouchableDistance);
+			shapeQueryParameters = new PhysicsShapeQueryParameters3D()
 			{
 				CollideWithAreas = true,
 				CollideWithBodies = true,
@@ -37,7 +37,7 @@ namespace Assets.Scripts.Tools
 			};
 		}
 
-		internal Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		internal Node3D FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			spaceState = inputSource.GetWorld().DirectSpaceState;
 			shapeQueryParameters.Transform = inputSource.GlobalTransform;
@@ -50,14 +50,14 @@ namespace Assets.Scripts.Tools
 			Vector3 closestNormal = -inputSource.GlobalTransform.basis.z.Normalized();
 			foreach (Dictionary intersectResult in intersectShapes)
 			{
-				var collider = (Spatial)intersectResult["collider"];
+				var collider = (Node3D)intersectResult["collider"];
 				Vector3 normal;
 
-				Spatial actor = collider;
+				Node3D actor = collider;
 				ITouchableBase touchable = null;
 				while (touchable == null)
 				{
-					actor = actor?.GetParent() as Spatial;
+					actor = actor?.GetParent() as Node3D;
 					if (actor == null) break;
 					touchable = actor.GetChild<ITouchableBase>();
 				}
@@ -93,13 +93,13 @@ namespace Assets.Scripts.Tools
 				if (IntersectRayResult.Count > 0)
 				{
 					Vector3 rayEndPoint = (Vector3)IntersectRayResult["position"];
-					var collider = (Spatial)IntersectRayResult["collider"];
+					var collider = (Node3D)IntersectRayResult["collider"];
 					hitPointNormal = (Vector3)IntersectRayResult["normal"];
-					Spatial actor = collider;
+					Node3D actor = collider;
 					ITouchableBase touchable = null;
 					while (touchable == null)
 					{
-						actor = actor?.GetParent() as Spatial;
+						actor = actor?.GetParent() as Node3D;
 						if (actor == null) break;
 						touchable = actor.GetChild<ITouchableBase>();
 					}
@@ -227,9 +227,9 @@ namespace Assets.Scripts.Tools
 			TryRaisePokeUp(inputSource);
 		}
 
-		private bool IsObjectPartOfTouchable(Spatial targetObject, ITouchableBase touchable)
+		private bool IsObjectPartOfTouchable(Node3D targetObject, ITouchableBase touchable)
 		{
-			return targetObject != null && touchable != null && targetObject.FindNode(((Spatial)touchable).Name, owned: false) != null;
+			return targetObject != null && touchable != null && targetObject.FindNode(((Node3D)touchable).Name, owned: false) != null;
 		}
 	}
 }

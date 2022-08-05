@@ -23,42 +23,42 @@ namespace MixedRealityExtension.Core.Interfaces
 		/// Freeze motion along the X-axis.
 		/// </summary>
 		FreezePositionX = 2,
-		
+
 		/// <summary>
 		/// Freeze motion along the Y-axis.
 		/// </summary>
 		FreezePositionY = 4,
-		
+
 		/// <summary>
 		/// Freeze motion along the Z-axis.
 		/// </summary>
 		FreezePositionZ = 8,
-		
+
 		/// <summary>
 		/// Freeze motion along all axes.
 		/// </summary>
 		FreezePosition = 14,
-		
+
 		/// <summary>
 		/// Freeze rotation along the X-axis.
 		/// </summary>
 		FreezeRotationX = 16,
-		
+
 		/// <summary>
 		/// Freeze rotation along the Y-axis.
 		/// </summary>
 		FreezeRotationY = 32,
-		
+
 		/// <summary>
 		/// Freeze rotation along the Z-axis.
 		/// </summary>
 		FreezeRotationZ = 64,
-		
+
 		/// <summary>
 		/// Freeze rotation along all axes.
 		/// </summary>
 		FreezeRotation = 112,
-		
+
 		/// <summary>
 		/// Freeze rotation and motion along all axes.
 		/// </summary>
@@ -89,7 +89,7 @@ namespace MixedRealityExtension.Core.Interfaces
 	/// <summary>
 	/// The interface that represents a rigid body within the mixed reality extension runtime.
 	/// </summary>
-	public interface IRigidBody
+	public interface IRigidDynamicBody3D
 	{
 		/// <summary>
 		/// Gets the velocity of the rigid body.
@@ -136,38 +136,38 @@ namespace MixedRealityExtension.Core.Interfaces
 		/// Move the position of the rigid body to the new position.
 		/// </summary>
 		/// <param name="position">The position to move the rigid body to.</param>
-		void RigidBodyMovePosition(MWVector3 position);
+		void RigidDynamicBody3DMovePosition(MWVector3 position);
 
 		/// <summary>
 		/// Move the rotation of the rigid body to the new rotation.
 		/// </summary>
 		/// <param name="rotation">The rotation to rotate the rigid body to.</param>
-		void RigidBodyMoveRotation(MWQuaternion rotation);
+		void RigidDynamicBody3DMoveRotation(MWQuaternion rotation);
 
 		/// <summary>
 		/// Apply a force to the rigid body.
 		/// </summary>
 		/// <param name="force">The force to apply to the rigid body.</param>
-		void RigidBodyAddForce(MWVector3 force);
+		void RigidDynamicBody3DAddForce(MWVector3 force);
 
 		/// <summary>
 		/// Apply a force at a specific position of the rigid body.
 		/// </summary>
 		/// <param name="force">The force to apply to the rigid body.</param>
 		/// <param name="position">The position at which to apply the force.</param>
-		void RigidBodyAddForceAtPosition(MWVector3 force, MWVector3 position);
+		void RigidDynamicBody3DAddForceAtPosition(MWVector3 force, MWVector3 position);
 
 		/// <summary>
 		/// Apply a torque to the rigid body.
 		/// </summary>
 		/// <param name="torque">The torque to apply to the rigid body.</param>
-		void RigidBodyAddTorque(MWVector3 torque);
+		void RigidDynamicBody3DAddTorque(MWVector3 torque);
 
 		/// <summary>
 		/// Apply a relative torque to the rigid body.
 		/// </summary>
 		/// <param name="relativeTorque">The relative torque to apply to the rigid body.</param>
-		void RigidBodyAddRelativeTorque(MWVector3 relativeTorque);
+		void RigidDynamicBody3DAddRelativeTorque(MWVector3 relativeTorque);
 		*/
 	}
 }

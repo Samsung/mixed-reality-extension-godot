@@ -34,7 +34,7 @@ namespace MixedRealityExtension.Assets
 		private readonly MixedRealityExtensionApp _app;
 
 		private readonly Node _owner;
-		private readonly static Dictionary<string, string> ShaderToSpatialProperties = new Dictionary<string, string>()
+		private readonly static Dictionary<string, string> ShaderToNode3DProperties = new Dictionary<string, string>()
 		{
 			{"albedo", "albedo_color"},
 			{"specular", "metallic_specular"},
@@ -70,7 +70,7 @@ namespace MixedRealityExtension.Assets
 			*/
 		}
 
-		internal Spatial GetGameObjectFromParentId(Guid? parentId)
+		internal Node3D GetGameObjectFromParentId(Guid? parentId)
 		{
 			var parent = _app.FindActor(parentId ?? Guid.Empty) as Actor;
 			return parent?.Node3D ?? _app.SceneRoot;
@@ -88,7 +88,7 @@ namespace MixedRealityExtension.Assets
 
 		internal IList<Actor> CreateEmpty(Guid? parentId)
 		{
-			Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
+			Node3D newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Node3D;
 			Actor actor = Actor.Instantiate(newGO);
 			GetGameObjectFromParentId(parentId).AddChild(actor);
 
@@ -98,7 +98,7 @@ namespace MixedRealityExtension.Assets
 		internal IList<Actor> CreateFromPrefab(Guid prefabId, Guid? parentId, CollisionLayer? collisionLayer)
 		{
 			var asset = _app.AssetManager.GetById(prefabId)?.Asset as Node;
-			Spatial prefab = asset.Duplicate() as Spatial;
+			Node3D prefab = asset.Duplicate() as Node3D;
 
 			// restore current animation.
 			foreach (var animationPlayer in prefab.GetChildren<Godot.AnimationPlayer>())
@@ -110,7 +110,7 @@ namespace MixedRealityExtension.Assets
 				}
 			}
 
-			Spatial parent = GetGameObjectFromParentId(parentId);
+			Node3D parent = GetGameObjectFromParentId(parentId);
 			parent.AddChild(prefab);
 
 			// note: actor properties are set in App#ProcessCreatedActors
@@ -118,44 +118,44 @@ namespace MixedRealityExtension.Assets
 
 			// if prefab only has one mesh, make it mesh instance of root actor.
 			if (prefab.GetChildCount() == 1
-				&& prefab.GetChild(0).IsClass("MeshInstance")
+				&& prefab.GetChild(0).IsClass("MeshInstance3D")
 				&& prefab.GetChild(0).GetChildCount() == 0)
 			{
-				MeshInstance meshInstance = prefab.GetChild(0) as MeshInstance;
-				var newActor = Actor.Instantiate((Spatial)prefab);
-				newActor.MeshInstance = meshInstance;
+				MeshInstance3D meshInstance = prefab.GetChild(0) as MeshInstance3D;
+				var newActor = Actor.Instantiate((Node3D)prefab);
+				newActor.MeshInstance3D = meshInstance;
 				actorList.Add(newActor);
 				return actorList;
 			}
 
 			MWGOTreeWalker.VisitTree(prefab, go =>
 			{
-				var collider = go.GetChild<Area>();
+				var collider = go.GetChild<Area3D>();
 				if (collider != null)
 				{
 					MREAPI.AppsAPI.LayerApplicator.ApplyLayerToCollider(collisionLayer, collider);
 				}
 
-				if (go.GetType() == typeof(Spatial))
+				if (go.GetType() == typeof(Node3D))
 				{
-					var meshInstance = go.GetChild<MeshInstance>();
+					var meshInstance = go.GetChild<MeshInstance3D>();
 					DuplicateResources(meshInstance);
-					var newActor = Actor.Instantiate((Spatial)go);
-					newActor.MeshInstance = meshInstance;
+					var newActor = Actor.Instantiate((Node3D)go);
+					newActor.MeshInstance3D = meshInstance;
 					actorList.Add(newActor);
 				}
-				else if (go.GetType() == typeof(MeshInstance))
+				else if (go.GetType() == typeof(MeshInstance3D))
 				{
-					var m = (MeshInstance)go;
-					Spatial newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Spatial;
+					var m = (MeshInstance3D)go;
+					Node3D newGO = _app.AssetManager.EmptyTemplate().Duplicate() as Node3D;
 					Actor actor = Actor.Instantiate(newGO);
 					var parent = m.GetParent();
 
 					actor.GlobalTransform = m.GlobalTransform;
 					parent.RemoveChild(m);
-					m.Transform = Transform.Identity;
+					m.Transform = Transform3D.Identity;
 					actor.AddChild(m);
-					actor.MeshInstance = m;
+					actor.MeshInstance3D = m;
 					foreach (Node child in m.GetChildren())
 					{
 						m.RemoveChild(child);
@@ -359,13 +359,13 @@ namespace MixedRealityExtension.Assets
 			// run this on a threadpool thread so that the Godot main thread is not blocked
 			var gltf = GD.Load<NativeScript>("res://addons/godot_gltf/PackedSceneGLTF_.gdns").New() as Godot.Object;
 			var gltfState = GD.Load<NativeScript>("res://addons/godot_gltf/GLTFState_.gdns").New() as Godot.Object;
-			Spatial gltfRoot = null;
+			Node3D gltfRoot = null;
 			try
 			{
-				gltfRoot = await Task.Run<Spatial>(() =>
+				gltfRoot = await Task.Run<Node3D>(() =>
 				{
 					stream.Position = 0;
-					return gltf.Call("import_gltf_scene", path, stream.ToArray(), 0, 1000, gltfState) as Spatial;
+					return gltf.Call("import_gltf_scene", path, stream.ToArray(), 0, 1000, gltfState) as Node3D;
 				});
 			}
 			catch (Exception e)
@@ -402,7 +402,7 @@ namespace MixedRealityExtension.Assets
 						 * related page: https://github.com/godotengine/godot/issues/53654
 						 */
 						var surfaceCount = mesh.GetSurfaceCount();
-						while (surfaceCount != VisualServer.MeshGetSurfaceCount(mesh.GetRid()))
+						while (surfaceCount != RenderingServer.MeshGetSurfaceCount(mesh.GetRid()))
 						{
 							await _app.SceneRoot.ToSignal(_app.SceneRoot.GetTree().CreateTimer(0.02f), "timeout");
 						}
@@ -415,26 +415,26 @@ namespace MixedRealityExtension.Assets
 				}
 
 				// load materials
-				var materialRepace = new System.Collections.Generic.Dictionary<SpatialMaterial, ShaderMaterial>();
+				var materialRepace = new System.Collections.Generic.Dictionary<StandardMaterial3D, ShaderMaterial>();
 				var materials = gltfState.Get("materials") as Godot.Collections.Array;
 				if (materials?.Count != 0)
 				{
 					for (var i = 0; i < materials.Count; i++)
 					{
-						var material = materials[i] as SpatialMaterial;
-						string shaderCode = await GetShaderCodeFromSpatialMaterial(material);
+						var material = materials[i] as StandardMaterial3D;
+						string shaderCode = await GetShaderCodeFromStandardMaterial3D(material);
 						var newShaderMaterial = new ShaderMaterial()
 						{
 							Shader = new Shader() { Code = InsertClippingFunction(shaderCode) },
 							ResourceName = material.ResourceName ?? $"material:{i}",
 						};
 
-						foreach (Godot.Collections.Dictionary param in VisualServer.ShaderGetParamList(newShaderMaterial.Shader.GetRid()))
+						foreach (Godot.Collections.Dictionary param in RenderingServer.ShaderGetParamList(newShaderMaterial.Shader.GetRid()))
 						{
 							string paramName = (string)param["name"];
-							if (ShaderToSpatialProperties.TryGetValue(paramName, out string SpatialParam))
+							if (ShaderToNode3DProperties.TryGetValue(paramName, out string Node3DParam))
 							{
-								newShaderMaterial.SetShaderParam(paramName, material.Get(SpatialParam));
+								newShaderMaterial.SetShaderParam(paramName, material.Get(Node3DParam));
 							}
 							else if (paramName.EndsWith("texture_channel"))
 							{
@@ -490,11 +490,11 @@ namespace MixedRealityExtension.Assets
 				//replace materials
 				MWGOTreeWalker.VisitTree(gltfRoot, async node =>
 				{
-					if (node is MeshInstance meshInstance)
+					if (node is MeshInstance3D meshInstance)
 					{
 						if (meshInstance.Mesh.HasMeta("collider"))
 						{
-							var collider = meshInstance.Mesh.GetMeta("collider") as Area;
+							var collider = meshInstance.Mesh.GetMeta("collider") as Area3D;
 							meshInstance.AddChild(collider);
 							meshInstance.Mesh.RemoveMeta("collider");
 						}
@@ -507,7 +507,7 @@ namespace MixedRealityExtension.Assets
 							* the code below is workaround to fix that bug.
 							* related page: https://github.com/godotengine/godot/issues/53654
 							*/
-							while (materialCount != VisualServer.MeshGetSurfaceCount(meshInstance.Mesh.GetRid()))
+							while (materialCount != RenderingServer.MeshGetSurfaceCount(meshInstance.Mesh.GetRid()))
 							{
 								await _app.SceneRoot.ToSignal(_app.SceneRoot.GetTree().CreateTimer(0.02f), "timeout");
 							}
@@ -515,7 +515,7 @@ namespace MixedRealityExtension.Assets
 							for (int i = 0; i < materialCount; i++)
 							{
 								var material = meshInstance.Mesh.SurfaceGetMaterial(i);
-								if (material is SpatialMaterial meshMaterial)
+								if (material is StandardMaterial3D meshMaterial)
 								{
 									meshInstance.SetSurfaceMaterial(i, materialRepace[meshMaterial]);
 								}
@@ -532,27 +532,27 @@ namespace MixedRealityExtension.Assets
 			return assets;
 		}
 
-		private Area GenerateColliderToMesh(ArrayMesh mesh, ColliderType colliderType)
+		private Area3D GenerateColliderToMesh(ArrayMesh mesh, ColliderType colliderType)
 		{
-			Area area = null;
-			CollisionShape collisionShape = null;
+			Area3D area = null;
+			CollisionShape3D collisionShape = null;
 			if (colliderType == ColliderType.Box)
 			{
 				var aabb = mesh.GetAabb();
-				area = new Area() { Name = "Area" };
-				collisionShape = new CollisionShape();
+				area = new Area3D() { Name = "Area3D" };
+				collisionShape = new CollisionShape3D();
 				collisionShape.Translation = (aabb.Position + aabb.End)/ 2;
-				collisionShape.Shape = new BoxShape() {
+				collisionShape.Shape = new BoxShape3D() {
 					Extents = aabb.Size / 2,
 				};
 				area.AddChild(collisionShape);
 			}
 			else if (colliderType == ColliderType.Mesh)
 			{
-				area = new Area() { Name = "Area" };
-				var concavePolygonShape = new ConcavePolygonShape();
+				area = new Area3D() { Name = "Area3D" };
+				var concavePolygonShape = new ConcavePolygonShape3D();
 				concavePolygonShape.Data = mesh.GetFaces();
-				collisionShape = new CollisionShape();
+				collisionShape = new CollisionShape3D();
 				collisionShape.Shape = concavePolygonShape;
 				area.AddChild(collisionShape);
 			}
@@ -560,15 +560,15 @@ namespace MixedRealityExtension.Assets
 			return area;
 		}
 
-		private async Task<string> GetShaderCodeFromSpatialMaterial(SpatialMaterial spatialMaterial)
+		private async Task<string> GetShaderCodeFromStandardMaterial3D(StandardMaterial3D spatialMaterial)
 		{
-			var shaderRID = VisualServer.MaterialGetShader(spatialMaterial.GetRid());
-			string shaderCode = VisualServer.ShaderGetCode(shaderRID);
+			var shaderRID = RenderingServer.MaterialGetShader(spatialMaterial.GetRid());
+			string shaderCode = RenderingServer.ShaderGetCode(shaderRID);
 			while (string.IsNullOrEmpty(shaderCode))
 			{
 				await _app.SceneRoot.ToSignal(_app.SceneRoot.GetTree().CreateTimer(0.0416f), "timeout");
-				shaderRID = VisualServer.MaterialGetShader(spatialMaterial.GetRid());
-				shaderCode = VisualServer.ShaderGetCode(shaderRID);
+				shaderRID = RenderingServer.MaterialGetShader(spatialMaterial.GetRid());
+				shaderCode = RenderingServer.ShaderGetCode(shaderRID);
 			}
 			return shaderCode;
 		}

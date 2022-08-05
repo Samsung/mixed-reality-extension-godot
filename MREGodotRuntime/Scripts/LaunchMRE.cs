@@ -8,7 +8,7 @@ public enum LaunchType
 }
 
 [Tool]
-public partial class LaunchMRE : Spatial
+public partial class LaunchMRE : Node3D
 {
 	private LaunchType launchType = LaunchType.OnStart;
 
@@ -66,13 +66,13 @@ public partial class LaunchMRE : Spatial
 			case LaunchType.TriggerVolume:
 				if (area == null)
 				{
-					area = new Area() { Name = "LaunchArea" };
+					area = new Area3D() { Name = "LaunchArea" };
 					AddChild(area);
 					area.Owner = GetTree().EditedSceneRoot;
 
-					var CollisionShape = new CollisionShape();
-					area.AddChild(CollisionShape);
-					CollisionShape.Owner = GetTree().EditedSceneRoot;
+					var CollisionShape3D = new CollisionShape3D();
+					area.AddChild(CollisionShape3D);
+					CollisionShape3D.Owner = GetTree().EditedSceneRoot;
 				}
 				break;
 			case LaunchType.OnStart:
@@ -113,7 +113,7 @@ public partial class LaunchMRE : Spatial
 		MREComponent.AutoJoin = AutoJoin;
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
-		MREComponent.UserNode = GetNode(UserNode + "/MainCamera");
+		MREComponent.UserNode = GetNode(UserNode + "/MainCamera3D");
 		MREComponent.DialogFactory = GetNode<DialogFactory>("Player/DialogFactory");
 		AddChild(MREComponent);
 	}

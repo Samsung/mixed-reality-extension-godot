@@ -4,16 +4,16 @@ namespace Assets.Scripts.User
 {
     public class partial Ray : ImmediateGeometry
     {
-        internal Camera Camera { get; set; }
+        internal Camera3D Camera3D { get; set; }
 
         public Color Color {
             get {
-                var gradientTexture = ((SpatialMaterial)MaterialOverride).AlbedoTexture as GradientTexture;
+                var gradientTexture = ((StandardMaterial3D)MaterialOverride).AlbedoTexture as GradientTexture;
                 var gradient = gradientTexture.Gradient;
                 return gradient.GetColor(1);
             }
             set {
-                var gradientTexture = ((SpatialMaterial)MaterialOverride).AlbedoTexture as GradientTexture;
+                var gradientTexture = ((StandardMaterial3D)MaterialOverride).AlbedoTexture as GradientTexture;
                 var gradient = gradientTexture.Gradient;
                 gradient.SetColor(0, new Color(1, 1, 1, 0));
                 gradient.SetColor(1, value);
@@ -26,10 +26,10 @@ namespace Assets.Scripts.User
         public void DrawRay(Vector3 rayBegin, Vector3 rayEnd)
         {
             var width = 1.6f;
-            var startDepth = ToLocal(rayBegin).Project(Camera.ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
-            var endDepth = ToLocal(rayEnd).Project(Camera.ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
-            var startPoint = Camera.UnprojectPosition(rayBegin);
-            var endPoint = Camera.UnprojectPosition(rayEnd);
+            var startDepth = ToLocal(rayBegin).Project(Camera3D.ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
+            var endDepth = ToLocal(rayEnd).Project(Camera3D.ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
+            var startPoint = Camera3D.UnprojectPosition(rayBegin);
+            var endPoint = Camera3D.UnprojectPosition(rayEnd);
             var normal = endPoint - startPoint;
             normal = new Vector2(-normal.y, normal.x).Normalized();
             // p# variable is a point in the 2D coordinate.
@@ -47,10 +47,10 @@ namespace Assets.Scripts.User
             var p3 = endPoint - normal * width;
             var p4 = endPoint + normal * width;
 
-            var v1 = Camera.ProjectPosition(p1, startDepth);
-            var v2 = Camera.ProjectPosition(p2, startDepth);
-            var v3 = Camera.ProjectPosition(p3, endDepth);
-            var v4 = Camera.ProjectPosition(p4, endDepth);
+            var v1 = Camera3D.ProjectPosition(p1, startDepth);
+            var v2 = Camera3D.ProjectPosition(p2, startDepth);
+            var v3 = Camera3D.ProjectPosition(p3, endDepth);
+            var v4 = Camera3D.ProjectPosition(p4, endDepth);
 
             Clear();
             Begin(Mesh.PrimitiveType.TriangleStrip);

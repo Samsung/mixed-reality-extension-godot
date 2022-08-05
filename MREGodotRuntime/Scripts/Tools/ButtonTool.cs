@@ -60,9 +60,9 @@ namespace Assets.Scripts.Tools
 		}
 
 		protected override void OnTargetChanged(
-			Spatial oldTarget,
+			Node3D oldTarget,
 			Vector3 oldTargetPosition,
-			Spatial newTarget,
+			Node3D newTarget,
 			Vector3 newTargetPosition,
 			TargetBehavior newBehavior,
 			InputSource inputSource)
@@ -119,7 +119,7 @@ namespace Assets.Scripts.Tools
 			}
 		}
 
-		protected override Spatial FindTarget(InputSource inputSource, out Vector3? hitPoint)
+		protected override Node3D FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
 			if (pressed)
 			{

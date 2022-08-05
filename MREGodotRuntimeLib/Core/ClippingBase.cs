@@ -9,22 +9,22 @@ using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Core
 {
-	public abstract partial class ClippingBase : Spatial
+	public abstract partial class ClippingBase : Node3D
 	{
-		private List<Spatial> meshInstances = new List<Spatial>();
+		private List<Node3D> meshInstances = new List<Node3D>();
 		private IActor parent;
 
 		public AABB Bounds => new AABB(GlobalTransform.origin - GlobalTransform.basis.Scale / 2, GlobalTransform.basis.Scale);
 
 		internal void ApplyPatch(ClippingPatch patch)
 		{
-			ClearMeshInstances();
+			ClearMeshInstance3Ds();
 			if (patch.ClippingObjects != null)
 			{
 				foreach (var clippingObjectId in patch.ClippingObjects)
 				{
-					Spatial targetActor = parent.App.FindActor(clippingObjectId) as Spatial;
-					AddMeshInstance(targetActor);
+					Node3D targetActor = parent.App.FindActor(clippingObjectId) as Node3D;
+					AddMeshInstance3D(targetActor);
 				}
 			}
 		}
@@ -64,36 +64,36 @@ namespace MixedRealityExtension.Core
 			parent = GetParent() as IActor;
 		}
 
-		public virtual void ClearMeshInstances()
+		public virtual void ClearMeshInstance3Ds()
 		{
 			meshInstances.Clear();
 		}
 
-		public virtual void AddMeshInstance(Spatial root)
+		public virtual void AddMeshInstance3D(Node3D root)
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
-				if (node is MeshInstance || node.IsClass("MeshInstance"))
+				if (node is MeshInstance3D || node.IsClass("MeshInstance3D"))
 				{
-					meshInstances.Add((Spatial)node);
+					meshInstances.Add((Node3D)node);
 				}
 			});
 		}
 
-		public virtual void RemoveMeshInstance(Spatial root)
+		public virtual void RemoveMeshInstance3D(Node3D root)
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
-				if (node is MeshInstance || node.IsClass("MeshInstance"))
+				if (node is MeshInstance3D || node.IsClass("MeshInstance3D"))
 				{
-					meshInstances.Remove((Spatial)node);
+					meshInstances.Remove((Node3D)node);
 				}
 			});
 		}
 
-		public IEnumerable<Spatial> GetNodesCopy()
+		public IEnumerable<Node3D> GetNodesCopy()
 		{
-			return new List<Spatial>(meshInstances);
+			return new List<Node3D>(meshInstances);
 		}
 	}
 }

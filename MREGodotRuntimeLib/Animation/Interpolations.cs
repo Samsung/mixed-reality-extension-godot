@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 using CubicBezier = MixedRealityExtension.Util.CubicBezier;
 using Newtonsoft.Json.Linq;
-using Quaternion = Godot.Quat;
+using Quaternion = Godot.Quaternion;
 using GodotMath = Godot.Mathf;
 
 namespace MixedRealityExtension.Animation

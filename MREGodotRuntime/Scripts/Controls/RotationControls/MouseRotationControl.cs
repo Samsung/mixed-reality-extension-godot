@@ -2,15 +2,15 @@ using Godot;
 
 namespace Assets.Scripts.Control
 {
-    internal partial class MouseRotationControl : Spatial, IRotationControl
+    internal partial class MouseRotationControl : Node3D, IRotationControl
     {
         private bool cameraMove = false;
         private Vector2 mouseDelta = new Vector2();
-        private Camera mainCamera;
+        private Camera3D mainCamera;
 
         public float CameraSpeed { get; set; } = 0.0015f;
 
-        public MouseRotationControl(Camera camera)
+        public MouseRotationControl(Camera3D camera)
         {
             mainCamera = camera;
         }

@@ -25,7 +25,7 @@ public enum ControllerType
     Mouse = 1 << 1,
 }
 
-public partial class Player : ARVROrigin
+public partial class Player : XROrigin3D
 {
     [Export]
     private NodePath viewport = null;
@@ -172,7 +172,7 @@ public partial class Player : ARVROrigin
         }
     }
 
-    public Camera MainCamera { get; private set; }
+    public Camera3D MainCamera { get; private set; }
 
     [Signal]
     public delegate void cursor_changed(string scenePath);
@@ -207,13 +207,13 @@ public partial class Player : ARVROrigin
 
     private bool InitializeOpenXR()
     {
-        var ARVRInterface = ARVRServer.FindInterface("OpenXR");
+        var ARVRInterface = XRServer.FindInterface("OpenXR");
         if (ARVRInterface?.Initialize() == true)
         {
             GD.Print("OpenXR Interface initialized");
 
             //default height 1.6m
-            MainCamera.Translation = Vector3.Up * 1.6f;
+            MainCamera.Position = Vector3.Up * 1.6f;
 
             Viewport vp = null;
             if (viewport != null)
@@ -235,7 +235,7 @@ public partial class Player : ARVROrigin
 
     public override void _EnterTree()
     {
-        MainCamera = GetNode<Camera>("MainCamera");
+        MainCamera = GetNode<Camera3D>("MainCamera");
 
         InitializeOpenXR();
     }

@@ -20,7 +20,7 @@ internal class HostAppUser : IHostAppUser
 		{"engine", Engine.GetVersionInfo()["build"] as string }
 	};
 
-	//public Vector3? LookAtPosition => (UserNode as Spatial).GlobalTransform.origin;
+	//public Vector3? LookAtPosition => (UserNode as Node3D).GlobalTransform.origin;
 
 	public event MWEventHandler BeforeAvatarDestroyed;
 	public event MWEventHandler AfterAvatarCreated;

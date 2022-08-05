@@ -7,8 +7,8 @@ namespace Assets.Scripts.Control
     {
         private bool isPinching;
         private bool pinchChanged;
-        private Spatial handNode;
-        private Camera mainCamera;
+        private Node3D handNode;
+        private Camera3D mainCamera;
 
         public HandController(string scenePath)
         {
@@ -39,20 +39,20 @@ namespace Assets.Scripts.Control
             }
         }
 
-        public Spatial ThumbTip { get; private set; }
+        public Node3D ThumbTip { get; private set; }
 
-        public Spatial IndexTip { get; private set; }
+        public Node3D IndexTip { get; private set; }
 
-        private Spatial CreateHandNode(string scenePath)
+        private Node3D CreateHandNode(string scenePath)
         {
             var handScene = ResourceLoader.Load<PackedScene>(scenePath);
-            var hand = handScene.Instance<Spatial>();
+            var hand = handScene.Instance<Node3D>();
             return hand;
         }
 
         private void AddHandNodes(Player player)
         {
-            var isOpenXRInitialized = ARVRServer.FindInterface("OpenXR")?.InterfaceIsInitialized;
+            var isOpenXRInitialized = XRServer.FindInterface("OpenXR")?.InterfaceIsInitialized;
             if (!isOpenXRInitialized.HasValue)
                 return;
 
@@ -62,14 +62,14 @@ namespace Assets.Scripts.Control
             }
             else
             {
-                handNode.Translation = new Vector3(0.081f, -0.006f, -0.151f);
+                handNode.Position = new Vector3(0.081f, -0.006f, -0.151f);
                 mainCamera.AddChild(handNode);
             }
         }
 
-        private void AddProximityLights(Spatial parent)
+        private void AddProximityLights(Node3D parent)
         {
-            var proximityLight = new OmniLight()
+            var proximityLight = new OmniLight3D()
             {
                 OmniRange = 0.0339852f,
                 OmniAttenuation = 1.46409f,
@@ -79,7 +79,7 @@ namespace Assets.Scripts.Control
                 LightCullMask = 4,
             };
             parent.AddChild(proximityLight);
-            var proximityVisibleLight = new OmniLight()
+            var proximityVisibleLight = new OmniLight3D()
             {
                 OmniRange = 0.0923046f,
                 LightEnergy = 1.46f,
@@ -91,11 +91,11 @@ namespace Assets.Scripts.Control
         public override void _Ready()
         {
             var player = GetParent<Player>();
-            mainCamera = player.FindNode("MainCamera") as Camera;
+            mainCamera = player.FindChild("MainCamera") as Camera3D;
 
             AddHandNodes(player);
-            ThumbTip = handNode?.FindNode("ThumbTip") as Spatial;
-            IndexTip = handNode?.FindNode("IndexTip") as Spatial;
+            ThumbTip = handNode?.FindChild("ThumbTip") as Node3D;
+            IndexTip = handNode?.FindChild("IndexTip") as Node3D;
             AddInputSource(IndexTip, mainCamera, player.CursorScenePath, player.RayScenePath);
 
             AddProximityLights(IndexTip);

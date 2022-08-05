@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class DefaultRightHand : Spatial
+public partial class DefaultRightHand : Node3D
 {
     private float handLocalOrigin;
     private Vector2 mouseDelta = new Vector2();

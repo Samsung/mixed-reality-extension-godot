@@ -129,7 +129,7 @@ namespace MixedRealityExtension.Animation
 			return patch;
 		}
 
-		private class NativeAnimationHelper : Spatial
+		private class NativeAnimationHelper : Node3D
 		{
 			public NativeAnimation Animation;
 

@@ -6,9 +6,9 @@ namespace Assets.Scripts.Control
 {
     internal partial class MouseController : BaseController
     {
-        private Camera mainCamera;
+        private Camera3D mainCamera;
 
-        public MouseController(Camera camera)
+        public MouseController(Camera3D camera)
         {
             mainCamera = camera;
         }
@@ -35,7 +35,7 @@ namespace Assets.Scripts.Control
                 var inputSourcePosition = mainCamera.ProjectPosition(mouseMotion.Position, mainCamera.Near + 0.3f);
                 InputSource.RayCastDirection = mainCamera.ProjectRayNormal(mouseMotion.Position);
                 InputSource.RayCastBegin = mainCamera.ProjectRayOrigin(mouseMotion.Position);
-                InputSource.GlobalTransform = new Transform(InputSource.GlobalTransform.basis, inputSourcePosition);
+                InputSource.GlobalTransform = new Transform3D(InputSource.GlobalTransform.basis, inputSourcePosition);
             }
             else if (inputEvent is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == 1)
             {

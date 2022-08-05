@@ -19,7 +19,7 @@ namespace MixedRealityExtension.Patching.Types
 
 		[PatchProperty]
 		public float? Z { get; set; }
-		
+
 		[PatchProperty]
 		public float? W { get; set; }
 
@@ -36,7 +36,7 @@ namespace MixedRealityExtension.Patching.Types
 			W = quaternion.W;
 		}
 
-		internal QuaternionPatch(Quat quaternion)
+		internal QuaternionPatch(Quaternion quaternion)
 		{
 			X = quaternion.x;
 			Y = quaternion.y;
