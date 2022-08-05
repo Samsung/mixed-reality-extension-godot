@@ -57,7 +57,7 @@ namespace MixedRealityExtension.Util
 				return;
 			}
 
-			_startTime = OS.GetTicksMsec();
+			_startTime = Time.GetTicksMsec();
 			updatePeriod *= 1000f;
 			this._updatePeriod = updatePeriod > 0 ? updatePeriod : DefaultUpdatePeriod;
 
@@ -75,7 +75,7 @@ namespace MixedRealityExtension.Util
 			if (rotation.HasValue)
 			{
 				_targetRotation = rotation.Value;
-				_startRotation = _spatial.GlobalTransform.basis.RotationQuat();
+				_startRotation = _spatial.GlobalTransform.basis.GetRotationQuaternion();
 				_lerpingRotation = true;
 			}
 			else
@@ -100,14 +100,14 @@ namespace MixedRealityExtension.Util
 		{
 			if (_percentComplete < 1f)
 			{
-				_percentComplete = Mathf.Clamp((OS.GetTicksMsec() - _startTime) / _updatePeriod, 0f, 1f);
+				_percentComplete = Mathf.Clamp((Time.GetTicksMsec() - _startTime) / _updatePeriod, 0f, 1f);
 
 				Vector3 origin = Vector3.Zero;
 				Basis basis = _spatial.GlobalTransform.basis;
 
 				if (_lerpingPosition)
 				{
-					origin = _startPosition.LinearInterpolate(_targetPosition, _percentComplete);
+					origin = _startPosition.Lerp(_targetPosition, _percentComplete);
 				}
 
 				if (_lerpingRotation)

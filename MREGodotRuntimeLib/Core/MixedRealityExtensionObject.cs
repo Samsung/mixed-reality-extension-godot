@@ -18,6 +18,9 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public Guid AppInstanceId => App.InstanceId;
 
+ 		/// <inheritdoc />
+		public virtual string Name => ((Node3D)this).Name;
+
 		/// <inheritdoc />
 		public Node3D Node3D => this;
 

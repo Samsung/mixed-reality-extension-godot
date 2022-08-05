@@ -46,13 +46,13 @@ namespace Assets.Scripts.Control
         private Node3D CreateHandNode(string scenePath)
         {
             var handScene = ResourceLoader.Load<PackedScene>(scenePath);
-            var hand = handScene.Instance<Node3D>();
+            var hand = handScene.Instantiate<Node3D>();
             return hand;
         }
 
         private void AddHandNodes(Player player)
         {
-            var isOpenXRInitialized = XRServer.FindInterface("OpenXR")?.InterfaceIsInitialized;
+            var isOpenXRInitialized = XRServer.FindInterface("OpenXR")?.IsInitialized();
             if (!isOpenXRInitialized.HasValue)
                 return;
 

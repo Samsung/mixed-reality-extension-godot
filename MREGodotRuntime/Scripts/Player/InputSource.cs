@@ -101,7 +101,7 @@ namespace Assets.Scripts.User
 
 		public override void _Ready()
 		{
-			spaceState = GetWorld().DirectSpaceState;
+			spaceState = GetWorld3d().DirectSpaceState;
 			AddChild(Cursor);
 			GetTree().Root.CallDeferred("add_child", Ray);
 
@@ -140,7 +140,12 @@ namespace Assets.Scripts.User
 			var forward = (Vector3)RayCastDirection?.Normalized();
 			var from = (Vector3)RayCastBegin;
 			var to = (Vector3)(RayCastBegin + forward * RayCastDistance);
-			return spaceState.IntersectRay(from, to, null, LayerMask, true, true);
+			return spaceState.IntersectRay(new PhysicsRayQueryParameters3D() {
+				From = from,
+				To = to,
+				CollisionMask = LayerMask,
+				CollideWithBodies = true,
+				CollideWithAreas = true});
 		}
 
 		public override void _EnterTree()

@@ -25,7 +25,6 @@ namespace MixedRealityExtension.Core
 		internal void Initialize(IHostAppUser hostAppUser, Guid userId, Guid ephemeralUserId, MixedRealityExtensionApp app)
 		{
 			HostAppUser = hostAppUser;
-			Name = HostAppUser.Name;
 			base.Initialize(userId, app);
 			EphemeralUserId = ephemeralUserId;
 		}

@@ -11,7 +11,7 @@ namespace Assets.Scripts.Control
         protected virtual Cursor LoadCursor(string scenePath)
         {
             var cursorScene = ResourceLoader.Load<PackedScene>(scenePath);
-            var cursor = cursorScene.Instance<Cursor>();
+            var cursor = cursorScene.Instantiate<Cursor>();
             return cursor;
         }
 

@@ -232,7 +232,7 @@ public partial class MREComponent : Node3D
 	{
 		if (PlaceholderObject != null)
 		{
-			PlaceholderObject.PauseMode = PauseModeEnum.Stop;
+			PlaceholderObject.ProcessMode = ProcessModeEnum.Disabled;
 		}
 
 		GD.Print("Connecting to MRE App.");
@@ -278,7 +278,7 @@ public partial class MREComponent : Node3D
 
 		if (PlaceholderObject != null)
 		{
-			PlaceholderObject.PauseMode = PauseModeEnum.Process;
+			PlaceholderObject.ProcessMode = ProcessModeEnum.Always;
 		}
 	}
 

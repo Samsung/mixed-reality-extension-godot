@@ -107,11 +107,11 @@ namespace MixedRealityExtension.Core
 			{
 				rb.IsKeyframed = isKinematic;
 				if (isKinematic)
-					rigidbody.Mode = Godot.RigidDynamicBody3D.ModeEnum.Kinematic;
+					rigidbody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
 			}
 			else
 			{
-				rigidbody.Mode = Godot.RigidDynamicBody3D.ModeEnum.Kinematic;
+				rigidbody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
 
 				_snapshotManager.RegisterOrUpateRigidDynamicBody3D(id, source);
 			}
@@ -195,7 +195,7 @@ namespace MixedRealityExtension.Core
 			// -set transforms/velocities for key framed bodies
 
 			// get all the prediction time infos in this struct
-			PredictionTimeParameters timeInfo = new PredictionTimeParameters(1f / Engine.IterationsPerSecond);
+			PredictionTimeParameters timeInfo = new PredictionTimeParameters(1f / Engine.TargetFps);
 
 			// start the predictor
 			_predictor.StartBodyPredicitonForNextFrame();
@@ -244,7 +244,7 @@ namespace MixedRealityExtension.Core
 
 					// get the key framed stream, and compute implicit velocities
 					Godot.Vector3 keyFramedPos = root.ToGlobal(transform.Position);
-					Godot.Quaternion keyFramedOrientation = root.GlobalTransform.basis.Quat() * transform.Rotation;
+					Godot.Quaternion keyFramedOrientation = root.GlobalTransform.basis.GetRotationQuaternion() * transform.Rotation;
 					Godot.Vector3 JBLinearVelocity =
 						root.GlobalTransform.basis.Xform(snapshot.RigidBodies.Values[index].LinearVelocity);
 					Godot.Vector3 JBAngularVelocity =
@@ -511,9 +511,9 @@ namespace MixedRealityExtension.Core
 						//update.localTransforms.Position = actor.transform.position;
 						var update = new PhysicsTranformServerUploadPatch.OneActorUpdate(
 							actor.Id,
-							actor.GlobalTransform.origin, actor.GlobalTransform.basis.Quat(),
+							actor.GlobalTransform.origin, actor.GlobalTransform.basis.GetRotationQuaternion(),
 							actor.App.SceneRoot.ToLocal(actor.GlobalTransform.origin),
-							(actor.App.SceneRoot.GlobalTransform.basis.Inverse() * actor.GlobalTransform.basis).Quat()
+							(actor.App.SceneRoot.GlobalTransform.basis.Inverse() * actor.GlobalTransform.basis).GetRotationQuaternion()
 							);
 
 						// todo see if we sent this update already

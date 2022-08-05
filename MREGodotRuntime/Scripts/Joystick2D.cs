@@ -34,7 +34,7 @@ public partial class Joystick2D : TouchScreenButton
         if (touchPosition != null)
         {
             playerDirection = ((Vector2)touchPosition - joystickCenter).Normalized();
-            GetTree().SetInputAsHandled();
+            GetTree().Root.SetInputAsHandled();
         }
     }
 

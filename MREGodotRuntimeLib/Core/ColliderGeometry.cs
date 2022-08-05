@@ -155,7 +155,7 @@ namespace MixedRealityExtension.Core
 		/// <summary>
 		/// The rotation of the collider in local space
 		/// </summary>
-		public Quat Rotation { get; set; }
+		public Quaternion Rotation { get; set; }
 
 		/// <summary>
 		/// The bounding box of the cylinder.

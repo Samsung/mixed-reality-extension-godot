@@ -35,7 +35,7 @@ internal class HostAppUser : IHostAppUser
 	public Node GetAttachPoint(string attachPointName)
 	{
 		string socketName = $"socket-{attachPointName}";
-		Node socket = UserNode.FindNode(socketName);
+		Node socket = UserNode.FindChild(socketName);
 		if (socket == null)
 		{
 			socket = UserNode;

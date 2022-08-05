@@ -221,11 +221,11 @@ public partial class Player : XROrigin3D
             if (vp == null)
                 vp = GetViewport();
 
-            vp.Arvr = true;
+            vp.UseXr = true;
             //vp.Keep3dLinear = (bool)GetNode("Configuration").Call("keep_3d_linear");
 
-            Engine.IterationsPerSecond = 144;
-            openXRIsInitialized = ARVRInterface.InterfaceIsInitialized;
+            Engine.TargetFps = 144;
+            openXRIsInitialized = ARVRInterface.IsInitialized();
 
             return true;
         }

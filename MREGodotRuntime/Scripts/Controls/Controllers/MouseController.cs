@@ -37,7 +37,7 @@ namespace Assets.Scripts.Control
                 InputSource.RayCastBegin = mainCamera.ProjectRayOrigin(mouseMotion.Position);
                 InputSource.GlobalTransform = new Transform3D(InputSource.GlobalTransform.basis, inputSourcePosition);
             }
-            else if (inputEvent is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == 1)
+            else if (inputEvent is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
             {
                 InputSource.IsPinching = mouseButton.Pressed;
             }

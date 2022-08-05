@@ -46,17 +46,17 @@ namespace MixedRealityExtension.Factories
 			switch (layer)
 			{
 				case CollisionLayer.Default:
-					area.SetCollisionLayerBit(defaultLayer, true);
-					area.SetCollisionMaskBit(defaultLayer, true);
-					area.SetCollisionMaskBit(navigationLayer, true);
+					area.SetCollisionLayerValue(defaultLayer, true);
+					area.SetCollisionMaskValue(defaultLayer, true);
+					area.SetCollisionMaskValue(navigationLayer, true);
 					break;
 				case CollisionLayer.Navigation:
-					area.SetCollisionLayerBit(navigationLayer, true);
-					area.SetCollisionMaskBit(navigationLayer, true);
+					area.SetCollisionLayerValue(navigationLayer, true);
+					area.SetCollisionMaskValue(navigationLayer, true);
 					break;
 				case CollisionLayer.Hologram:
-					area.SetCollisionLayerBit(hologramLayer, true);
-					area.SetCollisionMaskBit(hologramLayer, true);
+					area.SetCollisionLayerValue(hologramLayer, true);
+					area.SetCollisionMaskValue(hologramLayer, true);
 					break;
 				case CollisionLayer.UI:
 					break;
@@ -74,17 +74,17 @@ namespace MixedRealityExtension.Factories
 			switch (layer)
 			{
 				case CollisionLayer.Default:
-					physicsBody.SetCollisionLayerBit(defaultLayer, true);
-					physicsBody.SetCollisionMaskBit(defaultLayer, true);
-					physicsBody.SetCollisionMaskBit(navigationLayer, true);
+					physicsBody.SetCollisionLayerValue(defaultLayer, true);
+					physicsBody.SetCollisionMaskValue(defaultLayer, true);
+					physicsBody.SetCollisionMaskValue(navigationLayer, true);
 					break;
 				case CollisionLayer.Navigation:
-					physicsBody.SetCollisionLayerBit(navigationLayer, true);
-					physicsBody.SetCollisionMaskBit(navigationLayer, true);
+					physicsBody.SetCollisionLayerValue(navigationLayer, true);
+					physicsBody.SetCollisionMaskValue(navigationLayer, true);
 					break;
 				case CollisionLayer.Hologram:
-					physicsBody.SetCollisionLayerBit(hologramLayer, true);
-					physicsBody.SetCollisionMaskBit(hologramLayer, true);
+					physicsBody.SetCollisionLayerValue(hologramLayer, true);
+					physicsBody.SetCollisionMaskValue(hologramLayer, true);
 					break;
 				case CollisionLayer.UI:
 					break;

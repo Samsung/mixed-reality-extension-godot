@@ -463,7 +463,10 @@ namespace MixedRealityExtension.Assets
 						var animName = Regex.Replace(animations[i], "Animation[0-9]*$", "animation") + $"0x3A{i}";
 						anim.ResourceName = animName;
 						var player = new AnimationPlayer();
-						player.AddAnimation(animName, anim);
+						player.Name = "AnimationPlayer";
+						var animationLibrary = new AnimationLibrary();
+						player.AddAnimationLibrary("", animationLibrary);
+						animationLibrary.AddAnimation(animName, anim);
 						player.AssignedAnimation = animName;
 						player.CurrentAnimation = animName;
 						gltfRoot.AddChild(player);
@@ -517,7 +520,7 @@ namespace MixedRealityExtension.Assets
 								var material = meshInstance.Mesh.SurfaceGetMaterial(i);
 								if (material is StandardMaterial3D meshMaterial)
 								{
-									meshInstance.SetSurfaceMaterial(i, materialRepace[meshMaterial]);
+									meshInstance.SetSurfaceOverrideMaterial(i, materialRepace[meshMaterial]);
 								}
 							}
 						}
@@ -541,7 +544,7 @@ namespace MixedRealityExtension.Assets
 				var aabb = mesh.GetAabb();
 				area = new Area3D() { Name = "Area3D" };
 				collisionShape = new CollisionShape3D();
-				collisionShape.Translation = (aabb.Position + aabb.End)/ 2;
+				collisionShape.Position = (aabb.Position + aabb.End)/ 2;
 				collisionShape.Shape = new BoxShape3D() {
 					Extents = aabb.Size / 2,
 				};

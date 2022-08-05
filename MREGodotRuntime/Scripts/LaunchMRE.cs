@@ -59,7 +59,7 @@ public partial class LaunchMRE : Node3D
 		if (!IsInsideTree())
 			return;
 
-		var area = FindNode("LaunchArea*", false);
+		var area = FindChild("LaunchArea*", false);
 		switch (LaunchType)
 		{
 			case LaunchType.MouseButtonDown:
@@ -87,7 +87,7 @@ public partial class LaunchMRE : Node3D
 
 	private void InitializeLaunchArea()
 	{
-		var area = FindNode("LaunchArea*", false);
+		var area = FindChild("LaunchArea*", false);
 		if (area != null)
 		{
 			if (launchType == LaunchType.MouseButtonDown)
@@ -120,7 +120,7 @@ public partial class LaunchMRE : Node3D
 
 	private void StartApp()
 	{
-		if (Engine.EditorHint) return;
+		if (Engine.IsEditorHint()) return;
 		GD.Print("Starting MRE app.");
 		MREComponent?.EnableApp();
 		_running = true;
@@ -138,7 +138,7 @@ public partial class LaunchMRE : Node3D
 		{
 			if (LaunchType == LaunchType.MouseButtonDown && MREComponent != null)
 			{
-				var area = FindNode("LaunchArea*", false);
+				var area = FindChild("LaunchArea*", false);
 				if (area != null)
 				{
 					area.QueueFree();

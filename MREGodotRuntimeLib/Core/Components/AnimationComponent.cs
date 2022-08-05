@@ -82,8 +82,10 @@ namespace MixedRealityExtension.Core.Components
 			var continuation = new MWContinuation(AttachedActor, null, (result) =>
 			{
 				var animationPlayer = GetOrCreateGodotAnimationPlayer(animationName);
+				var animationLibrary = new AnimationLibrary();
 				var animation = new GodotAnimation();
-				animation.Loop = wrapMode.IsInterpolationLoopWrap();
+				animationLibrary.AddAnimation(animationName, animation);
+				animation.LoopMode = wrapMode.ToGodotLoopMode();
 
 				var curves = new Dictionary<string, int>();
 
@@ -159,7 +161,7 @@ namespace MixedRealityExtension.Core.Components
 					initialEnabled = initialState.Enabled ?? initialEnabled;
 				}
 
-				animationPlayer.AddAnimation(animationName, animation);
+				animationPlayer.AddAnimationLibrary(animationName, animationLibrary);
 				animationPlayer.AssignedAnimation = animationName;
 
 				SetAnimationState(animationName, initialTime, initialSpeed, initialEnabled);

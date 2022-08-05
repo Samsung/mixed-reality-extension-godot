@@ -85,7 +85,7 @@ namespace MixedRealityExtension.Patching
 			}
 		}
 
-		public static QuaternionPatch GeneratePatch(MWQuaternion _old, Quat _new)
+		public static QuaternionPatch GeneratePatch(MWQuaternion _old, Quaternion _new)
 		{
 			if (_old == null && _new != null)
 			{
@@ -119,7 +119,7 @@ namespace MixedRealityExtension.Patching
 			var globalTransform = appRoot.GlobalTransform.AffineInverse() * _new.GlobalTransform;
 			var globalOrigin = globalTransform.origin;
 			globalOrigin.z *= -1;
-			var globalRotation = globalTransform.basis.RotationQuat();
+			var globalRotation = globalTransform.basis.GetRotationQuaternion();
 			globalRotation.x *= -1;
 			globalRotation.y *= -1;
 
@@ -136,7 +136,7 @@ namespace MixedRealityExtension.Patching
 		{
 			var position = _new.Transform.origin;
 			position.z *= -1;
-			var rotation = _new.Transform.basis.RotationQuat();
+			var rotation = _new.Transform.basis.GetRotationQuaternion();
 			rotation.x *= -1;
 			rotation.y *= -1;
 
@@ -388,7 +388,7 @@ namespace MixedRealityExtension.Patching
 		public static void ApplyLocalPatch(this Node3D _this, MWScaledTransform current, ScaledTransformPatch patch)
 		{
 			var localPosition = _this.Transform.origin;
-			var localRotation = _this.Transform.basis.RotationQuat();
+			var localRotation = _this.Transform.basis.GetRotationQuaternion();
 			var localScale = _this.Transform.basis.Scale;
 
 			if (patch.Position != null)
@@ -417,7 +417,7 @@ namespace MixedRealityExtension.Patching
 		public static void ApplyAppPatch(this Node3D _this, Node3D appRoot, MWTransform current, TransformPatch patch)
 		{
 			var globalPosition = _this.GlobalTransform.origin;
-			var globalRotation = _this.GlobalTransform.basis.RotationQuat();
+			var globalRotation = _this.GlobalTransform.basis.GetRotationQuaternion();
 			var globalScale = _this.GlobalTransform.basis.Scale;
 
 			if (patch.Position != null)
@@ -429,7 +429,7 @@ namespace MixedRealityExtension.Patching
 
 			if (patch.Rotation != null)
 			{
-				var appRotation = appRoot.GlobalTransform.basis.RotationQuat();
+				var appRotation = appRoot.GlobalTransform.basis.GetRotationQuaternion();
 				var currAppRotation = appRotation.Inverse() * globalRotation;
 				var newAppRotation = currAppRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
 				newAppRotation.x *= -1;

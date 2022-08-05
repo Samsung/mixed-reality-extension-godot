@@ -39,9 +39,7 @@ namespace MixedRealityExtension.Util.GodotHelper
             }
             img.FlipY();
 
-            var imageTexture = new ImageTexture();
-            imageTexture.CreateFromImage(img);
-            Texture = imageTexture;
+            Texture = ImageTexture.CreateFromImage(img);
         }
     }
 }

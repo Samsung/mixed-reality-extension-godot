@@ -63,7 +63,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public Vector2 GetPoint(float position)
 		{
-			return a.LinearInterpolate(b, Mathf.Clamp(position, 0, 1));
+			return a.Lerp(b, Mathf.Clamp(position, 0, 1));
 		}
 
 		/// <summary>

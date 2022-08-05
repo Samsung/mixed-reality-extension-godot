@@ -59,7 +59,7 @@ namespace MixedRealityExtension.App
 		private float _timeSinceLastPhysicsUpdate = 0.0f;
 		private bool _shouldSendPhysicsUpdate = false;
 
-		private float _fixedDeltaTime = 1f / Engine.IterationsPerSecond;
+		private float _fixedDeltaTime = 1f / Engine.TargetFps;
 
 		private enum AppState
 		{
@@ -430,7 +430,7 @@ namespace MixedRealityExtension.App
 					// Sending snapshot which represents the state before physics step is done,
 					// hence we are using time stamp from the start of the fixed update.
 
-					SendPhysicsUpdate(OS.GetTicksMsec() * 0.001f);
+					SendPhysicsUpdate(Time.GetTicksMsec() * 0.001f);
 				}
 
 				PhysicsBridge.FixedUpdate(SceneRoot);
@@ -466,7 +466,7 @@ namespace MixedRealityExtension.App
 
 			//low frequency server upload transform stream
 			{
-				float systemTime = OS.GetTicksMsec() * 0.001f;
+				float systemTime = Time.GetTicksMsec() * 0.001f;
 				if (PhysicsBridge.shouldSendLowFrequencyTransformUpload(systemTime))
 				{
 					PhysicsTranformServerUploadPatch serverUploadPatch =
@@ -506,7 +506,7 @@ namespace MixedRealityExtension.App
 				{
 					// Sending snapshot which represents the state after physics step is done,
 					// hence we need to add time step to the time stamp from the start of the fixed update.
-					SendPhysicsUpdate(OS.GetTicksMsec() * 0.001f + _fixedDeltaTime);
+					SendPhysicsUpdate(Time.GetTicksMsec() * 0.001f + _fixedDeltaTime);
 				}
 			}
 
@@ -1014,7 +1014,7 @@ namespace MixedRealityExtension.App
 				{
 					// only overwrite material if there's something in the cache, i.e. not a random library material
 					{
-						var material = actor.MeshInstance3D.GetSurfaceMaterial(0);
+						var material = actor.MeshInstance3D.GetSurfaceOverrideMaterial(0);
 						var matId = AssetManager.GetByObject(material)?.Id;
 						if (matId.HasValue)
 						{

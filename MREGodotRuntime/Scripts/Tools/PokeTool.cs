@@ -10,7 +10,7 @@ namespace Assets.Scripts.Tools
 {
 	public class PokeTool : Tool
 	{
-		RID shape = PhysicsServer3D.ShapeCreate(PhysicsServer3D.ShapeType.Sphere);
+		RID shape = PhysicsServer3D.SphereShapeCreate();
 		PhysicsDirectSpaceState3D spaceState;
 		PhysicsShapeQueryParameters3D shapeQueryParameters;
 
@@ -39,7 +39,7 @@ namespace Assets.Scripts.Tools
 
 		internal Node3D FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
-			spaceState = inputSource.GetWorld().DirectSpaceState;
+			spaceState = inputSource.GetWorld3d().DirectSpaceState;
 			shapeQueryParameters.Transform = inputSource.GlobalTransform;
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
@@ -89,7 +89,11 @@ namespace Assets.Scripts.Tools
 				var touchableVector = closestNormal * TouchableDistance;
 				RayStartPoint = inputSource.GlobalTransform.origin + touchableVector;
 				Vector3 to = inputSource.GlobalTransform.origin - touchableVector;
-				var IntersectRayResult = spaceState.IntersectRay(RayStartPoint, to, collideWithAreas: true);
+				var IntersectRayResult = spaceState.IntersectRay(new PhysicsRayQueryParameters3D() {
+					From = RayStartPoint,
+					To = to,
+					CollideWithBodies = true,
+					CollideWithAreas = true});
 				if (IntersectRayResult.Count > 0)
 				{
 					Vector3 rayEndPoint = (Vector3)IntersectRayResult["position"];
@@ -229,7 +233,7 @@ namespace Assets.Scripts.Tools
 
 		private bool IsObjectPartOfTouchable(Node3D targetObject, ITouchableBase touchable)
 		{
-			return targetObject != null && touchable != null && targetObject.FindNode(((Node3D)touchable).Name, owned: false) != null;
+			return targetObject != null && touchable != null && targetObject.FindChild(((Node3D)touchable).Name, owned: false) != null;
 		}
 	}
 }

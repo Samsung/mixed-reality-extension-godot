@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-using GodotLight = Godot.Light;
+using GodotLight = Godot.Light3D;
 using GodotRigidDynamicBody3D = Godot.RigidDynamicBody3D;
 using GodotCollisionShape3D = Godot.CollisionShape3D;
 using MixedRealityExtension.PluginInterfaces.Behaviors;
@@ -37,7 +37,7 @@ namespace MixedRealityExtension.Core
 	/// </summary>
 	internal sealed partial class Actor : MixedRealityExtensionObject, ICommandHandlerContext, IActor
 	{
-		private static readonly Reference actorScript = new Actor().GetScript();
+		private static readonly object actorScript = new Actor().GetScript();
 
 		public static Actor Instantiate(Node3D node3D)
 		{
@@ -208,7 +208,7 @@ namespace MixedRealityExtension.Core
 					{
 						if (this == null || MeshInstance3D == null || _materialId != updatedMaterialId) return;
 
-						MeshInstance3D.SetSurfaceMaterial(0, (Material)(sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial.Duplicate()));
+						MeshInstance3D.SetSurfaceOverrideMaterial(0, (Material)(sharedMat.Asset ?? MREAPI.AppsAPI.DefaultMaterial.Duplicate()));
 
 						// keep this material up to date
 						if (!ListeningForMaterialChanges)
@@ -220,7 +220,7 @@ namespace MixedRealityExtension.Core
 				}
 				else
 				{
-					MeshInstance3D.SetSurfaceMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
+					MeshInstance3D.SetSurfaceOverrideMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
 					if (ListeningForMaterialChanges)
 					{
 						App.AssetManager.AssetReferenceChanged -= CheckMaterialReferenceChanged;
@@ -691,10 +691,10 @@ namespace MixedRealityExtension.Core
 			try
 			{
 				// TODO: Add ability to flag an actor for "high-frequency" updates
-				if (OS.GetTicksMsec() >= _nextUpdateTime)
+				if (Time.GetTicksMsec() >= _nextUpdateTime)
 				{
 
-					_nextUpdateTime = OS.GetTicksMsec() + 200f + (float)GD.RandRange(-100, 100);
+					_nextUpdateTime = Time.GetTicksMsec() + 200f + (float)GD.RandRange(-100, 100);
 					SynchronizeApp();
 
 					// Give components the opportunity to synchronize the app.
@@ -893,7 +893,7 @@ namespace MixedRealityExtension.Core
 						// if rigid body is exclusive to user, manage rigid body directly
 						if (args.NewState == ActionState.Started || RigidDynamicBody3D.IsKinematic)
 						{
-							_rigidbody.Mode = GodotRigidDynamicBody3D.ModeEnum.Kinematic;
+							_rigidbody.FreezeMode = GodotRigidDynamicBody3D.FreezeModeEnum.Kinematic;
 						}
 					}
 					else
@@ -1096,7 +1096,7 @@ namespace MixedRealityExtension.Core
 			if (nameOrNull != null)
 			{
 				Name = nameOrNull;
-				base.Name = Name;
+				((Node)this).Name = Name;
 			}
 		}
 
@@ -1176,7 +1176,7 @@ namespace MixedRealityExtension.Core
 					{
 						meshInstance = new MeshInstance3D();
 						Node3D.AddChild(meshInstance);
-						meshInstance.SetSurfaceMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
+						meshInstance.SetSurfaceOverrideMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
 						forceUpdateRenderer = true;
 					}
 
@@ -1249,7 +1249,7 @@ namespace MixedRealityExtension.Core
 		{
 			if (this != null && MaterialId == id && MeshInstance3D != null)
 			{
-				MeshInstance3D.SetSurfaceMaterial(0, (Material)App.AssetManager.GetById(id).Value.Asset);
+				MeshInstance3D.SetSurfaceOverrideMaterial(0, (Material)App.AssetManager.GetById(id).Value.Asset);
 			}
 		}
 
@@ -1312,7 +1312,7 @@ namespace MixedRealityExtension.Core
 					var localRotation = LocalTransform.Rotation.ApplyPatch(transformPatch.Local.Rotation).ToQuaternion();
 					localRotation.x *= -1;
 					localRotation.y *= -1;
-					transformUpdate.Rotation = parent.GlobalTransform.basis.RotationQuat() * localRotation;
+					transformUpdate.Rotation = parent.GlobalTransform.basis.GetRotationQuaternion() * localRotation;
 				}
 			}
 
@@ -1333,11 +1333,11 @@ namespace MixedRealityExtension.Core
 				if (transformPatch.App.Rotation != null)
 				{
 					// New app space rotation
-					var newAppRot = (TransformNode.GlobalTransform.basis.RotationQuat() * appTransform.Rotation)
+					var newAppRot = new Quaternion(TransformNode.GlobalTransform.basis.GetRotationQuaternion() * appTransform.Rotation)
 						.GetPatchApplied(AppTransform.Rotation.ApplyPatch(transformPatch.App.Rotation));
 
 					// Transform new app rotation to world space.
-					transformUpdate.Rotation = newAppRot * TransformNode.GlobalTransform.basis.RotationQuat();
+					transformUpdate.Rotation = newAppRot * TransformNode.GlobalTransform.basis.GetRotationQuaternion();
 				}
 			}
 
@@ -1380,7 +1380,7 @@ namespace MixedRealityExtension.Core
 					appRot.x = -transform.Rotation.X;
 					appRot.y = -transform.Rotation.Y;
 					appRot.z = transform.Rotation.Z;
-					newRot = App.SceneRoot.GlobalTransform.basis.RotationQuat() * appRot;
+					newRot = App.SceneRoot.GlobalTransform.basis.GetRotationQuaternion() * appRot;
 				}
 
 				// We do not pass in a value for the update period at this point.  We will be adding in lag

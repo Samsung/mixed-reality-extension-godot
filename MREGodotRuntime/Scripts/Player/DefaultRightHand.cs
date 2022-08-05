@@ -8,20 +8,20 @@ public partial class DefaultRightHand : Node3D
 
     public override void _Ready()
     {
-        handLocalOrigin = Translation.z;
+        handLocalOrigin = Position.z;
     }
 
     public override void _Process(float delta)
     {
         if (Input.IsActionPressed("hand_touch"))
         {
-            if (Translation.z > handLocalOrigin - 0.05f)
-                Translation -= Transform.basis.z * 0.0048f;
+            if (Position.z > handLocalOrigin - 0.05f)
+                Position -= Transform.basis.z * 0.0048f;
         }
         else
         {
-            if (Translation.z < handLocalOrigin)
-                Translation += Transform.basis.z * 0.0048f;
+            if (Position.z < handLocalOrigin)
+                Position += Transform.basis.z * 0.0048f;
         }
 
         if (Input.IsActionJustPressed("Fire1"))

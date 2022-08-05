@@ -93,7 +93,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 
 			_this.Position.FromGodotVector3(spatial.Transform.origin);
 			_this.Position.Z *= -1;
-			_this.Rotation.FromGodotQuaternion(spatial.Transform.basis.RotationQuat());
+			_this.Rotation.FromGodotQuaternion(spatial.Transform.basis.GetRotationQuaternion());
 			_this.Rotation.X *= -1;
 			_this.Rotation.Y *= -1;
 			_this.Scale.FromGodotVector3(spatial.Scale);
@@ -114,7 +114,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 			var globalTransform = appRoot.GlobalTransform.AffineInverse() * transform.GlobalTransform;
 			var globalOrigin = globalTransform.origin;
 			globalOrigin.z *= -1;
-			var globalRotation = globalTransform.basis.RotationQuat();
+			var globalRotation = globalTransform.basis.GetRotationQuaternion();
 			globalRotation.x *= -1;
 			globalRotation.y *= -1;
 

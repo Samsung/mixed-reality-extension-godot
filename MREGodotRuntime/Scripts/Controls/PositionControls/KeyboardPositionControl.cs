@@ -14,7 +14,7 @@ namespace Assets.Scripts.Control
 
         public override void _PhysicsProcess(float delta)
         {
-            if (Input.IsKeyPressed((int)Godot.KeyList.Space))
+            if (Input.IsKeyPressed(Godot.Key.Space))
                 XRServer.CenterOnHmd(XRServer.RotationMode.ResetButKeepTilt, true);
 
             if (Input.IsActionPressed("move_right"))

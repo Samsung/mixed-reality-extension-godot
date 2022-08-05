@@ -81,7 +81,7 @@ namespace MixedRealityExtension.Core
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddCentralForce(_sceneRoot.ToGlobal(force.ToVector3()));
+					rigidBody.ApplyCentralForce(_sceneRoot.ToGlobal(force.ToVector3()));
 				});
 		}
 
@@ -91,7 +91,7 @@ namespace MixedRealityExtension.Core
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddForce(_sceneRoot.ToGlobal(position.ToVector3()), _sceneRoot.ToGlobal(force.ToVector3()));
+					rigidBody.ApplyImpulse(_sceneRoot.ToGlobal(position.ToVector3()), _sceneRoot.ToGlobal(force.ToVector3()));
 				});
 		}
 
@@ -101,7 +101,7 @@ namespace MixedRealityExtension.Core
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddTorque(_sceneRoot.ToGlobal(torque.ToVector3()));
+					rigidBody.ApplyTorque(_sceneRoot.ToGlobal(torque.ToVector3()));
 				});
 		}
 
@@ -111,7 +111,7 @@ namespace MixedRealityExtension.Core
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddTorque(_sceneRoot.ToGlobal(relativeTorque.ToVector3()));
+					rigidBody.ApplyTorque(_sceneRoot.ToGlobal(relativeTorque.ToVector3()));
 				});
 		}
 
@@ -243,7 +243,7 @@ namespace MixedRealityExtension.Core
 		{
 			internal Vector3? Position { get; set; }
 
-			internal Quat? Rotation { get; set; }
+			internal Quaternion? Rotation { get; set; }
 		}
 	}
 }

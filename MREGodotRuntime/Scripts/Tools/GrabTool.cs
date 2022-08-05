@@ -28,7 +28,7 @@ namespace Assets.Scripts.Tools
 
 	public class GrabTool : Tool
 	{
-		readonly RID shape = PhysicsServer3D.ShapeCreate(PhysicsServer3D.ShapeType.Sphere);
+		readonly RID shape = PhysicsServer3D.SphereShapeCreate();
 		readonly PhysicsShapeQueryParameters3D shapeQueryParameters;
 		PhysicsDirectSpaceState3D spaceState;
 
@@ -77,13 +77,13 @@ namespace Assets.Scripts.Tools
 
 			PhysicsServer3D.ShapeSetData(shape, radius);
 			shapeQueryParameters.Transform = new Transform3D(Basis.Identity, (Vector3)hitPoint);
-			spaceState = inputSource.GetWorld().DirectSpaceState;
+			spaceState = inputSource.GetWorld3d().DirectSpaceState;
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
 			var intersections = spaceState.GetRestInfo(shapeQueryParameters);
 			if (intersections.Count != 0)
 			{
-				var collider = GD.InstanceFromId((ulong)(int)intersections["collider_id"]) as Node3D;
+				var collider = GD.InstanceFromId((ulong)(long)intersections["collider_id"]) as Node3D;
 
 				Node3D actor = collider;
 				TargetBehavior behavior = null;
