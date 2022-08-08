@@ -11,50 +11,34 @@ namespace MixedRealityExtension.Core
 {
 	public abstract partial class ClippingBase : Node3D
 	{
-		private List<Node3D> meshInstances = new List<Node3D>();
+		private List<GeometryInstance3D> meshInstances = new List<GeometryInstance3D>();
 		private IActor parent;
 
 		public AABB Bounds => new AABB(GlobalTransform.origin - GlobalTransform.basis.Scale / 2, GlobalTransform.basis.Scale);
 
 		internal void ApplyPatch(ClippingPatch patch)
 		{
-			ClearMeshInstance3Ds();
+			ClearMeshInstances();
 			if (patch.ClippingObjects != null)
 			{
 				foreach (var clippingObjectId in patch.ClippingObjects)
 				{
 					Node3D targetActor = parent.App.FindActor(clippingObjectId) as Node3D;
-					AddMeshInstance3D(targetActor);
+					AddMeshInstance(targetActor);
 				}
 			}
 		}
 
-		protected IEnumerable<ShaderMaterial> ShaderMaterials()
+		protected IEnumerable<RID> ShaderMaterialRIDs()
 		{
 			foreach (var meshInstance in meshInstances)
 			{
 				if (!meshInstance.IsVisibleInTree()) continue;
-				if (meshInstance.Get("material_override") is ShaderMaterial shaderMaterial)
-					yield return shaderMaterial;
-				else if (meshInstance.Get("mesh") is Mesh mesh)
+
+				var surfaceCount = RenderingServer.MeshGetSurfaceCount(meshInstance.GetBase());
+				for (int i = 0; i < surfaceCount; i++)
 				{
-					var materialCount = mesh.GetSurfaceCount();
-					for (int i = 0; i < materialCount; i++)
-					{
-						var material = mesh.SurfaceGetMaterial(i);
-						if (material is ShaderMaterial meshMaterial)
-							yield return meshMaterial;
-					}
-				}
-				else
-				{
-					var materialCount = (int)meshInstance.Call("get_surface_material_count");
-					for (int i = 0; i < materialCount; i++)
-					{
-						var material = meshInstance.Call("get_surface_material", i);
-						if (material is ShaderMaterial meshInstanceMaterial)
-							yield return meshInstanceMaterial;
-					}
+					yield return RenderingServer.MeshSurfaceGetMaterial(meshInstance.GetBase(), i);
 				}
 			}
 		}
@@ -64,29 +48,29 @@ namespace MixedRealityExtension.Core
 			parent = GetParent() as IActor;
 		}
 
-		public virtual void ClearMeshInstance3Ds()
+		public virtual void ClearMeshInstances()
 		{
 			meshInstances.Clear();
 		}
 
-		public virtual void AddMeshInstance3D(Node3D root)
+		public virtual void AddMeshInstance(Node3D root)
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
-				if (node is MeshInstance3D || node.IsClass("MeshInstance3D"))
+				if (node is GeometryInstance3D n)
 				{
-					meshInstances.Add((Node3D)node);
+					meshInstances.Add(n);
 				}
 			});
 		}
 
-		public virtual void RemoveMeshInstance3D(Node3D root)
+		public virtual void RemoveMeshInstance(Node3D root)
 		{
 			MWGOTreeWalker.VisitTree(root, node =>
 			{
-				if (node is MeshInstance3D || node.IsClass("MeshInstance3D"))
+				if (node is GeometryInstance3D n)
 				{
-					meshInstances.Remove((Node3D)node);
+					meshInstances.Remove(n);
 				}
 			});
 		}
