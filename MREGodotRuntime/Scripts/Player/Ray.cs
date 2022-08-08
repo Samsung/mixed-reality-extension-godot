@@ -2,18 +2,19 @@ using Godot;
 
 namespace Assets.Scripts.User
 {
-    public class partial Ray : ImmediateGeometry
+    public partial class Ray : MeshInstance3D
     {
         internal Camera3D Camera3D { get; set; }
+        private ImmediateMesh immediateMesh;
 
         public Color Color {
             get {
-                var gradientTexture = ((StandardMaterial3D)MaterialOverride).AlbedoTexture as GradientTexture;
+                var gradientTexture = ((StandardMaterial3D)MaterialOverride).AlbedoTexture as GradientTexture1D;
                 var gradient = gradientTexture.Gradient;
                 return gradient.GetColor(1);
             }
             set {
-                var gradientTexture = ((StandardMaterial3D)MaterialOverride).AlbedoTexture as GradientTexture;
+                var gradientTexture = ((StandardMaterial3D)MaterialOverride).AlbedoTexture as GradientTexture1D;
                 var gradient = gradientTexture.Gradient;
                 gradient.SetColor(0, new Color(1, 1, 1, 0));
                 gradient.SetColor(1, value);
@@ -23,11 +24,17 @@ namespace Assets.Scripts.User
             }
         }
 
+
+        public override void _Ready()
+        {
+            immediateMesh = Mesh as ImmediateMesh;
+        }
+
         public void DrawRay(Vector3 rayBegin, Vector3 rayEnd)
         {
             var width = 1.6f;
-            var startDepth = ToLocal(rayBegin).Project(Camera3D.ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
-            var endDepth = ToLocal(rayEnd).Project(Camera3D.ProjectLocalRayNormal(OS.WindowSize / 2)).Length();
+            var startDepth = ToLocal(rayBegin).Project(Camera3D.ProjectLocalRayNormal(DisplayServer.WindowGetSize() / 2)).Length();
+            var endDepth = ToLocal(rayEnd).Project(Camera3D.ProjectLocalRayNormal(DisplayServer.WindowGetSize() / 2)).Length();
             var startPoint = Camera3D.UnprojectPosition(rayBegin);
             var endPoint = Camera3D.UnprojectPosition(rayEnd);
             var normal = endPoint - startPoint;
@@ -52,18 +59,18 @@ namespace Assets.Scripts.User
             var v3 = Camera3D.ProjectPosition(p3, endDepth);
             var v4 = Camera3D.ProjectPosition(p4, endDepth);
 
-            Clear();
-            Begin(Mesh.PrimitiveType.TriangleStrip);
+            immediateMesh.ClearSurfaces();
+            immediateMesh.SurfaceBegin(Mesh.PrimitiveType.TriangleStrip);
 
-            SetUv(new Vector2(0, 0));
-            AddVertex(v1);
-            SetUv(new Vector2(0, 1));
-            AddVertex(v2);
-            SetUv(new Vector2(1, 0));
-            AddVertex(v4);
-            SetUv(new Vector2(1, 1));
-            AddVertex(v3);
-            End();
+            immediateMesh.SurfaceSetUv(new Vector2(0, 0));
+            immediateMesh.SurfaceAddVertex(v1);
+            immediateMesh.SurfaceSetUv(new Vector2(0, 1));
+            immediateMesh.SurfaceAddVertex(v2);
+            immediateMesh.SurfaceSetUv(new Vector2(1, 0));
+            immediateMesh.SurfaceAddVertex(v4);
+            immediateMesh.SurfaceSetUv(new Vector2(1, 1));
+            immediateMesh.SurfaceAddVertex(v3);
+            immediateMesh.SurfaceEnd();
         }
     }
 }
