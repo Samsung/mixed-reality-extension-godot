@@ -2,9 +2,6 @@
 // Licensed under the MIT License.
 using MixedRealityExtension.App;
 using MixedRealityExtension.Core.Interfaces;
-using MixedRealityExtension.Messaging.Commands;
-using MixedRealityExtension.Messaging.Payloads;
-using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.PluginInterfaces;
 using System;

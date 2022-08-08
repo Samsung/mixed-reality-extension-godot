@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 using System;
 using Godot;
-using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Core.Components
 {

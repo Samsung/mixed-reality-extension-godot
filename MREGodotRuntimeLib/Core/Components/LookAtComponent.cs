@@ -3,7 +3,6 @@
 
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.Patching.Types;
-using System;
 using Godot;
 
 namespace MixedRealityExtension.Core.Components

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using MixedRealityExtension.Animation;
 using MixedRealityExtension.Messaging.Events.Types;
 using MixedRealityExtension.Messaging.Payloads;
-using MixedRealityExtension.Patching;
 using MixedRealityExtension.Patching.Types;
 using MixedRealityExtension.Util;
 using MixedRealityExtension.Util.GodotHelper;
@@ -61,7 +60,6 @@ namespace MixedRealityExtension.Core.Components
 				if (!animationData.Enabled && animationData.IsInternal)
 				{
 					_animationData.Remove(animationPlayer.Name);
-					GD.Print(animationPlayer.Name);
 					this.RemoveChild(animationPlayer);
 					animationPlayer.QueueFree();
 					_animationPlayers.Remove(animationPlayer.Name);

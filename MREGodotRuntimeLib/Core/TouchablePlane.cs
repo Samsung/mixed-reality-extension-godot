@@ -1,7 +1,6 @@
 // Copyright (c) Samsung Electronics Co., Ltd. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
 using System.Diagnostics;
 using Godot;
 using MixedRealityExtension.Patching.Types;
