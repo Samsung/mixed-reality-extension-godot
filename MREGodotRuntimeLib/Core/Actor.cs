@@ -123,7 +123,11 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public IActor Parent => App.FindActor(ParentId);
 
-		public new string Name { get; set; }
+		public new string Name
+		{
+			get => ((Node)this).Name;
+			set => ((Node)this).Name = value;
+		}
 
 		private Guid? Owner = null;
 
@@ -1176,7 +1180,7 @@ namespace MixedRealityExtension.Core
 					{
 						meshInstance = new MeshInstance3D();
 						Node3D.AddChild(meshInstance);
-						meshInstance.SetSurfaceOverrideMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
+
 						forceUpdateRenderer = true;
 					}
 
@@ -1186,6 +1190,7 @@ namespace MixedRealityExtension.Core
 					{
 						if (MeshId != updatedMeshId) return;
 						GodotMesh = (Mesh)sharedMesh.Asset;
+						meshInstance.SetSurfaceOverrideMaterial(0, (Material)MREAPI.AppsAPI.DefaultMaterial.Duplicate());
 						if (Collider != null && Collider.Shape == ColliderType.Auto)
 						{
 							SetCollider(new ColliderPatch()

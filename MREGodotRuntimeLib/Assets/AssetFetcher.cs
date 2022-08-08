@@ -78,7 +78,7 @@ namespace MixedRealityExtension.Assets
 				{
 					handler = new DownloadHandlerAudioStream(uri, AudioType.Unknown);
 				}
-				else if (typeof(T) == typeof(Godot.Texture))
+				else if (typeof(T) == typeof(Godot.Texture2D))
 				{
 					handler = new DownloadHandlerTexture(uri);
 				}
@@ -91,7 +91,7 @@ namespace MixedRealityExtension.Assets
 				// Spin asynchronously until the load throttler would allow us through.
 				while (AssetLoadThrottling.WouldThrottle())
 				{
-					await runner.ToSignal(Engine.GetMainLoop(), "idle_frame");
+					await runner.ToSignal(Engine.GetMainLoop(), "process_frame");
 				}
 
 				using (var scope = new AssetLoadThrottling.AssetLoadScope())
@@ -128,7 +128,7 @@ namespace MixedRealityExtension.Assets
 								{
 									result.Asset = ((DownloadHandlerAudioStream)handler).AudioStream as T;
 								}
-								else if (typeof(T).IsAssignableFrom(typeof(Godot.Texture)))
+								else if (typeof(T).IsAssignableFrom(typeof(Godot.Texture2D)))
 								{
 									result.Asset = ((DownloadHandlerTexture)handler).Texture as T;
 								}

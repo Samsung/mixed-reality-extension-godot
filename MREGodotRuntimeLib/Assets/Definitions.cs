@@ -132,11 +132,6 @@ namespace MixedRealityExtension.Assets
 		/// The resolution of the texture
 		/// </summary>
 		public Vector2Patch Resolution;
-
-		/// <summary>
-		/// The flags are used to set various properties of the Texture.
-		/// </summary>
-		public uint? Flags;
 	}
 
 	/// <summary>

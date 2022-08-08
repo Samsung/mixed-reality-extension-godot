@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 using MixedRealityExtension.App;
-using Texture = Godot.Texture;
+using Texture = Godot.Texture2D;
 using Material = Godot.ShaderMaterial;
 using MixedRealityExtension.Patching.Types;
 
