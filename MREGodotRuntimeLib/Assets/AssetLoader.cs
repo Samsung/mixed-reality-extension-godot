@@ -619,22 +619,6 @@ namespace MixedRealityExtension.Assets
 
 					MREAPI.AppsAPI.MaterialPatcher.ApplyMaterialPatch(_app, mat, def.Material);
 				}
-				else if (def.Texture != null && asset.Asset != null && asset.Asset is Godot.Texture tex)
-				{
-					var texdef = def.Texture.Value;
-
-					// make sure texture reference actually needs to be updated
-					if (texdef.Flags.HasValue && texdef.Flags.Value != tex.Flags)
-					{
-						// make texture write-safe
-						// Note: It's safe to assume existence because we're inside the OnSet callback
-						tex = _app.AssetManager.GetById(def.Id, writeSafe: true).Value.Asset as Godot.Texture;
-
-						if (texdef.Flags.HasValue)
-							tex.Flags = texdef.Flags.Value;
-					}
-					// otherwise, the shared texture is in exactly the state we want, so use it
-				}
 				else if (def.Sound != null)
 				{
 					// do nothing; sound asset properties are immutable
@@ -681,13 +665,7 @@ namespace MixedRealityExtension.Assets
 			{
 				var texUri = new Uri(_app.ServerAssetUri, def.Texture.Value.Uri);
 				source = new AssetSource(AssetContainerType.None, texUri.AbsoluteUri);
-				var result = await AssetFetcher<Godot.Texture>.LoadTask(_owner, texUri);
-
-				// this is a newly loaded texture, so we decide initial settings for the shared asset
-				if (result.ReturnCode == 200)
-				{
-					result.Asset.Flags = def.Texture.Value.Flags ?? (uint)Godot.Texture.FlagsEnum.Default | (uint)Godot.Texture.FlagsEnum.AnisotropicFilter;
-				}
+				var result = await AssetFetcher<Godot.Texture2D>.LoadTask(_owner, texUri);
 
 				source.Version = result.ETag;
 				unityAsset = result.Asset;
@@ -847,7 +825,7 @@ namespace MixedRealityExtension.Assets
 					Material = MREAPI.AppsAPI.MaterialPatcher.GeneratePatch(_app, mat)
 				};
 			}
-			else if (unityAsset is Godot.Texture tex)
+			else if (unityAsset is Godot.Texture2D tex)
 			{
 				return new Asset()
 				{
@@ -855,7 +833,6 @@ namespace MixedRealityExtension.Assets
 					Texture = new MWTexture()
 					{
 						Resolution = new Vector2Patch(tex.GetSize()),
-						Flags = tex.Flags,
 					}
 				};
 			}

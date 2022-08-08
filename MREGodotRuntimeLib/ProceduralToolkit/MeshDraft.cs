@@ -851,26 +851,6 @@ namespace MixedRealityExtension.ProceduralToolkit
 			return mesh;
 		}
 
-		/// <summary>
-		/// Fills the <paramref name="mesh"/> with the data in the draft
-		/// </summary>
-		/// <param name="mesh"> Resulting mesh. Cleared before use. </param>
-		/// <param name="calculateBounds"> Calculate the bounding box of the Mesh after setting the triangles. </param>
-		/// <param name="autoIndexFormat"> Use 16 bit or 32 bit index buffers based on vertex count. </param>
-		public void ToMesh(ref ArrayMesh mesh, bool calculateBounds = true, bool autoIndexFormat = true)
-		{
-			if (mesh == null)
-			{
-				throw new ArgumentNullException("mesh");
-			}
-
-			var surfaceCount = mesh.GetSurfaceCount();
-			for (int i = 0; i < surfaceCount; i++)
-				mesh.SurfaceRemove(0);
-			mesh.ClearBlendShapes();
-			FillMesh(ref mesh, calculateBounds, autoIndexFormat);
-		}
-
 		private void FillMesh(ref ArrayMesh mesh, bool calculateBounds, bool autoIndexFormat)
 		{
 			if (vertexCount > 65535)

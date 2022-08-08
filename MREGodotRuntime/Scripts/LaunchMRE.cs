@@ -113,8 +113,7 @@ public partial class LaunchMRE : Node3D
 		MREComponent.AutoJoin = AutoJoin;
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
-		MREComponent.UserNode = GetNode(UserNode + "/MainCamera3D");
-		MREComponent.DialogFactory = GetNode<DialogFactory>("Player/DialogFactory");
+		MREComponent.UserNode = GetNode(UserNode + "/MainCamera");
 		AddChild(MREComponent);
 	}
 
