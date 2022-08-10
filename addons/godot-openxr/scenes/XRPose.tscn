@@ -1,4 +1,0 @@
-[gd_scene format=3 uid="uid://3xnavajaip01"]
-
-[node name="XRPose" type="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
