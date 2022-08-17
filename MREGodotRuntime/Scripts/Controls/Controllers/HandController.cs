@@ -82,7 +82,7 @@ namespace Assets.Scripts.Control
             var proximityVisibleLight = new OmniLight3D()
             {
                 OmniRange = 0.0923046f,
-                LightEnergy = 1.46f,
+                LightEnergy = 0.04f,
                 LightCullMask = 2,
             };
             parent.AddChild(proximityVisibleLight);

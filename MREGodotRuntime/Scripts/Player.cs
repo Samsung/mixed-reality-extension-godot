@@ -27,8 +27,6 @@ public enum ControllerType
 
 public partial class Player : XROrigin3D
 {
-    [Export]
-    private NodePath viewport = null;
     private string cursorScenePath = MRERuntimeScenePath.DefaultCursor;
     private string rayScenePath = MRERuntimeScenePath.DefaultRay;
     private string gamepadScenePath = MRERuntimeScenePath.Joypad;
@@ -216,18 +214,17 @@ public partial class Player : XROrigin3D
             //default height 1.6m
             MainCamera.Position = Vector3.Up * 1.6f;
 
-            Viewport vp = null;
-            if (viewport != null)
-                vp = GetNode<Viewport>(viewport);
-            if (vp == null)
-                vp = GetViewport();
-
-            vp.UseXr = true;
+            GetViewport().UseXr = true;
             //vp.Keep3dLinear = (bool)GetNode("Configuration").Call("keep_3d_linear");
 
             Engine.TargetFps = 144;
             openXRIsInitialized = ARVRInterface.IsInitialized();
 
+            var rightHand = new HandController(MRERuntimeScenePath.OpenXRRightHand);
+            var leftHand = new HandController(MRERuntimeScenePath.OpenXRLeftHand);
+
+            CallDeferred("add_child", rightHand);
+            CallDeferred("add_child", leftHand);
             return true;
         }
 

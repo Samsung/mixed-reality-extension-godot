@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://cbv524a5b1q1c"]
+
+[ext_resource type="PackedScene" uid="uid://c2o1g2u2gnkf3" path="res://MREGodotRuntime/Scenes/MRTK_R_Hand.gltf" id="1_cw7ba"]
+[ext_resource type="Script" path="res://MREGodotRuntime/Scripts/Player/DefaultRightHand.cs" id="2_3nq7w"]
+
+[node name="MRTK_R_Hand" instance=ExtResource("1_cw7ba")]
+script = ExtResource("2_3nq7w")
+
+[node name="Skeleton3D" parent="MRTK_R_Hand2/R_Hand_MRTK_Rig" index="0"]
+bones/0/position = Vector3(-0.060511, -0.116536, -0.092404)
+bones/0/rotation = Quaternion(-0.35747, 0.743282, -0.277044, 0.492944)
+bones/1/rotation = Quaternion(0.029801, -0.111533, 0.409273, 0.905079)
+bones/2/rotation = Quaternion(0.007709, 0.007477, 0.503033, 0.864201)
+bones/3/rotation = Quaternion(-0.094123, 0.002229, 0.216992, 0.971623)
+bones/5/rotation = Quaternion(0.111977, 0.004577, 0.023845, 0.993414)
+bones/6/rotation = Quaternion(0.093957, -0.006791, 0.131654, 0.98681)
+bones/7/rotation = Quaternion(-0.099625, -0.0292, 0.048044, 0.993436)
+bones/8/rotation = Quaternion(0.038544, 0.034654, -0.230517, 0.971687)
+bones/9/rotation = Quaternion(-0.024999, -0.141551, 0.477392, 0.866854)
+bones/10/rotation = Quaternion(-0.046838, 0.028329, 0.637267, 0.768697)
+bones/11/rotation = Quaternion(-0.072123, -0.005335, 0.247898, 0.966083)
+bones/13/rotation = Quaternion(0.59098, 0.372436, -0.025084, 0.715126)
+bones/14/rotation = Quaternion(8.1e-05, -0.015996, 0.143649, 0.989499)
+bones/15/rotation = Quaternion(-6.4e-05, 0.041278, -0.082284, 0.995754)
+bones/18/rotation = Quaternion(0.136869, -0.121448, 0.413315, 0.892014)
+bones/19/rotation = Quaternion(-0.059876, -0.016288, 0.550373, 0.83261)
+bones/20/rotation = Quaternion(-0.140073, 0.076001, 0.295862, 0.941844)
+
+[node name="ThumbTip" type="BoneAttachment3D" parent="MRTK_R_Hand2/R_Hand_MRTK_Rig/Skeleton3D" index="1"]
+transform = Transform3D(-0.743089, 0.664111, 0.0823188, -0.290444, -0.209244, -0.933734, -0.602878, -0.717756, 0.348374, 0.0416378, -0.0714854, -0.0177927)
+bone_name = "R_Thumb_end"
+bone_idx = 16
+
+[node name="IndexTip" type="Node3D" parent="." index="2"]
