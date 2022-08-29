@@ -2,11 +2,10 @@
 // Licensed under the MIT License.
 using System;
 using Godot;
-using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class ActorComponentBase : Spatial
+	internal partial class ActorComponentBase : Node3D
 	{
 		internal Actor AttachedActor { get; set; }
 

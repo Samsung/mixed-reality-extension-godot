@@ -57,22 +57,21 @@ namespace MixedRealityExtension.Util.GodotHelper
 				return 2;
 		}
 
-		public static bool IsInterpolationLoopWrap(this MWAnimationWrapMode wrapMode)
+		public static Godot.Animation.LoopModeEnum ToGodotLoopMode(this MWAnimationWrapMode wrapMode)
 		{
 			switch (wrapMode)
 			{
 				case MWAnimationWrapMode.Loop:
-					return true;
+					return Godot.Animation.LoopModeEnum.Linear;
 
 				case MWAnimationWrapMode.PingPong:
-					GD.PushError("WrapMode.PingPong is not supported.");
-					return true;
+					return Godot.Animation.LoopModeEnum.Pingpong;
 
 				case MWAnimationWrapMode.Once:
-					return false;
+					return Godot.Animation.LoopModeEnum.None;
 
 				default:
-					return true;
+					return Godot.Animation.LoopModeEnum.None;
 			}
 		}
 

@@ -40,7 +40,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			t = Mathf.Clamp(t, 0 ,1);
 			return new Circle3(
 				center: a.center + (b.center - a.center)*t,
-				normal: a.normal.LinearInterpolate(b.normal, t),
+				normal: a.normal.Lerp(b.normal, t),
 				radius: a.radius + (b.radius - a.radius)*t);
 		}
 
@@ -51,7 +51,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		{
 			return new Circle3(
 				center: a.center + (b.center - a.center)*t,
-				normal: a.normal.LinearInterpolate(b.normal, t),
+				normal: a.normal.Lerp(b.normal, t),
 				radius: a.radius + (b.radius - a.radius)*t);
 		}
 

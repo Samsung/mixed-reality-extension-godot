@@ -1,12 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-using MixedRealityExtension.Behaviors;
 using MixedRealityExtension.Behaviors.Contexts;
 using MixedRealityExtension.PluginInterfaces.Behaviors;
 
 namespace MixedRealityExtension.Core.Components
 {
-	internal class BehaviorComponent : ActorComponentBase
+	internal partial class BehaviorComponent : ActorComponentBase
 	{
 		private BehaviorContextBase _behaviorContext;
 

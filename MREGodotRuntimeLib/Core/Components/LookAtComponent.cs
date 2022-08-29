@@ -3,7 +3,6 @@
 
 using MixedRealityExtension.Core.Interfaces;
 using MixedRealityExtension.Patching.Types;
-using System;
 using Godot;
 
 namespace MixedRealityExtension.Core.Components
@@ -11,9 +10,9 @@ namespace MixedRealityExtension.Core.Components
 	/// <summary>
 	/// Unity Behaviour to face toward a given target object
 	/// </summary>
-	internal class LookAtComponent : ActorComponentBase
+	internal partial class LookAtComponent : ActorComponentBase
 	{
-		private Spatial _targetObject;
+		private Node3D _targetObject;
 		private LookAtMode _lookAtMode;
 		private bool _backward;
 		private Actor parent;
@@ -25,7 +24,7 @@ namespace MixedRealityExtension.Core.Components
 				IActor targetActor = AttachedActor.App.FindActor(patch.ActorId.Value);
 				if (targetActor != null)
 				{
-					_targetObject = targetActor.Node3D as Spatial;
+					_targetObject = targetActor.Node3D as Node3D;
 				}
 				else
 				{

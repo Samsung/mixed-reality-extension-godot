@@ -20,7 +20,7 @@ internal class HostAppUser : IHostAppUser
 		{"engine", Engine.GetVersionInfo()["build"] as string }
 	};
 
-	//public Vector3? LookAtPosition => (UserNode as Spatial).GlobalTransform.origin;
+	//public Vector3? LookAtPosition => (UserNode as Node3D).GlobalTransform.origin;
 
 	public event MWEventHandler BeforeAvatarDestroyed;
 	public event MWEventHandler AfterAvatarCreated;
@@ -35,7 +35,7 @@ internal class HostAppUser : IHostAppUser
 	public Node GetAttachPoint(string attachPointName)
 	{
 		string socketName = $"socket-{attachPointName}";
-		Node socket = UserNode.FindNode(socketName);
+		Node socket = UserNode.FindChild(socketName);
 		if (socket == null)
 		{
 			socket = UserNode;

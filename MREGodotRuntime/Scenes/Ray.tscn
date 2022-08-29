@@ -1,20 +1,23 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=3 uid="uid://duof1o2blitqn"]
 
-[ext_resource path="res://MREGodotRuntime/Scripts/Player/Ray.cs" type="Script" id=1]
+[ext_resource type="Script" path="res://MREGodotRuntime/Scripts/Player/Ray.cs" id="1"]
 
-[sub_resource type="Gradient" id=1]
-offsets = PoolRealArray( 0, 0.333, 0.667, 1 )
-colors = PoolColorArray( 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 )
+[sub_resource type="Gradient" id="1"]
+offsets = PackedFloat32Array(0, 0.333, 0.667, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture" id=2]
-gradient = SubResource( 1 )
+[sub_resource type="GradientTexture1D" id="2"]
+gradient = SubResource("1")
 
-[sub_resource type="SpatialMaterial" id=3]
-flags_transparent = true
-flags_unshaded = true
-flags_no_depth_test = true
-albedo_texture = SubResource( 2 )
+[sub_resource type="StandardMaterial3D" id="3"]
+transparency = 1
+no_depth_test = true
+shading_mode = 0
+albedo_texture = SubResource("2")
 
-[node name="Ray" type="ImmediateGeometry"]
-material_override = SubResource( 3 )
-script = ExtResource( 1 )
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_o4jjn"]
+
+[node name="Ray" type="MeshInstance3D"]
+material_override = SubResource("3")
+mesh = SubResource("ImmediateMesh_o4jjn")
+script = ExtResource("1")

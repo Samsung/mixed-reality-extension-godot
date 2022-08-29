@@ -25,14 +25,13 @@ public enum ControllerType
     Mouse = 1 << 1,
 }
 
-public class Player : ARVROrigin
+public partial class Player : XROrigin3D
 {
-    [Export]
-    private NodePath viewport = null;
     private string cursorScenePath = MRERuntimeScenePath.DefaultCursor;
     private string rayScenePath = MRERuntimeScenePath.DefaultRay;
     private string gamepadScenePath = MRERuntimeScenePath.Joypad;
     private bool openXRIsInitialized = false;
+    private Callable readyCallable;
 
     [ExportEnum(typeof(PositionControlType))]
     private int positionControl = (int)PositionControlType.Keyboard;
@@ -132,7 +131,7 @@ public class Player : ARVROrigin
                 }
                 else
                 {
-                    Connect("ready", this, nameof(_on_Player_ready));
+                    Connect("ready", readyCallable);
                 }
             }
         }
@@ -172,7 +171,7 @@ public class Player : ARVROrigin
         }
     }
 
-    public Camera MainCamera { get; private set; }
+    public Camera3D MainCamera { get; private set; }
 
     [Signal]
     public delegate void cursor_changed(string scenePath);
@@ -185,7 +184,7 @@ public class Player : ARVROrigin
 
     private void _on_Player_ready()
     {
-        Disconnect("ready", this, nameof(_on_Player_ready));
+        Disconnect("ready", readyCallable);
         AddHandController();
     }
 
@@ -207,26 +206,25 @@ public class Player : ARVROrigin
 
     private bool InitializeOpenXR()
     {
-        var ARVRInterface = ARVRServer.FindInterface("OpenXR");
+        var ARVRInterface = XRServer.FindInterface("OpenXR");
         if (ARVRInterface?.Initialize() == true)
         {
             GD.Print("OpenXR Interface initialized");
 
             //default height 1.6m
-            MainCamera.Translation = Vector3.Up * 1.6f;
+            MainCamera.Position = Vector3.Up * 1.6f;
 
-            Viewport vp = null;
-            if (viewport != null)
-                vp = GetNode<Viewport>(viewport);
-            if (vp == null)
-                vp = GetViewport();
-
-            vp.Arvr = true;
+            GetViewport().UseXr = true;
             //vp.Keep3dLinear = (bool)GetNode("Configuration").Call("keep_3d_linear");
 
-            Engine.IterationsPerSecond = 144;
-            openXRIsInitialized = ARVRInterface.InterfaceIsInitialized;
+            Engine.TargetFps = 144;
+            openXRIsInitialized = ARVRInterface.IsInitialized();
 
+            var rightHand = new HandController(MRERuntimeScenePath.OpenXRRightHand);
+            var leftHand = new HandController(MRERuntimeScenePath.OpenXRLeftHand);
+
+            CallDeferred("add_child", rightHand);
+            CallDeferred("add_child", leftHand);
             return true;
         }
 
@@ -235,13 +233,14 @@ public class Player : ARVROrigin
 
     public override void _EnterTree()
     {
-        MainCamera = GetNode<Camera>("MainCamera");
+        MainCamera = GetNode<Camera3D>("MainCamera");
 
         InitializeOpenXR();
     }
 
     public override void _Ready()
     {
+        readyCallable = new Callable(this, nameof(_on_Player_ready));
         // update control property
         PositionControl = (PositionControlType)positionControl;
         RotationControl = (RotationControlType)rotationControl;

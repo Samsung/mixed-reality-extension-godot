@@ -17,7 +17,7 @@ namespace MixedRealityExtension.Patching.Types
 	{
 		/// body that is simulated and should react to impacts
 		Dynamic = 1,
-		/// body is key framed, has infinite mass used for animation or mouse pick 
+		/// body is key framed, has infinite mass used for animation or mouse pick
 		Keyframed = 2,
 		/// special flag to signal that this body is now sleeping and will not move (can become key framed stationary until collision)
 		Sleeping = 4
@@ -74,7 +74,7 @@ namespace MixedRealityExtension.Patching.Types
 			{
 				return new Snapshot(Time, ConvertTransformBLOB(TransformsBLOB), Flags);
 			}
- 
+
 			return new Snapshot(Time, new List<Snapshot.TransformInfo>(), Flags);
 		}
 
@@ -102,7 +102,7 @@ namespace MixedRealityExtension.Patching.Types
 					position.y = binaryReader.ReadSingle();
 					position.z = -binaryReader.ReadSingle();
 
-					Quat rotation = new Quat();
+					Quaternion rotation = new Quaternion();
 					rotation.x = -binaryReader.ReadSingle();
 					rotation.y = -binaryReader.ReadSingle();
 					rotation.z = binaryReader.ReadSingle();
@@ -128,7 +128,7 @@ namespace MixedRealityExtension.Patching.Types
 				foreach (var transformInfo in list)
 				{
 					var blob = new byte[48];
-					Buffer.BlockCopy(transformInfo.RigidBodyId.ToByteArray(), 0, blob, 0, 16);
+					Buffer.BlockCopy(transformInfo.RigidDynamicBody3DId.ToByteArray(), 0, blob, 0, 16);
 					blob[16] = (byte)transformInfo.MotionType;
 					blob[17] = 0;
 					blob[18] = 0;
@@ -169,8 +169,8 @@ namespace MixedRealityExtension.Patching.Types
 	{
 		public struct OneActorUpdate
 		{
-			public OneActorUpdate(Guid id,Godot.Vector3 localPos, Godot.Quat localQuat,
-				Godot.Vector3 appPos, Godot.Quat appQuat)
+			public OneActorUpdate(Guid id,Godot.Vector3 localPos, Godot.Quaternion localQuat,
+				Godot.Vector3 appPos, Godot.Quaternion appQuat)
 			{
 				localTransform = new TransformPatch();
 				appTransform = new TransformPatch();
@@ -180,7 +180,7 @@ namespace MixedRealityExtension.Patching.Types
 
 				appTransform.Position = new Vector3Patch(appPos);
 				appTransform.Rotation = new QuaternionPatch(appQuat);
-				
+
 				actorGuid = id;
 			}
 

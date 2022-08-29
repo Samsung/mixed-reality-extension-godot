@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using MWAssets = MixedRealityExtension.Assets;
 using Material = Godot.ShaderMaterial;
-using Texture = Godot.Texture;
+using Texture = Godot.Texture2D;
 using Godot;
 
 namespace MixedRealityExtension.Factories
@@ -55,14 +55,16 @@ namespace MixedRealityExtension.Factories
 			}
 			if (patch.Color != null)
 			{
-				_materialColor.FromGodotColor((Color)material.GetShaderParam(AlbedoColorProp));
+				var color = material.GetShaderParam(AlbedoColorProp) as Color? ?? new Color();
+				_materialColor.FromGodotColor(color);
 				_materialColor.ApplyPatch(patch.Color);
 				material.SetShaderParam(AlbedoColorProp, _materialColor.ToColor());
 			}
 
 			if (patch.MainTextureOffset != null)
 			{
-				_textureOffset.FromGodotVector3((Vector3)material.GetShaderParam(Uv1OffsetProp));
+				var uv1Offset = material.GetShaderParam(Uv1OffsetProp) as Vector3? ?? new Vector3();
+				_textureOffset.FromGodotVector3(uv1Offset);
 				_textureOffset.ApplyPatch(patch.MainTextureOffset);
 				_textureOffset.Y *= -1;
 				material.SetShaderParam(Uv1OffsetProp, _textureOffset.ToVector3());
@@ -70,7 +72,8 @@ namespace MixedRealityExtension.Factories
 
 			if (patch.MainTextureScale != null)
 			{
-				_textureScale.FromGodotVector3((Vector3)material.GetShaderParam(Uv1ScaleProp));
+				var uv1Scale = material.GetShaderParam(Uv1ScaleProp) as Vector3? ?? new Vector3();
+				_textureScale.FromGodotVector3(uv1Scale);
 				_textureScale.ApplyPatch(patch.MainTextureScale);
 				material.SetShaderParam(Uv1ScaleProp, _textureScale.ToVector3());
 			}
@@ -95,7 +98,7 @@ namespace MixedRealityExtension.Factories
 
 			if (patch.EmissiveColor != null)
 			{
-				var color = (Color)material.GetShaderParam(EmissionColorProp);
+				var color = material.GetShaderParam(EmissionColorProp) as Color? ?? new Color();
 				color.r = patch.EmissiveColor.R ?? color.r;
 				color.g = patch.EmissiveColor.G ?? color.g;
 				color.b = patch.EmissiveColor.B ?? color.b;
@@ -105,7 +108,7 @@ namespace MixedRealityExtension.Factories
 
 			if (patch.EmissiveTextureOffset != null)
 			{
-				var offset = (Vector3)material.GetShaderParam(Uv2OffsetProp);
+				var offset = material.GetShaderParam(Uv2OffsetProp) as Vector3? ?? new Vector3();
 				offset.x = patch.EmissiveTextureOffset.X ?? offset.x;
 				offset.y = patch.EmissiveTextureOffset.Y ?? offset.y;
 				material.SetShaderParam(Uv2OffsetProp, offset);
@@ -113,7 +116,7 @@ namespace MixedRealityExtension.Factories
 
 			if (patch.EmissiveTextureScale != null)
 			{
-				var scale = (Vector3)material.GetShaderParam(Uv2ScaleProp);
+				var scale = material.GetShaderParam(Uv2ScaleProp) as Vector3? ?? new Vector3();
 				scale.x = patch.EmissiveTextureScale.X ?? scale.x;
 				scale.y = patch.EmissiveTextureScale.Y ?? scale.y;
 				material.SetShaderParam(Uv2ScaleProp, scale);

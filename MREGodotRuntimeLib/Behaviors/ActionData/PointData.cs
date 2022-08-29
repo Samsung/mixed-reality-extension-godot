@@ -11,7 +11,7 @@ namespace MixedRealityExtension.Behaviors.ActionData
 		public MWVector3 appSpacePoint;
 		public MWVector3 localSpacePoint;
 
-		public static PointData CreateFromGodotVector3(Vector3 point, Spatial localRoot, Spatial appRoot)
+		public static PointData CreateFromGodotVector3(Vector3 point, Node3D localRoot, Node3D appRoot)
 		{
 			return new PointData()
 			{

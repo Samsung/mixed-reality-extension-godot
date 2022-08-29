@@ -8,7 +8,7 @@ public enum LaunchType
 }
 
 [Tool]
-public class LaunchMRE : Spatial
+public partial class LaunchMRE : Node3D
 {
 	private LaunchType launchType = LaunchType.OnStart;
 
@@ -59,20 +59,20 @@ public class LaunchMRE : Spatial
 		if (!IsInsideTree())
 			return;
 
-		var area = FindNode("LaunchArea*", false);
+		var area = FindChild("LaunchArea*", false);
 		switch (LaunchType)
 		{
 			case LaunchType.MouseButtonDown:
 			case LaunchType.TriggerVolume:
 				if (area == null)
 				{
-					area = new Area() { Name = "LaunchArea" };
+					area = new Area3D() { Name = "LaunchArea" };
 					AddChild(area);
 					area.Owner = GetTree().EditedSceneRoot;
 
-					var CollisionShape = new CollisionShape();
-					area.AddChild(CollisionShape);
-					CollisionShape.Owner = GetTree().EditedSceneRoot;
+					var CollisionShape3D = new CollisionShape3D();
+					area.AddChild(CollisionShape3D);
+					CollisionShape3D.Owner = GetTree().EditedSceneRoot;
 				}
 				break;
 			case LaunchType.OnStart:
@@ -87,17 +87,17 @@ public class LaunchMRE : Spatial
 
 	private void InitializeLaunchArea()
 	{
-		var area = FindNode("LaunchArea*", false);
+		var area = FindChild("LaunchArea*", false);
 		if (area != null)
 		{
 			if (launchType == LaunchType.MouseButtonDown)
 			{
-				area.Connect("input_event", this, nameof(OnInputEvent));
+				area.Connect("input_event", new Callable(this, nameof(OnInputEvent)));
 			}
 			else if (launchType == LaunchType.TriggerVolume)
 			{
-				area.Connect("area_entered", this, nameof(OnAreaEntered));
-				area.Connect("area_exited", this, nameof(OnAreaExited));
+				area.Connect("area_entered", new Callable(this, nameof(OnAreaEntered)));
+				area.Connect("area_exited", new Callable(this, nameof(OnAreaExited)));
 			}
 		}
 	}
@@ -114,13 +114,12 @@ public class LaunchMRE : Spatial
 		MREComponent.GrantedPermissions = (MixedRealityExtension.Core.Permissions)(-1);
 		MREComponent.UserProperties = new MREComponent.UserProperty[0];
 		MREComponent.UserNode = GetNode(UserNode + "/MainCamera");
-		MREComponent.DialogFactory = GetNode<DialogFactory>("Player/DialogFactory");
 		AddChild(MREComponent);
 	}
 
 	private void StartApp()
 	{
-		if (Engine.EditorHint) return;
+		if (Engine.IsEditorHint()) return;
 		GD.Print("Starting MRE app.");
 		MREComponent?.EnableApp();
 		_running = true;
@@ -138,7 +137,7 @@ public class LaunchMRE : Spatial
 		{
 			if (LaunchType == LaunchType.MouseButtonDown && MREComponent != null)
 			{
-				var area = FindNode("LaunchArea*", false);
+				var area = FindChild("LaunchArea*", false);
 				if (area != null)
 				{
 					area.QueueFree();

@@ -15,7 +15,7 @@ namespace MixedRealityExtension.Core
 {
 	public class RigidBodyPhysicsBridgeInfo
 	{
-		public RigidBodyPhysicsBridgeInfo(Guid id, Godot.RigidBody rb, bool ownership)
+		public RigidBodyPhysicsBridgeInfo(Guid id, Godot.RigidDynamicBody3D rb, bool ownership)
 		{
 			Id = id;
 			RigidBody = rb;
@@ -30,8 +30,8 @@ namespace MixedRealityExtension.Core
 		/// the rigid body identifier
 		public Guid Id;
 
-		/// Unity rigid body 
-		public Godot.RigidBody RigidBody;
+		/// Unity rigid body
+		public Godot.RigidDynamicBody3D RigidBody;
 
 		/// these 3 fields are used to store the actual velocities ,
 		/// IF this body is owned then here we store the transform that last time was sent
@@ -93,7 +93,7 @@ namespace MixedRealityExtension.Core
 
 		#region Rigid Body Management
 
-		public void addRigidBody(Guid id, Godot.RigidBody rigidbody, Guid source, bool isKinematic)
+		public void addRigidBody(Guid id, Godot.RigidDynamicBody3D rigidbody, Guid source, bool isKinematic)
 		{
 			Debug.Assert(!_rigidBodies.ContainsKey(id), "PhysicsBridge already has an entry for rigid body with specified ID.");
 
@@ -107,17 +107,17 @@ namespace MixedRealityExtension.Core
 			{
 				rb.IsKeyframed = isKinematic;
 				if (isKinematic)
-					rigidbody.Mode = Godot.RigidBody.ModeEnum.Kinematic;
+					rigidbody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
 			}
 			else
 			{
-				rigidbody.Mode = Godot.RigidBody.ModeEnum.Kinematic;
+				rigidbody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
 
-				_snapshotManager.RegisterOrUpateRigidBody(id, source);
+				_snapshotManager.RegisterOrUpateRigidDynamicBody3D(id, source);
 			}
 		}
 
-		public void removeRigidBody(Guid id)
+		public void removeRigidDynamicBody3D(Guid id)
 		{
 			if (!_rigidBodies.ContainsKey(id))
 			{
@@ -128,13 +128,13 @@ namespace MixedRealityExtension.Core
 
 			if (!rb.Ownership)
 			{
-				_snapshotManager.UnregisterRigidBody(id);
+				_snapshotManager.UnregisterRigidDynamicBody3D(id);
 			}
 
 			_rigidBodies.Remove(id);
 		}
 
-		public void setRigidBodyOwnership(Guid id, Guid sourceId, bool isKinematic)
+		public void setRigidDynamicBody3DOwnership(Guid id, Guid sourceId, bool isKinematic)
 		{
 			if (!_rigidBodies.ContainsKey(id))
 			{
@@ -149,13 +149,13 @@ namespace MixedRealityExtension.Core
 			{
 				_rigidBodies[id].IsKeyframed = isKinematic;
 				if (isKinematic)
-					_rigidBodies[id].RigidBody.Mode = Godot.RigidBody.ModeEnum.Kinematic;
+					_rigidBodies[id].RigidBody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
 
-				_snapshotManager.UnregisterRigidBody(id);
+				_snapshotManager.UnregisterRigidDynamicBody3D(id);
 			}
 			else
 			{
-				_snapshotManager.RegisterOrUpateRigidBody(id, sourceId);
+				_snapshotManager.RegisterOrUpateRigidDynamicBody3D(id, sourceId);
 			}
 
 			_rigidBodies[id].Ownership = isLocalSumulationAuthoritative;
@@ -189,13 +189,13 @@ namespace MixedRealityExtension.Core
 
 		#endregion
 
-		public void FixedUpdate(Spatial root)
+		public void FixedUpdate(Node3D root)
 		{
 			// - physics rigid body management
 			// -set transforms/velocities for key framed bodies
 
 			// get all the prediction time infos in this struct
-			PredictionTimeParameters timeInfo = new PredictionTimeParameters(1f / Engine.IterationsPerSecond);
+			PredictionTimeParameters timeInfo = new PredictionTimeParameters(1f / Engine.TargetFps);
 
 			// start the predictor
 			_predictor.StartBodyPredicitonForNextFrame();
@@ -212,13 +212,13 @@ namespace MixedRealityExtension.Core
 				{
 					if (rb.IsKeyframed)
 					{
-						if (rb.RigidBody.Mode != Godot.RigidBody.ModeEnum.Kinematic)
-							rb.RigidBody.Mode = Godot.RigidBody.ModeEnum.Kinematic;
+						if (rb.RigidBody.FreezeMode != Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic)
+							rb.RigidBody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
 					}
 					else
 					{
-						if (rb.RigidBody.Mode != Godot.RigidBody.ModeEnum.Rigid)
-							rb.RigidBody.Mode = Godot.RigidBody.ModeEnum.Rigid;
+						// if (rb.RigidBody.FreezeMode != Godot.RigidDynamicBody3D.FreezeModeEnum.Rigid)
+						// 	rb.RigidBody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
 					}
 					continue;
 				}
@@ -235,7 +235,7 @@ namespace MixedRealityExtension.Core
 					// todo: kick-in prediction if we are missing an update for this rigid body
 					//if (!snapshot.RigidBodies.Values[index].HasUpdate)
 					//{
-					//	rb.RigidBody.isKinematic = false;
+					//	rb.RigidDynamicBody3D.isKinematic = false;
 					//	continue;
 					//}
 
@@ -244,7 +244,7 @@ namespace MixedRealityExtension.Core
 
 					// get the key framed stream, and compute implicit velocities
 					Godot.Vector3 keyFramedPos = root.ToGlobal(transform.Position);
-					Godot.Quat keyFramedOrientation = root.GlobalTransform.basis.Quat() * transform.Rotation;
+					Godot.Quaternion keyFramedOrientation = root.GlobalTransform.basis.GetRotationQuaternion() * transform.Rotation;
 					Godot.Vector3 JBLinearVelocity =
 						root.GlobalTransform.basis.Xform(snapshot.RigidBodies.Values[index].LinearVelocity);
 					Godot.Vector3 JBAngularVelocity =
@@ -252,7 +252,7 @@ namespace MixedRealityExtension.Core
 					// if there is a really new update then also store the implicit velocity
 					if (rb.lastTimeKeyFramedUpdate < timeOfSnapshot)
 					{
-						// we moved the velocity estimation into the jitter buffer 
+						// we moved the velocity estimation into the jitter buffer
 						rb.lastValidLinerVelocityOrPos = JBLinearVelocity;
 						rb.lastValidAngularVelocityorAng = JBAngularVelocity;
 
@@ -297,9 +297,9 @@ namespace MixedRealityExtension.Core
 								+ " time:" + timeOfSnapshot + " newp:" + keyFramedPos
 								+ " newR:" + keyFramedOrientation
 								+ " oldP:" + rb.RigidBody.GlobalTransform.origin
-								+ " oldR:" + rb.RigidBody.GlobalTransform.basis.RotationQuat()
+								+ " oldR:" + rb.RigidBody.GlobalTransform.basis.GetRotationQuaternion()
 								+ " OriginalRot:" + transform.Rotation
-								//+ " keyF:" + rb.RigidBody.isKinematic
+								//+ " keyF:" + rb.RigidDynamicBody3D.isKinematic
 								+ " KF:" + rb.IsKeyframed);
 						}
 #endif
@@ -322,9 +322,9 @@ namespace MixedRealityExtension.Core
 							+ " newR:" + keyFramedOrientation
 							+ " incUpdateDt:" + timeInfo.DT
 							+ " oldP:" + rb.RigidBody.GlobalTransform.origin
-							+ " oldR:" + rb.RigidBody.GlobalTransform.basis.RotationQuat()
+							+ " oldR:" + rb.RigidBody.GlobalTransform.basis.GetRotationQuaternion()
 							+ " OriginalRot:" + transform.Rotation
-							//+ " keyF:" + rb.RigidBody.isKinematic
+							//+ " keyF:" + rb.RigidDynamicBody3D.isKinematic
 							+ " KF:" + rb.IsKeyframed);
 #endif
 					}
@@ -333,11 +333,11 @@ namespace MixedRealityExtension.Core
 					rb.IsKeyframed = (snapshot.RigidBodies.Values[index].motionType == Patching.Types.MotionType.Keyframed);
 
 					// code to disable prediction and to use just key framing (and comment out the prediction)
-					//rb.RigidBody.isKinematic = true;
-					//rb.RigidBody.transform.position = keyFramedPos;
-					//rb.RigidBody.transform.rotation = keyFramedOrientation;
-					//rb.RigidBody.velocity.Set(0.0f, 0.0f, 0.0f);
-					//rb.RigidBody.angularVelocity.Set(0.0f, 0.0f, 0.0f);
+					//rb.RigidDynamicBody3D.isKinematic = true;
+					//rb.RigidDynamicBody3D.transform.position = keyFramedPos;
+					//rb.RigidDynamicBody3D.transform.rotation = keyFramedOrientation;
+					//rb.RigidDynamicBody3D.velocity.Set(0.0f, 0.0f, 0.0f);
+					//rb.RigidDynamicBody3D.angularVelocity.Set(0.0f, 0.0f, 0.0f);
 
 					// call the predictor with this remotely owned body
 					_predictor.AddAndProcessRemoteBodyForPrediction(rb, transform,
@@ -355,11 +355,11 @@ namespace MixedRealityExtension.Core
 		/// <param name="time">Snapshot timestamp.</param>
 		/// <param name="root">Root Scene.</param>
 		/// <returns>Generated snapshot.</returns>
-		public Snapshot GenerateSnapshot(float time, Spatial root)
+		public Snapshot GenerateSnapshot(float time, Node3D root)
 		{
 			// collect transforms from owned rigid bodies
 			// and generate update packet/snapshot
-			
+
 			// these constants define when a body is considered to be sleeping
 			const float globalToleranceMultipier = 1.0F;
 			const float maxSleepingSqrtLinearVelocity = 0.1F * globalToleranceMultipier;
@@ -386,7 +386,7 @@ namespace MixedRealityExtension.Core
 				RigidBodyTransform transform;
 				{
 					transform.Position = root.ToLocal(rb.RigidBody.GlobalTransform.origin);
-					transform.Rotation = (root.GlobalTransform.basis.Inverse() * rb.RigidBody.GlobalTransform.basis).Quat();
+					transform.Rotation = (root.GlobalTransform.basis.Inverse() * rb.RigidBody.GlobalTransform.basis).GetRotationQuaternion();
 				}
 
 				numOwnedBodies++;
@@ -417,7 +417,7 @@ namespace MixedRealityExtension.Core
 				// this is the real condition to put a body to sleep
 				bool isBodySleeping = (rb.numOfConsequentSleepingFrames > numConsecutiveSleepingTrueConditionForNoUpdate);
 
-				// test if this is sleeping, and when this was newly added then 
+				// test if this is sleeping, and when this was newly added then
 				if (rb.lastTimeKeyFramedUpdate > 0.001F && isBodySleeping &&
 					rb.sendMotionType == Patching.Types.MotionType.Sleeping &&
 					rb.numOfConsequentSleepingFrames < limitNoUpdateForSleepingBodies)
@@ -443,7 +443,7 @@ namespace MixedRealityExtension.Core
 				transforms.Add(new Snapshot.TransformInfo(rb.Id, transform, mType));
 #if MRE_PHYSICS_DEBUG
 				GD.Print(" SEND Remote body: " //+ rb.Id.ToString() + " OriginalRot:" + transform.Rotation
-					//+ " RigidBodyRot:" + rb.RigidBody.GlobalTransform.basis.RotationQuat()
+					//+ " RigidBodyRot:" + rb.RigidBody.GlobalTransform.basis.GetRotationQuaternion()
 					+ " lv:" + rb.RigidBody.LinearVelocity //+ " av:" + rb.RigidBody.AngularVelocity
 					+ " posDiff:" + posDiff/* + " rotDiff:" + rotDiff + " isKeyF:" + rb.IsKeyframed*/);
 #endif
@@ -511,9 +511,9 @@ namespace MixedRealityExtension.Core
 						//update.localTransforms.Position = actor.transform.position;
 						var update = new PhysicsTranformServerUploadPatch.OneActorUpdate(
 							actor.Id,
-							actor.GlobalTransform.origin, actor.GlobalTransform.basis.Quat(),
+							actor.GlobalTransform.origin, actor.GlobalTransform.basis.GetRotationQuaternion(),
 							actor.App.SceneRoot.ToLocal(actor.GlobalTransform.origin),
-							(actor.App.SceneRoot.GlobalTransform.basis.Inverse() * actor.GlobalTransform.basis).Quat()
+							(actor.App.SceneRoot.GlobalTransform.basis.Inverse() * actor.GlobalTransform.basis).GetRotationQuaternion()
 							);
 
 						// todo see if we sent this update already

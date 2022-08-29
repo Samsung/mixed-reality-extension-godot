@@ -1,13 +1,13 @@
 using Godot;
 
-public class Joystick2D : TouchScreenButton
+public partial class Joystick2D : TouchScreenButton
 {
     private Vector2 playerDirection;
     private Vector2 joystickCenter;
 
     public float Speed { get; set; } = 0.07f;
 
-    public Camera MainCamera { get; set; }
+    public Camera3D MainCamera { get; set; }
 
     public override void _Ready()
     {
@@ -34,14 +34,14 @@ public class Joystick2D : TouchScreenButton
         if (touchPosition != null)
         {
             playerDirection = ((Vector2)touchPosition - joystickCenter).Normalized();
-            GetTree().SetInputAsHandled();
+            GetTree().Root.SetInputAsHandled();
         }
     }
 
     public override void _Process(float delta)
     {
         var d = playerDirection * Speed;
-        MainCamera.Translation += MainCamera.Transform.basis.x * d.x;
-        MainCamera.Translation += MainCamera.Transform.basis.z * d.y;
+        MainCamera.Position += MainCamera.Transform.basis.x * d.x;
+        MainCamera.Position += MainCamera.Transform.basis.z * d.y;
     }
 }

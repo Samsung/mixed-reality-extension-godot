@@ -89,18 +89,29 @@ namespace MixedRealityExtension.Animation
 		{
 			get
 			{
-				return animation.Loop ? MWAnimationWrapMode.Loop : MWAnimationWrapMode.Once;
+				switch (animation.LoopMode)
+				{
+					case Godot.Animation.LoopModeEnum.None:
+						return MWAnimationWrapMode.Once;
+					case Godot.Animation.LoopModeEnum.Linear:
+						return MWAnimationWrapMode.Loop;
+					case Godot.Animation.LoopModeEnum.Pingpong:
+						return MWAnimationWrapMode.PingPong;
+				}
+				return MWAnimationWrapMode.Once;
 			}
 			protected set
 			{
 				switch (value)
 				{
 					case MWAnimationWrapMode.Loop:
+						animation.LoopMode = Godot.Animation.LoopModeEnum.Linear;
+						break;
 					case MWAnimationWrapMode.PingPong:
-						animation.Loop = true;
+						animation.LoopMode = Godot.Animation.LoopModeEnum.Pingpong;
 						break;
 					default:
-						animation.Loop = false;
+						animation.LoopMode = Godot.Animation.LoopModeEnum.None;
 						break;
 				}
 			}
@@ -129,13 +140,13 @@ namespace MixedRealityExtension.Animation
 			return patch;
 		}
 
-		private class NativeAnimationHelper : Spatial
+		private class NativeAnimationHelper : Node3D
 		{
 			public NativeAnimation Animation;
 
 			public override void _Ready()
 			{
-				Animation.animationPlayer.Connect("animation_finished", this, nameof(AnimationEndReached));
+				Animation.animationPlayer.Connect("animation_finished", new Callable(this, nameof(AnimationEndReached)));
 			}
 
 			private void AnimationEndReached(string animationString)

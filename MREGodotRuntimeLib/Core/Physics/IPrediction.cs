@@ -17,12 +17,12 @@ namespace MixedRealityExtension.Core.Physics
 
 		/// current time step of the frame
 		public float DT = 0.0f;
-		/// half of the time step for time tolerance 
+		/// half of the time step for time tolerance
 		public float halfDT = 0.0f;
 		/// to avoid divisions the inverse of the delta time of this frame
 		public float invDT = 0.0f;
 		/// method to set all the fields from DT;
-		/// <param name="timeStep"> time step of the current frame </param> 
+		/// <param name="timeStep"> time step of the current frame </param>
 		public void setFromDT(float timeStep)
 		{
 			DT = timeStep;
@@ -31,7 +31,7 @@ namespace MixedRealityExtension.Core.Physics
 		}
 	}
 
-	/// general interface to predict the remote bodies over multiple frames 
+	/// general interface to predict the remote bodies over multiple frames
 	public interface IPrediction
 	{
 		/// this signals to the interface that we will now start streaming into the prediction
@@ -42,7 +42,7 @@ namespace MixedRealityExtension.Core.Physics
 		/// predicted remote bodies for one frame
 		void AddAndProcessRemoteBodyForPrediction(RigidBodyPhysicsBridgeInfo rb,
 			RigidBodyTransform transform, Godot.Vector3 keyFramedPos,
-			Godot.Quat keyFramedOrientation, float timeOfSnapshot,
+			Godot.Quaternion keyFramedOrientation, float timeOfSnapshot,
 			PredictionTimeParameters timeInfo);
 
 		/// In the last step within the frame the owned bodies are added to the prediction

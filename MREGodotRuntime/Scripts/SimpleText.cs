@@ -6,18 +6,15 @@ using MixedRealityExtension.Patching.Types;
 using System.Collections.Generic;
 using Godot;
 
-public class SimpleText : MeshInstance, IText
+public partial class SimpleText : Label3D, IText
 {
-	private readonly QuadMesh textMesh;
-	private readonly RichTextLabel label;
-	private readonly DynamicFont dynamicFont;
-	private readonly Viewport textViewport;
-
-	private string plainContents;
 	private float height;
 	private TextAnchorLocation anchor;
-	private TextJustify justify;
-	private static Shader TextShader = ResourceLoader.Load<Shader>("res://MREGodotRuntime/Shaders/MRESimpleTextShader.shader");
+	private TextJustify? justify;
+	private bool PendingUpdate;
+	private Callable callable;
+	private static readonly Shader TextShader = ResourceLoader.Load<Shader>("res://MREGodotRuntime/Shaders/MRESimpleTextShader.gdshader");
+	private static readonly Font TextFont = ResourceLoader.Load<Font>("MREGodotRuntime/Scripts/Fonts/NanumSquareRound/NanumSquareRoundR.ttf");
 
 	/// <inheritdoc />
 	public bool Enabled
@@ -29,16 +26,8 @@ public class SimpleText : MeshInstance, IText
 	/// <inheritdoc />
 	public string Contents
 	{
-		get { return plainContents; }
-		set
-		{
-			if (label.Text == value)
-				return;
-
-			label.Text = value;
-			plainContents = value;
-			resizeContainer();
-		}
+		get => Text;
+		set => Text = value;
 	}
 
 	/// <inheritdoc />
@@ -51,7 +40,7 @@ public class SimpleText : MeshInstance, IText
 				return;
 
 			height = value;
-			resizeContainer();
+			Scale = Vector3.One * height;
 		}
 	}
 
@@ -59,17 +48,17 @@ public class SimpleText : MeshInstance, IText
 	/// <inheritdoc />
 	public float PixelsPerLine { get; private set; }
 
-	private static readonly Dictionary<TextAnchorLocation, Vector3> Pivot = new Dictionary<TextAnchorLocation, Vector3>
+	private static readonly Dictionary<TextAnchorLocation, (VerticalAlignment, HorizontalAlignment)> Pivot = new Dictionary<TextAnchorLocation, (VerticalAlignment, HorizontalAlignment)>
 	{
-		{ TextAnchorLocation.TopLeft, new Vector3(1, -1, 0)},
-		{ TextAnchorLocation.TopCenter, new Vector3(0, -1, 0) },
-		{ TextAnchorLocation.TopRight, new Vector3(-1, -1, 0) },
-		{ TextAnchorLocation.MiddleLeft, new Vector3(1, 0, 0) },
-		{ TextAnchorLocation.MiddleCenter, new Vector3(0, 0, 0) },
-		{ TextAnchorLocation.MiddleRight, new Vector3(-1, 0, 0) },
-		{ TextAnchorLocation.BottomLeft, new Vector3(1, 1, 0) },
-		{ TextAnchorLocation.BottomCenter, new Vector3(0, 1, 0) },
-		{ TextAnchorLocation.BottomRight, new Vector3(-1, 1, 0) }
+		{ TextAnchorLocation.TopLeft, (VerticalAlignment.Top, HorizontalAlignment.Left) },
+		{ TextAnchorLocation.TopCenter, (VerticalAlignment.Top, HorizontalAlignment.Center) },
+		{ TextAnchorLocation.TopRight, (VerticalAlignment.Top, HorizontalAlignment.Right) },
+		{ TextAnchorLocation.MiddleLeft, (VerticalAlignment.Center, HorizontalAlignment.Left) },
+		{ TextAnchorLocation.MiddleCenter, (VerticalAlignment.Center, HorizontalAlignment.Center) },
+		{ TextAnchorLocation.MiddleRight, (VerticalAlignment.Center, HorizontalAlignment.Right) },
+		{ TextAnchorLocation.BottomLeft, (VerticalAlignment.Bottom, HorizontalAlignment.Left) },
+		{ TextAnchorLocation.BottomCenter, (VerticalAlignment.Bottom, HorizontalAlignment.Center) },
+		{ TextAnchorLocation.BottomRight, (VerticalAlignment.Bottom, HorizontalAlignment.Right) }
 	};
 
 	/// <inheritdoc />
@@ -82,38 +71,24 @@ public class SimpleText : MeshInstance, IText
 				return;
 
 			anchor = value;
-			resizeContainer();
+			VerticalAlignment = Pivot[anchor].Item1;
+			HorizontalAlignment = Pivot[anchor].Item2;
 		}
 	}
 
 	/// <inheritdoc />
 	public TextJustify Justify
 	{
-		get => justify;
+		get => justify ?? TextJustify.Center;
 		private set
 		{
-			switch (value)
-			{
-				case TextJustify.Left:
-					label.BbcodeEnabled = false;
-					label.Text = plainContents;
-					break;
-				case TextJustify.Center:
-					label.BbcodeText = $"[center]{plainContents}[/center]";
-					label.BbcodeEnabled = true;
-
-					break;
-				case TextJustify.Right:
-					label.BbcodeText = $"[right]{plainContents}[/right]";
-					label.BbcodeEnabled = true;
-					break;
-			}
+			justify = value;
 		}
 	}
 
 	//FIXME
 	/// <inheritdoc />
-	public FontFamily Font
+	public new FontFamily Font
 	{
 		get;
 		private set;
@@ -123,7 +98,7 @@ public class SimpleText : MeshInstance, IText
 	public MWColor Color
 	{
 		get {
-			var color = label.GetColor("default_color");
+			var color = Modulate;
 			return new MWColor(
 				color.r,
 				color.g,
@@ -131,50 +106,30 @@ public class SimpleText : MeshInstance, IText
 				color.a);
 		}
 		private set {
-			label.AddColorOverride("default_color", new Color(value.R, value.G, value.B, value.A));
+			Modulate = new Color(
+				value.R,
+				value.G,
+				value.B,
+				value.A
+			);
+			UpdateDeferred();
 		}
 	}
 
 	public override void _Ready()
 	{
-		Mesh = textMesh;
+		callable = new Callable(this, nameof(OnSimpleTextProcessFrame));
+		((Label3D)this).Font = TextFont;
+		PixelSize = 0.004f;
+		FontSize = 160;
+		TextureFilter = BaseMaterial3D.TextureFilterEnum.LinearWithMipmapsAnisotropic;
+		Name = "SimpleText";
 
-		label.AddFontOverride("normal_font", dynamicFont);
-
-		textViewport.CallDeferred("add_child", label);
-		CallDeferred("add_child", textViewport);
-
-		var viewportTexture = textViewport.GetTexture();
-		viewportTexture.Flags |= (uint)Texture.FlagsEnum.Filter;
-
-		var textMeshMaterial = new ShaderMaterial()
-		{
-			Shader = TextShader,
-
-		};
-		textMeshMaterial.SetShaderParam("texture_albedo", viewportTexture);
-
-		Mesh.SurfaceSetMaterial(0, textMeshMaterial);
+		UpdateDeferred();
 	}
 
 	public SimpleText()
 	{
-		textMesh = new QuadMesh();
-
-		textViewport = new Viewport() {
-			Size = new Vector2(500, 500),
-			TransparentBg = true,
-			RenderTargetVFlip = true,
-		};
-
-		label = new RichTextLabel();
-		label.ScrollActive = false;
-		dynamicFont = new DynamicFont()
-		{
-			FontData = ResourceLoader.Load<DynamicFontData>("MREGodotRuntime/Scripts/Fonts/NanumSquareRound/NanumSquareRoundR.ttf"),
-			Size = 400
-		};
-
 		// set defaults
 		Enabled = true;
 		Contents = "";
@@ -185,7 +140,7 @@ public class SimpleText : MeshInstance, IText
 		Font = FontFamily.SansSerif;
 	}
 
-	public SimpleText(Spatial parent) : this()
+	public SimpleText(Node3D parent) : this()
 	{
 		parent?.CallDeferred("add_child", this);
 	}
@@ -207,21 +162,39 @@ public class SimpleText : MeshInstance, IText
 		ApplyPatch(patch);
 	}
 
-	private void resizeContainer()
+	private void UpdateDeferred()
 	{
-		float width = 0f;
-		var lines = label.Text.Split('\n');
-		foreach (var line in lines)
-		{
-			var stringSize = dynamicFont.GetStringSize(line).x;
-			if (width < stringSize)
-				width = stringSize;
+		if (PendingUpdate || !IsInsideTree()) {
+			return;
 		}
 
-		label.RectSize = new Vector2(width, lines.Length * dynamicFont.GetHeight());
-		textViewport.Size = label.RectSize;
-		textMesh.Size = new Vector2(label.RectSize.x / 428.84f, lines.Length) * Height;
+		PendingUpdate = true;
 
-		Translation = Pivot[Anchor] * Scale * new Vector3(textMesh.Size.x, textMesh.Size.y, 0) / 2;
+		GetTree().Connect("process_frame", callable);
+	}
+
+	private void OnSimpleTextProcessFrame()
+	{
+		GetTree().Disconnect("process_frame", callable);
+
+		UpdateLabelTexture();
+		PendingUpdate = false;
+	}
+
+	private void UpdateLabelTexture()
+	{
+		var surfaceCount = RenderingServer.MeshGetSurfaceCount(GetBase());
+		for (int i = 0; i < surfaceCount; i++)
+		{
+			var labelMaterial = RenderingServer.MeshSurfaceGetMaterial(GetBase(), i);
+			var labelTexture = RenderingServer.MaterialGetParam(labelMaterial, "texture_albedo") as RID;
+
+			var material = RenderingServer.MaterialCreate();
+			RenderingServer.MaterialSetShader(material, TextShader.GetRid());
+
+			RenderingServer.MaterialSetParam(material, "texture_albedo", labelTexture);
+			RenderingServer.MaterialSetParam(material, "albedo", Modulate);
+			RenderingServer.MeshSurfaceSetMaterial(GetBase(), i, material);
+		}
 	}
 }

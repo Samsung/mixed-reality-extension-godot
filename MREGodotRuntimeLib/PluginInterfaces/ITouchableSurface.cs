@@ -20,6 +20,6 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// <summary>
 		/// local center and local forward are adjusted to match a this collision shape.
 		/// </summary>
-		CollisionShape TouchableBoxShape { get; set; }
+		CollisionShape3D TouchableBoxShape { get; set; }
 	}
 }

@@ -11,16 +11,16 @@ namespace MixedRealityExtension.Util
 	/// </summary>
 	public class TransformLerper
 	{
-		private readonly Spatial _spatial;
+		private readonly Node3D _spatial;
 
 		private Vector3 _targetPosition;
-		private Quat _targetRotation;
+		private Quaternion _targetRotation;
 
 		private bool _lerpingPosition = false;
 		private bool _lerpingRotation = false;
 
 		private Vector3 _startPosition;
-		private Quat _startRotation;
+		private Quaternion _startRotation;
 
 		private float _startTime;
 		private float _updatePeriod;
@@ -36,7 +36,7 @@ namespace MixedRealityExtension.Util
 		/// Initializes and instance of class <see cref="TransformLerper"/>
 		/// </summary>
 		/// <param name="spatial"></param>
-		public TransformLerper(Spatial spatial)
+		public TransformLerper(Node3D spatial)
 		{
 			this._spatial = spatial;
 		}
@@ -48,7 +48,7 @@ namespace MixedRealityExtension.Util
 		/// <param name="rotation">The optional new rotation.</param>
 		/// <param name="updatePeriod">the expected amount time in seconds, between updates. This is the
 		/// time the lerper will take, starting from now, to reach the target position/rotation.</param>
-		public void SetTarget(Vector3? position, Quat? rotation, float updatePeriod = 0)
+		public void SetTarget(Vector3? position, Quaternion? rotation, float updatePeriod = 0)
 		{
 			bool canLerp = _spatial != null && (position != null || rotation != null);
 			_percentComplete = canLerp ? 0f : 1f;
@@ -57,7 +57,7 @@ namespace MixedRealityExtension.Util
 				return;
 			}
 
-			_startTime = OS.GetTicksMsec();
+			_startTime = Time.GetTicksMsec();
 			updatePeriod *= 1000f;
 			this._updatePeriod = updatePeriod > 0 ? updatePeriod : DefaultUpdatePeriod;
 
@@ -75,7 +75,7 @@ namespace MixedRealityExtension.Util
 			if (rotation.HasValue)
 			{
 				_targetRotation = rotation.Value;
-				_startRotation = _spatial.GlobalTransform.basis.RotationQuat();
+				_startRotation = _spatial.GlobalTransform.basis.GetRotationQuaternion();
 				_lerpingRotation = true;
 			}
 			else
@@ -100,14 +100,14 @@ namespace MixedRealityExtension.Util
 		{
 			if (_percentComplete < 1f)
 			{
-				_percentComplete = Mathf.Clamp((OS.GetTicksMsec() - _startTime) / _updatePeriod, 0f, 1f);
+				_percentComplete = Mathf.Clamp((Time.GetTicksMsec() - _startTime) / _updatePeriod, 0f, 1f);
 
 				Vector3 origin = Vector3.Zero;
 				Basis basis = _spatial.GlobalTransform.basis;
 
 				if (_lerpingPosition)
 				{
-					origin = _startPosition.LinearInterpolate(_targetPosition, _percentComplete);
+					origin = _startPosition.Lerp(_targetPosition, _percentComplete);
 				}
 
 				if (_lerpingRotation)
@@ -115,7 +115,7 @@ namespace MixedRealityExtension.Util
 					basis = new Basis(_startRotation.Slerpni(_targetRotation, _percentComplete));
 					basis.Scale = _spatial.GlobalTransform.basis.Scale;
 				}
-				_spatial.GlobalTransform = new Transform(basis, origin);
+				_spatial.GlobalTransform = new Transform3D(basis, origin);
 			}
 		}
 	}

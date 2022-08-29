@@ -20,21 +20,21 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// Apply a layer to a collision.
 		/// </summary>
 		/// <param name="layer">An MRE collision layer</param>
-		/// <param name="area">A Godot Area</param>
-		void ApplyLayerToCollider(CollisionLayer? layer, Area area);
+		/// <param name="area">A Godot Area3D</param>
+		void ApplyLayerToCollider(CollisionLayer? layer, Area3D area);
 
 		/// <summary>
 		/// Apply a layer to a collision.
 		/// </summary>
 		/// <param name="layer">An MRE collision layer</param>
-		/// <param name="physicsBody">A Godot PhysicsBody</param>
-		void ApplyLayerToCollider(CollisionLayer? layer, PhysicsBody physicsBody);
+		/// <param name="physicsBody">A Godot PhysicsBody3D</param>
+		void ApplyLayerToCollider(CollisionLayer? layer, PhysicsBody3D physicsBody);
 
 		/// <summary>
 		/// Get a collision's layer.
 		/// </summary>
 		/// <param name="area">The area.</param>
 		/// <returns>The layer the given collision is on.</returns>
-		CollisionLayer DetermineLayerOfCollider(Area area);
+		CollisionLayer DetermineLayerOfCollider(Area3D area);
 	}
 }

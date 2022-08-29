@@ -8,16 +8,16 @@ using MixedRealityExtension.PluginInterfaces;
 
 public class ResourceFactory : ILibraryResourceFactory
 {
-	public Task<Spatial> CreateFromLibrary(string resourceId, Spatial parent)
+	public Task<Node3D> CreateFromLibrary(string resourceId, Node3D parent)
 	{
 		//not support
-		//var prefab = Resources.Load<Spatial>($"Library/{resourceId}");
-		Spatial prefab = null;
+		//var prefab = Resources.Load<Node3D>($"Library/{resourceId}");
+		Node3D prefab = null;
 		if (prefab == null)
 		{
-			return Task.FromException<Spatial>(new ArgumentException($"Resource with ID {resourceId} not found"));
+			return Task.FromException<Node3D>(new ArgumentException($"Resource with ID {resourceId} not found"));
 		}
 
-		return Task.FromResult<Spatial>((Spatial)prefab.Duplicate());
+		return Task.FromResult<Node3D>((Node3D)prefab.Duplicate());
 	}
 }

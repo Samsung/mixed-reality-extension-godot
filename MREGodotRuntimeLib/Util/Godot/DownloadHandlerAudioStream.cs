@@ -41,7 +41,10 @@ namespace MixedRealityExtension.Util.GodotHelper
         private void ToOgg(MemoryStream stream)
         {
             var audioStream = new AudioStreamOGGVorbis();
-            audioStream.Data = stream.ToArray();
+            audioStream.PacketSequence = new OGGPacketSequence()
+            {
+                PacketData = new Godot.Collections.Array(stream.ToArray())
+            };
             AudioStream = audioStream;
         }
 
@@ -77,7 +80,7 @@ namespace MixedRealityExtension.Util.GodotHelper
                     byte[] chunkID = new byte[4];
                     reader.Read(chunkID, 0, 4);
                     var chunkSize = reader.ReadInt32();
-                    
+
                     /* Check format */
                     if (chunkID[0] == 'f' && chunkID[1] == 'm' && chunkID[2] == 't' && chunkID[3] == ' ' && !formatFound)
                     {

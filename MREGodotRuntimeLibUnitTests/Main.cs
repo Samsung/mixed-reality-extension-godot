@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace MREGodotRuntimeLib.Core.UnitTest
 {
-	public class Main : Spatial
+	public class Main : Node3D
 	{
 		public override void _Ready()
 		{

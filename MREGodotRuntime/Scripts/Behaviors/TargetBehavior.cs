@@ -8,7 +8,7 @@ using System;
 
 namespace Assets.Scripts.Behaviors
 {
-	public class TargetBehavior : BehaviorBase, ITargetBehavior
+	public partial class TargetBehavior : BehaviorBase, ITargetBehavior
 	{
 		protected TargetBehaviorContext _context;
 

@@ -7,7 +7,7 @@ using System;
 
 namespace Assets.Scripts.Behaviors
 {
-	public class ButtonBehavior : TargetBehavior, IButtonBehavior
+	public partial class ButtonBehavior : TargetBehavior, IButtonBehavior
 	{
 		public new ButtonBehaviorContext Context => _context as ButtonBehaviorContext;
 

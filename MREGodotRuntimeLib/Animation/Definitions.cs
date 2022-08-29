@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Linq;
 using CubicBezier = MixedRealityExtension.Util.CubicBezier;
 
 namespace MixedRealityExtension.Animation
@@ -10,7 +9,7 @@ namespace MixedRealityExtension.Animation
 	/// <summary>
 	/// Keyframe data for an animation (cacheable version)
 	/// </summary>
-	public class AnimationDataCached : Godot.Resource
+	public partial class AnimationDataCached : Godot.Resource
 	{
 		/// <summary>
 		/// The animation keyframe data

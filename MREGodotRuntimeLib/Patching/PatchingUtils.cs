@@ -7,7 +7,7 @@ using System;
 
 using MRECollisionDetectionMode = MixedRealityExtension.Core.Interfaces.CollisionDetectionMode;
 using MRELightType = MixedRealityExtension.Core.Interfaces.LightType;
-using GodotLightType = Godot.VisualServer.LightType;
+using GodotLightType = Godot.RenderingServer.LightType;
 using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Patching
@@ -85,7 +85,7 @@ namespace MixedRealityExtension.Patching
 			}
 		}
 
-		public static QuaternionPatch GeneratePatch(MWQuaternion _old, Quat _new)
+		public static QuaternionPatch GeneratePatch(MWQuaternion _old, Quaternion _new)
 		{
 			if (_old == null && _new != null)
 			{
@@ -114,12 +114,12 @@ namespace MixedRealityExtension.Patching
 			}
 		}
 
-		public static TransformPatch GenerateAppTransformPatch(MWTransform _old, Spatial _new, Spatial appRoot)
+		public static TransformPatch GenerateAppTransformPatch(MWTransform _old, Node3D _new, Node3D appRoot)
 		{
 			var globalTransform = appRoot.GlobalTransform.AffineInverse() * _new.GlobalTransform;
 			var globalOrigin = globalTransform.origin;
 			globalOrigin.z *= -1;
-			var globalRotation = globalTransform.basis.RotationQuat();
+			var globalRotation = globalTransform.basis.GetRotationQuaternion();
 			globalRotation.x *= -1;
 			globalRotation.y *= -1;
 
@@ -132,11 +132,11 @@ namespace MixedRealityExtension.Patching
 			return transform.IsPatched() ? transform : null;
 		}
 
-		public static ScaledTransformPatch GenerateLocalTransformPatch(MWScaledTransform _old, Spatial _new)
+		public static ScaledTransformPatch GenerateLocalTransformPatch(MWScaledTransform _old, Node3D _new)
 		{
 			var position = _new.Transform.origin;
 			position.z *= -1;
-			var rotation = _new.Transform.basis.RotationQuat();
+			var rotation = _new.Transform.basis.GetRotationQuaternion();
 			rotation.x *= -1;
 			rotation.y *= -1;
 
@@ -180,8 +180,8 @@ namespace MixedRealityExtension.Patching
 			}
 		}
 
-		public static RigidBodyPatch GeneratePatch(MixedRealityExtension.Core.RigidBody _old, Godot.RigidBody _new,
-			Spatial sceneRoot, bool addVelocities)
+		public static RigidBodyPatch GeneratePatch(MixedRealityExtension.Core.RigidBody _old, Godot.RigidDynamicBody3D _new,
+			Node3D sceneRoot, bool addVelocities)
 		{
 			if (_old == null && _new != null)
 			{
@@ -210,7 +210,7 @@ namespace MixedRealityExtension.Patching
 						false => MRECollisionDetectionMode.Discrete
 					}),
 				ConstraintFlags = GeneratePatch(_old.ConstraintFlags, _new.GetMRERigidBodyConstraints()),
-				DetectCollisions = GeneratePatch(_old.DetectCollisions, !_new.GetChild<CollisionShape>()?.Disabled ?? false),
+				DetectCollisions = GeneratePatch(_old.DetectCollisions, !_new.GetChild<CollisionShape3D>()?.Disabled ?? false),
 				Mass = GeneratePatch(_old.Mass, _new.Mass),
 				UseGravity = GeneratePatch(_old.UseGravity, !Mathf.IsZeroApprox(_new.GravityScale)),
 			};
@@ -385,10 +385,10 @@ namespace MixedRealityExtension.Patching
 			return _this;
 		}
 
-		public static void ApplyLocalPatch(this Spatial _this, MWScaledTransform current, ScaledTransformPatch patch)
+		public static void ApplyLocalPatch(this Node3D _this, MWScaledTransform current, ScaledTransformPatch patch)
 		{
 			var localPosition = _this.Transform.origin;
-			var localRotation = _this.Transform.basis.RotationQuat();
+			var localRotation = _this.Transform.basis.GetRotationQuaternion();
 			var localScale = _this.Transform.basis.Scale;
 
 			if (patch.Position != null)
@@ -411,13 +411,13 @@ namespace MixedRealityExtension.Patching
 
 			var basis = new Basis(localRotation);
 			basis.Scale = localScale;
-			_this.Transform = new Transform(basis, localPosition);
+			_this.Transform = new Transform3D(basis, localPosition);
 		}
 
-		public static void ApplyAppPatch(this Spatial _this, Spatial appRoot, MWTransform current, TransformPatch patch)
+		public static void ApplyAppPatch(this Node3D _this, Node3D appRoot, MWTransform current, TransformPatch patch)
 		{
 			var globalPosition = _this.GlobalTransform.origin;
-			var globalRotation = _this.GlobalTransform.basis.RotationQuat();
+			var globalRotation = _this.GlobalTransform.basis.GetRotationQuaternion();
 			var globalScale = _this.GlobalTransform.basis.Scale;
 
 			if (patch.Position != null)
@@ -429,7 +429,7 @@ namespace MixedRealityExtension.Patching
 
 			if (patch.Rotation != null)
 			{
-				var appRotation = appRoot.GlobalTransform.basis.RotationQuat();
+				var appRotation = appRoot.GlobalTransform.basis.GetRotationQuaternion();
 				var currAppRotation = appRotation.Inverse() * globalRotation;
 				var newAppRotation = currAppRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
 				newAppRotation.x *= -1;
@@ -439,7 +439,7 @@ namespace MixedRealityExtension.Patching
 
 			var basis = new Basis(globalRotation);
 			basis.Scale = globalScale;
-			_this.GlobalTransform = new Transform(basis, globalPosition);
+			_this.GlobalTransform = new Transform3D(basis, globalPosition);
 		}
 
 		public static T GetPatchApplied<T>(this T _this, T value) where T : struct
@@ -480,7 +480,7 @@ namespace MixedRealityExtension.Patching
 			return _this;
 		}
 
-		public static Quat GetPatchApplied(this Quat _this, MWQuaternion quaternion)
+		public static Quaternion GetPatchApplied(this Quaternion _this, MWQuaternion quaternion)
 		{
 			_this.w = _this.w.GetPatchApplied(quaternion.W);
 			_this.x = _this.x.GetPatchApplied(quaternion.X);
@@ -500,7 +500,7 @@ namespace MixedRealityExtension.Patching
 			return _this;
 		}
 
-		public static GodotLightType GetPatchApplied(this VisualServer.LightType _this, MRELightType value)
+		public static GodotLightType GetPatchApplied(this RenderingServer.LightType _this, MRELightType value)
 		{
 			var lightType = (GodotLightType)Enum.Parse(typeof(GodotLightType), value.ToString());
 			if (!_this.Equals(lightType))

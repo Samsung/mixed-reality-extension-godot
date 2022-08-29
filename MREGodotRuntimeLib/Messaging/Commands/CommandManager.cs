@@ -101,7 +101,7 @@ namespace MixedRealityExtension.Messaging.Commands
 			// Periodically check for timed out completion callback invocations.
 			if (_pendingCompletionCallbacks.Count > 0)
 			{
-				var currTime = Godot.OS.GetTicksMsec();
+				var currTime = Godot.Time.GetTicksMsec();
 				if (_nextQueueCheckTime <= currTime)
 				{
 					while (_pendingCompletionCallbacks.Count > 0)
@@ -157,14 +157,14 @@ namespace MixedRealityExtension.Messaging.Commands
 			// If the queue was previously empty then schedule a time to check it later.
 			if (_pendingCompletionCallbacks.Count == 0)
 			{
-				_nextQueueCheckTime = Godot.OS.GetTicksMsec() + QueuedCompletionCallbackTimeout + 1000;
+				_nextQueueCheckTime = Godot.Time.GetTicksMsec() + QueuedCompletionCallbackTimeout + 1000;
 			}
 
 			var callback = new PendingCompletionCallback()
 			{
 				Invoked = false,
 				Location = location,
-				CreationTime = Godot.OS.GetTicksMsec()
+				CreationTime = Godot.Time.GetTicksMsec()
 			};
 
 			_pendingCompletionCallbacks.Add(callback);

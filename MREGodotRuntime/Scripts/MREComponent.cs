@@ -38,7 +38,7 @@ public class MRELogger : IMRELogger
 	}
 }
 
-public class MREComponent : Spatial
+public partial class MREComponent : Node3D
 {
 	public delegate void AppEventHandler(MREComponent app);
 
@@ -66,15 +66,13 @@ public class MREComponent : Spatial
 	//[SerializeField]
 	internal Permissions GrantedPermissions;
 
-	public Spatial SceneRoot;
+	public Node3D SceneRoot;
 
 	public Node PlaceholderObject;
 
 	public Node UserNode;
 
 	public IMixedRealityExtensionApp MREApp { get; private set; }
-
-	public DialogFactory DialogFactory;
 
 	public event AppEventHandler OnConnecting;
 
@@ -115,7 +113,6 @@ public class MREComponent : Spatial
 				textFactory: new SimpleTextFactory(),
 				permissionManager: new SimplePermissionManager(GrantedPermissions),
 				behaviorFactory: new BehaviorFactory(),
-				dialogFactory: DialogFactory,
 				libraryFactory: new ResourceFactory(),
 				//gltfImporterFactory: new VertexShadedGltfImporterFactory(),
 				//materialPatcher: new VertexMaterialPatcher(),
@@ -232,7 +229,7 @@ public class MREComponent : Spatial
 	{
 		if (PlaceholderObject != null)
 		{
-			PlaceholderObject.PauseMode = PauseModeEnum.Stop;
+			PlaceholderObject.ProcessMode = ProcessModeEnum.Disabled;
 		}
 
 		GD.Print("Connecting to MRE App.");
@@ -278,7 +275,7 @@ public class MREComponent : Spatial
 
 		if (PlaceholderObject != null)
 		{
-			PlaceholderObject.PauseMode = PauseModeEnum.Process;
+			PlaceholderObject.ProcessMode = ProcessModeEnum.Always;
 		}
 	}
 

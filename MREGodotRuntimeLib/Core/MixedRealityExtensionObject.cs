@@ -2,15 +2,12 @@
 // Licensed under the MIT License.
 using MixedRealityExtension.App;
 using MixedRealityExtension.Core.Interfaces;
-using MixedRealityExtension.Core.Types;
-using MixedRealityExtension.Patching;
-using MixedRealityExtension.Patching.Types;
 using System;
 using Godot;
 
 namespace MixedRealityExtension.Core
 {
-	internal abstract class MixedRealityExtensionObject : Spatial, IMixedRealityExtensionObject
+	internal abstract partial class MixedRealityExtensionObject : Node3D, IMixedRealityExtensionObject
 	{
 		/// <inheritdoc />
 		public Guid Id { get; private set; }
@@ -18,8 +15,11 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public Guid AppInstanceId => App.InstanceId;
 
+ 		/// <inheritdoc />
+		public virtual string Name => ((Node3D)this).Name;
+
 		/// <inheritdoc />
-		public Spatial Node3D => this;
+		public Node3D Node3D => this;
 
 		internal MixedRealityExtensionApp App { get; private set; }
 
@@ -48,7 +48,7 @@ namespace MixedRealityExtension.Core
 
 		protected virtual void OnAwake()
 		{
-			
+
 		}
 
 		protected virtual void OnDestroyed()

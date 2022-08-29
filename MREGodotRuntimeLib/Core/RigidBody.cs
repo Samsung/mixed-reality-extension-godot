@@ -10,15 +10,15 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-using GodotRigidBody = Godot.RigidBody;
+using GodotRigidBody = Godot.RigidDynamicBody3D;
 using MRECollisionDetectionMode = MixedRealityExtension.Core.Interfaces.CollisionDetectionMode;
 using MRERigidBodyConstraints = MixedRealityExtension.Core.Interfaces.RigidBodyConstraints;
 
 namespace MixedRealityExtension.Core
 {
-	internal class RigidBody : IRigidBody
+	internal class RigidBody : IRigidDynamicBody3D
 	{
-		private readonly Spatial _sceneRoot;
+		private readonly Node3D _sceneRoot;
 		private readonly GodotRigidBody _rigidbody;
 
 		private Queue<Action<GodotRigidBody>> _updateActions = new Queue<Action<GodotRigidBody>>();
@@ -47,7 +47,7 @@ namespace MixedRealityExtension.Core
 		/// <inheritdoc />
 		public MRERigidBodyConstraints ConstraintFlags { get; set; }
 
-		internal RigidBody(GodotRigidBody rigidbody, Spatial sceneRoot)
+		internal RigidBody(GodotRigidBody rigidbody, Node3D sceneRoot)
 		{
 			_sceneRoot = sceneRoot;
 			_rigidbody = rigidbody;
@@ -56,7 +56,7 @@ namespace MixedRealityExtension.Core
 		}
 /*FIXME
 		/// <inheritdoc />
-		public void RigidBodyMovePosition(MWVector3 position)
+		public void RigidDynamicBody3DMovePosition(MWVector3 position)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -66,7 +66,7 @@ namespace MixedRealityExtension.Core
 		}
 
 		/// <inheritdoc />
-		public void RigidBodyMoveRotation(MWQuaternion rotation)
+		public void RigidDynamicBody3DMoveRotation(MWQuaternion rotation)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -76,42 +76,42 @@ namespace MixedRealityExtension.Core
 		}
 */
 		/// <inheritdoc />
-		public void RigidBodyAddForce(MWVector3 force)
+		public void RigidDynamicBody3DAddForce(MWVector3 force)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddCentralForce(_sceneRoot.ToGlobal(force.ToVector3()));
+					rigidBody.ApplyCentralForce(_sceneRoot.ToGlobal(force.ToVector3()));
 				});
 		}
 
 		/// <inheritdoc />
-		public void RigidBodyAddForceAtPosition(MWVector3 force, MWVector3 position)
+		public void RigidDynamicBody3DAddForceAtPosition(MWVector3 force, MWVector3 position)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddForce(_sceneRoot.ToGlobal(position.ToVector3()), _sceneRoot.ToGlobal(force.ToVector3()));
+					rigidBody.ApplyImpulse(_sceneRoot.ToGlobal(position.ToVector3()), _sceneRoot.ToGlobal(force.ToVector3()));
 				});
 		}
 
 		/// <inheritdoc />
-		public void RigidBodyAddTorque(MWVector3 torque)
+		public void RigidDynamicBody3DAddTorque(MWVector3 torque)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddTorque(_sceneRoot.ToGlobal(torque.ToVector3()));
+					rigidBody.ApplyTorque(_sceneRoot.ToGlobal(torque.ToVector3()));
 				});
 		}
 
 		/// <inheritdoc />
-		public void RigidBodyAddRelativeTorque(MWVector3 relativeTorque)
+		public void RigidDynamicBody3DAddRelativeTorque(MWVector3 relativeTorque)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
 				{
-					rigidBody.AddTorque(_sceneRoot.ToGlobal(relativeTorque.ToVector3()));
+					rigidBody.ApplyTorque(_sceneRoot.ToGlobal(relativeTorque.ToVector3()));
 				});
 		}
 
@@ -142,7 +142,7 @@ namespace MixedRealityExtension.Core
 
 			// No need to read Position or Rotation. They're write-only from the patch to the component.
 			Mass = rigidbody.Mass;
-			DetectCollisions = !rigidbody.GetChild<CollisionShape>()?.Disabled ?? false;
+			DetectCollisions = !rigidbody.GetChild<CollisionShape3D>()?.Disabled ?? false;
 			CollisionDetectionMode = rigidbody.ContinuousCd switch
 			{
 				true => MRECollisionDetectionMode.Continuous,
@@ -178,7 +178,7 @@ namespace MixedRealityExtension.Core
 			}
 			if (patch.DetectCollisions.HasValue)
 			{
-				var collisionShape = _rigidbody.GetChild<CollisionShape>();
+				var collisionShape = _rigidbody.GetChild<CollisionShape3D>();
 				collisionShape.Disabled = collisionShape.Disabled.GetPatchApplied(!DetectCollisions.ApplyPatch(patch.DetectCollisions));
 			}
 			if (patch.CollisionDetectionMode.HasValue)
@@ -226,7 +226,7 @@ namespace MixedRealityExtension.Core
 			{
 				basis = new Basis(update.Rotation.Value);
 			}
-			_rigidbody.GlobalTransform = new Transform(basis, origin);
+			_rigidbody.GlobalTransform = new Transform3D(basis, origin);
 		}
 
 		internal void SynchronizeEngine(RigidBodyTransformUpdate update)
@@ -243,7 +243,7 @@ namespace MixedRealityExtension.Core
 		{
 			internal Vector3? Position { get; set; }
 
-			internal Quat? Rotation { get; set; }
+			internal Quaternion? Rotation { get; set; }
 		}
 	}
 }
