@@ -61,7 +61,7 @@ namespace MixedRealityExtension.Core
 		/// <summary>
 		/// Forward direction of the actor
 		/// </summary>
-		public Vector3 Forward => ParentActor.GlobalTransform.basis.Xform(LocalForward);
+		public Vector3 Forward => ParentActor.GlobalTransform.basis * LocalForward;
 
 		/// <summary>
 		/// Forward direction of the TouchablePlane, the press direction needs to face the

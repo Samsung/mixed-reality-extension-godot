@@ -53,12 +53,12 @@ namespace MixedRealityExtension.Core.Physics
 		{
 			public TransformInfo(Guid rigidBodyId, RigidBodyTransform transform, MotionType motionType)
 			{
-				RigidDynamicBody3DId = rigidBodyId;
+				RigidBody3DId = rigidBodyId;
 				Transform = transform;
 				MotionType = motionType;
 			}
 
-			public Guid RigidDynamicBody3DId { get; private set; }
+			public Guid RigidBody3DId { get; private set; }
 
 			/// <summary>
 			/// The type of the motion
@@ -104,11 +104,11 @@ namespace MixedRealityExtension.Core.Physics
 	/// </summary>
 	public class SnapshotBuffer
 	{
-		public class RigidDynamicBody3DData
+		public class RigidBody3DData
 		{
-			public RigidDynamicBody3DData(Guid id)
+			public RigidBody3DData(Guid id)
 			{
-				RigidDynamicBody3DId = id;
+				RigidBody3DId = id;
 				Time = float.MinValue;
 				SetZeroVelocities();
 			}
@@ -136,7 +136,7 @@ namespace MixedRealityExtension.Core.Physics
 				}
 			}
 
-			public Guid RigidDynamicBody3DId;
+			public Guid RigidBody3DId;
 
 			public float Time;
 
@@ -180,12 +180,12 @@ namespace MixedRealityExtension.Core.Physics
 		/// <summary>
 		/// Rigid body data sorted by rigid body id.
 		/// </summary>
-		private SortedList<Guid, RigidDynamicBody3DData> _rigidBodies = new SortedList<Guid, RigidDynamicBody3DData>();
+		private SortedList<Guid, RigidBody3DData> _rigidBodies = new SortedList<Guid, RigidBody3DData>();
 
 		/// <summary>
 		/// Pending rigid body add/remove actions since last step.
 		/// </summary>
-		private SortedList<Guid, Action> _pendingRigidDynamicBody3DManagementActions = new SortedList<Guid, Action>();
+		private SortedList<Guid, Action> _pendingRigidBody3DManagementActions = new SortedList<Guid, Action>();
 
 		/// <summary>
 		/// Running average for packet availability at different time checkpoints relative to current output.
@@ -288,14 +288,14 @@ namespace MixedRealityExtension.Core.Physics
 			Remove
 		}
 
-		public void RegisterRigidDynamicBody3D(Guid id)
+		public void RegisterRigidBody3D(Guid id)
 		{
-			_pendingRigidDynamicBody3DManagementActions[id] = Action.Add;
+			_pendingRigidBody3DManagementActions[id] = Action.Add;
 		}
 
-		public void UnregisterRigidDynamicBody3D(Guid id)
+		public void UnregisterRigidBody3D(Guid id)
 		{
-			_pendingRigidDynamicBody3DManagementActions[id] = Action.Remove;
+			_pendingRigidBody3DManagementActions[id] = Action.Remove;
 		}
 
 		#endregion
@@ -489,28 +489,28 @@ namespace MixedRealityExtension.Core.Physics
 
 		private void processPendingActions()
 		{
-			if (_pendingRigidDynamicBody3DManagementActions.Count == 0)
+			if (_pendingRigidBody3DManagementActions.Count == 0)
 			{
 				return;
 			}
 
-			int maxNewCount = _rigidBodies.Count + _pendingRigidDynamicBody3DManagementActions.Count;
-			SortedList<Guid, RigidDynamicBody3DData> newRigidDynamicBody3DList = new SortedList<Guid, RigidDynamicBody3DData>(maxNewCount);
+			int maxNewCount = _rigidBodies.Count + _pendingRigidBody3DManagementActions.Count;
+			SortedList<Guid, RigidBody3DData> newRigidBody3DList = new SortedList<Guid, RigidBody3DData>(maxNewCount);
 
 			int rigidBodyIndex = 0;
 
-			foreach (var action in _pendingRigidDynamicBody3DManagementActions)
+			foreach (var action in _pendingRigidBody3DManagementActions)
 			{
 				while (rigidBodyIndex < _rigidBodies.Count &&
-					_rigidBodies.Values[rigidBodyIndex].RigidDynamicBody3DId.CompareTo(action.Key) < 0)
+					_rigidBodies.Values[rigidBodyIndex].RigidBody3DId.CompareTo(action.Key) < 0)
 				{
 					var rb = _rigidBodies.Values[rigidBodyIndex];
-					newRigidDynamicBody3DList.Add(rb.RigidDynamicBody3DId, rb);
+					newRigidBody3DList.Add(rb.RigidBody3DId, rb);
 
 					rigidBodyIndex++;
 				}
 
-				if (rigidBodyIndex < _rigidBodies.Count && _rigidBodies.Values[rigidBodyIndex].RigidDynamicBody3DId == action.Key)
+				if (rigidBodyIndex < _rigidBodies.Count && _rigidBodies.Values[rigidBodyIndex].RigidBody3DId == action.Key)
 				{
 					if (action.Value == Action.Remove)
 					{
@@ -525,29 +525,29 @@ namespace MixedRealityExtension.Core.Physics
 					else
 					{
 						var rb = _rigidBodies.Values[rigidBodyIndex];
-						newRigidDynamicBody3DList.Add(rb.RigidDynamicBody3DId, rb);
+						newRigidBody3DList.Add(rb.RigidBody3DId, rb);
 					}
 
 					rigidBodyIndex++;
 				}
 				else if (action.Value == Action.Add)
 				{
-					newRigidDynamicBody3DList.Add(action.Key, new RigidDynamicBody3DData(action.Key));
+					newRigidBody3DList.Add(action.Key, new RigidBody3DData(action.Key));
 				}
 			}
 
 			for (; rigidBodyIndex < _rigidBodies.Count; rigidBodyIndex++)
 			{
 				var rb = _rigidBodies.Values[rigidBodyIndex];
-				newRigidDynamicBody3DList.Add(rb.RigidDynamicBody3DId, rb);
+				newRigidBody3DList.Add(rb.RigidBody3DId, rb);
 			}
 
-			newRigidDynamicBody3DList.TrimExcess();
+			newRigidBody3DList.TrimExcess();
 
-			_pendingRigidDynamicBody3DManagementActions.Clear();
+			_pendingRigidBody3DManagementActions.Clear();
 			_rigidBodies.Clear();
 
-			_rigidBodies = newRigidDynamicBody3DList;
+			_rigidBodies = newRigidBody3DList;
 		}
 
 		/// <summary>
@@ -555,7 +555,7 @@ namespace MixedRealityExtension.Core.Physics
 		/// </summary>
 		private interface ISource
 		{
-			void Update(ref RigidDynamicBody3DData entry);
+			void Update(ref RigidBody3DData entry);
 		}
 
 		/// <summary>
@@ -575,19 +575,19 @@ namespace MixedRealityExtension.Core.Physics
 				_prevSnapshot = prevsnapShot;
 			}
 
-			public void Update(ref RigidDynamicBody3DData entry)
+			public void Update(ref RigidBody3DData entry)
 			{
 				if (_prevSnapshot != null)
 				{
 					while (_prevIndex < _prevSnapshot.Transforms.Count &&
-						_prevSnapshot.Transforms[_prevIndex].RigidDynamicBody3DId.CompareTo(entry.RigidDynamicBody3DId) < 0)
+						_prevSnapshot.Transforms[_prevIndex].RigidBody3DId.CompareTo(entry.RigidBody3DId) < 0)
 					{
 						_prevIndex++;
 					}
 				}
 
 				while (_iteratorIndex < _snapshot.Transforms.Count &&
-					_snapshot.Transforms[_iteratorIndex].RigidDynamicBody3DId.CompareTo(entry.RigidDynamicBody3DId) < 0)
+					_snapshot.Transforms[_iteratorIndex].RigidBody3DId.CompareTo(entry.RigidBody3DId) < 0)
 				{
 					_iteratorIndex++;
 				}
@@ -596,7 +596,7 @@ namespace MixedRealityExtension.Core.Physics
 				//	" DT=" + (_snapshot.Time - _prevSnapshot.Time));
 
 				if (_iteratorIndex < _snapshot.Transforms.Count &&
-					_snapshot.Transforms[_iteratorIndex].RigidDynamicBody3DId == entry.RigidDynamicBody3DId)
+					_snapshot.Transforms[_iteratorIndex].RigidBody3DId == entry.RigidBody3DId)
 				{
 					var rb = _snapshot.Transforms[_iteratorIndex];
 
@@ -608,7 +608,7 @@ namespace MixedRealityExtension.Core.Physics
 					if (_prevSnapshot != null)
 					{
 						if (_prevIndex < _prevSnapshot.Transforms.Count &&
-							_prevSnapshot.Transforms[_prevIndex].RigidDynamicBody3DId == entry.RigidDynamicBody3DId)
+							_prevSnapshot.Transforms[_prevIndex].RigidBody3DId == entry.RigidBody3DId)
 						{
 							// estimate velocity
 							float DT = _snapshot.Time - _prevSnapshot.Time;
@@ -654,22 +654,22 @@ namespace MixedRealityExtension.Core.Physics
 				_frac = (timestamp - prev.Time) / (next.Time - prev.Time); ;
 			}
 
-			public void Update(ref RigidDynamicBody3DData entry)
+			public void Update(ref RigidBody3DData entry)
 			{
 				while (_nextIndex < _next.Transforms.Count &&
-					_next.Transforms[_nextIndex].RigidDynamicBody3DId.CompareTo(entry.RigidDynamicBody3DId) < 0)
+					_next.Transforms[_nextIndex].RigidBody3DId.CompareTo(entry.RigidBody3DId) < 0)
 				{
 					_nextIndex++;
 				}
 
 				while (_prevIndex < _prev.Transforms.Count &&
-					_prev.Transforms[_prevIndex].RigidDynamicBody3DId.CompareTo(entry.RigidDynamicBody3DId) < 0)
+					_prev.Transforms[_prevIndex].RigidBody3DId.CompareTo(entry.RigidBody3DId) < 0)
 				{
 					_prevIndex++;
 				}
 
 				if (_nextIndex >= _next.Transforms.Count ||
-					_next.Transforms[_nextIndex].RigidDynamicBody3DId != entry.RigidDynamicBody3DId)
+					_next.Transforms[_nextIndex].RigidBody3DId != entry.RigidBody3DId)
 				{
 					// velocity is zero
 					entry.SetZeroVelocities();
@@ -687,7 +687,7 @@ namespace MixedRealityExtension.Core.Physics
 				}
 
 				if (_prevIndex < _prev.Transforms.Count &&
-						_prev.Transforms[_prevIndex].RigidDynamicBody3DId == _next.Transforms[_nextIndex].RigidDynamicBody3DId)
+						_prev.Transforms[_prevIndex].RigidBody3DId == _next.Transforms[_nextIndex].RigidBody3DId)
 				{
 					RigidBodyTransform t = new RigidBodyTransform();
 					{
@@ -724,7 +724,7 @@ namespace MixedRealityExtension.Core.Physics
 			int numSleeping = 0;
 			for (int i = 0; i < _rigidBodies.Count; i++)
 			{
-				RigidDynamicBody3DData data = _rigidBodies.Values[i];
+				RigidBody3DData data = _rigidBodies.Values[i];
 
 				// Update data from snapshot update
 				source.Update(ref data);
@@ -819,7 +819,7 @@ namespace MixedRealityExtension.Core.Physics
 			_iteratorIndex = 0;
 		}
 
-		internal bool Find(Guid key, out RigidDynamicBody3DData rigidBodyData)
+		internal bool Find(Guid key, out RigidBody3DData rigidBodyData)
 		{
 			while (_iteratorIndex < _rigidBodies.Count && _rigidBodies.Keys[_iteratorIndex].CompareTo(key) < 0) _iteratorIndex++;
 
@@ -872,9 +872,9 @@ namespace MixedRealityExtension.Core.Physics
 	/// </summary>
 	public class MultiSourceCombinedSnapshot
 	{
-		public struct RigidDynamicBody3DState
+		public struct RigidBody3DState
 		{
-			public RigidDynamicBody3DState(Guid id, float time, RigidBodyTransform transform,
+			public RigidBody3DState(Guid id, float time, RigidBodyTransform transform,
 				Vector3 linearVelocity, Vector3 angularVelocity,
 				bool hasUpdate, MotionType mType)
 			{
@@ -902,7 +902,7 @@ namespace MixedRealityExtension.Core.Physics
 			public Vector3 AngularVelocity;
 		}
 
-		public SortedList<Guid, RigidDynamicBody3DState> RigidBodies = new SortedList<Guid, RigidDynamicBody3DState>();
+		public SortedList<Guid, RigidBody3DState> RigidBodies = new SortedList<Guid, RigidBody3DState>();
 	}
 
 	/// <summary>
@@ -914,7 +914,7 @@ namespace MixedRealityExtension.Core.Physics
 
 		private SortedDictionary<Guid, Guid> _rigidBodySourceMap = new SortedDictionary<Guid, Guid>();
 
-		public void RegisterOrUpateRigidDynamicBody3D(Guid rigidBodyId, Guid sourceId)
+		public void RegisterOrUpateRigidBody3D(Guid rigidBodyId, Guid sourceId)
 		{
 			if (!_sources.ContainsKey(sourceId))
 			{
@@ -928,29 +928,29 @@ namespace MixedRealityExtension.Core.Physics
 				if (oldSourceId != sourceId)
 				{
 					// Unregister from old source
-					_sources[oldSourceId].UnregisterRigidDynamicBody3D(rigidBodyId);
+					_sources[oldSourceId].UnregisterRigidBody3D(rigidBodyId);
 
 					// Register for new source
-					_sources[sourceId].RegisterRigidDynamicBody3D(rigidBodyId);
+					_sources[sourceId].RegisterRigidBody3D(rigidBodyId);
 					_rigidBodySourceMap[rigidBodyId] = sourceId;
 				}
 			}
 			else
 			{
 				// Register for appropriate source
-				_sources[sourceId].RegisterRigidDynamicBody3D(rigidBodyId);
+				_sources[sourceId].RegisterRigidBody3D(rigidBodyId);
 				_rigidBodySourceMap[rigidBodyId] = sourceId;
 			}
 		}
 
-		public void UnregisterRigidDynamicBody3D(Guid rigidBodyId)
+		public void UnregisterRigidBody3D(Guid rigidBodyId)
 		{
 			if (_rigidBodySourceMap.ContainsKey(rigidBodyId))
 			{
 				Guid oldSourceId = _rigidBodySourceMap[rigidBodyId];
 
 				// Unregister from source
-				_sources[oldSourceId].UnregisterRigidDynamicBody3D(rigidBodyId);
+				_sources[oldSourceId].UnregisterRigidBody3D(rigidBodyId);
 				_rigidBodySourceMap.Remove(rigidBodyId);
 			}
 		}
@@ -990,12 +990,12 @@ namespace MixedRealityExtension.Core.Physics
 			{
 				var source = _sources[rb.Value];
 
-				SnapshotBuffer.RigidDynamicBody3DData data;
+				SnapshotBuffer.RigidBody3DData data;
 
 				if (source.Find(rb.Key, out data))
 				{
 					snapshot.RigidBodies.Add(rb.Key,
-							new MultiSourceCombinedSnapshot.RigidDynamicBody3DState(
+							new MultiSourceCombinedSnapshot.RigidBody3DState(
 								rb.Key, source.CurrentLocalTime, data.Transform,
 								data.LinearVelocity, data.AngularVelocity,
 								source.HasUpdate, data.MotionType));

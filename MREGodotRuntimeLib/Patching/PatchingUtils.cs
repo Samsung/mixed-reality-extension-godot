@@ -180,7 +180,7 @@ namespace MixedRealityExtension.Patching
 			}
 		}
 
-		public static RigidBodyPatch GeneratePatch(MixedRealityExtension.Core.RigidBody _old, Godot.RigidDynamicBody3D _new,
+		public static RigidBodyPatch GeneratePatch(MixedRealityExtension.Core.RigidBody _old, Godot.RigidBody3D _new,
 			Node3D sceneRoot, bool addVelocities)
 		{
 			if (_old == null && _new != null)

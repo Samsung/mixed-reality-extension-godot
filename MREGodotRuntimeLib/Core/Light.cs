@@ -77,7 +77,7 @@ namespace MixedRealityExtension.Core
 				}
 				return 0;
 			}
-		}// => _light.spo * Mathf.Deg2Rad;
+		}// => _light.spo * Mathf.DegToRad;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Light"/> class.
@@ -97,7 +97,7 @@ namespace MixedRealityExtension.Core
 			if (_light is SpotLight3D spotLight)
 			{
 				if (patch.SpotAngle.HasValue)
-					spotLight.SpotAngle = Mathf.Rad2Deg(patch.SpotAngle.Value);
+					spotLight.SpotAngle = Mathf.RadToDeg(patch.SpotAngle.Value);
 				spotLight.SpotRange = spotLight.SpotRange.GetPatchApplied(Range.ApplyPatch(patch.Range));
 			}
 			else if (_light is OmniLight3D omniLight)

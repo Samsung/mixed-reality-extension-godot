@@ -170,7 +170,7 @@ namespace MixedRealityExtension.Util.GodotHelper
 			};
 		}
 
-		public static MRERigidBodyConstraints GetMRERigidBodyConstraints(this Godot.RigidDynamicBody3D rigidBody)
+		public static MRERigidBodyConstraints GetMRERigidBodyConstraints(this Godot.RigidBody3D rigidBody)
 		{
 			MRERigidBodyConstraints constraints = 0;
 			if (rigidBody.AxisLockLinearX)

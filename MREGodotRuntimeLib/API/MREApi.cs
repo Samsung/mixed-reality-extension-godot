@@ -162,7 +162,8 @@ namespace MixedRealityExtension.API
 			if (!System.IO.File.Exists(dllPath))
 				throw new FileNotFoundException($"plugin not found", nameof(dllPath));
 
-			var dll = Assembly.LoadFile(dllPath);
+			var loadContext = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(GetType().Assembly);
+			var dll = loadContext.LoadFromAssemblyPath(dllPath);
 
 			if (System.IO.File.Exists(pckPath) && !ProjectSettings.LoadResourcePack(pckPath))
 			{

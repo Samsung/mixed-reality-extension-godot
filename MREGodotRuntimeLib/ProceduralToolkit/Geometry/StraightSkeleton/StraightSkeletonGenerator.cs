@@ -411,7 +411,7 @@ namespace MixedRealityExtension.ProceduralToolkit.Skeleton
 					Vector2 segmentDirection = (segmentB - segmentA).Normalized();
 					float toIntersection = vertex.position.DistanceTo(intersection.pointA);
 					float intersectionAngle = vertex.bisector.AngleTo(segmentDirection);
-					float intersectionSin = Mathf.Sin(Mathf.Deg2Rad(intersectionAngle));
+					float intersectionSin = Mathf.Sin(Mathf.DegToRad(intersectionAngle));
 					float bisectorSin = Geometry.GetAngleBisectorSin(vertex.angle);
 					offset = toIntersection/(1/intersectionSin + 1/bisectorSin);
 					return true;

@@ -9,7 +9,7 @@ using Godot;
 
 namespace MixedRealityExtension.Animation
 {
-	internal class NativeAnimation : BaseAnimation
+	internal partial class NativeAnimation : BaseAnimation
 	{
 		private AnimationPlayer animationPlayer;
 		private Godot.Animation animation;
@@ -140,7 +140,7 @@ namespace MixedRealityExtension.Animation
 			return patch;
 		}
 
-		private class NativeAnimationHelper : Node3D
+		private partial class NativeAnimationHelper : Node3D
 		{
 			public NativeAnimation Animation;
 

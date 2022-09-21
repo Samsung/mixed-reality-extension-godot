@@ -8,6 +8,7 @@
 [node name="MRENode" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.884308)
 script = ExtResource("1")
+LaunchType = 2
 MREURL = "ws://localhost:3901"
 SessionID = "testbed"
 AppID = "helloworld"

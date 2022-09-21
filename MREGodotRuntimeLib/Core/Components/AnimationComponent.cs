@@ -28,7 +28,7 @@ namespace MixedRealityExtension.Core.Components
 
 		private bool GetAnimationData(string animationName, out AnimationData animationData) => _animationData.TryGetValue(animationName, out animationData);
 
-		public override void _Process(float delta)
+		public override void _Process(double delta)
 		{
 			// Check for changes to an animation's enabled state and notify the server when a change is detected.
 			if (_animationPlayers.Count == 0) return;

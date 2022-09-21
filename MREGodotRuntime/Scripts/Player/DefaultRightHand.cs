@@ -11,7 +11,7 @@ public partial class DefaultRightHand : Node3D
         handLocalOrigin = Position.z;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (Input.IsActionPressed("hand_touch"))
         {

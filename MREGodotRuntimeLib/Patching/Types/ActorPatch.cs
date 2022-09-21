@@ -47,7 +47,7 @@ namespace MixedRealityExtension.Patching.Types
 		public AppearancePatch Appearance { get; set; }
 
 		[PatchProperty]
-		public RigidBodyPatch RigidDynamicBody3D { get; set; }
+		public RigidBodyPatch RigidBody3D { get; set; }
 
 		[PatchProperty]
 		public ColliderPatch Collider { get; set; }
@@ -127,7 +127,7 @@ namespace MixedRealityExtension.Patching.Types
 				&& Transform == null
 				&& ParentId == null
 				&& Appearance == null
-				&& RigidDynamicBody3D == null
+				&& RigidBody3D == null
 				&& Collider == null
 				&& Light == null
 				&& Text == null

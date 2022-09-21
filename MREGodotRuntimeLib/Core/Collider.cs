@@ -60,7 +60,7 @@ namespace MixedRealityExtension.Core
 
 	internal partial class Collider : Area3D, ICollider
 	{
-		private static readonly object colliderScript = new Collider().GetScript();
+		private static readonly Variant colliderScript = new Collider().GetScript();
 
 		public static Collider Instantiate(Area3D area)
 		{
@@ -85,14 +85,14 @@ namespace MixedRealityExtension.Core
 		public bool IsTrigger => _physicsbody?.GetChild<CollisionShape3D>() == null ? true : false;
 
 		/// <inheritdoc />
-		public float Bounciness => _physicsbody is Godot.RigidDynamicBody3D rigidBody
+		public float Bounciness => _physicsbody is Godot.RigidBody3D rigidBody
 				? rigidBody.PhysicsMaterialOverride.Bounce : ((StaticBody3D)_physicsbody).PhysicsMaterialOverride.Bounce;
 
 		/// <inheritdoc />
 		public float StaticFriction => DynamicFriction;
 
 		/// <inheritdoc />
-		public float DynamicFriction => _physicsbody is Godot.RigidDynamicBody3D rigidBody
+		public float DynamicFriction => _physicsbody is Godot.RigidBody3D rigidBody
 				? rigidBody.PhysicsMaterialOverride.Friction : ((StaticBody3D)_physicsbody).PhysicsMaterialOverride.Friction;
 
 		// /// <inheritdoc />
@@ -107,7 +107,7 @@ namespace MixedRealityExtension.Core
 				?? throw new Exception("An MRE collider must be associated with an MRE actor.");
 			if (_physicsbody == null)
 			{
-				_physicsbody = _ownerActor.GetParent() as Godot.RigidDynamicBody3D;
+				_physicsbody = _ownerActor.GetParent() as Godot.RigidBody3D;
 				if (_physicsbody == null)
 				{
 					_physicsbody = new StaticBody3D()
@@ -160,7 +160,7 @@ namespace MixedRealityExtension.Core
 			if (patch.StaticFriction.HasValue)
 				GD.PushWarning("StaticFriction is not supported in godot mre. please use DynamicFriction instead.");
 
-			if (_physicsbody is Godot.RigidDynamicBody3D rigidBody)
+			if (_physicsbody is Godot.RigidBody3D rigidBody)
 			{
 				rigidBody.PhysicsMaterialOverride.Bounce = rigidBody.PhysicsMaterialOverride.Bounce.GetPatchApplied(Bounciness.ApplyPatch(patch.Bounciness));
 				rigidBody.PhysicsMaterialOverride.Friction = rigidBody.PhysicsMaterialOverride.Friction.GetPatchApplied(DynamicFriction.ApplyPatch(patch.DynamicFriction));
@@ -183,10 +183,10 @@ namespace MixedRealityExtension.Core
 					_colliderEventSubscriptions |= sub;
 					if (sub == ColliderEventType.CollisionEnter || sub == ColliderEventType.CollisionExit)
 					{
-						if (_physicsbody is Godot.RigidDynamicBody3D rigid)
+						if (_physicsbody is Godot.RigidBody3D rigid)
 						{
 							rigid.ContactMonitor = true;
-							rigid.ContactsReported = 32;
+							rigid.MaxContactsReported = 32;
 							if (sub == ColliderEventType.CollisionEnter)
 								rigid.Connect("body_shape_entered", new Callable(this, nameof(OnBodyShapeEnter)));
 							else if (sub == ColliderEventType.CollisionExit)
@@ -281,7 +281,7 @@ namespace MixedRealityExtension.Core
 
 		private void OnAreaEnter(Area3D area)
 		{
-			if (area is Collider collider && collider._physicsbody is Godot.RigidDynamicBody3D)
+			if (area is Collider collider && collider._physicsbody is Godot.RigidBody3D)
 			{
 				SendAreaEvent(ColliderEventType.TriggerEnter, area);
 			}
@@ -289,7 +289,7 @@ namespace MixedRealityExtension.Core
 
 		private void OnAreaExit(Area3D area)
 		{
-			if (area is Collider collider && collider._physicsbody is Godot.RigidDynamicBody3D)
+			if (area is Collider collider && collider._physicsbody is Godot.RigidBody3D)
 			{
 				SendAreaEvent(ColliderEventType.TriggerExit, area);
 			}
@@ -329,7 +329,7 @@ namespace MixedRealityExtension.Core
 			}
 
 			Actor otherActor = null;
-			if (body is Godot.RigidDynamicBody3D rigidBody)
+			if (body is Godot.RigidBody3D rigidBody)
 			{
 				otherActor = rigidBody.GetChild<Actor>();
 			}

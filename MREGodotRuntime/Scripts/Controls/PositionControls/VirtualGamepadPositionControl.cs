@@ -41,7 +41,7 @@ namespace Assets.Scripts.Control
             var gamepad = LoadGamepad(player.GamePadScenePath);
             AddChild(gamepad);
 
-            player.Connect(nameof(Player.gamepad_changed), new Callable(this, nameof(_on_VirtualGamepadPositionControl_gamepad_changed)));
+            player.Connect(nameof(Player.GamepadChangedEventHandler), new Callable(this, nameof(_on_VirtualGamepadPositionControl_gamepad_changed)));
         }
     }
 }

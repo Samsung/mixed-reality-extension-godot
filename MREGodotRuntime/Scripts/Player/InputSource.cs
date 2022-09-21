@@ -156,7 +156,7 @@ namespace Assets.Scripts.User
 			}
 		}
 
-		public override void _Process(float delta)
+		public override void _Process(double delta)
 		{
 			_currentTool.Update(this);
 			Cursor.SetCursorTransform(HitPoint, HitPointNormal);

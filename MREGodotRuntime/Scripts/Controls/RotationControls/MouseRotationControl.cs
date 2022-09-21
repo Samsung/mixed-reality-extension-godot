@@ -15,7 +15,7 @@ namespace Assets.Scripts.Control
             mainCamera = camera;
         }
 
-        public override void _PhysicsProcess(float delta)
+        public override void _PhysicsProcess(double delta)
         {
             if (Input.IsActionPressed("ui_cancel"))
             {

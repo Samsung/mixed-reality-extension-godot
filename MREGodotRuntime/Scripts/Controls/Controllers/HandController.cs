@@ -114,7 +114,7 @@ namespace Assets.Scripts.Control
             handNode.AddChild(this);
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if ((ThumbTip.GlobalTransform.origin.DistanceTo(IndexTip.GlobalTransform.origin) < 0.03f) ^ isPinching)
             {

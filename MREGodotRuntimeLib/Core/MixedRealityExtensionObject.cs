@@ -68,12 +68,12 @@ namespace MixedRealityExtension.Core
 			OnAwake();
 		}
 
-		public override void _Process(float delta)
+		public override void _Process(double delta)
 		{
-			InternalUpdate(delta);
+			InternalUpdate((float)delta);
 		}
 
-		public override void _PhysicsProcess(float delta)
+		public override void _PhysicsProcess(double delta)
 		{
 			InternalFixedUpdate();
 		}

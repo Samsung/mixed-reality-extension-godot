@@ -174,7 +174,7 @@ namespace MixedRealityExtension.Assets
 			foreach (Godot.Collections.Dictionary p in o.GetPropertyList())
 			{
 				var propertyName = (string)p["name"];
-				if (o.Get(propertyName) is Resource resource)
+				if (o.Get(propertyName).AsGodotObject() is Resource resource)
 				{
 					var newResource = resource.Duplicate();
 					o.Set(propertyName, newResource);
@@ -389,7 +389,7 @@ namespace MixedRealityExtension.Assets
 				{
 					for (var i = 0; i < meshs.Count; i++)
 					{
-						var importerMesh = ((Godot.Object)meshs[i]).Get("mesh") as ImporterMesh;
+						var importerMesh = meshs[i].Get("mesh").AsGodotObject() as ImporterMesh;
 						var mesh = importerMesh.GetMesh();
 						mesh.ResourceName ??= $"mesh:{i}";
 						assets.Add(mesh);
@@ -770,7 +770,7 @@ namespace MixedRealityExtension.Assets
 				ArrayMesh arrayMesh = mesh as ArrayMesh;
 				Godot.Collections.Array array = arrayMesh.SurfaceGetArrays(0);
 				var aabb = arrayMesh.GetAabb();
-				var vertexCount = (array[(int)ArrayMesh.ArrayType.Vertex] as Array).Length;
+				var vertexCount = (array[(int)ArrayMesh.ArrayType.Vertex].AsInt32Array()).Length;
 
 				return new Asset()
 				{

@@ -17,7 +17,7 @@ internal class HostAppUser : IHostAppUser
 	public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>()
 	{
 		{"host", "MRETestBed" },
-		{"engine", Engine.GetVersionInfo()["build"] as string }
+		{"engine", Engine.GetVersionInfo()["build"].AsString() }
 	};
 
 	//public Vector3? LookAtPosition => (UserNode as Node3D).GlobalTransform.origin;
