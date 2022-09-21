@@ -1,7 +1,7 @@
 [gd_resource type="Environment" load_steps=3 format=3 uid="uid://cks7ywwkv3dgb"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tfsdd"]
-sky_top_color = Color(0.65098, 0.764706, 0.839216, 1)
+sky_top_color = Color(0.721569, 0.772549, 0.839216, 1)
 
 [sub_resource type="Sky" id="1"]
 sky_material = SubResource("ProceduralSkyMaterial_tfsdd")

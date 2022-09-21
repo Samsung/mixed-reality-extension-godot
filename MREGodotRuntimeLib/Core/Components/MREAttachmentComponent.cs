@@ -11,7 +11,7 @@ namespace MixedRealityExtension.Core.Components
 
 		public Actor Actor { get; set; }
 
-		public override void _Process(float delta)
+		public override void _Process(double delta)
 		{
 			var scale = Actor.Scale;
 			Actor.GlobalTransform = GlobalTransform;

@@ -23,7 +23,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <param name="angle">Angle in degrees</param>
 		public static Vector2 PointOnCircle2(float radius, float angle)
 		{
-			float angleInRadians = Mathf.Deg2Rad(angle);
+			float angleInRadians = Mathf.DegToRad(angle);
 			return new Vector2(radius*Mathf.Sin(angleInRadians), radius*Mathf.Cos(angleInRadians));
 		}
 
@@ -160,7 +160,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 		private static Vector3 PointOnCircle3(int xIndex, int yIndex, float radius, float angle)
 		{
-			float angleInRadians = Mathf.Deg2Rad(angle);
+			float angleInRadians = Mathf.DegToRad(angle);
 			var point = new Vector3();
 			point[xIndex] = radius*Mathf.Sin(angleInRadians);
 			point[yIndex] = radius*Mathf.Cos(angleInRadians);
@@ -217,8 +217,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <param name="verticalAngle">Vertical angle in degrees [-90, 90]</param>
 		public static Vector3 PointOnSpheroid(float radius, float height, float horizontalAngle, float verticalAngle)
 		{
-			float horizontalRadians = Mathf.Deg2Rad(horizontalAngle);
-			float verticalRadians = Mathf.Deg2Rad(verticalAngle);
+			float horizontalRadians = Mathf.DegToRad(horizontalAngle);
+			float verticalRadians = Mathf.DegToRad(verticalAngle);
 			float cosVertical = Mathf.Cos(verticalRadians);
 
 			return new Vector3(
@@ -236,8 +236,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <param name="verticalAngle">Vertical angle in degrees [-90, 90]</param>
 		public static Vector3 PointOnTeardrop(float radius, float height, float horizontalAngle, float verticalAngle)
 		{
-			float horizontalRadians = Mathf.Deg2Rad(horizontalAngle);
-			float verticalRadians = Mathf.Deg2Rad(verticalAngle);
+			float horizontalRadians = Mathf.DegToRad(horizontalAngle);
+			float verticalRadians = Mathf.DegToRad(verticalAngle);
 			float sinVertical = Mathf.Sin(verticalRadians);
 			float teardrop = (1 - sinVertical)*Mathf.Cos(verticalRadians)/2;
 
@@ -418,7 +418,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 		public static float GetAngleBisectorSin(float angle)
 		{
-			return Mathf.Sin(Mathf.Deg2Rad(angle)/2);
+			return Mathf.Sin(Mathf.DegToRad(angle)/2);
 		}
 
 		/// <summary>

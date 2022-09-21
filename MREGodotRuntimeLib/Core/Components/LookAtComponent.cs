@@ -42,7 +42,7 @@ namespace MixedRealityExtension.Core.Components
 			parent = GetParent() as Actor;
 		}
 
-		public override void _Process(float delta)
+		public override void _Process(double delta)
 		{
 			if (_lookAtMode != LookAtMode.None && _targetObject != null)
 			{

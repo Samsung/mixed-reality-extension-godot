@@ -95,15 +95,15 @@ namespace MixedRealityExtension.Core
 				}
 				if (options.Looping != null)
 				{
-					if (soundInstance.Stream is AudioStreamSample audioStreamSample)
+					if (soundInstance.Stream is AudioStreamWAV AudioStreamWAV)
 					{
-						audioStreamSample.LoopMode = options.Looping.Value ? AudioStreamSample.LoopModeEnum.Forward : AudioStreamSample.LoopModeEnum.Disabled;
+						AudioStreamWAV.LoopMode = options.Looping.Value ? AudioStreamWAV.LoopModeEnum.Forward : AudioStreamWAV.LoopModeEnum.Disabled;
 						int d = 1;
-						d *= audioStreamSample.Stereo ? 2 : 1;
-						d *= audioStreamSample.Format == AudioStreamSample.FormatEnum.Format16Bits ? 2 : 1;
-						audioStreamSample.LoopEnd = audioStreamSample.Data.Length / d;
+						d *= AudioStreamWAV.Stereo ? 2 : 1;
+						d *= AudioStreamWAV.Format == AudioStreamWAV.FormatEnum.Format16Bits ? 2 : 1;
+						AudioStreamWAV.LoopEnd = AudioStreamWAV.Data.Length / d;
 					}
-					else if (soundInstance.Stream is AudioStreamOGGVorbis audioStreamOGGVorbis)
+					else if (soundInstance.Stream is AudioStreamOggVorbis audioStreamOggVorbis)
 					{
 						//FIXME
 					}

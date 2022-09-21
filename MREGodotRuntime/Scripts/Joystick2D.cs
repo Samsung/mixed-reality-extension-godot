@@ -38,7 +38,7 @@ public partial class Joystick2D : TouchScreenButton
         }
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         var d = playerDirection * Speed;
         MainCamera.Position += MainCamera.Transform.basis.x * d.x;

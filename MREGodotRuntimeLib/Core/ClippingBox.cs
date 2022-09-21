@@ -10,7 +10,7 @@ namespace MixedRealityExtension.Core
 	{
 		private static Vector3 Vector3Half = Vector3.One * 0.5f;
 
-		public override void _Process(float delta)
+		public override void _Process(double delta)
 		{
 			var globalTransform = GlobalTransform;
 			globalTransform.basis = globalTransform.basis.Scaled(Vector3Half);
@@ -24,7 +24,7 @@ namespace MixedRealityExtension.Core
 				var count = meshInstance.GetSurfaceOverrideMaterialCount();
 				for (int i = 0; i < count; i++) {
 					var shaderMaterial = meshInstance.GetSurfaceOverrideMaterial(i) as ShaderMaterial;
-					shaderMaterial.SetShaderParam( "clipBoxInverseTransform", affineInverse);
+					shaderMaterial.SetShaderParameter( "clipBoxInverseTransform", affineInverse);
 				}
 			}
 		}
@@ -35,7 +35,7 @@ namespace MixedRealityExtension.Core
 			foreach (var shaderMaterial in ShaderMaterialRIDs())
 			{
 				// clear inverse transform matrix
-				RenderingServer.MaterialSetParam(shaderMaterial, "clipBoxInverseTransform", null);
+				RenderingServer.MaterialSetParam(shaderMaterial, "clipBoxInverseTransform", new Variant());
 			}
 		}
 	}

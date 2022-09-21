@@ -25,7 +25,7 @@ namespace MixedRealityExtension.Core
 
 		internal Dictionary<Guid, Actor>.ValueCollection Actors => _actorMapping.Values;
 
-		public delegate void RigidBodyAddedHandler(Guid id, Godot.RigidDynamicBody3D rigidbody, Guid? owner);
+		public delegate void RigidBodyAddedHandler(Guid id, Godot.RigidBody3D rigidbody, Guid? owner);
 		internal event RigidBodyAddedHandler RigidBodyAdded;
 
 		public delegate void RigidBodyRemovedHandler(Guid id);
@@ -42,7 +42,7 @@ namespace MixedRealityExtension.Core
 			_app = app;
 		}
 
-		private void OnRigidBodyAdded(Guid id, Godot.RigidDynamicBody3D rigidbody, Guid? owner)
+		private void OnRigidBodyAdded(Guid id, Godot.RigidBody3D rigidbody, Guid? owner)
 		{
 			RigidBodyAdded?.Invoke(id, rigidbody, owner);
 		}

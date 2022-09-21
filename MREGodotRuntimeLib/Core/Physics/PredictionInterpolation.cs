@@ -91,7 +91,7 @@ namespace MixedRealityExtension.Core.Physics
 			if (_monitorCollisionInfo.ContainsKey(rb.Id) && !rb.IsKeyframed)
 			{
 				// dynamic
-				rb.RigidBody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
+				rb.RigidBody.FreezeMode = Godot.RigidBody3D.FreezeModeEnum.Kinematic;
 				collisionInfo.monitorInfo = _monitorCollisionInfo[rb.Id];
 				collisionInfo.monitorInfo.timeFromStartCollision += timeInfo.DT;
 				collisionInfo.linearVelocity = rb.RigidBody.LinearVelocity;
@@ -115,9 +115,9 @@ namespace MixedRealityExtension.Core.Physics
 							GD.Print(" Interpolate body " + rb.Id.ToString() + " t=" + t
 								+ " time=" + Time.GetTicksMsec() * 0.001
 								+ " pos KF:" + keyFramedPos
-								+ " dyn:" + rb.RigidDynamicBody3D.Transform.origin
+								+ " dyn:" + rb.RigidBody3D.Transform.origin
 							    + " interp pos:" + interpolatedPos
-								+ " rb vel:" + rb.RigidDynamicBody3D.LinearVelocity
+								+ " rb vel:" + rb.RigidBody3D.LinearVelocity
 								+ " KF vel:" + rb.lastValidLinerVelocityOrPos);
 #endif
 					// apply these changes only if they are significant in order to not to bother the physics engine
@@ -153,7 +153,7 @@ namespace MixedRealityExtension.Core.Physics
 			else
 			{
 				// 100% key framing
-				rb.RigidBody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Kinematic;
+				rb.RigidBody.FreezeMode = Godot.RigidBody3D.FreezeModeEnum.Kinematic;
 				rb.RigidBody.GlobalTransform = new Transform3D(new Basis(keyFramedOrientation), keyFramedPos);
 				rb.RigidBody.LinearVelocity = new Vector3(0.0f, 0.0f, 0.0f);
 				rb.RigidBody.AngularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
@@ -333,7 +333,7 @@ namespace MixedRealityExtension.Core.Physics
 							if (collisionMonitorInfo.timeFromStartCollision < timeInfo.halfDT)
 							{
 								// switch back to dynamic
-								rb.RigidBody.FreezeMode = Godot.RigidDynamicBody3D.FreezeModeEnum.Static;
+								rb.RigidBody.FreezeMode = Godot.RigidBody3D.FreezeModeEnum.Static;
 								remoteBody.GlobalTransform = new Transform3D(new Basis(remoteBodyInfo.startOrientation), remoteBodyInfo.startPosition);
 								remoteBody.LinearVelocity = remoteBodyInfo.linearVelocity;
 								remoteBody.AngularVelocity = remoteBodyInfo.angularVelocity;
@@ -362,7 +362,7 @@ namespace MixedRealityExtension.Core.Physics
 			} // end for each
 		} // end of PredictAllRemoteBodiesWithOwnedBodies
 
-		private Vector3 ClosestPointOnBounds(Godot.RigidDynamicBody3D from, Godot.RigidDynamicBody3D to)
+		private Vector3 ClosestPointOnBounds(Godot.RigidBody3D from, Godot.RigidBody3D to)
 		{
 			var toCollisionShape3D = to.GetChild<CollisionShape3D>(1);
 			var aabb = toCollisionShape3D.Shape.GetDebugMesh().GetAabb();
@@ -409,13 +409,12 @@ namespace MixedRealityExtension.Core.Physics
 				var triangleA = aabbPoints[collisionTriangles[i, 0]];
 				var triangleB = aabbPoints[collisionTriangles[i, 1]];
 				var triangleC = aabbPoints[collisionTriangles[i, 2]];
-				var intersectionPoint = Geometry3D.SegmentIntersectsTriangle(localPositionFrom, Vector3.Zero, triangleA, triangleB, triangleC);
-				if (intersectionPoint == null) continue;
-				var distance = ((Vector3)intersectionPoint).LengthSquared();
+				var intersectionPoint = Geometry3D.SegmentIntersectsTriangle(localPositionFrom, Vector3.Zero, triangleA, triangleB, triangleC).AsVector3();
+				var distance = intersectionPoint.LengthSquared();
 				if (shortest > distance)
 				{
 					shortest = distance;
-					closestPoint = (Vector3)intersectionPoint;
+					closestPoint = intersectionPoint;
 				}
 			}
 

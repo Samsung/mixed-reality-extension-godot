@@ -13,7 +13,7 @@ public partial class XRHand : OpenXRHand
 		Ready();
 	}
 
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		PhysicsProcess();
 	}

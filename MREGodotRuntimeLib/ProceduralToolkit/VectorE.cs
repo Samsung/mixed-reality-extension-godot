@@ -90,7 +90,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		public static float SignedAngle(Vector2 from, Vector2 to)
 		{
 
-			return Mathf.Rad2Deg(Mathf.Atan2(PerpDot(to, from), to.Dot(from)));
+			return Mathf.RadToDeg(Mathf.Atan2(PerpDot(to, from), to.Dot(from)));
 		}
 
 		/// <summary>
@@ -123,7 +123,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 RotateCW(this Vector2 vector, float degrees)
 		{
-			float radians = Mathf.Deg2Rad(degrees);
+			float radians = Mathf.DegToRad(degrees);
 			float sin = Mathf.Sin(radians);
 			float cos = Mathf.Cos(radians);
 			return new Vector2(
@@ -136,7 +136,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 RotateCCW(this Vector2 vector, float degrees)
 		{
-			float radians = Mathf.Deg2Rad(degrees);
+			float radians = Mathf.DegToRad(degrees);
 			float sin = Mathf.Sin(radians);
 			float cos = Mathf.Cos(radians);
 			return new Vector2(

@@ -128,7 +128,7 @@ namespace MixedRealityExtension.Patching.Types
 				foreach (var transformInfo in list)
 				{
 					var blob = new byte[48];
-					Buffer.BlockCopy(transformInfo.RigidDynamicBody3DId.ToByteArray(), 0, blob, 0, 16);
+					Buffer.BlockCopy(transformInfo.RigidBody3DId.ToByteArray(), 0, blob, 0, 16);
 					blob[16] = (byte)transformInfo.MotionType;
 					blob[17] = 0;
 					blob[18] = 0;

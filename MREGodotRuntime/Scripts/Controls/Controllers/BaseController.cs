@@ -45,11 +45,11 @@ namespace Assets.Scripts.Control
             };
             parent.AddChild(InputSource);
 
-            player.Connect(nameof(Player.cursor_changed), new Callable(this, nameof(_on_BaseController_cursor_changed)));
-            player.Connect(nameof(Player.ray_changed), new Callable(this, nameof(_on_BaseController_ray_changed)));
+            player.CursorChanged += OnBaseControllerCursorChanged;
+            player.RayChanged += OnBaseControllerRayChanged;
         }
 
-        protected virtual void _on_BaseController_cursor_changed(string cursorPath)
+        protected virtual void OnBaseControllerCursorChanged(string cursorPath)
         {
             if (!string.IsNullOrEmpty(cursorPath))
             {
@@ -58,7 +58,7 @@ namespace Assets.Scripts.Control
             }
         }
 
-        protected virtual void _on_BaseController_ray_changed(string RayPath, Camera3D camera)
+        protected virtual void OnBaseControllerRayChanged(string RayPath, Camera3D camera)
         {
             if (camera == null)
             {

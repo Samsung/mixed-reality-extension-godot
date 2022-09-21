@@ -12,27 +12,27 @@ namespace Assets.Scripts.Control
             mainCamera = camera;
         }
 
-        public override void _PhysicsProcess(float delta)
+        public override void _PhysicsProcess(double delta)
         {
             if (Input.IsKeyPressed(Godot.Key.Space))
                 XRServer.CenterOnHmd(XRServer.RotationMode.ResetButKeepTilt, true);
 
             if (Input.IsActionPressed("move_right"))
             {
-                mainCamera.Position += mainCamera.Transform.basis.x * delta * Speed;
+                mainCamera.Position += mainCamera.Transform.basis.x * (float)delta * Speed;
             }
             else if (Input.IsActionPressed("move_left"))
             {
-                mainCamera.Position -= mainCamera.Transform.basis.x * delta * Speed;
+                mainCamera.Position -= mainCamera.Transform.basis.x * (float)delta * Speed;
             }
 
             if (Input.IsActionPressed("move_back"))
             {
-                mainCamera.Position += mainCamera.Transform.basis.z * delta * Speed;
+                mainCamera.Position += mainCamera.Transform.basis.z * (float)delta * Speed;
             }
             else if (Input.IsActionPressed("move_forward"))
             {
-                mainCamera.Position -= mainCamera.Transform.basis.z * delta * Speed;
+                mainCamera.Position -= mainCamera.Transform.basis.z * (float)delta * Speed;
             }
         }
     }

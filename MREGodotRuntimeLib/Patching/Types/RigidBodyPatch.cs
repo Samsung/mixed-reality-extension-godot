@@ -103,7 +103,7 @@ namespace MixedRealityExtension.Patching.Types
 		public RigidBodyPatch()
 		{ }
 
-		internal RigidBodyPatch(RigidDynamicBody3D rigidbody, Node3D sceneRoot)
+		internal RigidBodyPatch(RigidBody3D rigidbody, Node3D sceneRoot)
 		{
 			// Do not include Position or Rotation in the patch.
 			Velocity = new Vector3Patch(sceneRoot.ToLocal(rigidbody.LinearVelocity));

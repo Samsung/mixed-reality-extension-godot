@@ -10,13 +10,13 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-using GodotRigidBody = Godot.RigidDynamicBody3D;
+using GodotRigidBody = Godot.RigidBody3D;
 using MRECollisionDetectionMode = MixedRealityExtension.Core.Interfaces.CollisionDetectionMode;
 using MRERigidBodyConstraints = MixedRealityExtension.Core.Interfaces.RigidBodyConstraints;
 
 namespace MixedRealityExtension.Core
 {
-	internal class RigidBody : IRigidDynamicBody3D
+	internal class RigidBody : IRigidBody3D
 	{
 		private readonly Node3D _sceneRoot;
 		private readonly GodotRigidBody _rigidbody;
@@ -56,7 +56,7 @@ namespace MixedRealityExtension.Core
 		}
 /*FIXME
 		/// <inheritdoc />
-		public void RigidDynamicBody3DMovePosition(MWVector3 position)
+		public void RigidBody3DMovePosition(MWVector3 position)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -66,7 +66,7 @@ namespace MixedRealityExtension.Core
 		}
 
 		/// <inheritdoc />
-		public void RigidDynamicBody3DMoveRotation(MWQuaternion rotation)
+		public void RigidBody3DMoveRotation(MWQuaternion rotation)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -76,7 +76,7 @@ namespace MixedRealityExtension.Core
 		}
 */
 		/// <inheritdoc />
-		public void RigidDynamicBody3DAddForce(MWVector3 force)
+		public void RigidBody3DAddForce(MWVector3 force)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -86,7 +86,7 @@ namespace MixedRealityExtension.Core
 		}
 
 		/// <inheritdoc />
-		public void RigidDynamicBody3DAddForceAtPosition(MWVector3 force, MWVector3 position)
+		public void RigidBody3DAddForceAtPosition(MWVector3 force, MWVector3 position)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -96,7 +96,7 @@ namespace MixedRealityExtension.Core
 		}
 
 		/// <inheritdoc />
-		public void RigidDynamicBody3DAddTorque(MWVector3 torque)
+		public void RigidBody3DAddTorque(MWVector3 torque)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -106,7 +106,7 @@ namespace MixedRealityExtension.Core
 		}
 
 		/// <inheritdoc />
-		public void RigidDynamicBody3DAddRelativeTorque(MWVector3 relativeTorque)
+		public void RigidBody3DAddRelativeTorque(MWVector3 relativeTorque)
 		{
 			_updateActions.Enqueue(
 				(rigidBody) =>
@@ -165,9 +165,9 @@ namespace MixedRealityExtension.Core
 				if (patch.AngularVelocity != null && patch.AngularVelocity.IsPatched())
 				{
 					var angularVelocity =_sceneRoot.ToGlobal(AngularVelocity.ApplyPatch(patch.AngularVelocity).ToVector3());
-					angularVelocity.x = Mathf.Deg2Rad(angularVelocity.x);
-					angularVelocity.y = Mathf.Deg2Rad(angularVelocity.y);
-					angularVelocity.z = Mathf.Deg2Rad(angularVelocity.z);
+					angularVelocity.x = Mathf.DegToRad(angularVelocity.x);
+					angularVelocity.y = Mathf.DegToRad(angularVelocity.y);
+					angularVelocity.z = Mathf.DegToRad(angularVelocity.z);
 					_rigidbody.AngularVelocity = _rigidbody.AngularVelocity.GetPatchApplied(angularVelocity);
 				}
 			}

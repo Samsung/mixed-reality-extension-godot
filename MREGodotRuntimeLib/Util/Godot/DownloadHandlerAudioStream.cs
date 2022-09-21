@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Godot;
 
 namespace MixedRealityExtension.Util.GodotHelper
@@ -40,10 +41,12 @@ namespace MixedRealityExtension.Util.GodotHelper
 
         private void ToOgg(MemoryStream stream)
         {
-            var audioStream = new AudioStreamOGGVorbis();
-            audioStream.PacketSequence = new OGGPacketSequence()
+            var audioStream = new AudioStreamOggVorbis();
+            var packet = new Godot.Collections.Array();
+            packet.Add(Variant.CreateFrom(stream.ToArray()));
+            audioStream.PacketSequence = new OggPacketSequence()
             {
-                PacketData = new Godot.Collections.Array(stream.ToArray())
+                PacketData = new Godot.Collections.Array<Godot.Collections.Array>() { packet }
             };
             AudioStream = audioStream;
         }
@@ -169,7 +172,7 @@ namespace MixedRealityExtension.Util.GodotHelper
                         reader.ReadBytes((int)(oldPosition + chunkSize + 8 - reader.BaseStream.Position));
                     }
                 }
-                var sample = new AudioStreamSample();
+                var sample = new AudioStreamWAV();
                 bool is16 = bitForSample != 8;
                 var dstData = new byte[data.Length * (is16 ? 2 : 1)];
                 for (int i = 0; i < data.Length; i++)
@@ -188,7 +191,7 @@ namespace MixedRealityExtension.Util.GodotHelper
                     }
                 }
                 sample.Data = dstData;
-                sample.Format = bitForSample == 8 ? AudioStreamSample.FormatEnum.Format8Bits : AudioStreamSample.FormatEnum.Format16Bits;
+                sample.Format = bitForSample == 8 ? AudioStreamWAV.FormatEnum.Format8Bits : AudioStreamWAV.FormatEnum.Format16Bits;
                 sample.MixRate = sampleRate;
                 sample.Stereo = channel == 2;
 

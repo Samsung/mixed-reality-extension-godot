@@ -44,12 +44,12 @@ namespace MixedRealityExtension.ProceduralToolkit
 			if (mesh == null) throw new ArgumentNullException("mesh");
 
 			var array = mesh.SurfaceGetArrays(0);
-			vertices.AddRange(array[(int)ArrayMesh.ArrayType.Vertex] as Vector3[]);
-			triangles.AddRange(array[(int)ArrayMesh.ArrayType.Index] as int[]);
-			normals.AddRange(array[(int)ArrayMesh.ArrayType.Normal] as Vector3[]);
-			tangents.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Plane[]);
-			uv.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Vector2[]);
-			uv2.AddRange(array[(int)ArrayMesh.ArrayType.Index] as Vector2[]);
+			vertices.AddRange(array[(int)ArrayMesh.ArrayType.Vertex].AsVector3Array());
+			triangles.AddRange(array[(int)ArrayMesh.ArrayType.Index].AsInt32Array());
+			normals.AddRange(array[(int)ArrayMesh.ArrayType.Normal].AsVector3Array());
+			tangents.AddRange(array[(int)ArrayMesh.ArrayType.Index].AsGodotArray<Plane>());
+			uv.AddRange(array[(int)ArrayMesh.ArrayType.Index].AsVector2Array());
+			uv2.AddRange(array[(int)ArrayMesh.ArrayType.Index].AsVector2Array());
 		}
 
 		/// <summary>
@@ -880,19 +880,25 @@ namespace MixedRealityExtension.ProceduralToolkit
 			array.Resize((int)ArrayMesh.ArrayType.Max);
 
 			if (vertices.Count > 0)
-				array[(int)ArrayMesh.ArrayType.Vertex] = vertices.ToArray();
+				array[(int)ArrayMesh.ArrayType.Vertex] = Variant.CreateFrom(vertices.ToArray());
 			if (normals.Count > 0)
-				array[(int)ArrayMesh.ArrayType.Normal] = normals.ToArray();
-			if (tangents.Count > 0)
-				array[(int)ArrayMesh.ArrayType.Tangent] = tangents.ToArray();
+				array[(int)ArrayMesh.ArrayType.Normal] = Variant.CreateFrom(normals.ToArray());
+			if (tangents.Count > 0) {
+				var tangentArray = new Godot.Collections.Array<Plane>();
+				foreach (var tan in tangents)
+				{
+					tangentArray.Add(tan);
+				}
+				array[(int)ArrayMesh.ArrayType.Tangent] = Variant.CreateFrom<Plane>(tangentArray);
+			}
 			if (uv.Count > 0)
-				array[(int)ArrayMesh.ArrayType.TexUv] = uv.ToArray();
+				array[(int)ArrayMesh.ArrayType.TexUv] = Variant.CreateFrom(uv.ToArray());
 			if (uv2.Count > 0)
-				array[(int)ArrayMesh.ArrayType.TexUv2] = uv2.ToArray();
+				array[(int)ArrayMesh.ArrayType.TexUv2] = Variant.CreateFrom(uv2.ToArray());
 			if (colors.Count > 0)
-				array[(int)ArrayMesh.ArrayType.Color] = colors.ToArray();
+				array[(int)ArrayMesh.ArrayType.Color] = Variant.CreateFrom(colors.ToArray());
 			if (triangles.Count > 0)
-				array[(int)ArrayMesh.ArrayType.Index] = triangles.ToArray();
+				array[(int)ArrayMesh.ArrayType.Index] = Variant.CreateFrom(triangles.ToArray());
 
 			mesh.AddSurfaceFromArrays(Godot.ArrayMesh.PrimitiveType.Triangles, array);
 		}

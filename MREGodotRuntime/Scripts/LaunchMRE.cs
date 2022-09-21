@@ -171,7 +171,7 @@ public partial class LaunchMRE : Node3D
 		InitializeMREComponent();
 	}
 
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		if (!_running && LaunchType == LaunchType.OnStart)
 		{

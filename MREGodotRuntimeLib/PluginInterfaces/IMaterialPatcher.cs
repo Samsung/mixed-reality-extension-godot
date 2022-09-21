@@ -27,14 +27,5 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// <param name="material">An instance of the default MRE material provided on load</param>
 		/// <returns>A full definition of the given material</returns>
 		MaterialPatch GeneratePatch(IMixedRealityExtensionApp app, Material material);
-
-		/// <summary>
-		/// Reports whether a particular Godot texture is in use by the given material
-		/// </summary>
-		/// <param name="app">The app context of the material</param>
-		/// <param name="material">The material to test</param>
-		/// <param name="texture">The texture to test</param>
-		/// <returns></returns>
-		bool UsesTexture(IMixedRealityExtensionApp app, Material material, Texture texture);
 	}
 }

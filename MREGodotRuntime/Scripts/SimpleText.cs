@@ -187,7 +187,7 @@ public partial class SimpleText : Label3D, IText
 		for (int i = 0; i < surfaceCount; i++)
 		{
 			var labelMaterial = RenderingServer.MeshSurfaceGetMaterial(GetBase(), i);
-			var labelTexture = RenderingServer.MaterialGetParam(labelMaterial, "texture_albedo") as RID;
+			var labelTexture = RenderingServer.MaterialGetParam(labelMaterial, "texture_albedo");
 
 			var material = RenderingServer.MaterialCreate();
 			RenderingServer.MaterialSetShader(material, TextShader.GetRid());

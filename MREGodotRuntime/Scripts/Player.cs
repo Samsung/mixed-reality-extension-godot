@@ -33,13 +33,13 @@ public partial class Player : XROrigin3D
     private bool openXRIsInitialized = false;
     private Callable readyCallable;
 
-    [ExportEnum(typeof(PositionControlType))]
+    [Export(hint: PropertyHint.Enum, "None,Keyboard,VirtualGamePad")]
     private int positionControl = (int)PositionControlType.Keyboard;
 
-    [ExportEnum(typeof(RotationControlType))]
+    [Export(hint: PropertyHint.Enum, "None,Mouse")]
     private int rotationControl = (int)RotationControlType.Mouse;
 
-    [ExportEnum(typeof(ControllerType))]
+    [Export(hint: PropertyHint.Enum, "None,Hand,Mouse")]
     private int controller = (int)ControllerType.Hand;
 
     public PositionControlType PositionControl {
@@ -144,7 +144,7 @@ public partial class Player : XROrigin3D
             if (cursorScenePath == value)
                 return;
             cursorScenePath = value;
-            EmitSignal(nameof(cursor_changed), value);
+            EmitSignal(nameof(CursorChangedEventHandler), value);
         }
     }
 
@@ -156,7 +156,7 @@ public partial class Player : XROrigin3D
                 return;
             rayScenePath = value;
             if (MainCamera != null)
-                EmitSignal(nameof(ray_changed), value, MainCamera);
+                EmitSignal(nameof(RayChangedEventHandler), value, MainCamera);
         }
     }
 
@@ -167,20 +167,20 @@ public partial class Player : XROrigin3D
             if (gamepadScenePath == value)
                 return;
             gamepadScenePath = value;
-            EmitSignal(nameof(gamepad_changed), value);
+            EmitSignal(nameof(GamepadChangedEventHandler), value);
         }
     }
 
     public Camera3D MainCamera { get; private set; }
 
     [Signal]
-    public delegate void cursor_changed(string scenePath);
+    public delegate void CursorChangedEventHandler(string scenePath);
 
     [Signal]
-    public delegate void ray_changed(string scenePath);
+    public delegate void RayChangedEventHandler(string scenePath, Camera3D camera);
 
     [Signal]
-    public delegate void gamepad_changed(string scenePath);
+    public delegate void GamepadChangedEventHandler(string scenePath);
 
     private void _on_Player_ready()
     {

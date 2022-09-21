@@ -160,12 +160,12 @@ public partial class MREComponent : Node3D
 			GD.Print($"{testName}: {message}");
 		}));
 	}
-	public override void _PhysicsProcess(float delta)
+	public override void _PhysicsProcess(double delta)
 	{
 		MREApp?.FixedUpdate();
 	}
 
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		MREApp?.Update();
 	}

@@ -20,7 +20,7 @@ namespace Assets.Scripts.Control
             InputSource.RayCastDistance = 10000f;
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             if (InputSource.CurrentTool is TargetTool targetTool)
             {
