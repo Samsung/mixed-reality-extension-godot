@@ -9,7 +9,6 @@ radius = 0.02
 height = 0.04
 
 [node name="Player" type="XROrigin3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.69584, 0)
 script = ExtResource("2")
 
 [node name="MainCamera" type="XRCamera3D" parent="."]
@@ -24,4 +23,3 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 
 shape = SubResource("1")
 
 [node name="socket-head" type="Node3D" parent="MainCamera"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02003, -0.428197)

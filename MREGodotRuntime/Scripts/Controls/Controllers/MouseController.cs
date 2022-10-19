@@ -16,7 +16,7 @@ namespace Assets.Scripts.Control
         public override void _Ready()
         {
             var player = GetParent<Player>();
-            AddInputSource(mainCamera, mainCamera, player.CursorScenePath, player.RayScenePath);
+            AddInputSource(mainCamera, player, player.CursorScenePath, player.RayScenePath);
             InputSource.RayCastDistance = 10000f;
         }
 
@@ -24,7 +24,7 @@ namespace Assets.Scripts.Control
         {
             if (InputSource.CurrentTool is TargetTool targetTool)
             {
-                InputSource.Cursor.Visible = InputSource.Ray.Visible = (targetTool.Target != null);
+                InputSource.Cursor.Visible = (targetTool.Target != null);
             }
         }
 

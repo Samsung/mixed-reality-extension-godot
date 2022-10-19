@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://daofg01sydg35"]
+
+[ext_resource type="PackedScene" uid="uid://byop3qi4mbrtv" path="res://MREGodotRuntime/Scenes/Default_Left_Hand.gltf" id="1_t6euc"]
+[ext_resource type="Script" path="res://MREGodotRuntime/Scripts/Player/DefaultHand.cs" id="2_tu324"]
+
+[node name="Default_Left_Hand" instance=ExtResource("1_t6euc")]
+script = ExtResource("2_tu324")
+
+[node name="Index_Tip" type="BoneAttachment3D" parent="Left_Hand/Skeleton3D" index="1"]
+transform = Transform3D(-0.642026, 0.381394, -0.665088, 0.260245, 0.924394, 0.278871, 0.721163, 0.00595684, -0.692741, -6.45607e-05, 0.0682463, -0.0580108)
+bone_name = "Index_Tip_L"
+bone_idx = 8
+
+[node name="Index_Tip_Remote" type="RemoteTransform3D" parent="Left_Hand/Skeleton3D/Index_Tip" index="0"]
+
+[node name="Thumb_Tip" type="BoneAttachment3D" parent="Left_Hand/Skeleton3D" index="2"]
+transform = Transform3D(-0.317753, 0.94601, -0.0640181, 0.681941, 0.181102, -0.708631, -0.658778, -0.268827, -0.702669, 0.0250872, -0.0357927, -0.0735085)
+bone_name = "Thumb_Tip_L"
+bone_idx = 16
+
+[node name="Thumb_Tip_Remote" type="RemoteTransform3D" parent="Left_Hand/Skeleton3D/Thumb_Tip" index="0"]
+
+[node name="Wrist" type="BoneAttachment3D" parent="Left_Hand/Skeleton3D" index="3"]
+transform = Transform3D(-0.638122, 0.440144, -0.631723, 0.302795, 0.897838, 0.319692, 0.707895, 0.0127198, -0.706203, -0.100351, -0.079738, -0.0528)
+bone_name = "Wrist_L"
+bone_idx = 0
+
+[node name="Wrist_Remote" type="RemoteTransform3D" parent="Left_Hand/Skeleton3D/Wrist" index="0"]
+
+[node name="Middle_Tip" type="BoneAttachment3D" parent="Left_Hand/Skeleton3D" index="4"]
+transform = Transform3D(-0.619437, 0.296872, -0.726749, 0.155078, 0.953772, 0.257429, 0.769576, 0.0467585, -0.636841, -0.0183397, 0.0877284, -0.0379419)
+bone_name = "Middle_Tip_L"
+bone_idx = 4
+
+[node name="Middle_Tip_Remote" type="RemoteTransform3D" parent="Left_Hand/Skeleton3D/Middle_Tip" index="0"]
