@@ -98,10 +98,10 @@ namespace MixedRealityExtension.Patching
 
 			var patch = new QuaternionPatch()
 			{
-				X = _old.X != _new.x ? (float?)_new.x : null,
-				Y = _old.Y != _new.y ? (float?)_new.y : null,
-				Z = _old.Z != _new.z ? (float?)_new.z : null,
-				W = _old.W != _new.w ? (float?)_new.w : null
+				X = Math.Abs(_old.X - _new.x) > 0.001f ? (float?)_new.x : null,
+				Y = Math.Abs(_old.Y - _new.y) > 0.001f ? (float?)_new.y : null,
+				Z = Math.Abs(_old.Z - _new.z) > 0.001f ? (float?)_new.z : null,
+				W = Math.Abs(_old.W - _new.w) > 0.001f ? (float?)_new.w : null
 			};
 
 			if (patch.IsPatched())
@@ -389,7 +389,7 @@ namespace MixedRealityExtension.Patching
 		{
 			var localPosition = _this.Transform.origin;
 			var localRotation = _this.Transform.basis.GetRotationQuaternion();
-			var localScale = _this.Transform.basis.Scale;
+			var localScale = _this.Scale;
 
 			if (patch.Position != null)
 			{
