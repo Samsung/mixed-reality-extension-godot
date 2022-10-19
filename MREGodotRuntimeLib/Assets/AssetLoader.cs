@@ -509,6 +509,7 @@ namespace MixedRealityExtension.Assets
 					Size = aabb.Size / 2,
 				};
 				area.AddChild(collisionShape);
+				meshInstance.AddChild(area);
 			}
 			else if (colliderType == ColliderType.Mesh)
 			{
@@ -518,6 +519,7 @@ namespace MixedRealityExtension.Assets
 				var collisionShape = new CollisionShape3D();
 				collisionShape.Shape = concavePolygonShape;
 				area.AddChild(collisionShape);
+				meshInstance.AddChild(area);
 			}
 		}
 
