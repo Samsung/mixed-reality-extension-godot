@@ -127,7 +127,7 @@ namespace MixedRealityExtension.Assets
 					actorList.Add(actor);
 				}
 				else if (go.GetType() == typeof(Node3D)
-					|| go.GetType() == typeof(Skeleton3D)
+					// || go.GetType() == typeof(Skeleton3D)
 					|| go.GetType() == typeof(BoneAttachment3D))
 				{
 					var meshInstance = go.GetChild<MeshInstance3D>();
@@ -147,6 +147,22 @@ namespace MixedRealityExtension.Assets
 						}
 					}
 					actorList.Add(newActor);
+				}
+				else if (go.GetType() == typeof(Skeleton3D))
+				{
+					var m = go.GetChild<MeshInstance3D>();
+					Actor actor = new Actor();
+					actor.Name = m.Name;
+					actor.MeshInstance3D = m;
+					actor.Transform = m.Transform;
+					go.ReplaceBy(actor);
+
+					m.Name += "MeshInstance";
+					m.GetParent().RemoveChild(m);
+					actor.AddChild(m);
+					actor.AddChild(go);
+					m.Skeleton = m.GetPathTo(go);
+					m.AddToGroup("Actor");
 				}
 				else if (go.GetType() == typeof(MeshInstance3D))
 				{
