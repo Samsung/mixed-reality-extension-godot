@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c2o1g2u2gnkf3"
-path="res://.godot/imported/MRTK_R_Hand.gltf-08f00b9d70305d8de3e02bcf789b0e83.scn"
+uid="uid://dba34ueciwb1u"
+path="res://.godot/imported/Default_Right_Hand.gltf-3251339a712b06791bfbc6bc53a5d280.scn"
 
 [deps]
 
-source_file="res://MREGodotRuntime/Scenes/MRTK_R_Hand.gltf"
-dest_files=["res://.godot/imported/MRTK_R_Hand.gltf-08f00b9d70305d8de3e02bcf789b0e83.scn"]
+source_file="res://MREGodotRuntime/Scenes/Default_Right_Hand.gltf"
+dest_files=["res://.godot/imported/Default_Right_Hand.gltf-3251339a712b06791bfbc6bc53a5d280.scn"]
 
 [params]
 

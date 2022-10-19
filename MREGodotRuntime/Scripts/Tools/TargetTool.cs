@@ -216,7 +216,6 @@ namespace Assets.Scripts.Tools
 
 			hitPoint = null;
 			IsNearObject = false;
-			inputSource.Ray.Color = new Color(1, 1, 1);
 
 			Dictionary RayIntersectionResult = inputSource.IntersectRay();
 

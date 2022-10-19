@@ -14,7 +14,6 @@ namespace Assets.Scripts.User
 		private bool pinchChaged;
 		private PhysicsDirectSpaceState3D spaceState;
 		private Cursor cursor;
-		private User.Ray ray;
 
 		public Node UserNode { get; set; }
 
@@ -44,23 +43,6 @@ namespace Assets.Scripts.User
 				cursor = value;
 				if (cursor != null && IsInsideTree())
 					AddChild(cursor);
-			}
-		}
-
-		public User.Ray Ray
-		{
-			get => ray;
-			set
-			{
-				if (ray == value)
-					return;
-
-				if (ray != null)
-					ray.QueueFree();
-
-				ray = value;
-				if (ray != null && IsInsideTree())
-					GetTree().Root.CallDeferred("add_child", ray);
 			}
 		}
 
@@ -103,7 +85,6 @@ namespace Assets.Scripts.User
 		{
 			spaceState = GetWorld3d().DirectSpaceState;
 			AddChild(Cursor);
-			GetTree().Root.CallDeferred("add_child", Ray);
 
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();
 			_currentTool.OnToolHeld(this);
@@ -160,7 +141,6 @@ namespace Assets.Scripts.User
 		{
 			_currentTool.Update(this);
 			Cursor.SetCursorTransform(HitPoint, HitPointNormal);
-			Ray.DrawRay(GlobalTransform.origin, HitPoint);
 		}
 	}
 }

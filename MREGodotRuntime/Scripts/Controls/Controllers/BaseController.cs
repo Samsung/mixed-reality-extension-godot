@@ -15,38 +15,22 @@ namespace Assets.Scripts.Control
             return cursor;
         }
 
-        protected virtual User.Ray LoadRay(string scenePath, Camera3D mainCamera)
-        {
-            var rayScene = ResourceLoader.Load<PackedScene>(scenePath);
-            var ray = rayScene.Instantiate<User.Ray>();
-            ray.Camera3D = mainCamera;
-            return ray;
-        }
-
         protected virtual void AddInputSource(Node parent, Node userNode, string cursorScene = null, string rayScene = null)
         {
             Player player = FindParent("Player") as Player;
             Cursor cursor = null;
-            User.Ray ray = null;
             if (!string.IsNullOrEmpty(cursorScene))
             {
                 cursor = LoadCursor(cursorScene);
             }
 
-            if (!string.IsNullOrEmpty(rayScene))
-            {
-                ray = LoadRay(rayScene, (Camera3D)userNode);
-            }
-
             InputSource = new InputSource(userNode)
             {
                 Cursor = cursor,
-                Ray = ray,
             };
             parent.AddChild(InputSource);
 
             player.CursorChanged += OnBaseControllerCursorChanged;
-            player.RayChanged += OnBaseControllerRayChanged;
         }
 
         protected virtual void OnBaseControllerCursorChanged(string cursorPath)
@@ -55,20 +39,6 @@ namespace Assets.Scripts.Control
             {
                 var newCursor = LoadCursor(cursorPath);
                 InputSource.Cursor = newCursor;
-            }
-        }
-
-        protected virtual void OnBaseControllerRayChanged(string RayPath, Camera3D camera)
-        {
-            if (camera == null)
-            {
-                throw new ArgumentException(nameof(camera));
-            }
-
-            if (!string.IsNullOrEmpty(RayPath))
-            {
-                var newRay = LoadRay(RayPath, camera);
-                InputSource.Ray = newRay;
             }
         }
     }

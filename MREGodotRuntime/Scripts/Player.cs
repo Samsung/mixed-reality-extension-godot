@@ -1,11 +1,11 @@
 using System;
 using Godot;
 using Assets.Scripts.Control;
+using MixedRealityExtension.Util.GodotHelper;
 
 [Flags]
 public enum PositionControlType
 {
-    None = 0,
     Keyboard = 1 << 0,
     VirtualGamePad = 1 << 1,
 }
@@ -13,14 +13,12 @@ public enum PositionControlType
 [Flags]
 public enum RotationControlType
 {
-    None = 0,
     Mouse = 1 << 0,
 }
 
 [Flags]
 public enum ControllerType
 {
-    None = 0,
     Hand = 1 << 0,
     Mouse = 1 << 1,
 }
@@ -34,108 +32,13 @@ public partial class Player : XROrigin3D
     private Callable readyCallable;
 
     [Export(hint: PropertyHint.Enum, "None,Keyboard,VirtualGamePad")]
-    private int positionControl = (int)PositionControlType.Keyboard;
+    private PositionControlType positionControl = PositionControlType.Keyboard;
 
     [Export(hint: PropertyHint.Enum, "None,Mouse")]
-    private int rotationControl = (int)RotationControlType.Mouse;
+    private RotationControlType rotationControl = RotationControlType.Mouse;
 
     [Export(hint: PropertyHint.Enum, "None,Hand,Mouse")]
-    private int controller = (int)ControllerType.Hand;
-
-    public PositionControlType PositionControl {
-        get => (PositionControlType)positionControl;
-        set
-        {
-            if (!IsInsideTree())
-                return;
-
-            positionControl = (int)value;
-
-            // clear exist IPositionControl
-            foreach (Node childNode in GetChildren())
-            {
-                if (childNode is IPositionControl)
-                {
-                    RemoveChild(childNode);
-                }
-            }
-
-            if (value.HasFlag(PositionControlType.Keyboard))
-            {
-                var keyboardControl = new KeyboardPositionControl(MainCamera);
-                AddChild(keyboardControl);
-            }
-
-            if (value.HasFlag(PositionControlType.VirtualGamePad))
-            {
-                var virtualGamePadControl = new VirtualGamepadPositionControl(MainCamera);
-                AddChild(virtualGamePadControl);
-            }
-        }
-    }
-
-    public RotationControlType RotationControl {
-        get => (RotationControlType)rotationControl;
-        set
-        {
-            if (!IsInsideTree())
-                return;
-
-            rotationControl = (int)value;
-
-            // clear exist IRotationControl
-            foreach (Node childNode in GetChildren())
-            {
-                if (childNode is IRotationControl)
-                {
-                    RemoveChild(childNode);
-                }
-            }
-
-            if (value.HasFlag(RotationControlType.Mouse))
-            {
-                var mouseControl = new MouseRotationControl(MainCamera);
-                AddChild(mouseControl);
-            }
-        }
-    }
-
-    public ControllerType Controller {
-        get => (ControllerType)controller;
-        set
-        {
-            if (!IsInsideTree())
-                return;
-
-            controller = (int)value;
-
-            // clear exist Controller
-            foreach (Node childNode in GetChildren())
-            {
-                if (childNode is IController)
-                {
-                    RemoveChild(childNode);
-                }
-            }
-
-            if (value.HasFlag(ControllerType.Mouse))
-            {
-                var mouseControl = new MouseController(MainCamera);
-                AddChild(mouseControl);
-            }
-            if (value.HasFlag(ControllerType.Hand))
-            {
-                if (IsInsideTree())
-                {
-                    AddHandController();
-                }
-                else
-                {
-                    Connect("ready", readyCallable);
-                }
-            }
-        }
-    }
+    private ControllerType controller = ControllerType.Hand;
 
     [Export(PropertyHint.File, "*.tscn")]
     public string CursorScenePath {
@@ -182,25 +85,90 @@ public partial class Player : XROrigin3D
     [Signal]
     public delegate void GamepadChangedEventHandler(string scenePath);
 
-    private void _on_Player_ready()
-    {
-        Disconnect("ready", readyCallable);
-        AddHandController();
-    }
-
     private void AddHandController()
     {
+        AddChild(new HandController(HandController.Hands.Right));
         if (openXRIsInitialized)
         {
-            var rightHand = new HandController(MRERuntimeScenePath.OpenXRRightHand);
-            var leftHand = new HandController(MRERuntimeScenePath.OpenXRLeftHand);
-            AddChild(rightHand);
-            AddChild(leftHand);
+            AddChild(new HandController(HandController.Hands.Left));
+        }
+    }
+
+    private void AddDefaultHandNodes()
+    {
+        var rightHand = ResourceLoader.Load<PackedScene>(MRERuntimeScenePath.DefaultRightHand).Instantiate<DefaultHand>();
+        var rightThumbTip = GetOrCreateSocket("right-thumb");
+        var rightIndexTip = GetOrCreateSocket("right-index");
+        var rightMiddleTip = GetOrCreateSocket("right-middle");
+        var rightWrist = GetOrCreateSocket("right-hand");
+
+        if (!openXRIsInitialized)
+        {
+            rightHand.Position = new Vector3(0.081f, -0.006f, -0.151f);
+            MainCamera.AddChild(rightHand);
         }
         else
         {
-            var rightHand = new HandController(MRERuntimeScenePath.DefaultHand);
+            var leftHand = this.AddNode(ResourceLoader.Load<PackedScene>(MRERuntimeScenePath.DefaultLeftHand).Instantiate<DefaultHand>());
+            var leftThumbTip = GetOrCreateSocket("left-thumb");
+            var leftIndexTip = GetOrCreateSocket("left-index");
+            leftHand.SetThumbTip(leftThumbTip);
+            leftHand.SetIndexTip(leftIndexTip);
+
             AddChild(rightHand);
+
+            // Add XRHands
+            var rightXRHand = new OpenXRHand() { Name = "XRHand_R" };
+            rightXRHand.Hand = OpenXRHand.Hands.Right;
+            AddChild(rightXRHand);
+            rightXRHand.HandSkeleton = rightXRHand.GetPathTo(rightHand.FindChild("Skeleton3D"));
+
+            var leftXRHand = new OpenXRHand() { Name = "XRHand_L" };
+            leftXRHand.Hand = OpenXRHand.Hands.Left;
+            AddChild(leftXRHand);
+            leftXRHand.HandSkeleton = leftXRHand.GetPathTo(leftHand.FindChild("Skeleton3D"));
+        }
+
+        rightHand.SetThumbTip(rightThumbTip);
+        rightHand.SetIndexTip(rightIndexTip);
+        rightHand.SetMiddleTip(rightMiddleTip);
+        rightHand.SetWrist(rightWrist);
+    }
+
+    private void InitializeController()
+    {
+        switch (controller)
+        {
+            case ControllerType.Mouse:
+                AddChild(new MouseController(MainCamera));
+                break;
+            case ControllerType.Hand:
+                AddDefaultHandNodes();
+                AddHandController();
+                break;
+        }
+    }
+
+    private void InitializePositionControl()
+    {
+        switch (positionControl)
+        {
+            case PositionControlType.Keyboard:
+                AddChild(new KeyboardPositionControl(MainCamera));
+                break;
+            case PositionControlType.VirtualGamePad:
+                AddChild(new VirtualGamepadPositionControl(MainCamera));
+                break;
+        }
+    }
+
+    private void InitializeRotationControl()
+    {
+        switch (rotationControl)
+        {
+            case RotationControlType.Mouse:
+                AddChild(new MouseRotationControl(MainCamera));
+                break;
         }
     }
 
@@ -219,16 +187,17 @@ public partial class Player : XROrigin3D
 
             Engine.TargetFps = 144;
             openXRIsInitialized = ARVRInterface.IsInitialized();
-
-            var rightHand = new HandController(MRERuntimeScenePath.OpenXRRightHand);
-            var leftHand = new HandController(MRERuntimeScenePath.OpenXRLeftHand);
-
-            CallDeferred("add_child", rightHand);
-            CallDeferred("add_child", leftHand);
             return true;
         }
 
         return false;
+    }
+
+    public Node3D GetOrCreateSocket(string name)
+    {
+        var socket = GetNodeOrNull<Node3D>($"socket-{name}") ?? this.AddNode(new Node3D(){ Name = $"socket-{name}" });
+        socket.Owner = this;
+        return socket;
     }
 
     public override void _EnterTree()
@@ -240,10 +209,9 @@ public partial class Player : XROrigin3D
 
     public override void _Ready()
     {
-        readyCallable = new Callable(this, nameof(_on_Player_ready));
-        // update control property
-        PositionControl = (PositionControlType)positionControl;
-        RotationControl = (RotationControlType)rotationControl;
-        Controller = (ControllerType)controller;
+        // initialize control property
+        InitializeController();
+        InitializePositionControl();
+        InitializeRotationControl();
     }
 }

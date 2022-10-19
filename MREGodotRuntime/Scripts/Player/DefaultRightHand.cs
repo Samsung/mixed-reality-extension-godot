@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class DefaultRightHand : Node3D
+public partial class DefaultRightHand : DefaultHand
 {
     private float handLocalOrigin;
     private Vector2 mouseDelta = new Vector2();
@@ -8,6 +8,7 @@ public partial class DefaultRightHand : Node3D
 
     public override void _Ready()
     {
+        base._Ready();
         handLocalOrigin = Position.z;
     }
 

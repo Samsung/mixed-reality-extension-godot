@@ -5,14 +5,22 @@ namespace Assets.Scripts.Control
 {
     public partial class HandController : BaseController
     {
+        public enum Hands
+        {
+            Left = 0,
+            Right = 1,
+        }
+
         private bool isPinching;
         private bool pinchChanged;
-        private Node3D handNode;
+        private Hands hands;
+        private string handString;
         private Camera3D mainCamera;
 
-        public HandController(string scenePath)
+        public HandController(Hands hands)
         {
-            handNode = CreateHandNode(scenePath);
+            this.hands = hands;
+            handString = hands == Hands.Left ? "left" : "right";
         }
 
         public bool IsPinching
@@ -50,22 +58,6 @@ namespace Assets.Scripts.Control
             return hand;
         }
 
-        private void AddHandNodes(Player player)
-        {
-            var isOpenXRInitialized = XRServer.FindInterface("OpenXR")?.IsInitialized();
-            if (!isOpenXRInitialized.HasValue)
-                return;
-
-            if (isOpenXRInitialized.Value)
-            {
-                player.AddChild(handNode);
-            }
-            else
-            {
-                handNode.Position = new Vector3(0.081f, -0.006f, -0.151f);
-                mainCamera.AddChild(handNode);
-            }
-        }
 
         private void AddProximityLights(Node3D parent)
         {
@@ -93,25 +85,31 @@ namespace Assets.Scripts.Control
             var player = GetParent<Player>();
             mainCamera = player.FindChild("MainCamera") as Camera3D;
 
-            AddHandNodes(player);
-            ThumbTip = handNode?.FindChild("ThumbTip") as Node3D;
-            IndexTip = handNode?.FindChild("IndexTip") as Node3D;
-            AddInputSource(IndexTip, mainCamera, player.CursorScenePath, player.RayScenePath);
+            ThumbTip = player.FindChild($"socket-{handString}-thumb") as Node3D;
+            IndexTip = player.FindChild($"socket-{handString}-index") as Node3D;
+            AddInputSource(IndexTip, player, player.CursorScenePath, player.RayScenePath);
 
             AddProximityLights(IndexTip);
 
             /*
-              Reparent HandController node. Node tree will be:
-              ┖╴SceneRoot
-                 ┠╴Player(or MainCamera)
-                 ┃  ┖╴HandNode
-                 ┃     ┠╴HandController
-                 ┃     ┖╴InputSource
-                 ┃        ┖╴Cursor
-                 ┖╴Ray
+            ┖╴SceneRoot
+                ┠╴Player(or MainCamera)
+                ┃  ┠╴HandNode
+                ┃  ┃ ┖╴BoneAttachment(Index_Tip_R)
+                ┃  ┃   ┖╴RemoteTransform3D -> socket-right
+                ┃  ┠╴XRHand
+                ┃  ┠╴HandController(left)
+                ┃  ┠╴HandController
+                ┠╴socket-left-index
+                ┃ ┖╴InputSource
+                ┃   ┖╴Cursor
+                ┠╴socket-left-thumb
+                ┠╴socket-right-index
+                ┃ ┖╴InputSource
+                ┃   ┖╴Cursor
+                ┠╴socket-right-thumb
+                ┖╴Ray
             */
-            player.RemoveChild(this);
-            handNode.AddChild(this);
         }
 
         public override void _Process(double delta)
