@@ -698,7 +698,7 @@ namespace MixedRealityExtension.Core
 				if (Time.GetTicksMsec() >= _nextUpdateTime)
 				{
 
-					_nextUpdateTime = Time.GetTicksMsec() + 200f + (float)GD.RandRange(-100, 100);
+					_nextUpdateTime = Time.GetTicksMsec();// + 200f + (float)GD.RandRange(-100, 100);
 					SynchronizeApp();
 
 					// Give components the opportunity to synchronize the app.
