@@ -158,32 +158,32 @@ namespace MixedRealityExtension.API
 
 			var pluginPath = GetMREPluginPath(pluginName);
 			var dllPath = System.IO.Path.Join(pluginPath, $"{pluginName}.dll");
-			var pckPath = System.IO.Path.Join(pluginPath, $"{pluginName}.pck");
 			if (!System.IO.File.Exists(dllPath))
 				throw new FileNotFoundException($"plugin not found", nameof(dllPath));
 
 			var loadContext = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(GetType().Assembly);
 			var dll = loadContext.LoadFromAssemblyPath(dllPath);
 
-			if (System.IO.File.Exists(pckPath) && !ProjectSettings.LoadResourcePack(pckPath))
-			{
-				GD.PushError($"{pckPath} not found.");
-				return;
-			}
-
 			foreach (var type in dll.GetTypes())
 			{
-				if (typeof(JsonConverter).IsAssignableFrom(type))
-					RegisterJsonConverter((JsonConverter)Activator.CreateInstance(type));
-				else if (type.Name.EndsWith("TypeRegistry"))
-					RegisterPayloadType(type);
-				else if (typeof(ICommandHandlerContext).IsAssignableFrom(type))
+				if (typeof(MREPlugin).IsAssignableFrom(type))
 				{
-					var commandHandler = (ICommandHandlerContext)Activator.CreateInstance(type, new object[] { app });
+					var MREPlugin = (MREPlugin)Activator.CreateInstance(type, new object[] { app });
 					app.RegisterCommandHandlers(new Dictionary<Type, ICommandHandlerContext>()
 					{
-						{ type, commandHandler },
+						{ type, MREPlugin },
 					});
+					if (MREPlugin.JsonConverters != null)
+					{
+						foreach (var jsonConverter in MREPlugin.JsonConverters)
+						{
+							RegisterJsonConverter(jsonConverter);
+						}
+					}
+					if (MREPlugin.TypeRegistry != null)
+					{
+						RegisterPayloadType(MREPlugin.TypeRegistry);
+					}
 				}
 			}
 		}
