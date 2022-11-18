@@ -22,7 +22,6 @@ namespace Assets.Scripts.Tools
 		private Node3D CurrentPointerTarget;
 		private Vector3 RayStartPoint;
 		private Vector3 RayEndPoint;
-		private float previousClosestDistance = 0.0f;
 		private Vector3 hitPointNormal;
 
 		public PokeTool()
@@ -62,14 +61,14 @@ namespace Assets.Scripts.Tools
 					touchable = actor.GetChild<ITouchableBase>();
 				}
 				if (touchable == null || actor == null) continue;
-
 				float distance = touchable.DistanceToTouchable(inputSource.GlobalTransform.origin, out normal);
 
-				if (Math.Abs(distance) < closestDistance)
+				bool bothInside = (distance <= 0f) && (closestDistance <= 0f);
+				bool betterFit = bothInside ? Mathf.Abs(distance) < Mathf.Abs(closestDistance) : distance < closestDistance;
+				if (betterFit)
 				{
 					newClosestTouchable = touchable;
-					closestDistance = Math.Abs(distance);
-					previousClosestDistance = distance;
+					closestDistance = distance;
 					closestNormal = normal;
 				}
 			}
@@ -132,7 +131,7 @@ namespace Assets.Scripts.Tools
 			if (CurrentPointerTarget != null && ClosestProximityTouchable != null)
 			{
 				float distToTouchable = RayStartPoint.DistanceTo(RayEndPoint) - TouchableDistance;
-				bool newIsDown = distToTouchable < ClosestProximityTouchable.DebounceThreshold;
+				bool newIsDown = distToTouchable < 0.0f;
 				bool newIsUp = distToTouchable > ClosestProximityTouchable.DebounceThreshold;
 
 				if (newIsDown)
@@ -159,7 +158,7 @@ namespace Assets.Scripts.Tools
 
 		private void TryRaisePokeDown(InputSource inputSource)
 		{
-			if (CurrentTouchableObjectDown == null && previousClosestDistance > 0.0f)
+			if (CurrentTouchableObjectDown == null)
 			{
 				if (IsObjectPartOfTouchable(CurrentPointerTarget, ClosestProximityTouchable))
 				{
