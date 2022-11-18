@@ -93,11 +93,11 @@ namespace MixedRealityExtension.Core
 		{
 			_light.Visible = _light.Visible.GetPatchApplied(Enabled.ApplyPatch(patch.Enabled));
 			_light.LightColor = _light.LightColor.GetPatchApplied(Color.ApplyPatch(patch.Color));
-			_light.LightEnergy = _light.LightEnergy.GetPatchApplied(Intensity.ApplyPatch(patch.Intensity));
+			_light.LightEnergy = _light.LightEnergy.GetPatchApplied(Intensity.ApplyPatch(patch.Intensity)) * 0.5f;
 			if (_light is SpotLight3D spotLight)
 			{
 				if (patch.SpotAngle.HasValue)
-					spotLight.SpotAngle = Mathf.RadToDeg(patch.SpotAngle.Value);
+					spotLight.SpotAngle = Mathf.RadToDeg(patch.SpotAngle.Value) * 0.5f;
 				spotLight.SpotRange = spotLight.SpotRange.GetPatchApplied(Range.ApplyPatch(patch.Range));
 			}
 			else if (_light is OmniLight3D omniLight)
