@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MREGodotRuntimeLib", "MREGodotRuntimeLib\MREGodotRuntimeLib.csproj", "{95CF6A2A-8F56-4070-A1DD-F8CA0F7299B7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MREGodotToolkit", "Toolkit\MREGodotToolkit.csproj", "{FBA20F8A-4414-4728-9547-8350258648DB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
