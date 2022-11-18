@@ -869,11 +869,17 @@ namespace MixedRealityExtension.Core
 				switch (lightType)
 				{
 					case LightType.Spot:
-						_light = new SpotLight3D();
-						_light.RotateX(-90);
+						_light = new SpotLight3D()
+						{
+							SpotAngle = 15,
+							SpotRange = 10,
+						};
 						break;
 					case LightType.Point:
-						_light = new OmniLight3D();
+						_light = new OmniLight3D()
+						{
+							OmniRange = 10,
+						};
 						break;
 					case LightType.Directional:
 						_light = new DirectionalLight3D();
