@@ -61,7 +61,7 @@ namespace MixedRealityExtension.Core
 		/// <summary>
 		/// Forward direction of the actor
 		/// </summary>
-		public Vector3 Forward => ParentActor.GlobalTransform.basis * LocalForward;
+		public Vector3 Forward => ParentActor.ToGlobal(LocalForward);
 
 		/// <summary>
 		/// Forward direction of the TouchablePlane, the press direction needs to face the
@@ -167,10 +167,10 @@ namespace MixedRealityExtension.Core
 			switch (patch.Direction)
 			{
 				case TouchableDirection.Forward:
-					SetLocalForward(-Vector3.Forward);
+					SetLocalForward(Vector3.Forward);
 					break;
 				case TouchableDirection.Back:
-					SetLocalForward(Vector3.Forward);
+					SetLocalForward(-Vector3.Forward);
 					break;
 				case TouchableDirection.Up:
 					SetLocalForward(Vector3.Up);
