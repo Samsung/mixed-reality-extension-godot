@@ -15,7 +15,7 @@ namespace Assets.Scripts.Tools
 		PhysicsShapeQueryParameters3D shapeQueryParameters;
 
 		public ITouchableBase ClosestProximityTouchable { get; private set; }
-		public float TouchableDistance { get; } = 0.2f;
+		public float TouchableDistance { get; } = 0.02f;
 		public Node3D CurrentTouchableObjectDown { get; private set; }
 		public Vector3 PreviousPosition { get; private set; } = Vector3.Zero;
 
