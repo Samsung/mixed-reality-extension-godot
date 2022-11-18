@@ -91,7 +91,7 @@ namespace MixedRealityExtension.Core
 					Vector3 newCenter;
 					newCenter.x = Center.X;
 					newCenter.y = Center.Y;
-					newCenter.z = Center.Z;
+					newCenter.z = -Center.Z;
 					collider.Transform = new Transform3D(Basis.Identity, newCenter);
 				}
 
