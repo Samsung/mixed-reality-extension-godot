@@ -168,7 +168,16 @@ namespace MixedRealityExtension.API
 			{
 				if (typeof(MREPlugin).IsAssignableFrom(type))
 				{
-					var MREPlugin = (MREPlugin)Activator.CreateInstance(type, new object[] { app });
+					MREPlugin MREPlugin;
+					try
+					{
+						MREPlugin = (MREPlugin)Activator.CreateInstance(type, new object[] { app });
+					}
+					catch (Exception e)
+					{
+						GD.PushError(e.ToString());
+						continue;
+					}
 					app.RegisterCommandHandlers(new Dictionary<Type, ICommandHandlerContext>()
 					{
 						{ type, MREPlugin },
