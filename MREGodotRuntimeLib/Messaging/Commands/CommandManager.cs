@@ -137,13 +137,13 @@ namespace MixedRealityExtension.Messaging.Commands
 			foreach (var commandHandlerPair in commandHandlers)
 			{
 				// Build table of handler to method info.
-				_methodHandlersByContextType.Add(commandHandlerPair.Key,
+				_methodHandlersByContextType[commandHandlerPair.Key] =
 					new Type[] { commandHandlerPair.Key }
 						.SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
 						.Where(m => m.GetCustomAttributes().OfType<CommandHandler>().Any())
-						.ToDictionary(m => m.GetCustomAttributes().OfType<CommandHandler>().First().CommandType));
+						.ToDictionary(m => m.GetCustomAttributes().OfType<CommandHandler>().First().CommandType);
 
-				_invocationTargets.Add(commandHandlerPair.Key, commandHandlerPair.Value);
+				_invocationTargets[commandHandlerPair.Key] = commandHandlerPair.Value;
 			}
 		}
 

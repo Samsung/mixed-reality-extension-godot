@@ -31,6 +31,7 @@ using Regex = System.Text.RegularExpressions.Regex;
 using System.Text;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MixedRealityExtension.App
 {
@@ -74,6 +75,9 @@ namespace MixedRealityExtension.App
 
 		private AppState _appState = AppState.Stopped;
 		private int generation = 0;
+
+		private AppManifest _manifest = null;
+		private bool _isManifestDownloaded = false;
 
 		public IMRELogger Logger { get; private set; }
 
@@ -232,7 +236,7 @@ namespace MixedRealityExtension.App
 		}
 
 		/// <inheritdoc />
-		public async void Startup(string url, string sessionId)
+		public void Startup(string url, string sessionId)
 		{
 			if (_appState != AppState.Stopped)
 			{
@@ -243,35 +247,45 @@ namespace MixedRealityExtension.App
 			ServerAssetUri = new Uri(Regex.Replace(ServerUri.AbsoluteUri, "^ws(s?):", "http$1:"));
 			SessionId = sessionId;
 
+			var connection = new WebSocket();
+			connection.Url = url;
+			connection.Headers.Add(Constants.SessionHeader, SessionId);
+			connection.Headers.Add(Constants.LegacyProtocolVersionHeader, $"{Constants.LegacyProtocolVersion}");
+			connection.Headers.Add(Constants.CurrentClientVersionHeader, Constants.CurrentClientVersion);
+			connection.Headers.Add(Constants.MinimumSupportedSDKVersionHeader, Constants.MinimumSupportedSDKVersion);
+			connection.OnConnecting += Conn_OnConnecting;
+			connection.OnConnectFailed += Conn_OnConnectFailed;
+			connection.OnConnected += Conn_OnConnected;
+			connection.OnDisconnected += Conn_OnDisconnected;
+			connection.OnError += Connection_OnError;
+			_conn = connection;
+			_conn.Open();
+		}
+
+		private async Task<bool> DownloadManifest()
+		{
+			var prevAppState = _appState;
+
 			_appState = AppState.WaitingForPermission;
 			OnWaitingForPermission?.Invoke();
 
 			// download manifest
 			var manifestUri = new Uri(ServerAssetUri, "./manifest.json");
-			AppManifest manifest;
 			try
 			{
-				manifest = await AppManifest.DownloadManifest(manifestUri);
+				_manifest = await AppManifest.DownloadManifest(manifestUri);
 			}
 			catch (Exception e)
 			{
 				var errMessage = String.Format("Error downloading MRE manifest \"{0}\":\n{1}", manifestUri, e.ToString());
 				GD.PushError(errMessage);
-				manifest = new AppManifest()
-				{
-					Permissions = new Permissions[] { Permissions.UserTracking, Permissions.UserInteraction }
-				};
+				_appState = prevAppState;
+				return false;
 			}
 
-			var neededFlags = Permissions.Execution | (manifest.Permissions?.ToFlags() ?? Permissions.None);
-			var wantedFlags = manifest.OptionalPermissions?.ToFlags() ?? Permissions.None;
-
-			// load plugins
-			if (manifest.Plugins != null)
-			{
-				foreach (var plugin in manifest.Plugins)
-					MREAPI.AppsAPI.LoadMREPlugin(this, plugin);
-			}
+			var neededFlags = Permissions.Execution | (_manifest.Permissions?.ToFlags() ?? Permissions.None);
+			var wantedFlags = _manifest.OptionalPermissions?.ToFlags() ?? Permissions.None;
+			GD.Print("wantedFlags : " + wantedFlags);
 
 			// set up cancel source
 			if (permissionRequestCancelSource != null)
@@ -283,11 +297,11 @@ namespace MixedRealityExtension.App
 			// get permission to run from host app
 			var grantedPerms = await MREAPI.AppsAPI.PermissionManager.PromptForPermissions(
 				appLocation: ServerUri,
-				permissionsNeeded: new HashSet<Permissions>(manifest.Permissions ?? new Permissions[0]) { Permissions.Execution },
-				permissionsWanted: manifest.OptionalPermissions,
+				permissionsNeeded: new HashSet<Permissions>(_manifest.Permissions ?? new Permissions[0]) { Permissions.Execution },
+				permissionsWanted: _manifest.OptionalPermissions,
 				permissionFlagsNeeded: neededFlags,
 				permissionFlagsWanted: wantedFlags,
-				appManifest: manifest,
+				appManifest: _manifest,
 				cancellationToken: permissionRequestCancelSource.Token);
 
 			// clear cancel source once we don't need it anymore
@@ -303,24 +317,22 @@ namespace MixedRealityExtension.App
 			{
 				OnPermissionDenied?.Invoke();
 				Shutdown(reactivateOnPermissions: true);
-				return;
+				return false;
 			}
 
 			_appState = AppState.Starting;
+			return true;
+		}
 
-			var connection = new WebSocket();
-			connection.Url = url;
-			connection.Headers.Add(Constants.SessionHeader, SessionId);
-			connection.Headers.Add(Constants.LegacyProtocolVersionHeader, $"{Constants.LegacyProtocolVersion}");
-			connection.Headers.Add(Constants.CurrentClientVersionHeader, Constants.CurrentClientVersion);
-			connection.Headers.Add(Constants.MinimumSupportedSDKVersionHeader, Constants.MinimumSupportedSDKVersion);
-			connection.OnConnecting += Conn_OnConnecting;
-			connection.OnConnectFailed += Conn_OnConnectFailed;
-			connection.OnConnected += Conn_OnConnected;
-			connection.OnDisconnected += Conn_OnDisconnected;
-			connection.OnError += Connection_OnError;
-			_conn = connection;
-			_conn.Open();
+		private void LoadMREPlugin()
+		{
+			if (_manifest?.Plugins != null)
+			{
+				foreach (var plugin in _manifest.Plugins)
+				{
+					MREAPI.AppsAPI.LoadMREPlugin(this, plugin);
+				}
+			}
 		}
 
 		private void OnPermissionsUpdated(Uri updatedUrl, Permissions oldPermissions, Permissions newPermissions)
@@ -751,6 +763,20 @@ namespace MixedRealityExtension.App
 		{
 			OnConnected?.Invoke();
 
+			if (!_isManifestDownloaded)
+			{
+				_isManifestDownloaded = Task.Run(async () => await DownloadManifest()).Result;
+				if (!_isManifestDownloaded)
+				{
+					GD.PushError("Failed to downloadManifest in Conn_OnConnected!");
+				}
+				else
+				{
+					// This function has to be called in the main thread.
+					LoadMREPlugin();
+				}
+			}
+
 			if (_appState != AppState.Stopped)
 			{
 				IsAuthoritativePeer = false;
@@ -773,6 +799,7 @@ namespace MixedRealityExtension.App
 				Protocol = new Idle(this);
 			}
 
+			_isManifestDownloaded = false;
 			FreeResources();
 
 			this.OnDisconnected?.Invoke();
