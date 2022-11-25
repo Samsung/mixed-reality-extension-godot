@@ -803,8 +803,9 @@ namespace MixedRealityExtension.Core
 						attachmentComponent.UserId = Attachment.UserId;
 						attachmentComponent.Transform = this.Transform;
 						hostAppUser.BeforeAvatarDestroyed += UserInfo_BeforeAvatarDestroyed;
-						// FIXME: I have no idea how to bind user parameters.
-						//Connect("tree_exited", new Callable(this, nameof(ActorTreeExited)), new Godot.Collections.Array() { attachmentComponent });
+						TreeExited += () => {
+							ActorTreeExited(attachmentComponent);
+						};
 						return true;
 					}
 				}
