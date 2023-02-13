@@ -8,7 +8,7 @@ This project was forked from [Mixed Reality Extension Unity](https://github.com/
 
 ## Prerequisites
 * Install Git
-* Use [GodotEngine](https://godotengine.org/) to Install Godot 3.
+* Use [GodotEngine](https://godotengine.org/) to Install Godot 4.
 
 
 ## How to build and run Hello World in the Godot editor
