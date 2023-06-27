@@ -15,7 +15,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 ToVector2X(this Vector2 vector)
 		{
-			return new Vector2(vector.x, 0);
+			return new Vector2(vector.X, 0);
 		}
 
 		/// <summary>
@@ -23,7 +23,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 ToVector2Y(this Vector2 vector)
 		{
-			return new Vector2(0, vector.y);
+			return new Vector2(0, vector.Y);
 		}
 
 		/// <summary>
@@ -31,7 +31,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3XY(this Vector2 vector)
 		{
-			return new Vector3(vector.x, vector.y, 0);
+			return new Vector3(vector.X, vector.Y, 0);
 		}
 
 		/// <summary>
@@ -39,7 +39,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3XZ(this Vector2 vector)
 		{
-			return new Vector3(vector.x, 0, vector.y);
+			return new Vector3(vector.X, 0, vector.Y);
 		}
 
 		/// <summary>
@@ -47,7 +47,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3YZ(this Vector2 vector)
 		{
-			return new Vector3(0, vector.x, vector.y);
+			return new Vector3(0, vector.X, vector.Y);
 		}
 
 		/// <summary>
@@ -67,7 +67,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </remarks>
 		public static Vector2 Perp(this Vector2 vector)
 		{
-			return new Vector2(-vector.y, vector.x);
+			return new Vector2(-vector.Y, vector.X);
 		}
 
 		/// <summary>
@@ -79,7 +79,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </remarks>
 		public static float PerpDot(Vector2 a, Vector2 b)
 		{
-			return a.x*b.y - a.y*b.x;
+			return a.X*b.Y - a.Y*b.X;
 		}
 
 		/// <summary>
@@ -114,8 +114,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 		public static Vector2 InverseLerp(Vector2 a, Vector2 b, Vector2 value)
 		{
 			return new Vector2(
-				Mathf.InverseLerp(a.x, b.x, value.x),
-				Mathf.InverseLerp(a.y, b.y, value.y));
+				Mathf.InverseLerp(a.X, b.X, value.X),
+				Mathf.InverseLerp(a.Y, b.Y, value.Y));
 		}
 
 		/// <summary>
@@ -127,8 +127,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 			float sin = Mathf.Sin(radians);
 			float cos = Mathf.Cos(radians);
 			return new Vector2(
-				vector.x*cos + vector.y*sin,
-				vector.y*cos - vector.x*sin);
+				vector.X*cos + vector.Y*sin,
+				vector.Y*cos - vector.X*sin);
 		}
 
 		/// <summary>
@@ -140,8 +140,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 			float sin = Mathf.Sin(radians);
 			float cos = Mathf.Cos(radians);
 			return new Vector2(
-				vector.x*cos - vector.y*sin,
-				vector.y*cos + vector.x*sin);
+				vector.X*cos - vector.Y*sin,
+				vector.Y*cos + vector.X*sin);
 		}
 
 		/// <summary>
@@ -149,7 +149,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 RotateCW45(this Vector2 vector)
 		{
-			return new Vector2((vector.x + vector.y)*PTUtils.Sqrt05, (vector.y - vector.x)*PTUtils.Sqrt05);
+			return new Vector2((vector.X + vector.Y)*PTUtils.Sqrt05, (vector.Y - vector.X)*PTUtils.Sqrt05);
 		}
 
 		/// <summary>
@@ -157,7 +157,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 RotateCCW45(this Vector2 vector)
 		{
-			return new Vector2((vector.x - vector.y)*PTUtils.Sqrt05, (vector.y + vector.x)*PTUtils.Sqrt05);
+			return new Vector2((vector.X - vector.Y)*PTUtils.Sqrt05, (vector.Y + vector.X)*PTUtils.Sqrt05);
 		}
 
 		/// <summary>
@@ -165,7 +165,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 RotateCW90(this Vector2 vector)
 		{
-			return new Vector2(vector.y, -vector.x);
+			return new Vector2(vector.Y, -vector.X);
 		}
 
 		/// <summary>
@@ -173,17 +173,17 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 RotateCCW90(this Vector2 vector)
 		{
-			return new Vector2(-vector.y, vector.x);
+			return new Vector2(-vector.Y, vector.X);
 		}
 
 		public static string ToString(this Vector2 vector, string format, IFormatProvider formatProvider)
 		{
-			return string.Format("({0}, {1})", vector.x.ToString(format, formatProvider), vector.y.ToString(format, formatProvider));
+			return string.Format("({0}, {1})", vector.X.ToString(format, formatProvider), vector.Y.ToString(format, formatProvider));
 		}
 
 		#endregion Vector2
 
-		#region Vector2i
+		#region Vector2I
 
 		/// <summary>
 		/// Returns a perp of vector
@@ -192,9 +192,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// Hill, F. S. Jr. "The Pleasures of 'Perp Dot' Products."
 		/// Ch. II.5 in Graphics Gems IV (Ed. P. S. Heckbert). San Diego: Academic Press, pp. 138-148, 1994
 		/// </remarks>
-		public static Vector2i Perp(this Vector2i vector)
+		public static Vector2I Perp(this Vector2I vector)
 		{
-			return new Vector2i(-vector.y, vector.x);
+			return new Vector2I(-vector.Y, vector.X);
 		}
 
 		/// <summary>
@@ -204,12 +204,12 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// Hill, F. S. Jr. "The Pleasures of 'Perp Dot' Products."
 		/// Ch. II.5 in Graphics Gems IV (Ed. P. S. Heckbert). San Diego: Academic Press, pp. 138-148, 1994
 		/// </remarks>
-		public static int PerpDot(Vector2i a, Vector2i b)
+		public static int PerpDot(Vector2I a, Vector2I b)
 		{
-			return a.x*b.y - a.y*b.x;
+			return a.X*b.Y - a.Y*b.X;
 		}
 
-		#endregion Vector2i
+		#endregion Vector2I
 
 		#region Vector3
 
@@ -218,7 +218,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3X(this Vector3 vector)
 		{
-			return new Vector3(vector.x, 0, 0);
+			return new Vector3(vector.X, 0, 0);
 		}
 
 		/// <summary>
@@ -226,7 +226,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3Y(this Vector3 vector)
 		{
-			return new Vector3(0, vector.y, 0);
+			return new Vector3(0, vector.Y, 0);
 		}
 
 		/// <summary>
@@ -234,7 +234,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3Z(this Vector3 vector)
 		{
-			return new Vector3(0, 0, vector.z);
+			return new Vector3(0, 0, vector.Z);
 		}
 
 		/// <summary>
@@ -242,7 +242,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3XY(this Vector3 vector)
 		{
-			return new Vector3(vector.x, vector.y, 0);
+			return new Vector3(vector.X, vector.Y, 0);
 		}
 
 		/// <summary>
@@ -250,7 +250,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3XZ(this Vector3 vector)
 		{
-			return new Vector3(vector.x, 0, vector.z);
+			return new Vector3(vector.X, 0, vector.Z);
 		}
 
 		/// <summary>
@@ -258,7 +258,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector3 ToVector3YZ(this Vector3 vector)
 		{
-			return new Vector3(0, vector.y, vector.z);
+			return new Vector3(0, vector.Y, vector.Z);
 		}
 
 		/// <summary>
@@ -266,7 +266,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 ToVector2XY(this Vector3 vector)
 		{
-			return new Vector2(vector.x, vector.y);
+			return new Vector2(vector.X, vector.Y);
 		}
 
 		/// <summary>
@@ -274,7 +274,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 ToVector2XZ(this Vector3 vector)
 		{
-			return new Vector2(vector.x, vector.z);
+			return new Vector2(vector.X, vector.Z);
 		}
 
 		/// <summary>
@@ -282,7 +282,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// </summary>
 		public static Vector2 ToVector2YZ(this Vector3 vector)
 		{
-			return new Vector2(vector.y, vector.z);
+			return new Vector2(vector.Y, vector.Z);
 		}
 
 		/// <summary>
@@ -307,9 +307,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 		public static Vector3 InverseLerp(Vector3 a, Vector3 b, Vector3 value)
 		{
 			return new Vector3(
-				Mathf.InverseLerp(a.x, b.x, value.x),
-				Mathf.InverseLerp(a.y, b.y, value.y),
-				Mathf.InverseLerp(a.z, b.z, value.z));
+				Mathf.InverseLerp(a.X, b.X, value.X),
+				Mathf.InverseLerp(a.Y, b.Y, value.Y),
+				Mathf.InverseLerp(a.Z, b.Z, value.Z));
 		}
 
 		#endregion Vector3

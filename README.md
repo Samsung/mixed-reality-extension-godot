@@ -5,15 +5,9 @@ https://github.com/Microsoft/mixed-reality-extension-sdk). It also makes it easy
 
 This project was forked from [Mixed Reality Extension Unity](https://github.com/Microsoft/mixed-reality-extension-unity).
 
-
-## Prerequisites
-* Install Git
-* Use [GodotEngine](https://godotengine.org/) to Install Godot 4.
-
-
 ## How to build and run Hello World in the Godot editor
 From command prompt:
-* `git clone http://github.com/dasg34/mixed-reality-extension-godot`
+* `git clone https://github.com/Samsung/mixed-reality-extension-godot.git`
 * Open Godot editor with `project.godot`
 * Open the scene `MREGodotRuntime/Scenes/HelloWorld.tscn`
 * Play Scene(F6)
@@ -39,9 +33,9 @@ https://github.com/Microsoft/mixed-reality-extension-sdk) repository's [README.m
 
 ## Getting In Touch
 To report issues and feature requests: [Github issues page](
-https://github.com/dasg34/mixed-reality-extension-godot/issues).
+https://github.com/Samsung/mixed-reality-extension-godot/issues).
 
 
 ## License
-Code licensed under the [MIT License](https://github.com/dasg34/mixed-reality-extension-godot/blob/main/LICENSE).
+Code licensed under the [MIT License](https://github.com/Samsung/mixed-reality-extension-godot/blob/main/LICENSE).
 

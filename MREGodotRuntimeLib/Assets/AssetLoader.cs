@@ -185,7 +185,7 @@ namespace MixedRealityExtension.Assets
 			return actorList;
 		}
 
-		private void DuplicateResources(Godot.Object o)
+		private void DuplicateResources(Godot.GodotObject o)
 		{
 			foreach (Godot.Collections.Dictionary p in o.GetPropertyList())
 			{
@@ -296,7 +296,7 @@ namespace MixedRealityExtension.Assets
 			IList<Asset> assetDefs = new List<Asset>(30);
 			DeterministicGuids guidGenerator = new DeterministicGuids(UtilMethods.StringToGuid(
 				$"{containerId}:{source.ParsedUri.AbsoluteUri}"));
-			IList<Godot.Object> assets;
+			IList<Godot.GodotObject> assets;
 
 			// fetch assets from glTF stream or cache
 			if (source.Version != cachedVersion)
@@ -361,14 +361,14 @@ namespace MixedRealityExtension.Assets
 			return assetDefs;
 		}
 
-		private async Task<IList<Godot.Object>> LoadGltfFromStream(string path, MemoryStream stream, ColliderType colliderType)
+		private async Task<IList<Godot.GodotObject>> LoadGltfFromStream(string path, MemoryStream stream, ColliderType colliderType)
 		{
-			var assets = new List<Godot.Object>(30);
+			var assets = new List<Godot.GodotObject>(30);
 
 			// pre-parse glTF document so we can get a scene count
 			// run this on a threadpool thread so that the Godot main thread is not blocked
-			var gltf = new GLTFDocument();
-			var gltfState = new GLTFState();
+			var gltf = new GltfDocument();
+			var gltfState = new GltfState();
 			Node gltfRoot = null;
 			try
 			{
@@ -745,7 +745,7 @@ namespace MixedRealityExtension.Assets
 			onCompleteCallback?.Invoke();
 		}
 
-		private Asset GenerateAssetPatch(Godot.Object unityAsset, Guid id)
+		private Asset GenerateAssetPatch(Godot.GodotObject unityAsset, Guid id)
 		{
 			if (unityAsset is Node go)
 			{
@@ -801,15 +801,15 @@ namespace MixedRealityExtension.Assets
 
 						BoundingBoxDimensions = new Vector3Patch()
 						{
-							X = aabb.Size.x,
-							Y = aabb.Size.y,
-							Z = aabb.Size.z
+							X = aabb.Size.X,
+							Y = aabb.Size.Y,
+							Z = aabb.Size.Z
 						},
 						BoundingBoxCenter = new Vector3Patch()
 						{
-							X = aabb.Position.x,
-							Y = aabb.Position.y,
-							Z = aabb.Position.z
+							X = aabb.Position.X,
+							Y = aabb.Position.Y,
+							Z = aabb.Position.Z
 						}
 
 					}
@@ -822,7 +822,7 @@ namespace MixedRealityExtension.Assets
 					Id = id,
 					Sound = new MWSound()
 					{
-						Duration = sound.GetLength()
+						Duration = (float)sound.GetLength()
 					}
 				};
 			}

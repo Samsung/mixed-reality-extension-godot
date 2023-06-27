@@ -34,10 +34,10 @@ namespace MixedRealityExtension.Patching.Types
 
 		internal ColorPatch(Godot.Color color)
 		{
-			R = color.r;
-			G = color.g;
-			B = color.b;
-			A = color.a;
+			R = color.R;
+			G = color.G;
+			B = color.B;
+			A = color.A;
 		}
 
 		public bool Equals(ColorPatch other)

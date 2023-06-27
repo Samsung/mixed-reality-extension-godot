@@ -51,7 +51,7 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// <param name="version">
 		/// The version of the loaded resource. Will typically be the HTTP response's ETag header.
 		/// </param>
-		void StoreAssets(Uri uri, IEnumerable<Godot.Object> assets, string version);
+		void StoreAssets(Uri uri, IEnumerable<Godot.GodotObject> assets, string version);
 
 		/// <summary>
 		/// Asynchronously return the cached assets at the given URI, and increment the internal reference counter
@@ -62,7 +62,7 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// <param name="uri">The resource identifier</param>
 		/// <param name="ifMatchesVersion">Return null if the cached assets are not of this version</param>
 		/// <returns>A task that completes with the cached assets, or null if no assets are cached.</returns>
-		Task<IEnumerable<Godot.Object>> LeaseAssets(Uri uri, string ifMatchesVersion = null);
+		Task<IEnumerable<Godot.GodotObject>> LeaseAssets(Uri uri, string ifMatchesVersion = null);
 
 		/// <summary>
 		/// Same as <see cref="LeaseAssets(Uri, string)"/>, but is only valid if <see cref="SupportsSync"/> is true.
@@ -70,7 +70,7 @@ namespace MixedRealityExtension.PluginInterfaces
 		/// <param name="uri">The resource identifier</param>
 		/// <param name="ifMatchesVersion">Return null if the cached assets are not of this version</param>
 		/// <returns>The cached assets, or null if no assets are cached.</returns>
-		IEnumerable<Godot.Object> LeaseAssetsSync(Uri uri, string ifMatchesVersion = null);
+		IEnumerable<Godot.GodotObject> LeaseAssetsSync(Uri uri, string ifMatchesVersion = null);
 
 		/// <summary>
 		/// Returns the stored version of the given resource, or null if not cached. We'll need this for If-Not-Match

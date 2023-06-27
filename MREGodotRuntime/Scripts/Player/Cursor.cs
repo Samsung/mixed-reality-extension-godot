@@ -14,8 +14,8 @@ namespace Assets.Scripts.User
         public void SetCursorTransform(Vector3 hitPoint, Vector3 hitPointNormal)
         {
             var basis = Basis.Identity;
-            basis.y = hitPointNormal;
-            basis.x = basis.z.Cross(basis.y);
+            basis.Y = hitPointNormal;
+            basis.X = basis.Z.Cross(basis.Y);
             basis = basis.Orthonormalized();
 
             GlobalTransform = new Transform3D(basis, hitPoint);

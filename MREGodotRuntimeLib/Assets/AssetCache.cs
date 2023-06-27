@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot;
-using Object = Godot.Object;
+using Object = Godot.GodotObject;
 
 namespace MixedRealityExtension.Assets
 {

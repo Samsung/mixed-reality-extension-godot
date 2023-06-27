@@ -52,8 +52,8 @@ namespace MixedRealityExtension.Core.Components
 
 		private void LookAt()
 		{
-			Vector3 pos = -_targetObject.GlobalTransform.origin;
-			Vector3 delta = pos - parent.GlobalTransform.origin;
+			Vector3 pos = -_targetObject.GlobalTransform.Origin;
+			Vector3 delta = pos - parent.GlobalTransform.Origin;
 
 			if (parent == null)
 			{
@@ -75,7 +75,7 @@ namespace MixedRealityExtension.Core.Components
 			parent.LookAt(pos, Vector3.Up);
 			if (_lookAtMode == LookAtMode.TargetY)
 			{
-				parent.Rotation = new Vector3(0, parent.Rotation.y, parent.Rotation.z);
+				parent.Rotation = new Vector3(0, parent.Rotation.Y, parent.Rotation.Z);
 			}
 		}
 	}

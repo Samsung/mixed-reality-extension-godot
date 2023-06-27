@@ -40,7 +40,7 @@ namespace MixedRealityExtension.Core
 			float offset = options.Time.GetValueOrDefault();
 			if (options.Looping != null && options.Looping.Value && audioClip.GetLength() != 0.0f)
 			{
-				offset = offset % audioClip.GetLength();
+				offset = offset % (float)audioClip.GetLength();
 			}
 			if (offset < audioClip.GetLength())
 			{
@@ -95,13 +95,13 @@ namespace MixedRealityExtension.Core
 				}
 				if (options.Looping != null)
 				{
-					if (soundInstance.Stream is AudioStreamWAV AudioStreamWAV)
+					if (soundInstance.Stream is AudioStreamWav AudioStreamWav)
 					{
-						AudioStreamWAV.LoopMode = options.Looping.Value ? AudioStreamWAV.LoopModeEnum.Forward : AudioStreamWAV.LoopModeEnum.Disabled;
+						AudioStreamWav.LoopMode = options.Looping.Value ? AudioStreamWav.LoopModeEnum.Forward : AudioStreamWav.LoopModeEnum.Disabled;
 						int d = 1;
-						d *= AudioStreamWAV.Stereo ? 2 : 1;
-						d *= AudioStreamWAV.Format == AudioStreamWAV.FormatEnum.Format16Bits ? 2 : 1;
-						AudioStreamWAV.LoopEnd = AudioStreamWAV.Data.Length / d;
+						d *= AudioStreamWav.Stereo ? 2 : 1;
+						d *= AudioStreamWav.Format == AudioStreamWav.FormatEnum.Format16Bits ? 2 : 1;
+						AudioStreamWav.LoopEnd = AudioStreamWav.Data.Length / d;
 					}
 					else if (soundInstance.Stream is AudioStreamOggVorbis audioStreamOggVorbis)
 					{

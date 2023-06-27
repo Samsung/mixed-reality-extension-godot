@@ -791,7 +791,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			}
 			for (var i = 0; i < list.Count; i++)
 			{
-				list[i] = new Vector2(1 - list[i].x, list[i].y);
+				list[i] = new Vector2(1 - list[i].X, list[i].Y);
 			}
 			return this;
 		}
@@ -821,7 +821,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 			}
 			for (var i = 0; i < list.Count; i++)
 			{
-				list[i] = new Vector2(list[i].x, 1 - list[i].y);
+				list[i] = new Vector2(list[i].X, 1 - list[i].Y);
 			}
 			return this;
 		}
@@ -892,9 +892,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 				array[(int)ArrayMesh.ArrayType.Tangent] = Variant.CreateFrom<Plane>(tangentArray);
 			}
 			if (uv.Count > 0)
-				array[(int)ArrayMesh.ArrayType.TexUv] = Variant.CreateFrom(uv.ToArray());
+				array[(int)ArrayMesh.ArrayType.TexUV] = Variant.CreateFrom(uv.ToArray());
 			if (uv2.Count > 0)
-				array[(int)ArrayMesh.ArrayType.TexUv2] = Variant.CreateFrom(uv2.ToArray());
+				array[(int)ArrayMesh.ArrayType.TexUV2] = Variant.CreateFrom(uv2.ToArray());
 			if (colors.Count > 0)
 				array[(int)ArrayMesh.ArrayType.Color] = Variant.CreateFrom(colors.ToArray());
 			if (triangles.Count > 0)

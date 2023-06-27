@@ -60,9 +60,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <summary>
 		/// Checks if <paramref name="vector"/> is within array bounds
 		/// </summary>
-		public static bool IsInBounds<T>(this T[,] array, Vector2i vector)
+		public static bool IsInBounds<T>(this T[,] array, Vector2I vector)
 		{
-			return IsInBounds(array, vector.x, vector.y);
+			return IsInBounds(array, vector.X, vector.Y);
 		}
 
 		/// <summary>
@@ -82,10 +82,10 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <remarks>
 		/// https://en.wikipedia.org/wiki/Flood_fill
 		/// </remarks>
-		public static void FloodVisit4<T>(this T[,] array, Vector2i start, Action<int, int> visit,
+		public static void FloodVisit4<T>(this T[,] array, Vector2I start, Action<int, int> visit,
 			IEqualityComparer<T> comparer = null)
 		{
-			FloodVisit4(array, start.x, start.y, visit, comparer);
+			FloodVisit4(array, start.X, start.Y, visit, comparer);
 		}
 
 		/// <summary>
@@ -114,8 +114,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 			bool[,] processed = new bool[lengthX, lengthY];
 			T value = array[startX, startY];
 
-			var queue = new Queue<Vector2i>();
-			queue.Enqueue(new Vector2i(startX, startY));
+			var queue = new Queue<Vector2I>();
+			queue.Enqueue(new Vector2I(startX, startY));
 			processed[startX, startY] = true;
 
 			Action<int, int> process = (x, y) =>
@@ -124,7 +124,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				{
 					if (comparer.Equals(array[x, y], value))
 					{
-						queue.Enqueue(new Vector2i(x, y));
+						queue.Enqueue(new Vector2I(x, y));
 					}
 					processed[x, y] = true;
 				}
@@ -132,26 +132,26 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 			while (queue.Count > 0)
 			{
-				Vector2i cell = queue.Dequeue();
+				Vector2I cell = queue.Dequeue();
 
-				if (cell.x > 0)
+				if (cell.X > 0)
 				{
-					process(cell.x - 1, cell.y);
+					process(cell.X - 1, cell.Y);
 				}
-				if (cell.x + 1 < lengthX)
+				if (cell.X + 1 < lengthX)
 				{
-					process(cell.x + 1, cell.y);
+					process(cell.X + 1, cell.Y);
 				}
-				if (cell.y > 0)
+				if (cell.Y > 0)
 				{
-					process(cell.x, cell.y - 1);
+					process(cell.X, cell.Y - 1);
 				}
-				if (cell.y + 1 < lengthY)
+				if (cell.Y + 1 < lengthY)
 				{
-					process(cell.x, cell.y + 1);
+					process(cell.X, cell.Y + 1);
 				}
 
-				visit(cell.x, cell.y);
+				visit(cell.X, cell.Y);
 			}
 		}
 
@@ -165,10 +165,10 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <remarks>
 		/// https://en.wikipedia.org/wiki/Flood_fill
 		/// </remarks>
-		public static void FloodVisit8<T>(this T[,] array, Vector2i start, Action<int, int> visit,
+		public static void FloodVisit8<T>(this T[,] array, Vector2I start, Action<int, int> visit,
 			IEqualityComparer<T> comparer = null)
 		{
-			FloodVisit4(array, start.x, start.y, visit, comparer);
+			FloodVisit4(array, start.X, start.Y, visit, comparer);
 		}
 
 		/// <summary>
@@ -197,8 +197,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 			bool[,] processed = new bool[lengthX, lengthY];
 			T value = array[startX, startY];
 
-			var queue = new Queue<Vector2i>();
-			queue.Enqueue(new Vector2i(startX, startY));
+			var queue = new Queue<Vector2I>();
+			queue.Enqueue(new Vector2I(startX, startY));
 			processed[startX, startY] = true;
 
 			Action<int, int> process = (x, y) =>
@@ -207,7 +207,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				{
 					if (comparer.Equals(array[x, y], value))
 					{
-						queue.Enqueue(new Vector2i(x, y));
+						queue.Enqueue(new Vector2I(x, y));
 					}
 					processed[x, y] = true;
 				}
@@ -215,36 +215,36 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 			while (queue.Count > 0)
 			{
-				Vector2i cell = queue.Dequeue();
+				Vector2I cell = queue.Dequeue();
 
-				bool xGreaterThanZero = cell.x > 0;
-				bool xLessThanWidth = cell.x + 1 < lengthX;
+				bool xGreaterThanZero = cell.X > 0;
+				bool xLessThanWidth = cell.X + 1 < lengthX;
 
-				bool yGreaterThanZero = cell.y > 0;
-				bool yLessThanHeight = cell.y + 1 < lengthY;
+				bool yGreaterThanZero = cell.Y > 0;
+				bool yLessThanHeight = cell.Y + 1 < lengthY;
 
 				if (yGreaterThanZero)
 				{
-					if (xGreaterThanZero) process(cell.x - 1, cell.y - 1);
+					if (xGreaterThanZero) process(cell.X - 1, cell.Y - 1);
 
-					process(cell.x, cell.y - 1);
+					process(cell.X, cell.Y - 1);
 
-					if (xLessThanWidth) process(cell.x + 1, cell.y - 1);
+					if (xLessThanWidth) process(cell.X + 1, cell.Y - 1);
 				}
 
-				if (xGreaterThanZero) process(cell.x - 1, cell.y);
-				if (xLessThanWidth) process(cell.x + 1, cell.y);
+				if (xGreaterThanZero) process(cell.X - 1, cell.Y);
+				if (xLessThanWidth) process(cell.X + 1, cell.Y);
 
 				if (yLessThanHeight)
 				{
-					if (xGreaterThanZero) process(cell.x - 1, cell.y + 1);
+					if (xGreaterThanZero) process(cell.X - 1, cell.Y + 1);
 
-					process(cell.x, cell.y + 1);
+					process(cell.X, cell.Y + 1);
 
-					if (xLessThanWidth) process(cell.x + 1, cell.y + 1);
+					if (xLessThanWidth) process(cell.X + 1, cell.Y + 1);
 				}
 
-				visit(cell.x, cell.y);
+				visit(cell.X, cell.Y);
 			}
 		}
 
@@ -258,9 +258,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <remarks>
 		/// https://en.wikipedia.org/wiki/Von_Neumann_neighborhood
 		/// </remarks>
-		public static void Visit4<T>(this T[,] array, Vector2i center, Action<int, int> visit)
+		public static void Visit4<T>(this T[,] array, Vector2I center, Action<int, int> visit)
 		{
-			Visit4(array, center.x, center.y, visit);
+			Visit4(array, center.X, center.Y, visit);
 		}
 
 		/// <summary>
@@ -298,9 +298,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <remarks>
 		/// https://en.wikipedia.org/wiki/Von_Neumann_neighborhood
 		/// </remarks>
-		public static void Visit4Unbounded<T>(this T[,] array, Vector2i center, Action<int, int> visit)
+		public static void Visit4Unbounded<T>(this T[,] array, Vector2I center, Action<int, int> visit)
 		{
-			Visit4Unbounded(array, center.x, center.y, visit);
+			Visit4Unbounded(array, center.X, center.Y, visit);
 		}
 
 		/// <summary>
@@ -330,9 +330,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <remarks>
 		/// https://en.wikipedia.org/wiki/Moore_neighborhood
 		/// </remarks>
-		public static void Visit8<T>(this T[,] array, Vector2i center, Action<int, int> visit)
+		public static void Visit8<T>(this T[,] array, Vector2I center, Action<int, int> visit)
 		{
-			Visit8(array, center.x, center.y, visit);
+			Visit8(array, center.X, center.Y, visit);
 		}
 
 		/// <summary>
@@ -380,9 +380,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 		/// <remarks>
 		/// https://en.wikipedia.org/wiki/Moore_neighborhood
 		/// </remarks>
-		public static void Visit8Unbounded<T>(this T[,] array, Vector2i center, Action<int, int> visit)
+		public static void Visit8Unbounded<T>(this T[,] array, Vector2I center, Action<int, int> visit)
 		{
-			Visit8Unbounded(array, center.x, center.y, visit);
+			Visit8Unbounded(array, center.X, center.Y, visit);
 		}
 
 		/// <summary>

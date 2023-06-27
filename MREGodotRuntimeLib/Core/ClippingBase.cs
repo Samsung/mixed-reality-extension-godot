@@ -14,7 +14,7 @@ namespace MixedRealityExtension.Core
 		private List<GeometryInstance3D> meshInstances = new List<GeometryInstance3D>();
 		private IActor parent;
 
-		public AABB Bounds => new AABB(GlobalTransform.origin - GlobalTransform.basis.Scale / 2, GlobalTransform.basis.Scale);
+		public Aabb Bounds => new Aabb(GlobalTransform.Origin - GlobalTransform.Basis.Scale / 2, GlobalTransform.Basis.Scale);
 
 		internal void ApplyPatch(ClippingPatch patch)
 		{
@@ -29,7 +29,7 @@ namespace MixedRealityExtension.Core
 			}
 		}
 
-		protected IEnumerable<RID> ShaderMaterialRIDs()
+		protected IEnumerable<Rid> ShaderMaterialRIDs()
 		{
 			foreach (var meshInstance in meshInstances)
 			{

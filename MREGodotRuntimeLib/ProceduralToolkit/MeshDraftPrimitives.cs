@@ -283,7 +283,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				for (var i = 0; i < segments; i++)
 				{
 					Vector2 uv = Geometry.PointOnCircle2(0.5f, currentAngle) + new Vector2(0.5f, 0.5f);
-					uv.x = 1 - uv.x;
+					uv.X = 1 - uv.X;
 					fanUV[i] = uv;
 					currentAngle += segmentAngle;
 				}
@@ -341,7 +341,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				{
 					Vector2 uv = Geometry.PointOnCircle2(0.5f, currentAngle) + new Vector2(0.5f, 0.5f);
 					upperDiskUV.Add(uv);
-					uv.x = 1 - uv.x;
+					uv.X = 1 - uv.X;
 					lowerDiskUV.Add(uv);
 				}
 				currentAngle += segmentAngle;
@@ -393,7 +393,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				{
 					Vector2 uv = Geometry.PointOnCircle2(0.5f, currentAngle) + new Vector2(0.5f, 0.5f);
 					upperDiskUV.Add(uv);
-					uv.x = 1 - uv.x;
+					uv.X = 1 - uv.X;
 					lowerDiskUV.Add(uv);
 				}
 				currentAngle += segmentAngle;
@@ -427,9 +427,9 @@ namespace MixedRealityExtension.ProceduralToolkit
 			Vector3 point = normal*radius;
 			lowerVertex = point - halfHeightUp;
 			upperVertex = point + halfHeightUp;
-			lowerVertex.z *= -1;
-			upperVertex.z *= -1;
-			normal.z *= -1;
+			lowerVertex.Z *= -1;
+			upperVertex.Z *= -1;
+			normal.Z *= -1;
 
 			vertices.Add(upperVertex);
 			normals.Add(normal);
@@ -589,7 +589,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 				for (int x = 0; x <= horizontalSegments; x++)
 				{
 					Vector3 point = surfaceFunction(radius, height, currentHorizontalAngle, currentVerticalAngle);
-					point.z *= -1;
+					point.Z *= -1;
 					draft.vertices.Add(point);
 					draft.normals.Add(point.Normalized());
 					if (generateUV)
@@ -711,8 +711,8 @@ namespace MixedRealityExtension.ProceduralToolkit
 					norms[vi++].Normalized();
 
 					// mirror top-cap verts for bottom cap
-					verts[vi] = new Vector3(verts[vi - 1].x, -verts[vi - 1].y, verts[vi - 1].z);
-					norms[vi] = new Vector3(norms[vi - 1].x, -norms[vi - 1].y, norms[vi - 1].z);
+					verts[vi] = new Vector3(verts[vi - 1].X, -verts[vi - 1].Y, verts[vi - 1].Z);
+					norms[vi] = new Vector3(norms[vi - 1].X, -norms[vi - 1].Y, norms[vi - 1].Z);
 					vi++;
 
 					int top_s1r1 = vi - 2, top_s1r0 = vi - 4;

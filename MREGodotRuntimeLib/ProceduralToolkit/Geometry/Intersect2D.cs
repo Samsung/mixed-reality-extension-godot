@@ -231,14 +231,14 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 		public static bool PointSegmentCollinear(Vector2 segmentA, Vector2 segmentB, Vector2 point)
 		{
-			if (Mathf.Abs(segmentA.x - segmentB.x) < Geometry.Epsilon)
+			if (Mathf.Abs(segmentA.X - segmentB.X) < Geometry.Epsilon)
 			{
 				// Vertical
-				if (segmentA.y <= point.y && point.y <= segmentB.y)
+				if (segmentA.Y <= point.Y && point.Y <= segmentB.Y)
 				{
 					return true;
 				}
-				if (segmentA.y >= point.y && point.y >= segmentB.y)
+				if (segmentA.Y >= point.Y && point.Y >= segmentB.Y)
 				{
 					return true;
 				}
@@ -246,11 +246,11 @@ namespace MixedRealityExtension.ProceduralToolkit
 			else
 			{
 				// Not vertical
-				if (segmentA.x <= point.x && point.x <= segmentB.x)
+				if (segmentA.X <= point.X && point.X <= segmentB.X)
 				{
 					return true;
 				}
-				if (segmentA.x >= point.x && point.x >= segmentB.x)
+				if (segmentA.X >= point.X && point.X >= segmentB.X)
 				{
 					return true;
 				}

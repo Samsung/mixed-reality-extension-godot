@@ -114,14 +114,14 @@ namespace Assets.Scripts.Control
 
         public override void _Process(double delta)
         {
-            if ((ThumbTip.GlobalTransform.origin.DistanceTo(IndexTip.GlobalTransform.origin) < 0.03f) ^ isPinching)
+            if ((ThumbTip.GlobalTransform.Origin.DistanceTo(IndexTip.GlobalTransform.Origin) < 0.03f) ^ isPinching)
             {
                 IsPinching = !isPinching;
                 InputSource.IsPinching = IsPinching;
             }
 
-            InputSource.RayCastDirection = -InputSource.GlobalTransform.basis.z.Normalized();
-            InputSource.RayCastBegin = InputSource.GlobalTransform.origin - InputSource.RayCastDirection * 0.05f;
+            InputSource.RayCastDirection = -InputSource.GlobalTransform.Basis.Z.Normalized();
+            InputSource.RayCastBegin = InputSource.GlobalTransform.Origin - InputSource.RayCastDirection * 0.05f;
             InputSource.RayCastDistance = 1.55f;
         }
     }

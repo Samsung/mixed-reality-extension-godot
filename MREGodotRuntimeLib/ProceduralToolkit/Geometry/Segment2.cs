@@ -97,7 +97,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 		public static explicit operator Segment3(Segment2 segment)
 		{
-			return new Segment3(new Vector3(segment.a.x, segment.a.y, 0), new Vector3(segment.b.x, segment.b.y, 0));
+			return new Segment3(new Vector3(segment.a.X, segment.a.Y, 0), new Vector3(segment.b.X, segment.b.Y, 0));
 		}
 
 		#endregion Casting operators

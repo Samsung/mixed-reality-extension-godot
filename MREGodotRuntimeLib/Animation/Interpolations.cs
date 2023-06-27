@@ -34,10 +34,10 @@ namespace MixedRealityExtension.Animation
 							tempA = new Quaternion(A.ForceFloat("x"), A.ForceFloat("y"), A.ForceFloat("z"), A.ForceFloat("w"));
 							tempB = new Quaternion(B.ForceFloat("x"), B.ForceFloat("y"), B.ForceFloat("z"), B.ForceFloat("w"));
 							tempMix = tempA.Slerp(tempB, easedT);
-							Mix.SetOrAdd("x", tempMix.x);
-							Mix.SetOrAdd("y", tempMix.y);
-							Mix.SetOrAdd("z", tempMix.z);
-							Mix.SetOrAdd("w", tempMix.w);
+							Mix.SetOrAdd("x", tempMix.X);
+							Mix.SetOrAdd("y", tempMix.Y);
+							Mix.SetOrAdd("z", tempMix.Z);
+							Mix.SetOrAdd("w", tempMix.W);
 						}
 						// Vector3
 						else
@@ -116,10 +116,10 @@ namespace MixedRealityExtension.Animation
 								Relative.ForceFloat("w"));
 							// equivalent to applying rotations in sequence: reference, then relative
 							tempMix = tempA * tempB;
-							Result.SetOrAdd("x", tempMix.x);
-							Result.SetOrAdd("y", tempMix.y);
-							Result.SetOrAdd("z", tempMix.z);
-							Result.SetOrAdd("w", tempMix.w);
+							Result.SetOrAdd("x", tempMix.X);
+							Result.SetOrAdd("y", tempMix.Y);
+							Result.SetOrAdd("z", tempMix.Z);
+							Result.SetOrAdd("w", tempMix.W);
 						}
 						// Vector3
 						else

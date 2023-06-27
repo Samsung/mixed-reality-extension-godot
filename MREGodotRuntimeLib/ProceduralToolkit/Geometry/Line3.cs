@@ -67,12 +67,12 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 		public static explicit operator Ray2D(Line3 line)
 		{
-			return new Ray2D(new Vector2(line.origin.x, line.origin.y), new Vector2(line.direction.x, line.direction.y));
+			return new Ray2D(new Vector2(line.origin.X, line.origin.Y), new Vector2(line.direction.X, line.direction.Y));
 		}
 
 		public static explicit operator Line2(Line3 line)
 		{
-			return new Line2(new Vector2(line.origin.x, line.origin.y), new Vector2(line.direction.x, line.direction.y));
+			return new Line2(new Vector2(line.origin.X, line.origin.Y), new Vector2(line.direction.X, line.direction.Y));
 		}
 
 		#endregion Casting operators

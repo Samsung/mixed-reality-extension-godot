@@ -8,7 +8,6 @@
 [node name="MRENode" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.831082)
 script = ExtResource("1")
-LaunchType = 2
 MREURL = "ws://localhost:3901"
 SessionID = "testbed"
 AppID = "helloworld"
@@ -16,6 +15,4 @@ EphemeralAppID = "helloworld-temp"
 UserNode = NodePath("../Player")
 
 [node name="Player" parent="." instance=ExtResource("2")]
-CursorScenePath = "res://MREGodotRuntime/Scenes/RingCursor.tscn"
-RayScenePath = "res://MREGodotRuntime/Scenes/Ray.tscn"
-GamePadScenePath = "res://MREGodotRuntime/Scenes/Joystick2D.tscn"
+controller = 2

@@ -13,7 +13,7 @@ namespace MixedRealityExtension.Core
 		public override void _Process(double delta)
 		{
 			var globalTransform = GlobalTransform;
-			globalTransform.basis = globalTransform.basis.Scaled(Vector3Half);
+			globalTransform.Basis = globalTransform.Basis.Scaled(Vector3Half);
 			var affineInverse = globalTransform.AffineInverse();
 			foreach (var shaderMaterial in ShaderMaterialRIDs())
 			{

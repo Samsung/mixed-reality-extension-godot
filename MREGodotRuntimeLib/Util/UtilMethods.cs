@@ -25,15 +25,15 @@ namespace MixedRealityExtension.Util
 		///     Male,
 		///     Female
 		/// }
-		/// 
+		///
 		/// enum Sex
 		/// {
 		///     Male,
 		///     Female
 		/// }
-		/// 
+		///
 		/// var gen = Gender.Male;
-		/// 
+		///
 		/// // Result will be the string matching of Gender.Male.ToString() and Sex.Male.ToString()
 		/// Sex sex = UnityHelpers.ConvertEnum(gen);
 		/// </example>
@@ -173,9 +173,9 @@ namespace MixedRealityExtension.Util
 		internal static Godot.Vector3 TransformEulerAnglesToRadians(Godot.Vector3 eulerAngles)
 		{
 			Godot.Vector3 ret = eulerAngles;
-			ret.x = TransformEulerAngleToRadian(ret.x);
-			ret.y = TransformEulerAngleToRadian(ret.y);
-			ret.z = TransformEulerAngleToRadian(ret.z);
+			ret.X = TransformEulerAngleToRadian(ret.X);
+			ret.Y = TransformEulerAngleToRadian(ret.Y);
+			ret.Z = TransformEulerAngleToRadian(ret.Z);
 			return ret;
 		}
 	}

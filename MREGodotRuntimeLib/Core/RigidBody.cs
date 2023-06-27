@@ -165,9 +165,9 @@ namespace MixedRealityExtension.Core
 				if (patch.AngularVelocity != null && patch.AngularVelocity.IsPatched())
 				{
 					var angularVelocity =_sceneRoot.ToGlobal(AngularVelocity.ApplyPatch(patch.AngularVelocity).ToVector3());
-					angularVelocity.x = Mathf.DegToRad(angularVelocity.x);
-					angularVelocity.y = Mathf.DegToRad(angularVelocity.y);
-					angularVelocity.z = Mathf.DegToRad(angularVelocity.z);
+					angularVelocity.X = Mathf.DegToRad(angularVelocity.X);
+					angularVelocity.Y = Mathf.DegToRad(angularVelocity.Y);
+					angularVelocity.Z = Mathf.DegToRad(angularVelocity.Z);
 					_rigidbody.AngularVelocity = _rigidbody.AngularVelocity.GetPatchApplied(angularVelocity);
 				}
 			}
@@ -215,8 +215,8 @@ namespace MixedRealityExtension.Core
 
 		internal void UpdateTransform(RigidBodyTransformUpdate update)
 		{
-			Vector3 origin = _rigidbody.GlobalTransform.origin;
-			Basis basis = _rigidbody.GlobalTransform.basis;
+			Vector3 origin = _rigidbody.GlobalTransform.Origin;
+			Basis basis = _rigidbody.GlobalTransform.Basis;
 
 			if (update.Position != null)
 			{

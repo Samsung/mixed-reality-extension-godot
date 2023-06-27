@@ -64,7 +64,7 @@ namespace MixedRealityExtension.Util
 			if (position.HasValue)
 			{
 				_targetPosition = position.Value;
-				_startPosition = _spatial.GlobalTransform.origin;
+				_startPosition = _spatial.GlobalTransform.Origin;
 				_lerpingPosition = true;
 			}
 			else
@@ -75,7 +75,7 @@ namespace MixedRealityExtension.Util
 			if (rotation.HasValue)
 			{
 				_targetRotation = rotation.Value;
-				_startRotation = _spatial.GlobalTransform.basis.GetRotationQuaternion();
+				_startRotation = _spatial.GlobalTransform.Basis.GetRotationQuaternion();
 				_lerpingRotation = true;
 			}
 			else
@@ -103,7 +103,7 @@ namespace MixedRealityExtension.Util
 				_percentComplete = Mathf.Clamp((Time.GetTicksMsec() - _startTime) / _updatePeriod, 0f, 1f);
 
 				Vector3 origin = Vector3.Zero;
-				Basis basis = _spatial.GlobalTransform.basis;
+				Basis basis = _spatial.GlobalTransform.Basis;
 
 				if (_lerpingPosition)
 				{
@@ -113,7 +113,7 @@ namespace MixedRealityExtension.Util
 				if (_lerpingRotation)
 				{
 					basis = new Basis(_startRotation.Slerpni(_targetRotation, _percentComplete));
-					basis.Scale = _spatial.GlobalTransform.basis.Scale;
+					basis = basis.Scaled(_spatial.GlobalTransform.Basis.Scale / basis.Scale);
 				}
 				_spatial.GlobalTransform = new Transform3D(basis, origin);
 			}

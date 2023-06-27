@@ -83,7 +83,7 @@ namespace Assets.Scripts.User
 
 		public override void _Ready()
 		{
-			spaceState = GetWorld3d().DirectSpaceState;
+			spaceState = GetWorld3D().DirectSpaceState;
 			AddChild(Cursor);
 
 			_currentTool = ToolCache.GetOrCreateTool<TargetTool>();

@@ -99,26 +99,26 @@ namespace MixedRealityExtension.Factories
 			if (patch.EmissiveColor != null)
 			{
 				var color = material.GetShaderParameter(EmissionColorProp).AsColor();
-				color.r = patch.EmissiveColor.R ?? color.r;
-				color.g = patch.EmissiveColor.G ?? color.g;
-				color.b = patch.EmissiveColor.B ?? color.b;
-				color.a = patch.EmissiveColor.A ?? color.a;
+				color.R = patch.EmissiveColor.R ?? color.R;
+				color.G = patch.EmissiveColor.G ?? color.G;
+				color.B = patch.EmissiveColor.B ?? color.B;
+				color.A = patch.EmissiveColor.A ?? color.A;
 				material.SetShaderParameter(EmissionColorProp, color);
 			}
 
 			if (patch.EmissiveTextureOffset != null)
 			{
 				var offset = material.GetShaderParameter(Uv2OffsetProp).AsVector3();
-				offset.x = patch.EmissiveTextureOffset.X ?? offset.x;
-				offset.y = patch.EmissiveTextureOffset.Y ?? offset.y;
+				offset.X = patch.EmissiveTextureOffset.X ?? offset.X;
+				offset.Y = patch.EmissiveTextureOffset.Y ?? offset.Y;
 				material.SetShaderParameter(Uv2OffsetProp, offset);
 			}
 
 			if (patch.EmissiveTextureScale != null)
 			{
 				var scale = material.GetShaderParameter(Uv2ScaleProp).AsVector3();
-				scale.x = patch.EmissiveTextureScale.X ?? scale.x;
-				scale.y = patch.EmissiveTextureScale.Y ?? scale.y;
+				scale.X = patch.EmissiveTextureScale.X ?? scale.X;
+				scale.Y = patch.EmissiveTextureScale.Y ?? scale.Y;
 				material.SetShaderParameter(Uv2ScaleProp, scale);
 			}
 
@@ -152,11 +152,11 @@ namespace MixedRealityExtension.Factories
 			return new MaterialPatch()
 			{
 				Color = material.GetShaderParameter(AlbedoColorProp).Obj is Color albedoColor ? new ColorPatch(albedoColor) : null,
-				MainTextureId = material.GetShaderParameter(TextureAlbedoProp).Obj is Godot.Object textureAlbedo ? app.AssetManager.GetByObject(textureAlbedo)?.Id : null,
+				MainTextureId = material.GetShaderParameter(TextureAlbedoProp).Obj is Godot.GodotObject textureAlbedo ? app.AssetManager.GetByObject(textureAlbedo)?.Id : null,
 				MainTextureOffset = material.GetShaderParameter(Uv1OffsetProp).Obj is Vector3 uv1Offset ? new Vector3Patch(uv1Offset) : null,
 				MainTextureScale = material.GetShaderParameter(Uv1ScaleProp).Obj is Vector3 uv1Scale ? new Vector3Patch(uv1Scale) : null,
 				EmissiveColor = material.GetShaderParameter(EmissionColorProp).Obj is Color emissionColor ? new ColorPatch(emissionColor): null,
-				EmissiveTextureId = material.GetShaderParameter(TextureEmissionProp).Obj is Godot.Object textureEmission ? app.AssetManager.GetByObject(textureEmission)?.Id : null,
+				EmissiveTextureId = material.GetShaderParameter(TextureEmissionProp).Obj is Godot.GodotObject textureEmission ? app.AssetManager.GetByObject(textureEmission)?.Id : null,
 				EmissiveTextureOffset = material.GetShaderParameter(Uv2OffsetProp).Obj is Vector3 uv2Offset ? new Vector2Patch(ToVector2(uv2Offset)) : null,
 				EmissiveTextureScale = material.GetShaderParameter(Uv2ScaleProp).Obj is Vector3 uv2Scale ? new Vector2Patch(ToVector2(uv2Scale)) : null
 			};
@@ -164,7 +164,7 @@ namespace MixedRealityExtension.Factories
 
 		private static Vector2 ToVector2(Vector3 vec3)
 		{
-			return new Vector2(vec3.x, vec3.y);
+			return new Vector2(vec3.X, vec3.Y);
 		}
 	}
 }

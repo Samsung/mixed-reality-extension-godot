@@ -6,7 +6,7 @@ using System.Linq;
 using MixedRealityExtension.API;
 using MixedRealityExtension.Util;
 using Godot;
-using Object = Godot.Object;
+using Object = Godot.GodotObject;
 
 using ColliderGeometry = MixedRealityExtension.Core.ColliderGeometry;
 using AssetCallback = System.Action<MixedRealityExtension.Assets.AssetManager.AssetMetadata>;

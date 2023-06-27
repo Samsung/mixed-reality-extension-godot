@@ -17,7 +17,7 @@ public partial class ThumbTip : MeshInstance3D
         }
         else if (Input.IsActionJustReleased("Fire2"))
         {
-            Transform = new Transform3D(Transform.basis, new Vector3(0, 0, -0.05f));
+            Transform = new Transform3D(Transform.Basis, new Vector3(0, 0, -0.05f));
         }
     }
 }

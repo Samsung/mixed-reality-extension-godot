@@ -82,7 +82,7 @@ namespace MixedRealityExtension.Core
 					touchableBoxShape = value;
 					// Set x and y center to match the newCollider but change the position of the
 					// z axis so the plane is always in front of the object
-					SetLocalCenter(touchableBoxShape.Transform.origin + LocalForward * boxShape.Size / 2);
+					SetLocalCenter(touchableBoxShape.Transform.Origin + LocalForward * boxShape.Size / 2);
 				}
 				else
 				{
@@ -158,8 +158,8 @@ namespace MixedRealityExtension.Core
 				localPoint.Dot(LocalForward));
 
 			// Scale back to 3D space
-			planeSpacePoint = ParentActor.GlobalTransform.basis.Scale * planeSpacePoint;
-			return planeSpacePoint.z;
+			planeSpacePoint = ParentActor.GlobalTransform.Basis.Scale * planeSpacePoint;
+			return planeSpacePoint.Z;
 		}
 
 		internal void ApplyPatch(TouchablePatch patch)
