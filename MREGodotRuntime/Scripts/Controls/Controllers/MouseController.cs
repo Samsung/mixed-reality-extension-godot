@@ -35,7 +35,7 @@ namespace Assets.Scripts.Control
                 var inputSourcePosition = mainCamera.ProjectPosition(mouseMotion.Position, mainCamera.Near + 0.3f);
                 InputSource.RayCastDirection = mainCamera.ProjectRayNormal(mouseMotion.Position);
                 InputSource.RayCastBegin = mainCamera.ProjectRayOrigin(mouseMotion.Position);
-                InputSource.GlobalTransform = new Transform3D(InputSource.GlobalTransform.basis, inputSourcePosition);
+                InputSource.GlobalTransform = new Transform3D(InputSource.GlobalTransform.Basis, inputSourcePosition);
             }
             else if (inputEvent is InputEventMouseButton mouseButton && mouseButton.ButtonIndex == MouseButton.Left)
             {

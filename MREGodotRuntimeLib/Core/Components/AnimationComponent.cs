@@ -301,15 +301,15 @@ namespace MixedRealityExtension.Core.Components
 			void BuildKeyframePosition(MWAnimationKeyframe keyframe, float t)
 			{
 				float value;
-				if (LerpFloat(out value, Transform.origin.x, finalTransform.Position.X, t))
+				if (LerpFloat(out value, Transform.Origin.X, finalTransform.Position.X, t))
 				{
 					keyframe.Value.Transform.Local.Position.X = value;
 				}
-				if (LerpFloat(out value, Transform.origin.y, finalTransform.Position.Y, t))
+				if (LerpFloat(out value, Transform.Origin.Y, finalTransform.Position.Y, t))
 				{
 					keyframe.Value.Transform.Local.Position.Y = value;
 				}
-				if (LerpFloat(out value, Transform.origin.z, finalTransform.Position.Z, t))
+				if (LerpFloat(out value, Transform.Origin.Z, finalTransform.Position.Z, t))
 				{
 					keyframe.Value.Transform.Local.Position.Z = value;
 				}
@@ -318,15 +318,15 @@ namespace MixedRealityExtension.Core.Components
 			void BuildKeyframeScale(MWAnimationKeyframe keyframe, float t)
 			{
 				float value;
-				if (LerpFloat(out value, Scale.x, finalTransform.Scale.X, t))
+				if (LerpFloat(out value, Scale.X, finalTransform.Scale.X, t))
 				{
 					keyframe.Value.Transform.Local.Scale.X = value;
 				}
-				if (LerpFloat(out value, Scale.y, finalTransform.Scale.Y, t))
+				if (LerpFloat(out value, Scale.Y, finalTransform.Scale.Y, t))
 				{
 					keyframe.Value.Transform.Local.Scale.Y = value;
 				}
-				if (LerpFloat(out value, Scale.z, finalTransform.Scale.Z, t))
+				if (LerpFloat(out value, Scale.Z, finalTransform.Scale.Z, t))
 				{
 					keyframe.Value.Transform.Local.Scale.Z = value;
 				}
@@ -335,7 +335,7 @@ namespace MixedRealityExtension.Core.Components
 			void BuildKeyframeRotation(MWAnimationKeyframe keyframe, float t)
 			{
 				Quaternion value;
-				if (SlerpQuaternion(out value, new Quaternion(Rotation), finalTransform.Rotation, t))
+				if (SlerpQuaternion(out value, Quaternion.FromEuler(Rotation), finalTransform.Rotation, t))
 				{
 					keyframe.Value.Transform.Local.Rotation = new QuaternionPatch(value);
 				}
@@ -406,7 +406,7 @@ namespace MixedRealityExtension.Core.Components
 
 					if (speed.HasValue)
 					{
-						animationPlayer.PlaybackSpeed = speed.Value;
+						animationPlayer.SpeedScale = speed.Value;
 					}
 					if (time.HasValue)
 					{
@@ -477,8 +477,8 @@ namespace MixedRealityExtension.Core.Components
 				AnimationName = animationPlayer.Name,
 				State = new MWSetAnimationStateOptions
 				{
-					Time = animationPlayer.CurrentAnimationPosition,
-					Speed = animationPlayer.PlaybackSpeed,
+					Time = (float)animationPlayer.CurrentAnimationPosition,
+					Speed = animationPlayer.SpeedScale,
 					Enabled = animationPlayer.PlaybackActive
 				}
 			};
@@ -498,7 +498,7 @@ namespace MixedRealityExtension.Core.Components
 		{
 			if (animationTime < 0)
 			{
-				animationTime = animationPlayer.CurrentAnimationLength;
+				animationTime = (float)animationPlayer.CurrentAnimationLength;
 			}
 
 			animationPlayer.Seek(animationTime);

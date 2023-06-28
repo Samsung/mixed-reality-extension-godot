@@ -38,10 +38,10 @@ namespace MixedRealityExtension.Patching.Types
 
 		internal QuaternionPatch(Quaternion quaternion)
 		{
-			X = quaternion.x;
-			Y = quaternion.y;
-			Z = quaternion.z;
-			W = quaternion.w;
+			X = quaternion.X;
+			Y = quaternion.Y;
+			Z = quaternion.Z;
+			W = quaternion.W;
 		}
 
 		internal QuaternionPatch(QuaternionPatch other)

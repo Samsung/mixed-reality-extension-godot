@@ -70,9 +70,9 @@ namespace MixedRealityExtension.Patching
 
 			var patch = new Vector3Patch()
 			{
-				X = _old.X != _new.x ? (float?)_new.x : null,
-				Y = _old.Y != _new.y ? (float?)_new.y : null,
-				Z = _old.Z != _new.z ? (float?)_new.z : null
+				X = _old.X != _new.X ? (float?)_new.X : null,
+				Y = _old.Y != _new.Y ? (float?)_new.Y : null,
+				Z = _old.Z != _new.Z ? (float?)_new.Z : null
 			};
 
 			if (patch.IsPatched())
@@ -98,10 +98,10 @@ namespace MixedRealityExtension.Patching
 
 			var patch = new QuaternionPatch()
 			{
-				X = Math.Abs(_old.X - _new.x) > 0.001f ? (float?)_new.x : null,
-				Y = Math.Abs(_old.Y - _new.y) > 0.001f ? (float?)_new.y : null,
-				Z = Math.Abs(_old.Z - _new.z) > 0.001f ? (float?)_new.z : null,
-				W = Math.Abs(_old.W - _new.w) > 0.001f ? (float?)_new.w : null
+				X = Math.Abs(_old.X - _new.X) > 0.001f ? (float?)_new.X : null,
+				Y = Math.Abs(_old.Y - _new.Y) > 0.001f ? (float?)_new.Y : null,
+				Z = Math.Abs(_old.Z - _new.Z) > 0.001f ? (float?)_new.Z : null,
+				W = Math.Abs(_old.W - _new.W) > 0.001f ? (float?)_new.W : null
 			};
 
 			if (patch.IsPatched())
@@ -117,11 +117,11 @@ namespace MixedRealityExtension.Patching
 		public static TransformPatch GenerateAppTransformPatch(MWTransform _old, Node3D _new, Node3D appRoot)
 		{
 			var globalTransform = appRoot.GlobalTransform.AffineInverse() * _new.GlobalTransform;
-			var globalOrigin = globalTransform.origin;
-			globalOrigin.z *= -1;
-			var globalRotation = globalTransform.basis.GetRotationQuaternion();
-			globalRotation.x *= -1;
-			globalRotation.y *= -1;
+			var globalOrigin = globalTransform.Origin;
+			globalOrigin.Z *= -1;
+			var globalRotation = globalTransform.Basis.GetRotationQuaternion();
+			globalRotation.X *= -1;
+			globalRotation.Y *= -1;
 
 			TransformPatch transform = new TransformPatch()
 			{
@@ -134,11 +134,11 @@ namespace MixedRealityExtension.Patching
 
 		public static ScaledTransformPatch GenerateLocalTransformPatch(MWScaledTransform _old, Node3D _new)
 		{
-			var position = _new.Transform.origin;
-			position.z *= -1;
-			var rotation = _new.Transform.basis.GetRotationQuaternion();
-			rotation.x *= -1;
-			rotation.y *= -1;
+			var position = _new.Transform.Origin;
+			position.Z *= -1;
+			var rotation = _new.Transform.Basis.GetRotationQuaternion();
+			rotation.X *= -1;
+			rotation.Y *= -1;
 
 
 			ScaledTransformPatch transform = new ScaledTransformPatch()
@@ -164,10 +164,10 @@ namespace MixedRealityExtension.Patching
 
 			var patch = new ColorPatch()
 			{
-				R = _old.R != _new.r ? (float?)_new.r : null,
-				G = _old.G != _new.g ? (float?)_new.g : null,
-				B = _old.B != _new.b ? (float?)_new.b : null,
-				A = _old.A != _new.a ? (float?)_new.a : null
+				R = _old.R != _new.R ? (float?)_new.R : null,
+				G = _old.G != _new.G ? (float?)_new.G : null,
+				B = _old.B != _new.B ? (float?)_new.B : null,
+				A = _old.A != _new.A ? (float?)_new.A : null
 			};
 
 			if (patch.IsPatched())
@@ -387,21 +387,21 @@ namespace MixedRealityExtension.Patching
 
 		public static void ApplyLocalPatch(this Node3D _this, MWScaledTransform current, ScaledTransformPatch patch)
 		{
-			var localPosition = _this.Transform.origin;
-			var localRotation = _this.Transform.basis.GetRotationQuaternion();
+			var localPosition = _this.Transform.Origin;
+			var localRotation = _this.Transform.Basis.GetRotationQuaternion();
 			var localScale = _this.Scale;
 
 			if (patch.Position != null)
 			{
 				localPosition = localPosition.GetPatchApplied(current.Position.ApplyPatch(patch.Position));
-				localPosition.z *= -1;
+				localPosition.Z *= -1;
 			}
 
 			if (patch.Rotation != null)
 			{
 				localRotation = localRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
-				localRotation.x *= -1;
-				localRotation.y *= -1;
+				localRotation.X *= -1;
+				localRotation.Y *= -1;
 			}
 
 			if (patch.Scale != null)
@@ -410,35 +410,35 @@ namespace MixedRealityExtension.Patching
 			}
 
 			var basis = new Basis(localRotation);
-			basis.Scale = localScale;
+			basis = basis.Scaled(localScale / basis.Scale);
 			_this.Transform = new Transform3D(basis, localPosition);
 		}
 
 		public static void ApplyAppPatch(this Node3D _this, Node3D appRoot, MWTransform current, TransformPatch patch)
 		{
-			var globalPosition = _this.GlobalTransform.origin;
-			var globalRotation = _this.GlobalTransform.basis.GetRotationQuaternion();
-			var globalScale = _this.GlobalTransform.basis.Scale;
+			var globalPosition = _this.GlobalTransform.Origin;
+			var globalRotation = _this.GlobalTransform.Basis.GetRotationQuaternion();
+			var globalScale = _this.GlobalTransform.Basis.Scale;
 
 			if (patch.Position != null)
 			{
-				globalPosition = appRoot.ToLocal(_this.GlobalTransform.origin).GetPatchApplied(current.Position.ApplyPatch(patch.Position));
-				globalPosition.z *= -1;
+				globalPosition = appRoot.ToLocal(_this.GlobalTransform.Origin).GetPatchApplied(current.Position.ApplyPatch(patch.Position));
+				globalPosition.Z *= -1;
 				globalPosition = appRoot.ToGlobal(globalPosition);
 			}
 
 			if (patch.Rotation != null)
 			{
-				var appRotation = appRoot.GlobalTransform.basis.GetRotationQuaternion();
+				var appRotation = appRoot.GlobalTransform.Basis.GetRotationQuaternion();
 				var currAppRotation = appRotation.Inverse() * globalRotation;
 				var newAppRotation = currAppRotation.GetPatchApplied(current.Rotation.ApplyPatch(patch.Rotation));
-				newAppRotation.x *= -1;
-				newAppRotation.y *= -1;
+				newAppRotation.X *= -1;
+				newAppRotation.Y *= -1;
 				globalRotation = appRotation * newAppRotation;
 			}
 
 			var basis = new Basis(globalRotation);
-			basis.Scale = globalScale;
+			basis = basis.Scaled(globalScale / basis.Scale);
 			_this.GlobalTransform = new Transform3D(basis, globalPosition);
 		}
 
@@ -465,37 +465,37 @@ namespace MixedRealityExtension.Patching
 
 		public static Vector2 GetPatchApplied(this Vector2 _this, MWVector2 vector)
 		{
-			_this.x = _this.x.GetPatchApplied(vector.X);
-			_this.y = _this.y.GetPatchApplied(vector.Y);
+			_this.X = _this.X.GetPatchApplied(vector.X);
+			_this.Y = _this.Y.GetPatchApplied(vector.Y);
 
 			return _this;
 		}
 
 		public static Vector3 GetPatchApplied(this Vector3 _this, MWVector3 vector)
 		{
-			_this.x = _this.x.GetPatchApplied(vector.X);
-			_this.y = _this.y.GetPatchApplied(vector.Y);
-			_this.z = _this.z.GetPatchApplied(vector.Z);
+			_this.X = _this.X.GetPatchApplied(vector.X);
+			_this.Y = _this.Y.GetPatchApplied(vector.Y);
+			_this.Z = _this.Z.GetPatchApplied(vector.Z);
 
 			return _this;
 		}
 
 		public static Quaternion GetPatchApplied(this Quaternion _this, MWQuaternion quaternion)
 		{
-			_this.w = _this.w.GetPatchApplied(quaternion.W);
-			_this.x = _this.x.GetPatchApplied(quaternion.X);
-			_this.y = _this.y.GetPatchApplied(quaternion.Y);
-			_this.z = _this.z.GetPatchApplied(quaternion.Z);
+			_this.W = _this.W.GetPatchApplied(quaternion.W);
+			_this.X = _this.X.GetPatchApplied(quaternion.X);
+			_this.Y = _this.Y.GetPatchApplied(quaternion.Y);
+			_this.Z = _this.Z.GetPatchApplied(quaternion.Z);
 
 			return _this;
 		}
 
 		public static Color GetPatchApplied(this Color _this, MWColor color)
 		{
-			_this.r = _this.r.GetPatchApplied(color.R);
-			_this.g = _this.g.GetPatchApplied(color.G);
-			_this.b = _this.b.GetPatchApplied(color.B);
-			_this.a = _this.a.GetPatchApplied(color.A);
+			_this.R = _this.R.GetPatchApplied(color.R);
+			_this.G = _this.G.GetPatchApplied(color.G);
+			_this.B = _this.B.GetPatchApplied(color.B);
+			_this.A = _this.A.GetPatchApplied(color.A);
 
 			return _this;
 		}

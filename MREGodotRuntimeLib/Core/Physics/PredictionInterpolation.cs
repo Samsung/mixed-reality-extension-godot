@@ -83,8 +83,8 @@ namespace MixedRealityExtension.Core.Physics
 			PredictionTimeParameters timeInfo)
 		{
 			var collisionInfo = new CollisionSwitchInfo();
-			collisionInfo.startPosition = rb.RigidBody.GlobalTransform.origin;
-			collisionInfo.startOrientation = rb.RigidBody.GlobalTransform.basis.GetRotationQuaternion();
+			collisionInfo.startPosition = rb.RigidBody.GlobalTransform.Origin;
+			collisionInfo.startOrientation = rb.RigidBody.GlobalTransform.Basis.GetRotationQuaternion();
 			collisionInfo.rigidBodyId = rb.Id;
 			collisionInfo.isKeyframed = rb.IsKeyframed;
 			// test is this remote body is in the monitor stream or if this is grabbed & key framed then this should not be dynamic
@@ -109,22 +109,22 @@ namespace MixedRealityExtension.Core.Physics
 					float t = collisionInfo.monitorInfo.keyframedInterpolationRatio;
 					Godot.Vector3 interpolatedPos;
 					Godot.Quaternion interpolatedQuad;
-					interpolatedPos = t * keyFramedPos + (1.0f - t) * rb.RigidBody.GlobalTransform.origin;
-					interpolatedQuad = keyFramedOrientation.Slerp(rb.RigidBody.GlobalTransform.basis.GetRotationQuaternion(), t);
+					interpolatedPos = t * keyFramedPos + (1.0f - t) * rb.RigidBody.GlobalTransform.Origin;
+					interpolatedQuad = keyFramedOrientation.Slerp(rb.RigidBody.GlobalTransform.Basis.GetRotationQuaternion(), t);
 #if MRE_PHYSICS_DEBUG
 							GD.Print(" Interpolate body " + rb.Id.ToString() + " t=" + t
 								+ " time=" + Time.GetTicksMsec() * 0.001
 								+ " pos KF:" + keyFramedPos
-								+ " dyn:" + rb.RigidBody3D.Transform.origin
+								+ " dyn:" + rb.RigidBody3D.Transform.Origin
 							    + " interp pos:" + interpolatedPos
 								+ " rb vel:" + rb.RigidBody3D.LinearVelocity
 								+ " KF vel:" + rb.lastValidLinerVelocityOrPos);
 #endif
 					// apply these changes only if they are significant in order to not to bother the physics engine
 					// for settled objects
-					Godot.Vector3 posdiff = rb.RigidBody.GlobalTransform.origin - interpolatedPos;
-					Vector3 rigidBodyOrigin = rb.RigidBody.GlobalTransform.origin;
-					Basis rigidBodyBasis = rb.RigidBody.GlobalTransform.basis;
+					Godot.Vector3 posdiff = rb.RigidBody.GlobalTransform.Origin - interpolatedPos;
+					Vector3 rigidBodyOrigin = rb.RigidBody.GlobalTransform.Origin;
+					Basis rigidBodyBasis = rb.RigidBody.GlobalTransform.Basis;
 					bool originNeedUpdate = false;
 					bool basisNeedUpdate = false;
 					if (posdiff.Length() > interpolationPosEpsilon)
@@ -201,21 +201,21 @@ namespace MixedRealityExtension.Core.Physics
 							continue;
 						}
 
-						var comDist = (remoteBody.GlobalTransform.origin - rb.RigidBody.GlobalTransform.origin).Length();
+						var comDist = (remoteBody.GlobalTransform.Origin - rb.RigidBody.GlobalTransform.Origin).Length();
 
 						var remoteHitPoint = ClosestPointOnBounds(rb.RigidBody, remoteBody);
 						var ownedHitPoint = ClosestPointOnBounds(remoteBody, rb.RigidBody);
 
-						var remoteRelativeHitP = (remoteHitPoint - remoteBody.GlobalTransform.origin);
-						var ownedRelativeHitP = (ownedHitPoint - rb.RigidBody.GlobalTransform.origin);
+						var remoteRelativeHitP = (remoteHitPoint - remoteBody.GlobalTransform.Origin);
+						var ownedRelativeHitP = (ownedHitPoint - rb.RigidBody.GlobalTransform.Origin);
 
 						var radiousRemote = radiusExpansionFactor * remoteRelativeHitP.Length();
 						var radiusOwnedBody = radiusExpansionFactor * ownedRelativeHitP.Length();
 						var totalDistance = radiousRemote + radiusOwnedBody + 0.0001f; // avoid division by zero
 
 						// project the linear velocity of the body
-						var projectedOwnedBodyPos = rb.RigidBody.GlobalTransform.origin + rb.RigidBody.LinearVelocity * timeInfo.DT;
-						var projectedComDist = (remoteBody.GlobalTransform.origin - projectedOwnedBodyPos).Length();
+						var projectedOwnedBodyPos = rb.RigidBody.GlobalTransform.Origin + rb.RigidBody.LinearVelocity * timeInfo.DT;
+						var projectedComDist = (remoteBody.GlobalTransform.Origin - projectedOwnedBodyPos).Length();
 
 						var collisionMonitorInfo = remoteBodyInfo.monitorInfo;
 						float lastApproxDistance = Math.Min(comDist, projectedComDist);
@@ -341,7 +341,7 @@ namespace MixedRealityExtension.Core.Physics
 								//if (remoteBodyInfo.isKeyframed)
 								{
 									GD.Print(" remote body velocity SWITCH to collision: " + remoteBody.LinearVelocity.ToString()
-									   + "  start position:" + remoteBody.GlobalTransform.origin.ToString()
+									   + "  start position:" + remoteBody.GlobalTransform.Origin.ToString()
 									   + " linVel:" + remoteBody.LinearVelocity + " angVel:" + remoteBody.AngularVelocity);
 								}
 #endif
@@ -351,7 +351,7 @@ namespace MixedRealityExtension.Core.Physics
 #if MRE_PHYSICS_DEBUG
 								// this is a previous collision so do nothing just leave dynamic
 								GD.Print(" remote body velocity stay in collision: " + remoteBody.LinearVelocity.ToString() +
-									"  start position:" + remoteBody.GlobalTransform.origin.ToString() +
+									"  start position:" + remoteBody.GlobalTransform.Origin.ToString() +
 									" relative dist:" + collisionMonitorInfo.relativeDistance +
 									" Ratio:" + collisionMonitorInfo.keyframedInterpolationRatio );
 #endif
@@ -371,12 +371,12 @@ namespace MixedRealityExtension.Core.Physics
 
 			Vector3[] aabbPoints = new Vector3[8];
 			aabbPoints[0] = aabbPosition;
-			aabbPoints[1] = new Vector3(aabbPosition.x, aabbPosition.y, aabbEnd.z);
-			aabbPoints[2] = new Vector3(aabbEnd.x, aabbPosition.y, aabbEnd.z);
-			aabbPoints[3] = new Vector3(aabbEnd.x, aabbPosition.y, aabbPosition.z);
-			aabbPoints[4] = new Vector3(aabbPosition.x, aabbEnd.y, aabbPosition.z);
-			aabbPoints[5] = new Vector3(aabbPosition.x, aabbEnd.y, aabbEnd.z);
-			aabbPoints[6] = new Vector3(aabbEnd.x, aabbEnd.y, aabbPosition.z);
+			aabbPoints[1] = new Vector3(aabbPosition.X, aabbPosition.Y, aabbEnd.Z);
+			aabbPoints[2] = new Vector3(aabbEnd.X, aabbPosition.Y, aabbEnd.Z);
+			aabbPoints[3] = new Vector3(aabbEnd.X, aabbPosition.Y, aabbPosition.Z);
+			aabbPoints[4] = new Vector3(aabbPosition.X, aabbEnd.Y, aabbPosition.Z);
+			aabbPoints[5] = new Vector3(aabbPosition.X, aabbEnd.Y, aabbEnd.Z);
+			aabbPoints[6] = new Vector3(aabbEnd.X, aabbEnd.Y, aabbPosition.Z);
 			aabbPoints[7] = aabbEnd;
 /* AABB Points
   /|\ Y
@@ -402,8 +402,8 @@ namespace MixedRealityExtension.Core.Physics
 			};
 
 			var shortest = float.MaxValue;
-			var localPositionFrom = from.GlobalTransform.origin - to.GlobalTransform.origin;
-			Vector3 closestPoint = to.GlobalTransform.origin;
+			var localPositionFrom = from.GlobalTransform.Origin - to.GlobalTransform.Origin;
+			Vector3 closestPoint = to.GlobalTransform.Origin;
 			for (int i = 0; i < 12; i++)
 			{
 				var triangleA = aabbPoints[collisionTriangles[i, 0]];
@@ -419,8 +419,8 @@ namespace MixedRealityExtension.Core.Physics
 			}
 
 			if (shortest == float.MaxValue)
-				return to.GlobalTransform.origin;
-			return closestPoint + to.GlobalTransform.origin;
+				return to.GlobalTransform.Origin;
+			return closestPoint + to.GlobalTransform.Origin;
 		}
 
 		public void Clear()

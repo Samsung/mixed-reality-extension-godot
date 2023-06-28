@@ -48,7 +48,7 @@ namespace MixedRealityExtension.Animation
 
 		public override float Time
 		{
-			get => animationPlayer.IsPlaying() ? animationPlayer.CurrentAnimationPosition : 0.0f;
+			get => animationPlayer.IsPlaying() ? (float)animationPlayer.CurrentAnimationPosition : 0.0f;
 			protected set
 			{
 				animationPlayer.Seek(value, true);
@@ -57,10 +57,10 @@ namespace MixedRealityExtension.Animation
 
 		public override float Speed
 		{
-			get => animationPlayer.PlaybackSpeed;
+			get => animationPlayer.SpeedScale;
 			protected set
 			{
-				animationPlayer.PlaybackSpeed = value;
+				animationPlayer.SpeedScale = value;
 			}
 		}
 
@@ -152,7 +152,7 @@ namespace MixedRealityExtension.Animation
 			private void AnimationEndReached(string animationString)
 			{
 				var animation = Animation.animationPlayer.GetAnimation(animationString);
-				var time = Animation.animationPlayer.CurrentAnimationPosition;
+				float time = (float)Animation.animationPlayer.CurrentAnimationPosition;
 				if (Animation.WrapMode == MWAnimationWrapMode.Once &&
 					(Animation.Speed < 0 && time <= 0 || Animation.Speed > 0 && time == animation.Length))
 				{

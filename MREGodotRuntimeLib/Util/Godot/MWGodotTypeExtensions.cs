@@ -13,34 +13,34 @@ namespace MixedRealityExtension.Util.GodotHelper
 	{
 		public static MWVector2 FromGodotVector2(this MWVector2 _this, Vector2 other)
 		{
-			_this.X = other.x;
-			_this.Y = other.y;
+			_this.X = other.X;
+			_this.Y = other.Y;
 			return _this;
 		}
 
 		public static MWVector3 FromGodotVector3(this MWVector3 _this, Vector3 other)
 		{
-			_this.X = other.x;
-			_this.Y = other.y;
-			_this.Z = other.z;
+			_this.X = other.X;
+			_this.Y = other.Y;
+			_this.Z = other.Z;
 			return _this;
 		}
 
 		public static MWQuaternion FromGodotQuaternion(this MWQuaternion _this, Quaternion other)
 		{
-			_this.W = other.w;
-			_this.X = other.x;
-			_this.Y = other.y;
-			_this.Z = other.z;
+			_this.W = other.W;
+			_this.X = other.X;
+			_this.Y = other.Y;
+			_this.Z = other.Z;
 			return _this;
 		}
 
 		public static MWColor FromGodotColor(this MWColor _this, Color other)
 		{
-			_this.R = other.r;
-			_this.G = other.g;
-			_this.B = other.b;
-			_this.A = other.a;
+			_this.R = other.R;
+			_this.G = other.G;
+			_this.B = other.B;
+			_this.A = other.A;
 			return _this;
 		}
 
@@ -48,8 +48,8 @@ namespace MixedRealityExtension.Util.GodotHelper
 		{
 			return new MWVector2()
 			{
-				X = _this.x,
-				Y = _this.y
+				X = _this.X,
+				Y = _this.Y
 			};
 		}
 
@@ -57,9 +57,9 @@ namespace MixedRealityExtension.Util.GodotHelper
 		{
 			return new MWVector3()
 			{
-				X = _this.x,
-				Y = _this.y,
-				Z = _this.z
+				X = _this.X,
+				Y = _this.Y,
+				Z = _this.Z
 			};
 		}
 
@@ -67,10 +67,10 @@ namespace MixedRealityExtension.Util.GodotHelper
 		{
 			return new MWQuaternion()
 			{
-				W = _this.w,
-				X = _this.x,
-				Y = _this.y,
-				Z = _this.z
+				W = _this.W,
+				X = _this.X,
+				Y = _this.Y,
+				Z = _this.Z
 			};
 		}
 
@@ -91,9 +91,9 @@ namespace MixedRealityExtension.Util.GodotHelper
 				_this.Scale = new MWVector3();
 			}
 
-			_this.Position.FromGodotVector3(spatial.Transform.origin);
+			_this.Position.FromGodotVector3(spatial.Transform.Origin);
 			_this.Position.Z *= -1;
-			_this.Rotation.FromGodotQuaternion(spatial.Transform.basis.GetRotationQuaternion());
+			_this.Rotation.FromGodotQuaternion(spatial.Transform.Basis.GetRotationQuaternion());
 			_this.Rotation.X *= -1;
 			_this.Rotation.Y *= -1;
 			_this.Scale.FromGodotVector3(spatial.Scale);
@@ -112,11 +112,11 @@ namespace MixedRealityExtension.Util.GodotHelper
 			}
 
 			var globalTransform = appRoot.GlobalTransform.AffineInverse() * transform.GlobalTransform;
-			var globalOrigin = globalTransform.origin;
-			globalOrigin.z *= -1;
-			var globalRotation = globalTransform.basis.GetRotationQuaternion();
-			globalRotation.x *= -1;
-			globalRotation.y *= -1;
+			var globalOrigin = globalTransform.Origin;
+			globalOrigin.Z *= -1;
+			var globalRotation = globalTransform.Basis.GetRotationQuaternion();
+			globalRotation.X *= -1;
+			globalRotation.Y *= -1;
 
 			_this.Position.FromGodotVector3(globalOrigin);
 			_this.Rotation.FromGodotQuaternion(globalRotation);
@@ -133,8 +133,8 @@ namespace MixedRealityExtension.Util.GodotHelper
 		{
 			return new Vector2()
 			{
-				x = _this.X,
-				y = _this.Y
+				X = _this.X,
+				Y = _this.Y
 			};
 		}
 
@@ -142,9 +142,9 @@ namespace MixedRealityExtension.Util.GodotHelper
 		{
 			return new Vector3()
 			{
-				x = _this.X,
-				y = _this.Y,
-				z = _this.Z
+				X = _this.X,
+				Y = _this.Y,
+				Z = _this.Z
 			};
 		}
 
@@ -152,10 +152,10 @@ namespace MixedRealityExtension.Util.GodotHelper
 		{
 			return new Quaternion()
 			{
-				w = _this.W,
-				x = _this.X,
-				y = _this.Y,
-				z = _this.Z
+				W = _this.W,
+				X = _this.X,
+				Y = _this.Y,
+				Z = _this.Z
 			};
 		}
 
@@ -163,10 +163,10 @@ namespace MixedRealityExtension.Util.GodotHelper
 		{
 			return new Color()
 			{
-				r = _this.R,
-				g = _this.G,
-				b = _this.B,
-				a = _this.A
+				R = _this.R,
+				G = _this.G,
+				B = _this.B,
+				A = _this.A
 			};
 		}
 

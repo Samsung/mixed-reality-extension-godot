@@ -29,8 +29,8 @@ namespace MixedRealityExtension.Patching.Types
 
 		public Vector2Patch(Vector2 vector2)
 		{
-			X = vector2.x;
-			Y = vector2.y;
+			X = vector2.X;
+			Y = vector2.Y;
 		}
 
 		public Vector2Patch(Vector2Patch other)

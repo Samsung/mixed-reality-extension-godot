@@ -16,7 +16,7 @@ namespace Assets.Scripts.Tools
 		{
 			base.UpdateTool(inputSource);
 
-			if (!Godot.Object.IsInstanceValid(Target) || IsNearObject || !inputSource.PinchChaged)
+			if (!Godot.GodotObject.IsInstanceValid(Target) || IsNearObject || !inputSource.PinchChaged)
 			{
 				return;
 			}
@@ -29,7 +29,7 @@ namespace Assets.Scripts.Tools
 					var mwUser = buttonBehavior.GetMWUnityUser(inputSource.UserNode);
 					if (mwUser != null)
 					{
-						startOffset = inputSource.GlobalTransform.origin - CurrentTargetPoint;
+						startOffset = inputSource.GlobalTransform.Origin - CurrentTargetPoint;
 						buttonBehavior.Context.StartButton(mwUser, CurrentTargetPoint);
 						inputSource.Cursor.Color = new Color(1, 0, 0);
 
@@ -75,7 +75,7 @@ namespace Assets.Scripts.Tools
 				newBehavior,
 				inputSource);
 
-			if (oldTarget != null && Godot.Object.IsInstanceValid(oldTarget))
+			if (oldTarget != null && Godot.GodotObject.IsInstanceValid(oldTarget))
 			{
 				var oldBehavior = oldTarget.GetBehavior<ButtonBehavior>();
 				if (oldBehavior != null)
@@ -88,7 +88,7 @@ namespace Assets.Scripts.Tools
 				}
 			}
 
-			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget))
+			if (newTarget != null && Godot.GodotObject.IsInstanceValid(newTarget))
 			{
 				var newButtonBehavior = newBehavior as ButtonBehavior;
 				if (newButtonBehavior != null)
@@ -123,7 +123,7 @@ namespace Assets.Scripts.Tools
 		{
 			if (pressed)
 			{
-				hitPoint = inputSource.GlobalTransform.origin - startOffset;
+				hitPoint = inputSource.GlobalTransform.Origin - startOffset;
 				return Target;
 			}
 			return base.FindTarget(inputSource, out hitPoint);

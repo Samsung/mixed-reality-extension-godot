@@ -45,7 +45,7 @@ namespace MixedRealityExtension.Core
 			var name = node3D.Name;
 
 			node3D.SetScript(actorScript);
-			var newNode = GD.InstanceFromId(objId) as Actor;
+			var newNode = GodotObject.InstanceFromId(objId) as Actor;
 			newNode.Name = name;
 			newNode.SetProcess(true);
 
@@ -1183,7 +1183,7 @@ namespace MixedRealityExtension.Core
 				if (MeshId != Guid.Empty)
 				{
 					// guarantee meshInstance
-					if (meshInstance == null || !Godot.Object.IsInstanceValid(meshInstance))
+					if (meshInstance == null || !Godot.GodotObject.IsInstanceValid(meshInstance))
 					{
 						meshInstance = new MeshInstance3D();
 						Node3D.AddChild(meshInstance);
@@ -1315,16 +1315,16 @@ namespace MixedRealityExtension.Core
 				if (transformPatch.Local.Position != null)
 				{
 					var localPosition = LocalTransform.Position.ApplyPatch(transformPatch.Local.Position).ToVector3();
-					localPosition.z *= -1;
+					localPosition.Z *= -1;
 					transformUpdate.Position = parent.ToGlobal(localPosition);
 				}
 
 				if (transformPatch.Local.Rotation != null)
 				{
 					var localRotation = LocalTransform.Rotation.ApplyPatch(transformPatch.Local.Rotation).ToQuaternion();
-					localRotation.x *= -1;
-					localRotation.y *= -1;
-					transformUpdate.Rotation = parent.GlobalTransform.basis.GetRotationQuaternion() * localRotation;
+					localRotation.X *= -1;
+					localRotation.Y *= -1;
+					transformUpdate.Rotation = parent.GlobalTransform.Basis.GetRotationQuaternion() * localRotation;
 				}
 			}
 
@@ -1335,7 +1335,7 @@ namespace MixedRealityExtension.Core
 				if (transformPatch.App.Position != null)
 				{
 					// New app space position.
-					var newAppPos = appTransform.ToLocal(Transform.origin)
+					var newAppPos = appTransform.ToLocal(Transform.Origin)
 						.GetPatchApplied(AppTransform.Position.ApplyPatch(transformPatch.App.Position));
 
 					// Transform new position to world space.
@@ -1345,11 +1345,11 @@ namespace MixedRealityExtension.Core
 				if (transformPatch.App.Rotation != null)
 				{
 					// New app space rotation
-					var newAppRot = new Quaternion(TransformNode.GlobalTransform.basis.GetRotationQuaternion() * appTransform.Rotation)
+					var newAppRot = Quaternion.FromEuler(TransformNode.GlobalTransform.Basis.GetRotationQuaternion() * appTransform.Rotation)
 						.GetPatchApplied(AppTransform.Rotation.ApplyPatch(transformPatch.App.Rotation));
 
 					// Transform new app rotation to world space.
-					transformUpdate.Rotation = newAppRot * TransformNode.GlobalTransform.basis.GetRotationQuaternion();
+					transformUpdate.Rotation = newAppRot * TransformNode.GlobalTransform.Basis.GetRotationQuaternion();
 				}
 			}
 
@@ -1379,20 +1379,20 @@ namespace MixedRealityExtension.Core
 				if (transform.Position != null)
 				{
 					Vector3 appPos;
-					appPos.x = transform.Position.X;
-					appPos.y = transform.Position.Y;
-					appPos.z = -transform.Position.Z;
+					appPos.X = transform.Position.X;
+					appPos.Y = transform.Position.Y;
+					appPos.Z = -transform.Position.Z;
 					newPos = App.SceneRoot.ToGlobal(appPos);
 				}
 
 				if (transform.Rotation != null)
 				{
 					Quaternion appRot;
-					appRot.w = transform.Rotation.W;
-					appRot.x = -transform.Rotation.X;
-					appRot.y = -transform.Rotation.Y;
-					appRot.z = transform.Rotation.Z;
-					newRot = App.SceneRoot.GlobalTransform.basis.GetRotationQuaternion() * appRot;
+					appRot.W = transform.Rotation.W;
+					appRot.X = -transform.Rotation.X;
+					appRot.Y = -transform.Rotation.Y;
+					appRot.Z = transform.Rotation.Z;
+					newRot = App.SceneRoot.GlobalTransform.Basis.GetRotationQuaternion() * appRot;
 				}
 
 				// We do not pass in a value for the update period at this point.  We will be adding in lag

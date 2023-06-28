@@ -10,7 +10,7 @@ namespace Assets.Scripts.Tools
 {
 	public class PokeTool : Tool
 	{
-		RID shape = PhysicsServer3D.SphereShapeCreate();
+		Rid shape = PhysicsServer3D.SphereShapeCreate();
 		PhysicsDirectSpaceState3D spaceState;
 		PhysicsShapeQueryParameters3D shapeQueryParameters;
 
@@ -38,7 +38,7 @@ namespace Assets.Scripts.Tools
 
 		internal Node3D FindTarget(InputSource inputSource, out Vector3? hitPoint)
 		{
-			spaceState = inputSource.GetWorld3d().DirectSpaceState;
+			spaceState = inputSource.GetWorld3D().DirectSpaceState;
 			shapeQueryParameters.Transform = inputSource.GlobalTransform;
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
@@ -46,7 +46,7 @@ namespace Assets.Scripts.Tools
 
 			ITouchableBase newClosestTouchable = null;
 			var closestDistance = float.PositiveInfinity;
-			Vector3 closestNormal = -inputSource.GlobalTransform.basis.z.Normalized();
+			Vector3 closestNormal = -inputSource.GlobalTransform.Basis.Z.Normalized();
 			foreach (Dictionary intersectResult in intersectShapes)
 			{
 				var collider = (Node3D)intersectResult["collider"];
@@ -61,7 +61,7 @@ namespace Assets.Scripts.Tools
 					touchable = actor.GetChild<ITouchableBase>();
 				}
 				if (touchable == null || actor == null) continue;
-				float distance = touchable.DistanceToTouchable(inputSource.GlobalTransform.origin, out normal);
+				float distance = touchable.DistanceToTouchable(inputSource.GlobalTransform.Origin, out normal);
 
 				bool bothInside = (distance <= 0f) && (closestDistance <= 0f);
 				bool betterFit = bothInside ? Mathf.Abs(distance) < Mathf.Abs(closestDistance) : distance < closestDistance;
@@ -86,8 +86,8 @@ namespace Assets.Scripts.Tools
 			if (newClosestTouchable != null)
 			{
 				var touchableVector = closestNormal * TouchableDistance;
-				RayStartPoint = inputSource.GlobalTransform.origin + touchableVector;
-				Vector3 to = inputSource.GlobalTransform.origin - touchableVector;
+				RayStartPoint = inputSource.GlobalTransform.Origin + touchableVector;
+				Vector3 to = inputSource.GlobalTransform.Origin - touchableVector;
 				var IntersectRayResult = spaceState.IntersectRay(new PhysicsRayQueryParameters3D() {
 					From = RayStartPoint,
 					To = to,
@@ -127,7 +127,7 @@ namespace Assets.Scripts.Tools
 
 		protected override void UpdateTool(InputSource inputSource)
 		{
-			Position = inputSource.GlobalTransform.origin;
+			Position = inputSource.GlobalTransform.Origin;
 			if (CurrentPointerTarget != null && ClosestProximityTouchable != null)
 			{
 				float distToTouchable = RayStartPoint.DistanceTo(RayEndPoint) - TouchableDistance;
@@ -151,7 +151,7 @@ namespace Assets.Scripts.Tools
 				}
 			}
 
-			PreviousPosition = inputSource.GlobalTransform.origin;
+			PreviousPosition = inputSource.GlobalTransform.Origin;
 		}
 
 		public override void CleanUp() { }
@@ -220,7 +220,7 @@ namespace Assets.Scripts.Tools
 					}
 				}
 
-				inputSource.HitPoint = inputSource.GlobalTransform.origin;
+				inputSource.HitPoint = inputSource.GlobalTransform.Origin;
 				inputSource.HitPointNormal = hitPointNormal;
 			}
 		}

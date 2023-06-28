@@ -50,9 +50,9 @@ namespace MixedRealityExtension.Core
 				if (Center != null)
 				{
 					Vector3 newCenter;
-					newCenter.x = Center.X;
-					newCenter.y = Center.Y;
-					newCenter.z = Center.Z;
+					newCenter.X = Center.X;
+					newCenter.Y = Center.Y;
+					newCenter.Z = Center.Z;
 					collider.Transform = new Transform3D(Basis.Identity, newCenter);
 				}
 
@@ -89,18 +89,18 @@ namespace MixedRealityExtension.Core
 				if (Center != null)
 				{
 					Vector3 newCenter;
-					newCenter.x = Center.X;
-					newCenter.y = Center.Y;
-					newCenter.z = -Center.Z;
+					newCenter.X = Center.X;
+					newCenter.Y = Center.Y;
+					newCenter.Z = -Center.Z;
 					collider.Transform = new Transform3D(Basis.Identity, newCenter);
 				}
 
 				if (Size != null)
 				{
 					Vector3 newSize;
-					newSize.x = Size.X;
-					newSize.y = Size.Y;
-					newSize.z = Size.Z;
+					newSize.X = Size.X;
+					newSize.Y = Size.Y;
+					newSize.Z = Size.Z;
 					boxShape.Size = newSize * 0.999998f;
 				}
 			}
@@ -170,9 +170,9 @@ namespace MixedRealityExtension.Core
 				Basis basis = Basis.Identity;
 				if (Center != null)
 				{
-					newCenter.x = Center.X;
-					newCenter.y = Center.Y;
-					newCenter.z = Center.Z;
+					newCenter.X = Center.X;
+					newCenter.Y = Center.Y;
+					newCenter.Z = Center.Z;
 				}
 
 				if (Dimensions != null)
@@ -263,9 +263,9 @@ namespace MixedRealityExtension.Core
 				Basis basis = Basis.Identity;
 				if (Center != null)
 				{
-					newCenter.x = Center.X;
-					newCenter.y = Center.Y;
-					newCenter.z = Center.Z;
+					newCenter.X = Center.X;
+					newCenter.Y = Center.Y;
+					newCenter.Z = Center.Z;
 				}
 
 				if (Size != null)

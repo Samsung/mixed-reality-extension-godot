@@ -19,20 +19,20 @@ namespace Assets.Scripts.Control
 
             if (Input.IsActionPressed("move_right"))
             {
-                mainCamera.Position += mainCamera.Transform.basis.x * (float)delta * Speed;
+                mainCamera.Position += mainCamera.Transform.Basis.X * (float)delta * Speed;
             }
             else if (Input.IsActionPressed("move_left"))
             {
-                mainCamera.Position -= mainCamera.Transform.basis.x * (float)delta * Speed;
+                mainCamera.Position -= mainCamera.Transform.Basis.X * (float)delta * Speed;
             }
 
             if (Input.IsActionPressed("move_back"))
             {
-                mainCamera.Position += mainCamera.Transform.basis.z * (float)delta * Speed;
+                mainCamera.Position += mainCamera.Transform.Basis.Z * (float)delta * Speed;
             }
             else if (Input.IsActionPressed("move_forward"))
             {
-                mainCamera.Position -= mainCamera.Transform.basis.z * (float)delta * Speed;
+                mainCamera.Position -= mainCamera.Transform.Basis.Z * (float)delta * Speed;
             }
         }
     }

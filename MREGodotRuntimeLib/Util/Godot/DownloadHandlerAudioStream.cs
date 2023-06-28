@@ -172,7 +172,7 @@ namespace MixedRealityExtension.Util.GodotHelper
                         reader.ReadBytes((int)(oldPosition + chunkSize + 8 - reader.BaseStream.Position));
                     }
                 }
-                var sample = new AudioStreamWAV();
+                var sample = new AudioStreamWav();
                 bool is16 = bitForSample != 8;
                 var dstData = new byte[data.Length * (is16 ? 2 : 1)];
                 for (int i = 0; i < data.Length; i++)
@@ -191,7 +191,7 @@ namespace MixedRealityExtension.Util.GodotHelper
                     }
                 }
                 sample.Data = dstData;
-                sample.Format = bitForSample == 8 ? AudioStreamWAV.FormatEnum.Format8Bits : AudioStreamWAV.FormatEnum.Format16Bits;
+                sample.Format = bitForSample == 8 ? AudioStreamWav.FormatEnum.Format8Bits : AudioStreamWav.FormatEnum.Format16Bits;
                 sample.MixRate = sampleRate;
                 sample.Stereo = channel == 2;
 

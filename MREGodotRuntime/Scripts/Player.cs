@@ -182,10 +182,10 @@ public partial class Player : XROrigin3D
             //default height 1.6m
             MainCamera.Position = Vector3.Up * 1.6f;
 
-            GetViewport().UseXr = true;
+            GetViewport().UseXR = true;
             //vp.Keep3dLinear = (bool)GetNode("Configuration").Call("keep_3d_linear");
 
-            Engine.TargetFps = 144;
+            Engine.MaxFps = 144;
             openXRIsInitialized = ARVRInterface.IsInitialized();
             return true;
         }

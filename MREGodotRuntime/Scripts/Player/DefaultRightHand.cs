@@ -9,20 +9,20 @@ public partial class DefaultRightHand : DefaultHand
     public override void _Ready()
     {
         base._Ready();
-        handLocalOrigin = Position.z;
+        handLocalOrigin = Position.Z;
     }
 
     public override void _Process(double delta)
     {
         if (Input.IsActionPressed("hand_touch"))
         {
-            if (Position.z > handLocalOrigin - 0.05f)
-                Position -= Transform.basis.z * 0.0048f;
+            if (Position.Z > handLocalOrigin - 0.05f)
+                Position -= Transform.Basis.Z * 0.0048f;
         }
         else
         {
-            if (Position.z < handLocalOrigin)
-                Position += Transform.basis.z * 0.0048f;
+            if (Position.Z < handLocalOrigin)
+                Position += Transform.Basis.Z * 0.0048f;
         }
 
         if (Input.IsActionJustPressed("Fire1"))
@@ -38,7 +38,7 @@ public partial class DefaultRightHand : DefaultHand
 
         if (Input.IsActionPressed("shift"))
         {
-            Translate(new Vector3(mouseDelta.x * speed, -mouseDelta.y * speed, 0));
+            Translate(new Vector3(mouseDelta.X * speed, -mouseDelta.Y * speed, 0));
             mouseDelta = Vector2.Zero;
         }
     }

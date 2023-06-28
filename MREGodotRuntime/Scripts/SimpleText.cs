@@ -100,10 +100,10 @@ public partial class SimpleText : Label3D, IText
 		get {
 			var color = Modulate;
 			return new MWColor(
-				color.r,
-				color.g,
-				color.b,
-				color.a);
+				color.R,
+				color.G,
+				color.B,
+				color.A);
 		}
 		private set {
 			Modulate = new Color(

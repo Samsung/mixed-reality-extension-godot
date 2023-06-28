@@ -62,7 +62,7 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 		public static explicit operator Circle2(Circle3 circle)
 		{
-			return new Circle2(new Vector2(circle.center.x, circle.center.y), circle.radius);
+			return new Circle2(new Vector2(circle.center.X, circle.center.Y), circle.radius);
 		}
 
 		public static Circle3 operator +(Circle3 circle, Vector3 vector)

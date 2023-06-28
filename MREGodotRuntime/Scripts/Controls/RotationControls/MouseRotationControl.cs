@@ -26,8 +26,8 @@ namespace Assets.Scripts.Control
             if (!Input.IsActionPressed("shift"))
             {
                 var newRotation = mainCamera.Rotation;
-                newRotation.x -= mouseDelta.y * CameraSpeed;
-                newRotation.y -= mouseDelta.x * CameraSpeed;
+                newRotation.X -= mouseDelta.Y * CameraSpeed;
+                newRotation.Y -= mouseDelta.X * CameraSpeed;
                 mainCamera.Rotation = newRotation;
             }
             mouseDelta = Vector2.Zero;

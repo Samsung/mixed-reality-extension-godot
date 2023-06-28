@@ -28,7 +28,7 @@ namespace Assets.Scripts.Tools
 
 	public class GrabTool : Tool
 	{
-		readonly RID shape = PhysicsServer3D.SphereShapeCreate();
+		readonly Rid shape = PhysicsServer3D.SphereShapeCreate();
 		readonly PhysicsShapeQueryParameters3D shapeQueryParameters;
 		PhysicsDirectSpaceState3D spaceState;
 
@@ -57,7 +57,7 @@ namespace Assets.Scripts.Tools
 
 		public Vector3 GetNearGraspPoint(InputSource inputSource)
 		{
-			return inputSource.GlobalTransform.origin;
+			return inputSource.GlobalTransform.Origin;
 		}
 
 		internal Node3D FindTarget(InputSource inputSource, out Vector3? hitPoint)
@@ -77,13 +77,13 @@ namespace Assets.Scripts.Tools
 
 			PhysicsServer3D.ShapeSetData(shape, radius);
 			shapeQueryParameters.Transform = new Transform3D(Basis.Identity, (Vector3)hitPoint);
-			spaceState = inputSource.GetWorld3d().DirectSpaceState;
+			spaceState = inputSource.GetWorld3D().DirectSpaceState;
 			var intersectShapes = spaceState.IntersectShape(shapeQueryParameters);
 
 			var intersections = spaceState.GetRestInfo(shapeQueryParameters);
 			if (intersections.Count != 0)
 			{
-				var collider = GD.InstanceFromId((ulong)(long)intersections["collider_id"]) as Node3D;
+				var collider = GodotObject.InstanceFromId((ulong)(long)intersections["collider_id"]) as Node3D;
 
 				Node3D actor = collider;
 				TargetBehavior behavior = null;
@@ -133,7 +133,7 @@ namespace Assets.Scripts.Tools
 							}
 
 							var nearGraspPoint = GetNearGraspPoint(inputSource);
-							grabbableOffset = currentGrabbableActor.GlobalTransform.origin - nearGraspPoint;
+							grabbableOffset = currentGrabbableActor.GlobalTransform.Origin - nearGraspPoint;
 
 							if (currentGrabbableActor.HasUserSignal("pointer_down"))
 								currentGrabbableActor.EmitSignal("pointer_down", inputSource, inputSource.UserNode, nearGraspPoint);
@@ -167,12 +167,12 @@ namespace Assets.Scripts.Tools
 				else if (GrabActive)
 				{
 					var nearGraspPoint = GetNearGraspPoint(inputSource);
-					currentGrabbableActor.GlobalTransform = new Transform3D(currentGrabbableActor.GlobalTransform.basis, nearGraspPoint + grabbableOffset);
+					currentGrabbableActor.GlobalTransform = new Transform3D(currentGrabbableActor.GlobalTransform.Basis, nearGraspPoint + grabbableOffset);
 
 					if (currentGrabbableActor.HasUserSignal("pointer_dragged"))
 						currentGrabbableActor.EmitSignal("pointer_dragged", inputSource, inputSource.UserNode, nearGraspPoint);
 
-					inputSource.HitPoint = inputSource.GlobalTransform.origin;
+					inputSource.HitPoint = inputSource.GlobalTransform.Origin;
 				}
 
 			}

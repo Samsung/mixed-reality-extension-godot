@@ -68,7 +68,7 @@ namespace MixedRealityExtension.Core
 			ulong objId = area.GetInstanceId();
 
 			area.SetScript(colliderScript);
-			var newArea3D = GD.InstanceFromId(objId) as Collider;
+			var newArea3D = GodotObject.InstanceFromId(objId) as Collider;
 			newArea3D.SetProcess(true);
 			return newArea3D;
 		}
@@ -224,7 +224,7 @@ namespace MixedRealityExtension.Core
 				colliderGeo = new SphereColliderGeometry()
 				{
 					Radius = sphereCollider.Radius,
-					Center = _collider.Transform.origin.CreateMWVector3()
+					Center = _collider.Transform.Origin.CreateMWVector3()
 				};
 			}
 			else if (_collider.Shape is BoxShape3D boxCollider)
@@ -232,7 +232,7 @@ namespace MixedRealityExtension.Core
 				colliderGeo = new BoxColliderGeometry()
 				{
 					Size = (boxCollider.Size * 0.999998f).CreateMWVector3(),
-					Center = _collider.Transform.origin.CreateMWVector3()
+					Center = _collider.Transform.Origin.CreateMWVector3()
 				};
 			}
 			else if (_collider.Shape is CapsuleShape3D capsuleCollider)
@@ -256,7 +256,7 @@ namespace MixedRealityExtension.Core
 
 				colliderGeo = new CapsuleColliderGeometry()
 				{
-					Center = _collider.Transform.origin.CreateMWVector3(),
+					Center = _collider.Transform.Origin.CreateMWVector3(),
 					Size = size
 				};
 			}

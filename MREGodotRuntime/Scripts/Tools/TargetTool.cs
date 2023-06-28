@@ -42,7 +42,7 @@ namespace Assets.Scripts.Tools
 
 			Vector3? hitPoint;
 			var newTarget = FindTarget(inputSource, out hitPoint);
-			if (newTarget == null || !Godot.Object.IsInstanceValid(newTarget))
+			if (newTarget == null || !Godot.GodotObject.IsInstanceValid(newTarget))
 			{
 				return;
 			}
@@ -87,9 +87,9 @@ namespace Assets.Scripts.Tools
 			pokeTool.Update(inputSource);
 			Vector3? hitPoint;
 
-			Position = inputSource.GlobalTransform.origin;
+			Position = inputSource.GlobalTransform.Origin;
 			var newTarget = FindTarget(inputSource, out hitPoint);
-			if ((Target == null || !Godot.Object.IsInstanceValid(Target)) && (newTarget == null || !Godot.Object.IsInstanceValid(newTarget)))
+			if ((Target == null || !Godot.GodotObject.IsInstanceValid(Target)) && (newTarget == null || !Godot.GodotObject.IsInstanceValid(newTarget)))
 			{
 				return;
 			}
@@ -109,7 +109,7 @@ namespace Assets.Scripts.Tools
 			}
 
 			TargetBehavior newBehavior = null;
-			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget))
+			if (newTarget != null && Godot.GodotObject.IsInstanceValid(newTarget))
 			{
 				newBehavior = newTarget.GetBehavior<TargetBehavior>();
 
@@ -156,12 +156,12 @@ namespace Assets.Scripts.Tools
 			TargetBehavior newBehavior,
 			InputSource inputSource)
 		{
-			if (Godot.Object.IsInstanceValid(oldTarget) && pokeTool.CurrentTouchableObjectDown == oldTarget)
+			if (Godot.GodotObject.IsInstanceValid(oldTarget) && pokeTool.CurrentTouchableObjectDown == oldTarget)
 			{
 				pokeTool.OnTargetChanged(inputSource);
 			}
 
-			if (oldTarget != null && Godot.Object.IsInstanceValid(oldTarget) && !IsNearObject)
+			if (oldTarget != null && Godot.GodotObject.IsInstanceValid(oldTarget) && !IsNearObject)
 			{
 				_currentTargetBehavior.Context.EndTargeting(_currentTargetBehavior.GetMWUnityUser(inputSource.UserNode), oldTargetPoint);
 
@@ -169,7 +169,7 @@ namespace Assets.Scripts.Tools
 					oldTarget.EmitSignal("focus_exit", inputSource, inputSource.UserNode, oldTarget, newTarget);
 			}
 
-			if (newTarget != null && Godot.Object.IsInstanceValid(newTarget) && !IsNearObject)
+			if (newTarget != null && Godot.GodotObject.IsInstanceValid(newTarget) && !IsNearObject)
 			{
 				newBehavior.Context.StartTargeting(newBehavior.GetMWUnityUser(inputSource.UserNode), newTargetPoint);
 
@@ -234,13 +234,13 @@ namespace Assets.Scripts.Tools
 					}
 				}
 
-				inputSource.HitPoint = inputSource.GlobalTransform.origin - inputSource.GlobalTransform.basis.z.Normalized() * 1.5f;
-				inputSource.HitPointNormal = inputSource.GlobalTransform.basis.z;
+				inputSource.HitPoint = inputSource.GlobalTransform.Origin - inputSource.GlobalTransform.Basis.Z.Normalized() * 1.5f;
+				inputSource.HitPointNormal = inputSource.GlobalTransform.Basis.Z;
 			}
 			else
 			{
-				inputSource.HitPoint = inputSource.GlobalTransform.origin - inputSource.GlobalTransform.basis.z.Normalized() * 1.5f;
-				inputSource.HitPointNormal = inputSource.GlobalTransform.basis.z;
+				inputSource.HitPoint = inputSource.GlobalTransform.Origin - inputSource.GlobalTransform.Basis.Z.Normalized() * 1.5f;
+				inputSource.HitPointNormal = inputSource.GlobalTransform.Basis.Z;
 			}
 
 			return null;

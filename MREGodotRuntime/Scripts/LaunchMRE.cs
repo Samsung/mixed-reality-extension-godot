@@ -131,7 +131,7 @@ public partial class LaunchMRE : Node3D
 		_running = false;
 	}
 
-	private void OnInputEvent(Godot.Object camera, InputEvent inputEvent, Vector3 clickPosition, Vector3 clickNormal, int shapeIdx)
+	private void OnInputEvent(Godot.GodotObject camera, InputEvent inputEvent, Vector3 clickPosition, Vector3 clickNormal, int shapeIdx)
 	{
 		if ((inputEvent is InputEventMouseButton e) && e.IsPressed())
 		{

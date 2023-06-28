@@ -133,14 +133,14 @@ namespace MixedRealityExtension.ProceduralToolkit
 
 		public static string ToString(this Vector3 vector, string format, IFormatProvider formatProvider)
 		{
-			return string.Format("({0}, {1}, {2})", vector.x.ToString(format, formatProvider), vector.y.ToString(format, formatProvider),
-				vector.z.ToString(format, formatProvider));
+			return string.Format("({0}, {1}, {2})", vector.X.ToString(format, formatProvider), vector.Y.ToString(format, formatProvider),
+				vector.Z.ToString(format, formatProvider));
 		}
 
 		public static string ToString(this Quaternion quaternion, string format, IFormatProvider formatProvider)
 		{
-			return string.Format("({0}, {1}, {2}, {3})", quaternion.x.ToString(format, formatProvider), quaternion.y.ToString(format, formatProvider),
-				quaternion.z.ToString(format, formatProvider), quaternion.w.ToString(format, formatProvider));
+			return string.Format("({0}, {1}, {2}, {3})", quaternion.X.ToString(format, formatProvider), quaternion.Y.ToString(format, formatProvider),
+				quaternion.Z.ToString(format, formatProvider), quaternion.W.ToString(format, formatProvider));
 		}
 	}
 }

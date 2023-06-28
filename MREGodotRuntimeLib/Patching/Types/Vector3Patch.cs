@@ -33,9 +33,9 @@ namespace MixedRealityExtension.Patching.Types
 
 		public Vector3Patch(Vector3 vector3)
 		{
-			X = vector3.x;
-			Y = vector3.y;
-			Z = vector3.z;
+			X = vector3.X;
+			Y = vector3.Y;
+			Z = vector3.Z;
 		}
 
 		public Vector3Patch(Vector3Patch other)

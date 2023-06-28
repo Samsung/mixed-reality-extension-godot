@@ -98,15 +98,15 @@ namespace MixedRealityExtension.Patching.Types
 					binaryReader.ReadBytes(3);
 
 					Vector3 position = new Vector3();
-					position.x = binaryReader.ReadSingle();
-					position.y = binaryReader.ReadSingle();
-					position.z = -binaryReader.ReadSingle();
+					position.X = binaryReader.ReadSingle();
+					position.Y = binaryReader.ReadSingle();
+					position.Z = -binaryReader.ReadSingle();
 
 					Quaternion rotation = new Quaternion();
-					rotation.x = -binaryReader.ReadSingle();
-					rotation.y = -binaryReader.ReadSingle();
-					rotation.z = binaryReader.ReadSingle();
-					rotation.w = binaryReader.ReadSingle();
+					rotation.X = -binaryReader.ReadSingle();
+					rotation.Y = -binaryReader.ReadSingle();
+					rotation.Z = binaryReader.ReadSingle();
+					rotation.W = binaryReader.ReadSingle();
 
 					var rigidBodyTransform = new RigidBodyTransform()
 					{
@@ -133,13 +133,13 @@ namespace MixedRealityExtension.Patching.Types
 					blob[17] = 0;
 					blob[18] = 0;
 					blob[19] = 0;
-					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Position.x), 0, blob, 20, 4);
-					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Position.y), 0, blob, 24, 4);
-					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Position.z), 0, blob, 28, 4);
-					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Rotation.x), 0, blob, 32, 4);
-					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Rotation.y), 0, blob, 36, 4);
-					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Rotation.z), 0, blob, 40, 4);
-					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Rotation.w), 0, blob, 44, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Position.X), 0, blob, 20, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Position.Y), 0, blob, 24, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Position.Z), 0, blob, 28, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Rotation.X), 0, blob, 32, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(-transformInfo.Transform.Rotation.Y), 0, blob, 36, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Rotation.Z), 0, blob, 40, 4);
+					Buffer.BlockCopy(System.BitConverter.GetBytes(transformInfo.Transform.Rotation.W), 0, blob, 44, 4);
 					binaryWriter.Write(blob);
 				}
 

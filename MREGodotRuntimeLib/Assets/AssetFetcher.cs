@@ -9,7 +9,7 @@ using MixedRealityExtension.Util.GodotHelper;
 
 namespace MixedRealityExtension.Assets
 {
-	public static class AssetFetcher<T> where T : Godot.Object
+	public static class AssetFetcher<T> where T : Godot.GodotObject
 	{
 		public struct FetchResult
 		{
@@ -64,7 +64,7 @@ namespace MixedRealityExtension.Assets
 			{
 				MREAPI.AppsAPI.AssetCache.StoreAssets(
 					uri,
-					new Godot.Object[] { result.Asset },
+					new Godot.GodotObject[] { result.Asset },
 					result.ETag);
 			}
 
