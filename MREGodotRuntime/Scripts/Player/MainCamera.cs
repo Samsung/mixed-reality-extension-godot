@@ -7,6 +7,7 @@ public partial class MainCamera : XRCamera3D
         var ARVRInterface = XRServer.FindInterface("OpenXR");
         if (ARVRInterface?.IsInitialized() == true)
         {
+            Environment.BackgroundMode = Environment.BGMode.Color;
             //Environment = ResourceLoader.Load<Godot.Environment>(MRERuntimeScenePath.ARVREnvironment);
             GetTree().Root.TransparentBg = true;
         }
